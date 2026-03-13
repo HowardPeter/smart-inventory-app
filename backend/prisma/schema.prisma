@@ -12,3 +12,184 @@ generator client {
 datasource db {
   provider = "postgresql"
 }
+
+model UserProfile {
+  user_id    String   @id @default(uuid())
+  username   String
+  email      String
+  full_name  String
+  last_login DateTime @default(now())
+
+  stores_owned  Store[]
+  transactions  Transaction[]
+  sync_queues   SyncQueue[]
+  audit_logs    AuditLog[]
+  store_members StoreMember[]
+}
+
+model Store {
+  store_id      String   @id @default(uuid())
+  address       String
+  timezone      String
+  name          String
+  created_at    DateTime @default(now())
+  updated_at    DateTime @default(now())
+  active_status String
+  user_id       String
+
+  owner          UserProfile    @relation(fields: [user_id], references: [user_id])
+  categories     Category[]
+  products       Product[]
+  audit_logs     AuditLog[]
+  store_members  StoreMember[]
+  hided_defaults HidedDefault[]
+}
+
+model Category {
+  category_id String @id @default(uuid())
+  name        String
+  description String
+  is_default  String
+  store_id    String
+
+  store          Store          @relation(fields: [store_id], references: [store_id])
+  products       Product[]
+  hided_defaults HidedDefault[]
+}
+
+model Product {
+  product_id    String   @id @default(uuid())
+  name          String
+  image_url     String
+  created_at    DateTime @default(now())
+  updated_at    DateTime @default(now())
+  brand         String
+  active_status String
+  store_id      String
+  category_id   String
+
+  store            Store            @relation(fields: [store_id], references: [store_id])
+  category         Category         @relation(fields: [category_id], references: [category_id])
+  product_packages ProductPackage[]
+}
+
+model Transaction {
+  transaction_id String   @id @default(uuid())
+  type           String
+  created_at     DateTime @default(now())
+  note           String
+  status         String
+  total_price    Decimal  @db.Decimal(18, 2)
+  user_id        String
+
+  user                UserProfile         @relation(fields: [user_id], references: [user_id])
+  transaction_details TransactionDetail[]
+}
+
+model Unit {
+  unit_id String @id @default(uuid())
+  code    String
+  name    String
+
+  product_packages ProductPackage[]
+}
+
+model ProductPackage {
+  product_package_id String   @id @default(uuid())
+  barcode_value      String
+  display_name       String
+  import_price       Decimal  @db.Decimal(18, 2)
+  selling_price      Decimal  @db.Decimal(18, 2)
+  active_status      String
+  barcode_type       String
+  created_at         DateTime @default(now())
+  updated_at         DateTime @default(now())
+  unit_id            String
+  product_id         String
+
+  unit                Unit                @relation(fields: [unit_id], references: [unit_id])
+  product             Product             @relation(fields: [product_id], references: [product_id])
+  inventories         Inventory[]
+  transaction_details TransactionDetail[]
+}
+
+model Inventory {
+  inventory_id       String   @id @default(uuid())
+  quantity           Int
+  reorder_threshold  Int
+  last_count         Int
+  updated_at         DateTime @default(now())
+  product_package_id String
+
+  product_package ProductPackage @relation(fields: [product_package_id], references: [product_package_id])
+}
+
+model TransactionDetail {
+  quantity           Int
+  unit_price         Decimal @db.Decimal(18, 2)
+  transaction_id     String
+  product_package_id String
+
+  transaction     Transaction    @relation(fields: [transaction_id], references: [transaction_id])
+  product_package ProductPackage @relation(fields: [product_package_id], references: [product_package_id])
+
+  @@id([transaction_id, product_package_id])
+}
+
+model SyncQueue {
+  queue_id    String   @id @default(uuid())
+  created_at  DateTime @default(now())
+  queue_type  String
+  payload     Json
+  status      String
+  action_type String
+  user_id     String
+
+  user UserProfile @relation(fields: [user_id], references: [user_id])
+}
+
+model AuditLog {
+  event_id     String   @id @default(uuid())
+  action_type  String
+  entity_type  String
+  old_value    Json
+  new_value    Json
+  performed_at DateTime @default(now())
+  user_id      String
+  store_id     String
+
+  user  UserProfile @relation(fields: [user_id], references: [user_id])
+  store Store       @relation(fields: [store_id], references: [store_id])
+}
+
+model BarcodeApiCache {
+  barcode    String   @id
+  payload    Json
+  provider   String
+  fetched_at DateTime @default(now())
+  status     String
+  type       String
+}
+
+model StoreMember {
+  user_id       String
+  store_id      String
+  role          String
+  joined_at     DateTime @default(now())
+  active_status String
+
+  user  UserProfile @relation(fields: [user_id], references: [user_id])
+  store Store       @relation(fields: [store_id], references: [store_id])
+
+  @@id([user_id, store_id])
+}
+
+model HidedDefault {
+  store_id    String
+  category_id String
+
+  store    Store    @relation(fields: [store_id], references: [store_id])
+  category Category @relation(fields: [category_id], references: [category_id])
+
+  @@id([store_id, category_id])
+}
