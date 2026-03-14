@@ -18,7 +18,12 @@ class TImages {
 class OnboardingImages {
   const OnboardingImages();
 
-  final String sidePicture = 'assets/images/on_boarding/side_picture.png';
+  final String onboardingContent1 =
+      'assets/images/onboarding/onboarding-content-1.png';
+  final String onboardingContent2 =
+      'assets/images/onboarding/onboarding-content-2.png';
+  final String onboardingContent3 =
+      'assets/images/onboarding/onboarding-content-3.png';
 }
 
 class AppLogos {

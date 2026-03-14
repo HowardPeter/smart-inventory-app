@@ -1,102 +1,63 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:frontend/features/onboarding/controllers/onboarding_controller.dart';
 
-// Import tài nguyên Core
 import 'package:frontend/core/constants/image_strings.dart';
-import 'package:frontend/core/theme/app_colors.dart';
 import 'package:frontend/core/theme/app_sizes.dart';
+import 'package:frontend/features/onboarding/controllers/onboarding_controller.dart';
+import 'package:frontend/features/onboarding/layouts/onboarding_page_one_layout.dart';
+import 'package:frontend/features/onboarding/layouts/onboarding_standard_layout.dart';
+import 'package:frontend/features/onboarding/widgets/onboarding_progress_widget.dart';
 
+/// View chính điều phối luồng giới thiệu (Onboarding) qua PageView
 class OnboardingView extends GetView<OnboardingController> {
   const OnboardingView({super.key});
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: SafeArea(
-        child: Padding(
-          padding: const EdgeInsets.all(AppSizes.p24),
-          child: Column(
+      body: Stack(
+        children: [
+          // Khung chứa danh sách các trang layout giới thiệu
+          PageView(
+            controller: controller.pageController,
+            onPageChanged: controller.onPageChanged,
             children: [
-              // Nút Bỏ qua (Skip) ở góc trên phải
-              Align(
-                alignment: Alignment.topRight,
-                child: TextButton(
-                  onPressed: controller.skipPage,
-                  child: Text('Bỏ qua'),
-                ),
+              const OnboardingPageOneLayout(),
+              OnboardingStandardLayout(
+                image: TImages.onboardingImages.onboardingContent2,
+                title: 'Elevate Your Tracking\nWith Real-Time Data',
+                subtitle:
+                    'Say goodbye to manual counting. Monitor your stock, track movements, and manage orders instantly with absolute precision.',
+                progress: 0.66,
+                startingAngle: 120.0,
+                onNext: controller.onNextPressed,
+                onSkip: controller.onSkipPressed,
               ),
-
-              const Spacer(), // Đẩy phần nội dung xuống giữa
-              // 1. Hình ảnh minh họa (Chiếm khoảng 40% màn hình)
-              // Nếu chưa có hình, bạn dùng tạm Image.asset hoặc Icon bự
-              Image.asset(
-                TImages.onboardingImages.sidePicture,
-                height: Get.height * 0.4, // Cần import 'package:get/get.dart'
-                errorBuilder: (context, error, stackTrace) => const Icon(
-                  Icons.inventory_2_outlined,
-                  size: 150,
-                  color: AppColors.primary,
-                ), // Icon hiện tạm nếu chưa có hình
+              OnboardingStandardLayout(
+                image: TImages.onboardingImages.onboardingContent3,
+                title: 'Scale Your Business\nWith Smart Insights',
+                subtitle:
+                    'Make data-driven decisions effortlessly. Sync your inventory across all devices securely and watch your efficiency grow.',
+                progress: 1.0,
+                startingAngle: 240.0,
+                nextIcon: Icons.check_rounded,
+                onNext: controller.onNextPressed,
+                onSkip: controller.onSkipPressed,
               ),
-              const SizedBox(height: AppSizes.p32),
-
-              // 2. Tiêu đề (Suez One)
-              Text('Quản Lý Kho\nDễ Dàng Hơn', textAlign: TextAlign.center),
-              const SizedBox(height: AppSizes.p16),
-
-              // 3. Mô tả (Poppins)
-              Text(
-                'Kiểm soát hàng hóa, theo dõi xuất nhập tồn và quét mã vạch nhanh chóng chỉ với một chạm.',
-                textAlign: TextAlign.center,
-              ),
-
-              const Spacer(), // Đẩy nút bấm xuống đáy
-              // 4. Thanh điều hướng (Dấu chấm + Nút Tiếp tục)
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  // Dấu chấm (Dots) giả lập cho 3 trang
-                  Row(
-                    children: [
-                      _buildDot(isActive: true),
-                      const SizedBox(width: AppSizes.p8),
-                      _buildDot(isActive: false),
-                      const SizedBox(width: AppSizes.p8),
-                      _buildDot(isActive: false),
-                    ],
-                  ),
-
-                  // Nút Tiếp tục (Ăn theo style màu Cam ở app_theme)
-                  ElevatedButton(
-                    onPressed: controller.nextPage,
-                    style: ElevatedButton.styleFrom(
-                      shape: const CircleBorder(), // Biến nút thành hình tròn
-                      padding: const EdgeInsets.all(AppSizes.p16),
-                    ),
-                    child: const Icon(Icons.arrow_forward_ios, size: 20),
-                  ),
-                ],
-              ),
-              const SizedBox(height: AppSizes.p16), // Cách đáy một chút
             ],
           ),
-        ),
-      ),
-    );
-  }
 
-  // Widget vẽ dấu chấm (Dot)
-  Widget _buildDot({required bool isActive}) {
-    return AnimatedContainer(
-      duration: const Duration(milliseconds: 300),
-      height: 8,
-      width: isActive ? 24 : 8, // Chấm đang chọn sẽ dài ra
-      decoration: BoxDecoration(
-        color: isActive
-            ? AppColors.primary
-            : AppColors.primary.withOpacity(0.2),
-        borderRadius: BorderRadius.circular(AppSizes.radius8),
+          // Thanh tiến trình (indicator) nằm cố định ở góc trên
+          const SafeArea(
+            child: Padding(
+              padding: EdgeInsets.only(top: AppSizes.p16, right: AppSizes.p24),
+              child: Align(
+                alignment: Alignment.topRight,
+                child: OnboardingProgressWidget(),
+              ),
+            ),
+          ),
+        ],
       ),
     );
   }

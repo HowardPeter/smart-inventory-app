@@ -1,0 +1,25 @@
+====================================================================
+               CẤU TRÚC THƯ MỤC FRONTEND (FLUTTER & GETX)
+====================================================================
+
+lib/
+├── core/                       # Chứa các thành phần cốt lõi, dùng chung toàn app
+│   ├── constants/              # Các hằng số: image_strings.dart, api_endpoints.dart
+│   ├── network/                # Cấu hình API: api_client.dart, interceptors
+│   ├── theme/                  # UI Design System: app_colors.dart, app_sizes.dart, app_theme.dart
+│   └── utils/                  # Các hàm tiện ích: formatters, validators
+│
+├── features/                   # Chứa các tính năng (Modules) độc lập của ứng dụng
+│   ├── auth/                   # Ví dụ: Tính năng Đăng nhập / Đăng ký
+│   └── onboarding/             # Tính năng Giới thiệu ứng dụng
+│       ├── bindings/           # Khởi tạo dependencies: onboarding_binding.dart
+│       ├── controllers/        # Xử lý logic & state: onboarding_controller.dart
+│       ├── layouts/            # Cấu trúc UI dùng chung cho nhiều page: onboarding_standard_layout.dart
+│       ├── views/              # Màn hình chính (có Route): onboarding_view.dart
+│       └── widgets/            # Các component nhỏ gọn chỉ dùng trong module này: skip_button_widget.dart
+│
+├── routes/                     # Quản lý định tuyến toàn app
+│   ├── app_pages.dart          # Danh sách GetPage
+│   └── app_routes.dart         # Định nghĩa các hằng số tên route (vd: '/login')
+│
+└── main.dart                   # Entry point khởi chạy ứng dụng
