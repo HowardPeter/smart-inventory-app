@@ -7,6 +7,11 @@ class AppTranslations extends Translations {
     'en_US': {
       TTexts.appName: 'Smart Inventory',
 
+      TTexts.errorAccessRestrictedTitle: 'Access Restricted',
+      TTexts.errorAccessRestrictedSubtitle:
+          'This application is exclusively optimized for Smartphones. Please access via a mobile device or a standard desktop web browser for the full experience.',
+      TTexts.exit: 'Exit',
+
       TTexts.splashSlogan: 'Smart Inventory, Smarter Business',
       TTexts.splashVersion: 'Version',
       TTexts.splashDevelopedBy: 'Developed by Group 21',

@@ -3,17 +3,32 @@ class TImages {
   TImages._();
 
   // -- IMPORTS CLASS -- //
-
-  // Authentication Images
-  static const onboardingImages = OnboardingImages();
-
   // App Logos & General Icons
   static const appLogos = AppLogos();
+
+  // Core Images
+  static const coreImages = CoreImages();
+
+  // Onboarding Images
+  static const onboardingImages = OnboardingImages();
 }
 
 // ==========================================
 // ĐỊNH NGHĨA CÁC CLASS CON CHỨA ĐƯỜNG DẪN
 // ==========================================
+
+class AppLogos {
+  const AppLogos();
+
+  final String appLogo = 'assets/logos/app_icon.png';
+}
+
+class CoreImages {
+  const CoreImages();
+
+  final String deviceNotSupported =
+      'assets/images/core/device-not-supported.png';
+}
 
 class OnboardingImages {
   const OnboardingImages();
@@ -24,10 +39,4 @@ class OnboardingImages {
       'assets/images/onboarding/onboarding-content-2.png';
   final String onboardingContent3 =
       'assets/images/onboarding/onboarding-content-3.png';
-}
-
-class AppLogos {
-  const AppLogos();
-
-  final String appLogo = 'assets/logos/app_icon.png';
 }

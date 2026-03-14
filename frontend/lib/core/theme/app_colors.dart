@@ -17,6 +17,7 @@ class AppColors {
   // Màu chữ
   static const Color primaryText = Color(0xFF1A1C23);
   static const Color subText = Color(0xFF6C757D);
+  static const Color whiteText = Color(0xFFFFFFFF);
 
   // Màu trạng thái
   static const Color success = Color(0xFF28A745);

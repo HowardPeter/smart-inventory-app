@@ -47,6 +47,7 @@ flutter:
 
   assets:
     - assets/logos/
+    - assets/images/core/
     - assets/images/onboarding/
 
   # Fonts phải nằm lùi vào 2 space bên trong flutter:
@@ -70,7 +71,7 @@ flutter:
           weight: 400
 
 # ----------------------------------------------------
-# Cấu hình App Icon phải nằm NGOÀI CÙNG 
+# Cấu hình App Icon phải nằm NGOÀI CÙNG
 # ----------------------------------------------------
 flutter_launcher_icons:
   android: true

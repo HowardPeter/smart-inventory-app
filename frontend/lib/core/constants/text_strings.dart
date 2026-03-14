@@ -5,6 +5,13 @@ class TTexts {
   // -- Global Texts
   static const String appName = "app_name";
 
+  // -- Error / Restricted Access
+  static const String errorAccessRestrictedTitle =
+      "error_access_restricted_title";
+  static const String errorAccessRestrictedSubtitle =
+      "error_access_restricted_subtitle";
+  static const String exit = "exit";
+
   // -- Splash Screen
   static const String splashSlogan = "splash_slogan";
   static const String splashVersion = "splash_version";
