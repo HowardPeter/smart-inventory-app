@@ -151,13 +151,6 @@ export default defineConfig([
           leadingUnderscore: "allow",
         },
 
-        // Property thông thường dùng lowerCamelCase
-        {
-          selector: "property",
-          format: ["camelCase"],
-          leadingUnderscore: "allow",
-        },
-
         // Class, interface, type alias, enum dùng UpperCamelCase
         {
           selector: "typeLike",
