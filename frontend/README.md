@@ -257,15 +257,20 @@ type(scope): description
 
 ## Commit Types
 
-| Type     | Meaning                |
-| -------- | ---------------------- |
-| feat     | thêm tính năng         |
-| fix      | sửa bug                |
-| docs     | cập nhật documentation |
-| style    | format code            |
-| refactor | refactor code          |
-| test     | thêm test              |
-| chore    | maintenance            |
+### 🧾 Commit Types
+
+| Type         | Purpose                                                | Example                                   |
+| :----------- | :----------------------------------------------------- | :---------------------------------------- |
+| **feat**     | Add new features                                       | `feat(cart): add shopping cart checkout`  |
+| **fix**      | Bug fixes                                              | `fix(api): handle null response error`    |
+| **docs**     | Only change documents (README, comment code, etc.)     | `docs(readme): update installation guide` |
+| **style**    | Changing the code format (without affecting logic)     | `style(css): format with prettier`        |
+| **refactor** | Refactoring the code (no added features, no bug fixes) | `refactor(auth): simplify login logic`    |
+| **perf**     | Improved performance                                   | `perf(db): optimize query performance`    |
+| **test**     | Add or edit test cases                                 | `test(unit): add tests for user model`    |
+| **chore**    | Miscellaneous changes, optimizations, or minor tweaks  | `chore(deps): update lodash to v4.17.21`  |
+| **ci**       | Change CI/CD Configuration                             | `ci(github): add linting to workflow`     |
+| **build**    | Build-related changes (webpacks, npm scripts, etc.)    | `build(webpack): add production config`   |
 
 ---
 
@@ -388,4 +393,3 @@ All rights reserved © 2026
 Developed by **Smart Inventory Team**
 
 ---
-
