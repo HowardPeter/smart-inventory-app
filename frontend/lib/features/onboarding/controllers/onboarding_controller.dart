@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:frontend/routes/app_routes.dart';
 import 'package:get/get.dart';
 
 class OnboardingController extends GetxController {
@@ -30,14 +31,12 @@ class OnboardingController extends GetxController {
         curve: Curves.easeInOut, // Luôn có dấu phẩy đuôi ở thuộc tính cuối
       );
     } else {
-      // TODO: Mở khóa code chuyển sang màn hình Login khi đã setup Route
-      // Get.offAllNamed(AppRoutes.login);
+      Get.offAllNamed(AppRoutes.login);
     }
   }
 
   /// Xử lý bỏ qua Onboarding, tiến thẳng vào app
   void onSkipPressed() {
-    // TODO: Mở khóa code chuyển thẳng sang màn hình Login
-    // Get.offAllNamed(AppRoutes.login);
+    Get.offAllNamed(AppRoutes.login);
   }
 }
