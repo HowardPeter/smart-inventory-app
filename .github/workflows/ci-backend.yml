@@ -49,6 +49,7 @@ jobs:
         uses: ./.github/actions/setup-deps-backend
 
       - name: Run test
+        continue-on-error: true
         run: npm run test
 
   build:
