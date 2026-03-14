@@ -79,57 +79,39 @@ Frontend được phát triển bằng **Flutter** với kiến trúc **Feature-
 
 ```
 lib/
+├── core/                           # Thành phần cốt lõi, dùng chung toàn app
+│   ├── constants/                  # Hằng số hệ thống
+│   │   ├── dimension.dart          # Breakpoints (600, 1440)
+│   │   ├── image_strings.dart      # Đường dẫn assets/images
+│   │   ├── text_strings.dart       # Keys cho Localization (TTexts)
+│   │   └── api_endpoints.dart      # URL API
+│   ├── layouts/                    # CẤU TRÚC (Engine) điều phối Responsive
+│   │   ├── t_responsive_layout.dart # Bộ lọc Mobile/Tablet/Web
+│   │   └── t_size_error_layout.dart # Màn hình chặn thiết bị không hỗ trợ
+│   ├── localization/               # Đa ngôn ngữ (AppTranslations)
+│   ├── network/                    # Cấu hình API Client
+│   ├── theme/                      # UI Design System (Colors, Sizes, Theme)
+│   ├── utils/                      # Hàm tiện ích (Formatters, Validators)
+│   └── widgets/                    # Các thành phần UI nguyên tử (Atomic Components)
+│       ├── buttons/                # TPrimaryButton, TBackButton
+│       └── t_image_widget.dart     # Widget hiển thị ảnh dùng chung
 │
-├── core/                               # ⚙️ Thành phần core dùng chung toàn app
-│   │
-│   ├── constants/                      # Hằng số toàn hệ thống
-│   │     ├── api_constants.dart
-│   │     ├── image_constants.dart
-│   │
-│   ├── network/                        # Cấu hình API
-│   │     ├── api_client.dart
-│   │     └── interceptors.dart
-│   │
-│   ├── theme/                          # Design system
-│   │     ├── app_colors.dart
-│   │     ├── app_sizes.dart
-│   │     └── app_text_styles.dart
-│   │
-│   ├── widgets/                        # Widget tái sử dụng toàn app
-│   │     ├── t_button.dart
-│   │     └── t_text_field.dart
-│   │
-│   └── utils/                          # Helper functions
-│         ├── validators.dart
-│         └── formatter.dart
+├── features/                       # Các tính năng (Modules) độc lập
+│   └── onboarding/                 # Ví dụ: Module Giới thiệu
+│       ├── bindings/               # Khởi tạo Dependencies
+│       ├── controllers/            # Logic & State (GetxController)
+│       ├── layouts/                # GIAO DIỆN (Content) chi tiết từng trang slide
+│       │   ├── onboarding_page_one_layout.dart # Trang 1 (Ảnh lẹm phải)
+│       │   └── onboarding_standard_layout.dart # Trang chuẩn (Ảnh Aura)
+│       ├── views/                  # Điều phối màn hình chính
+│       │   ├── onboarding_view.dart # Entry Point (Gọi TResponsiveLayout)
+│       │   └── platform/           # Phân tách View theo nền tảng
+│       │       ├── onboarding_mobile_view.dart  # View chính trên Mobile
+│       │       └── onboarding_desktop_view.dart # View chính trên Desktop
+│       └── widgets/                # Widget đặc thù chỉ dùng cho module này
 │
-│
-├── features/                           # ✨ Các module chức năng
-│
-│   ├── auth/                           # Module Authentication
-│   │     ├── bindings/
-│   │     ├── controllers/
-│   │     ├── views/
-│   │     └── widgets/
-│
-│   ├── inventory/                      # Module quản lý kho
-│   │     ├── bindings/
-│   │     ├── controllers/
-│   │     ├── views/
-│   │     └── widgets/
-│
-│   ├── product/                        # Module quản lý sản phẩm
-│   │     ├── bindings/
-│   │     ├── controllers/
-│   │     ├── views/
-│   │     └── widgets/
-│
-│
-├── routes/                             # 🛣️ Quản lý routing
-│   ├── app_pages.dart
-│   └── app_routes.dart
-│
-└── main.dart                           # 🚀 Entry point
+├── routes/                         # Quản lý định tuyến (AppPages, AppRoutes)
+└── main.dart                       # Điểm khởi chạy ứng dụng
 ```
 
 ---
