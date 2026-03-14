@@ -4,9 +4,11 @@
   "description": "",
   "main": "dist/server.js",
   "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
     "dev": "tsx watch src/server.ts",
     "start": "node dist/server.js",
-    "build": "tsc --build",
+    "prisma:generate": "prisma generate",
+    "build": "npm run prisma:generate && tsc -p tsconfig.json",
     "lint": "eslint .",
     "lint:fix": "eslint . --fix",
     "format": "prettier . --write",

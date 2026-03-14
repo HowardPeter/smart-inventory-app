@@ -1,0 +1,76 @@
+name: CI workflow for backend
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - 'backend/**'
+  pull_request:
+    branches:
+      - main
+    paths:
+      - 'backend/**'
+  workflow_dispatch:
+
+jobs:
+  lint:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        shell: bash
+        working-directory: ./backend
+    steps:
+      - name: Get code
+        uses: actions/checkout@v4
+
+      - name: Setup dependencies
+        id: deps
+        uses: ./.github/actions/setup-deps-backend
+      
+      - name: Output cache information
+        run: echo "Cache hit? ${{ steps.deps.outputs.cache-hit }}"
+
+      - name: Lint code
+        run: npm run lint
+
+  test:
+    needs: lint
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        shell: bash
+        working-directory: ./backend
+    steps:
+      - name: Get code
+        uses: actions/checkout@v4
+
+      - name: Setup dependencies
+        uses: ./.github/actions/setup-deps-backend
+
+      - name: Run test
+        continue-on-error: true
+        run: npm run test
+
+  build:
+    needs: test
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        shell: bash
+        working-directory: ./backend
+    steps:
+      - name: Get code
+        uses: actions/checkout@v4
+
+      - name: Setup dependencies
+        uses: ./.github/actions/setup-deps-backend
+
+      - name: Run build
+        run: npm run build
+
+      - name: Upload artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: dist-files
+          path: backend/dist
