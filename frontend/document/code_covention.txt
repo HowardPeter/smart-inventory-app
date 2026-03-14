@@ -28,6 +28,8 @@ II. CONTROLLER CONVENTION (Xử lý Logic & State)
 2. Quản lý State (GetX):
    - Ưu tiên dùng biến `.obs` (Reactive) cho hầu hết các update UI[cite: 746].
    - Biến danh sách (List) nên đặt tên số nhiều (ví dụ: RxList<ProductModel> products)[cite: 635, 637].
+   - Các View phức tạp cần chia thư mục platform/ để chứa giao diện riêng cho Mobile/Desktop (ví dụ: login_mobile_view.dart).
+   - View chính chỉ đóng vai trò điều phối Responsive (Orchestrator)
 3. Thứ tự khai báo trong Controller (Order of members):
    Giữ code sạch bằng cách khai báo đúng thứ tự sau[cite: 642]:
    1. Static/Const variables (Hằng số dùng chung) [cite: 643]
