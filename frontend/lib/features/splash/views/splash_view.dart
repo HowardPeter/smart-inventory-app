@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:frontend/core/widgets/t_image_widget.dart.dart';
+import 'package:frontend/core/constants/text_strings.dart';
+import 'package:frontend/core/widgets/t_image_widget.dart';
 import 'package:get/get.dart';
 
 import 'package:frontend/core/constants/image_strings.dart';
@@ -27,7 +28,7 @@ class SplashView extends GetView<SplashController> {
                 const SizedBox(height: AppSizes.p16),
 
                 Text(
-                  'Smart Inventory, Smarter Business',
+                  TTexts.splashSlogan.tr,
                   style: TextStyle(
                     fontFamily: 'Poppins',
                     fontSize: 14,

@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:frontend/core/constants/text_strings.dart';
 
 import 'package:frontend/core/theme/app_colors.dart';
 import 'package:frontend/core/theme/app_sizes.dart';
+import 'package:get/get.dart';
 
 /// Widget nút 'Skip' cho phép bỏ qua các màn hình giới thiệu
 class OnboardingSkipButtonWidget extends StatelessWidget {
@@ -20,8 +22,8 @@ class OnboardingSkipButtonWidget extends StatelessWidget {
           vertical: AppSizes.p8,
         ),
       ),
-      child: const Text(
-        'Skip',
+      child: Text(
+        TTexts.onboardingSkip.tr,
         style: TextStyle(
           fontFamily: 'Poppins',
           fontSize: 16,

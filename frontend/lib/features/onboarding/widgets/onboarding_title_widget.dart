@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:frontend/core/constants/text_strings.dart';
 
 import 'package:frontend/core/theme/app_colors.dart';
+import 'package:get/get.dart';
 
 /// Widget hiển thị tiêu đề Onboarding với chữ 'S' được cách điệu
 class OnboardingTitleWidget extends StatelessWidget {
@@ -9,7 +11,7 @@ class OnboardingTitleWidget extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return RichText(
-      text: const TextSpan(
+      text: TextSpan(
         style: TextStyle(
           fontFamily: 'Poppins',
           fontSize: 42,
@@ -18,15 +20,15 @@ class OnboardingTitleWidget extends StatelessWidget {
         ),
         children: [
           TextSpan(
-            text: 'Empower\n',
+            text: TTexts.onboardingTitle1Part1.tr,
             style: TextStyle(fontWeight: FontWeight.w500),
           ),
           TextSpan(
-            text: 'Your\n',
+            text: TTexts.onboardingTitle1Part2.tr,
             style: TextStyle(fontWeight: FontWeight.w400),
           ),
           TextSpan(
-            text: 'S',
+            text: TTexts.onboardingTitle1Part3.tr,
             style: TextStyle(
               color: AppColors.primary,
               fontFamily: 'SuezOne',
@@ -34,12 +36,8 @@ class OnboardingTitleWidget extends StatelessWidget {
             ),
           ),
           TextSpan(
-            text: 'torage\n',
+            text: TTexts.onboardingTitle1Part4.tr,
             style: TextStyle(fontWeight: FontWeight.w400),
-          ),
-          TextSpan(
-            text: 'Management',
-            style: TextStyle(fontWeight: FontWeight.w500),
           ),
         ],
       ),

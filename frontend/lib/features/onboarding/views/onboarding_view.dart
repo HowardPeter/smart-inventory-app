@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:frontend/core/constants/text_strings.dart';
 import 'package:get/get.dart';
 
 import 'package:frontend/core/constants/image_strings.dart';
@@ -25,9 +26,8 @@ class OnboardingView extends GetView<OnboardingController> {
               const OnboardingPageOneLayout(),
               OnboardingStandardLayout(
                 image: TImages.onboardingImages.onboardingContent2,
-                title: 'Elevate Your Tracking\nWith Real-Time Data',
-                subtitle:
-                    'Say goodbye to manual counting. Monitor your stock, track movements, and manage orders instantly with absolute precision.',
+                title: TTexts.onboardingTitle2.tr,
+                subtitle: TTexts.onboardingSubtitle2.tr,
                 progress: 0.66,
                 startingAngle: 120.0,
                 onNext: controller.onNextPressed,
@@ -35,9 +35,8 @@ class OnboardingView extends GetView<OnboardingController> {
               ),
               OnboardingStandardLayout(
                 image: TImages.onboardingImages.onboardingContent3,
-                title: 'Scale Your Business\nWith Smart Insights',
-                subtitle:
-                    'Make data-driven decisions effortlessly. Sync your inventory across all devices securely and watch your efficiency grow.',
+                title: TTexts.onboardingTitle3.tr,
+                subtitle: TTexts.onboardingSubtitle3.tr,
                 progress: 1.0,
                 startingAngle: 240.0,
                 nextIcon: Icons.check_rounded,

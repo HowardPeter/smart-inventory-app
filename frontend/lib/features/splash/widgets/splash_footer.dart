@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:frontend/core/constants/text_strings.dart';
 import 'package:frontend/core/theme/app_colors.dart';
 import 'package:frontend/core/theme/app_sizes.dart';
+import 'package:get/get.dart';
 
 class SplashFooter extends StatelessWidget {
   const SplashFooter({super.key});
@@ -14,7 +16,7 @@ class SplashFooter extends StatelessWidget {
       child: Column(
         children: [
           Text(
-            'Version 1.0.0', // [cite: 16]
+            '${TTexts.splashVersion.tr} 1.0.0',
             style: TextStyle(
               color: AppColors.primaryText.withOpacity(0.3),
               fontSize: 12,
@@ -22,7 +24,7 @@ class SplashFooter extends StatelessWidget {
           ),
           const SizedBox(height: 4),
           Text(
-            'Developed by Group 21', // [cite: 6]
+            TTexts.loginTitle.tr,
             style: TextStyle(
               color: AppColors.primaryText.withOpacity(0.5),
               fontWeight: FontWeight.w500,
