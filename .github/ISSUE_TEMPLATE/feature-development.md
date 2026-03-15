@@ -33,16 +33,12 @@ Brief description of the use case.
 - [ ] Implement service logic
 - [ ] Validate request data
 - [ ] Handle error cases
+- [ ] Update Prisma schema (if needed)
 
 ### Frontend
 - [ ] Create UI component/screen
 - [ ] Connect API
 - [ ] Handle loading and error states
-
-### Database
-- [ ] Create / update schema
-- [ ] Write migration
-- [ ] Update ORM model (Prisma)
 
 ### Test
 - [ ] API manual test
