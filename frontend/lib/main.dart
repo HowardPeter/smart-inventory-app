@@ -1,5 +1,7 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:frontend/core/localization/app_translations.dart';
+import 'package:frontend/routes/app_pages.dart';
 import 'package:get/get.dart';
 import 'package:device_preview/device_preview.dart';
 import 'core/theme/app_theme.dart';
@@ -35,31 +37,23 @@ class App extends StatelessWidget {
       debugShowCheckedModeBanner: false,
 
       // 1. Cấu hình Device Preview kết hợp với GetX
-      // Hai dòng này bắt buộc phải có để Device Preview giả lập được màn hình điện thoại
-      locale: DevicePreview.locale(context),
       builder: DevicePreview.appBuilder,
 
       // 2. Cấu hình Theme (Chỉ dùng Light Theme nguyên bản)
       theme: AppTheme.lightTheme,
       themeMode: ThemeMode.light, // Ép app luôn chạy ở chế độ Sáng
-      // 3. Cấu hình Định tuyến (Routing)
-      // Tạm thời comment lại nếu bạn chưa viết file app_pages.dart
-      // initialRoute: AppRoutes.login,
-      // getPages: AppPages.routes,
+      // 3. Khai báo bộ dịch
+      translations: AppTranslations(),
 
-      // 4. Quản lý bộ nhớ của GetX (Giữ nguyên factory để tránh lỗi trùng lặp controller)
+      // 4. Ngôn ngữ mặc định khi mở app
+      locale: const Locale('en', 'US'),
+
+      // 5. Cấu hình Định tuyến (Routing)
+      initialRoute: AppPages.initial,
+      getPages: AppPages.routes,
+
+      // 6. Quản lý bộ nhớ của GetX (Giữ nguyên factory để tránh lỗi trùng lặp controller)
       smartManagement: SmartManagement.keepFactory,
-
-      // Màn hình tạm thời để test xem app đã chạy lên được chưa
-      home: Scaffold(
-        appBar: AppBar(title: const Text('Smart Inventory')),
-        body: Center(
-          child: ElevatedButton(
-            onPressed: () {},
-            child: const Text('Bắt đầu dự án'),
-          ),
-        ),
-      ),
     );
   }
 }
