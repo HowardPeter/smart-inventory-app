@@ -1,5 +1,7 @@
-import 'package:frontend/features/auth/bindings/auth_binding.dart';
+import 'package:frontend/features/auth/bindings/login_binding.dart';
 import 'package:frontend/features/auth/views/login_view.dart';
+import 'package:frontend/features/home/bindings/home_binding.dart';
+import 'package:frontend/features/home/views/home_view.dart';
 import 'package:frontend/features/onboarding/bindings/onboarding_binding.dart';
 import 'package:get/get.dart';
 
@@ -33,8 +35,14 @@ class AppPages {
     GetPage(
       name: AppRoutes.login,
       page: () => const LoginView(),
-      binding: AuthBinding(),
+      binding: LoginBinding(),
       transition: Transition.fadeIn,
+    ),
+
+    GetPage(
+      name: AppRoutes.home,
+      page: () => const HomeView(),
+      binding: HomeBinding(), // Tiêm vũ khí cho Home
     ),
   ];
 }

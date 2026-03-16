@@ -11,6 +11,9 @@ class TImages {
 
   // Onboarding Images
   static const onboardingImages = OnboardingImages();
+
+  // Auth Images
+  static const authImages = AuthImages();
 }
 
 // ==========================================
@@ -21,6 +24,12 @@ class AppLogos {
   const AppLogos();
 
   final String appLogo = 'assets/logos/app_icon.png';
+
+  final String appLogoWhite = 'assets/logos/app_icon_white.png';
+
+  final String appLogoWhiteCS = 'assets/logos/app_icon_white_cs.png';
+
+  final String googleLogo = 'assets/logos/google_logo.png';
 }
 
 class CoreImages {
@@ -39,4 +48,10 @@ class OnboardingImages {
       'assets/images/onboarding/onboarding-content-2.png';
   final String onboardingContent3 =
       'assets/images/onboarding/onboarding-content-3.png';
+}
+
+class AuthImages {
+  const AuthImages();
+
+  final String authBackground = 'assets/images/auth/auth_background.png';
 }

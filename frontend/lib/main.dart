@@ -1,9 +1,12 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:frontend/core/bindings/initial_binding.dart';
 import 'package:frontend/core/localization/app_translations.dart';
+import 'package:frontend/core/services/auth_service.dart';
 import 'package:frontend/routes/app_pages.dart';
 import 'package:get/get.dart';
 import 'package:device_preview/device_preview.dart';
+import 'package:get_storage/get_storage.dart';
 import 'core/theme/app_theme.dart';
 // import 'core/network/api_client.dart'; // Sau này mở ra để inject ApiClient
 
@@ -14,6 +17,12 @@ void main() async {
   // ---------------------------------------------------------
   // KHỞI TẠO CÁC DỊCH VỤ TOÀN CẦU (GLOBAL SERVICES) Ở ĐÂY
   // Ví dụ: Get.put(ApiClient());
+
+  // 1. Khởi tạo GetStorage
+  await GetStorage.init();
+  // 2. Khởi tạo AuthService một cách bất đồng bộ
+  // Việc dùng putAsync giúp App chờ AuthService check ổ cứng xong mới chạy tiếp
+  await Get.putAsync(() => AuthService().init());
   // ---------------------------------------------------------
 
   runApp(
@@ -48,11 +57,14 @@ class App extends StatelessWidget {
       // 4. Ngôn ngữ mặc định khi mở app
       locale: const Locale('en', 'US'),
 
-      // 5. Cấu hình Định tuyến (Routing)
+      // 5. Khai báo danh sách binding toàn cục
+      initialBinding: InitialBinding(),
+
+      // 6. Cấu hình Định tuyến (Routing)
       initialRoute: AppPages.initial,
       getPages: AppPages.routes,
 
-      // 6. Quản lý bộ nhớ của GetX (Giữ nguyên factory để tránh lỗi trùng lặp controller)
+      // 7. Quản lý bộ nhớ của GetX (Giữ nguyên factory để tránh lỗi trùng lặp controller)
       smartManagement: SmartManagement.keepFactory,
     );
   }

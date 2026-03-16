@@ -16,7 +16,6 @@ class AppTheme {
       primary: AppColors.primary, // Cam đậm
       secondary: AppColors.secondPrimary, // Cam nhạt
       surface: AppColors.surface, // Màu nền card (xám nhạt)
-      error: AppColors.failed, // Màu đỏ báo lỗi
       onPrimary: Colors.white, // Chữ màu trắng khi nằm trên nền Cam
       onSurface: AppColors.primaryText, // Chữ đen khi nằm trên nền xám
     ),

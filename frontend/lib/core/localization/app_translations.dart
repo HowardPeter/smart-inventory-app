@@ -6,6 +6,7 @@ class AppTranslations extends Translations {
   Map<String, Map<String, String>> get keys => {
     'en_US': {
       TTexts.appName: 'Smart Inventory',
+      TTexts.group21: "Group 21",
 
       TTexts.errorAccessRestrictedTitle: 'Access Restricted',
       TTexts.errorAccessRestrictedSubtitle:
@@ -30,9 +31,49 @@ class AppTranslations extends Translations {
       TTexts.onboardingSubtitle3:
           'Make data-driven decisions effortlessly. Sync your inventory across all devices securely and watch your efficiency grow.',
 
-      TTexts.loginTitle: 'Welcome Back',
-      TTexts.loginSubTitle: 'Sign in to manage your inventory',
-      TTexts.loginBtnSignIn: 'Sign In',
+      // Auth
+      TTexts.authOrDivider: "Or",
+
+      // Login
+      TTexts.loginWelcomeTitle: 'Welcome Back',
+      TTexts.loginWelcomeSubtitle:
+          'Enter your details to proceed or create a new account.',
+      TTexts.loginTab: 'Log In',
+      TTexts.signupTab: 'Sign Up',
+      TTexts.emailLabel: 'Email',
+      TTexts.emailHint: 'johndoe@gmail.com',
+      TTexts.passwordLabel: 'Password',
+      TTexts.passwordHint: '********',
+      TTexts.rememberMe: 'Remember me',
+      TTexts.forgotPassword: 'Forgot Password?',
+      TTexts.loginBtn: 'Log In',
+      TTexts.continueWithGoogle: 'Continue with Google',
+      TTexts.loginErrorEmptyFieldsTitle: 'Input Error',
+      TTexts.loginErrorEmptyFieldsMessage:
+          'Please enter both Email and Password.',
+      TTexts.loginErrorInvalidEmailTitle: 'Invalid Email',
+      TTexts.loginErrorInvalidEmailMessage:
+          'Please enter a valid email format.',
+      TTexts.loginSuccessTitle: 'Welcome Back',
+      TTexts.loginSuccessMessage: 'Login successful: @name',
+
+      TTexts.loginFailedTitle: 'Login Failed',
+
+      // Register
+      TTexts.registerTitle: 'Create an Account',
+      TTexts.registerSubtitle:
+          'Sign up today to start managing your inventory and streamline your business operations.',
+
+      // Forgot Password
+      TTexts.forgetPasswordTitle: 'Reset Your Password',
+      TTexts.forgetPasswordSubtitle:
+          'Enter your registered email address and we will send you instructions to securely reset your password.',
+
+      // Verify Email
+      TTexts.verifyEmailTitle: 'Verify your email address',
+      TTexts.verifyEmailSubtitle:
+          'Congratulations! Your account awaits: verify your email to start managing your smart inventory and streamline your operations.',
+      TTexts.resendEmail: 'Resend Email',
     },
   };
 }

@@ -4,6 +4,8 @@ class TTexts {
 
   // -- Global Texts
   static const String appName = "app_name";
+  static const String group21 = "group_21";
+  static const String tryAgain = "try_again";
 
   // -- Error / Restricted Access
   static const String errorAccessRestrictedTitle =
@@ -34,10 +36,42 @@ class TTexts {
   static const String onboardingTitle3 = "onboarding_title_3";
   static const String onboardingSubtitle3 = "onboarding_subtitle_3";
 
-  // -- Login Screen (Prefix bằng tên module để tránh trùng)
-  static const String loginTitle = "login_title";
-  static const String loginSubTitle = "login_subtitle";
-  static const String loginEmail = "login_email";
-  static const String loginPassword = "login_password";
-  static const String loginBtnSignIn = "login_btn_signin";
+  // -- Auth
+  static const String authOrDivider = "auth_or_divider";
+
+  // -- Login Screen
+  static const String loginWelcomeTitle = "login_welcome_title";
+  static const String loginWelcomeSubtitle = "login_welcome_subtitle";
+  static const String loginTab = "login_tab";
+  static const String signupTab = "signup_tab";
+  static const String emailLabel = "email_label";
+  static const String emailHint = "email_hint";
+  static const String passwordLabel = "password_label";
+  static const String passwordHint = "password_hint";
+  static const String rememberMe = "remember_me";
+  static const String forgotPassword = "forgot_password";
+  static const String loginBtn = "login_btn";
+  static const String continueWithGoogle = "continue_with_google";
+
+  // Các câu thông báo (Snackbar/Toast) cho Login
+  static const String loginErrorEmptyFieldsTitle = "login_error_empty_fields_title";
+  static const String loginErrorEmptyFieldsMessage = "login_error_empty_fields_message";
+  static const String loginErrorInvalidEmailTitle = "login_error_invalid_email_title";
+  static const String loginErrorInvalidEmailMessage = "login_error_invalid_email_message";
+  static const String loginSuccessTitle = "login_success_title";
+  static const String loginSuccessMessage = "login_success_message";
+  static const String loginFailedTitle = "login_failed_title";
+
+  // -- Register Screen
+  static const String registerTitle = "register_title";
+  static const String registerSubtitle = "register_subtitle";
+
+  // -- Forgot Password Screen
+  static const String forgetPasswordTitle = "forget_password_title";
+  static const String forgetPasswordSubtitle = "forget_password_subtitle";
+
+  // -- Verify Email Screen
+  static const String verifyEmailTitle = "verify_email_title";
+  static const String verifyEmailSubtitle = "verify_email_subtitle";
+  static const String resendEmail = "resend_email";
 }
