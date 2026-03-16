@@ -18,6 +18,19 @@ class TTexts {
   static const String splashSlogan = "splash_slogan";
   static const String splashVersion = "splash_version";
   static const String splashDevelopedBy = "splash_developed_by";
+  // -- Splash Loading Messages
+  static const String splashLoadingStart = "splash_loading_start";
+  static const String splashLoadingInternet = "splash_loading_internet";
+  static const String splashLoadingSettings = "splash_loading_settings";
+  static const String splashLoadingServices = "splash_loading_services";
+  static const String splashLoadingUser = "splash_loading_user";
+
+  // -- Network Error Dialog
+  static const String netErrorTitle = "net_error_title";
+  static const String netErrorDescription = "net_error_description";
+  static const String netErrorPrimaryBtn = "net_error_primary_btn";
+  static const String netErrorSecondaryBtn = "net_error_secondary_btn";
+  static const String netErrorWaiting = "net_error_waiting";
 
   // -- Onboarding
   static const String onboardingSkip = "onboarding_skip";

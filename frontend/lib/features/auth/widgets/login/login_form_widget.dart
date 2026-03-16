@@ -21,7 +21,7 @@ class LoginFormWidget extends GetView<LoginController> {
   Widget build(BuildContext context) {
     return Column(
       children: [
-        const AuthTabToggleWidget(),
+        const AuthTabToggleWidget(isLogin: true),
         const SizedBox(height: AppSizes.p24),
 
         // 2. Ô Email (Đã gắn controller)

@@ -1,5 +1,6 @@
 import 'dart:io';
 import 'package:flutter/material.dart';
+import 'package:frontend/core/constants/text_strings.dart';
 import 'package:frontend/core/widgets/t_custom_dialog.dart';
 import 'package:get/get.dart';
 import 'package:get_storage/get_storage.dart';
@@ -11,8 +12,7 @@ import 'package:frontend/core/services/auth_service.dart';
 class SplashController extends GetxController {
   // 1. State variables
   final RxDouble progress = 0.0.obs;
-  final RxString loadingMessage =
-      'Khởi động hệ thống...'.obs; // Thêm biến lưu text loading
+  final RxString loadingMessage = TTexts.splashLoadingStart.tr.obs;
 
   @override
   void onInit() {
@@ -22,36 +22,32 @@ class SplashController extends GetxController {
 
   // 3. Private methods
   Future<void> _initializeApp() async {
-    // Định nghĩa danh sách các tác vụ và dòng chữ hiển thị tương ứng
+    // 2. Cập nhật danh sách Tasks dùng Locale
     final List<Map<String, dynamic>> tasks = [
       {
-        'message': 'Checking internet connection...',
+        'message': TTexts.splashLoadingInternet.tr, // Dùng .tr ở đây
         'action': _checkInternetConnection,
       },
-      {'message': 'Loading system settings...', 'action': _loadSystemSettings},
-      {'message': 'Loading core services...', 'action': _initCoreServices},
-      {'message': 'Verifying user data...', 'action': _checkUserAuthentication},
+      {
+        'message': TTexts.splashLoadingSettings.tr,
+        'action': _loadSystemSettings,
+      },
+      {'message': TTexts.splashLoadingServices.tr, 'action': _initCoreServices},
+      {
+        'message': TTexts.splashLoadingUser.tr,
+        'action': _checkUserAuthentication,
+      },
     ];
 
-    // Chạy tuần tự từng tác vụ
     for (int i = 0; i < tasks.length; i++) {
-      loadingMessage.value = tasks[i]['message']; // Cập nhật chữ hiển thị
+      loadingMessage.value = tasks[i]['message'];
 
-      try {
-        await tasks[i]['action'](); // Thực thi hàm
-      } catch (e) {
-        // Nếu có lỗi Exception văng ra ở bất kỳ task nào, bạn có thể xử lý ở đây
-        debugPrint('Lỗi ở task ${tasks[i]['message']}: $e');
-        // Tuỳ trường hợp, bạn có thể Get.dialog báo lỗi ròi cho đi tiếp hoặc dừng hẳn
-      }
+      await tasks[i]['action']();
 
-      progress.value = (i + 1) / tasks.length; // Cập nhật thanh Load
+      progress.value = (i + 1) / tasks.length;
+      await Future.delayed(const Duration(milliseconds: 500));
     }
 
-    loadingMessage.value = 'Done!'; // Xong 100%
-    await Future.delayed(
-      const Duration(milliseconds: 500),
-    ); // Dừng nửa giây cho đẹp
     _navigateToNextScreen();
   }
 
@@ -59,39 +55,31 @@ class SplashController extends GetxController {
   Future<void> _checkInternetConnection() async {
     bool hasInternet = await _checkConnectivityDirectly();
 
-    // Vòng lặp vô hạn: Chừng nào chưa có mạng thì cứ hiện Dialog đòi mạng (trừ khi bấm Got it)
     while (!hasInternet) {
-      // Gọi cái Khuôn dùng chung ra và bơm nội dung riêng của lỗi mạng vào
       final userChoice = await Get.dialog<String>(
         TCustomDialog(
-          icon: const Text(
-            '📡',
-            style: TextStyle(fontSize: 40),
-          ), // Truyền cái hộp vô
-          title: 'No Internet Connection',
-          description:
-              'You are offline. Your actions will not be saved to the cloud. Do you want to continue offline or check your connection?',
-
-          // Cấu hình Nút phụ (Màu xám)
-          secondaryButtonText: 'Got it!',
+          icon: const Text('📡', style: TextStyle(fontSize: 40)),
+          title: TTexts.netErrorTitle.tr, // Đã dùng Locale
+          description: TTexts.netErrorDescription.tr, // Đã dùng Locale
+          // Nút phụ
+          secondaryButtonText: TTexts.netErrorSecondaryBtn.tr,
           onSecondaryPressed: () => Get.back(result: 'got_it'),
 
-          // Cấu hình Nút chính (Màu cam)
-          primaryButtonText: 'Check my Wifi',
+          // Nút chính
+          primaryButtonText: TTexts.netErrorPrimaryBtn.tr,
           onPrimaryPressed: () => Get.back(result: 'check_wifi'),
         ),
         barrierDismissible: false,
       );
 
       if (userChoice == 'got_it') {
-        // Bấm Got it -> Thoát khỏi vòng lặp check mạng -> Cho phép code chạy tiếp các task bên dưới
         break;
       } else if (userChoice == 'check_wifi') {
-        // Bấm Check Wifi -> Mở setting điện thoại
         AppSettings.openAppSettings(type: AppSettingsType.wifi);
 
-        // Đợi người dùng đổi mạng trong 3 giây rồi tự động quay lại vòng lặp check lại
-        loadingMessage.value = 'Waiting for network...';
+        // Thông báo chờ mạng cũng dùng Locale
+        loadingMessage.value = TTexts.netErrorWaiting.tr;
+
         await Future.delayed(const Duration(seconds: 3));
         hasInternet = await _checkConnectivityDirectly();
       }

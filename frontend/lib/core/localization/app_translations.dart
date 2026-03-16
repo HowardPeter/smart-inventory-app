@@ -16,6 +16,18 @@ class AppTranslations extends Translations {
       TTexts.splashSlogan: 'Smart Inventory, Smarter Business',
       TTexts.splashVersion: 'Version',
       TTexts.splashDevelopedBy: 'Developed by Group 21',
+      TTexts.splashLoadingStart: 'Initializing system...',
+      TTexts.splashLoadingInternet: 'Checking internet connection...',
+      TTexts.splashLoadingSettings: 'Loading system settings...',
+      TTexts.splashLoadingServices: 'Loading core services...',
+      TTexts.splashLoadingUser: 'Verifying user data...',
+      
+      TTexts.netErrorTitle: 'No Internet Connection',
+      TTexts.netErrorDescription:
+          'You are offline. Your actions will not be saved to the cloud. Do you want to continue offline or check your connection?',
+      TTexts.netErrorPrimaryBtn: 'Check my Wifi',
+      TTexts.netErrorSecondaryBtn: 'Got it!',
+      TTexts.netErrorWaiting: 'Waiting for network...',
 
       TTexts.onboardingSkip: 'Skip',
       TTexts.onboardingTitle1Part1: 'Empower\n',
@@ -63,7 +75,7 @@ class AppTranslations extends Translations {
       // Register
       TTexts.registerTitle: 'Create an Account',
       TTexts.registerSubtitle:
-          'Sign up today to start managing your inventory and streamline your business operations.',
+          'Sign up today to start managing your inventory.',
 
       // Forgot Password
       TTexts.forgetPasswordTitle: 'Reset Your Password',
