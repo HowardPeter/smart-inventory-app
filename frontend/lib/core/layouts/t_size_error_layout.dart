@@ -5,7 +5,7 @@ import 'package:frontend/core/constants/text_strings.dart';
 import 'package:frontend/core/theme/app_colors.dart';
 import 'package:frontend/core/theme/app_sizes.dart';
 import 'package:frontend/core/widgets/t_image_widget.dart';
-import 'package:frontend/core/widgets/t_primary_button.dart';
+import 'package:frontend/core/widgets/t_primary_button_widget.dart';
 import 'package:get/get.dart';
 
 class TSizeErrorLayout extends StatelessWidget {

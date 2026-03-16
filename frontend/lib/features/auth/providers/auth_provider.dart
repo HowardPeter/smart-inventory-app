@@ -24,7 +24,7 @@ class AuthProvider {
       });
     } else {
       // Trả về lỗi nếu nhập sai
-      throw Exception("Email hoặc mật khẩu không đúng!");
+      throw Exception("Email or password was wrong. Please try again!");
     }
 
     // Future<UserProfileModel> loginWithEmail(LoginRequestModel request) async {

@@ -51,13 +51,18 @@ class TTexts {
   static const String rememberMe = "remember_me";
   static const String forgotPassword = "forgot_password";
   static const String loginBtn = "login_btn";
+  static const String loggingIn = "logging";
   static const String continueWithGoogle = "continue_with_google";
 
   // Các câu thông báo (Snackbar/Toast) cho Login
-  static const String loginErrorEmptyFieldsTitle = "login_error_empty_fields_title";
-  static const String loginErrorEmptyFieldsMessage = "login_error_empty_fields_message";
-  static const String loginErrorInvalidEmailTitle = "login_error_invalid_email_title";
-  static const String loginErrorInvalidEmailMessage = "login_error_invalid_email_message";
+  static const String loginErrorEmptyFieldsTitle =
+      "login_error_empty_fields_title";
+  static const String loginErrorEmptyFieldsMessage =
+      "login_error_empty_fields_message";
+  static const String loginErrorInvalidEmailTitle =
+      "login_error_invalid_email_title";
+  static const String loginErrorInvalidEmailMessage =
+      "login_error_invalid_email_message";
   static const String loginSuccessTitle = "login_success_title";
   static const String loginSuccessMessage = "login_success_message";
   static const String loginFailedTitle = "login_failed_title";

@@ -47,6 +47,7 @@ class AppTranslations extends Translations {
       TTexts.rememberMe: 'Remember me',
       TTexts.forgotPassword: 'Forgot Password?',
       TTexts.loginBtn: 'Log In',
+      TTexts.loggingIn: 'Logging...',
       TTexts.continueWithGoogle: 'Continue with Google',
       TTexts.loginErrorEmptyFieldsTitle: 'Input Error',
       TTexts.loginErrorEmptyFieldsMessage:

@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:frontend/core/utils/t_full_screen_loader.dart';
 import 'package:frontend/features/auth/providers/auth_provider.dart';
 import 'package:get/get.dart';
-import 'package:frontend/core/widgets/t_snackbars.dart';
+import 'package:frontend/core/widgets/t_snackbars_widget.dart';
 import 'package:frontend/core/constants/text_strings.dart';
 import 'package:frontend/core/services/auth_service.dart';
 import 'package:frontend/routes/app_routes.dart';
@@ -43,21 +44,22 @@ class LoginController extends GetxController {
       return;
     }
 
+    // 1. GỌI LOADING GIAO DIỆN MỚI
     isLoading.value = true;
-    _showLoadingOverlay();
+    TFullScreenLoader.openLoadingDialog(TTexts.loggingIn.tr);
 
     try {
       final request = LoginRequestModel(email: email, password: password);
       final userProfile = await authProvider.loginWithEmail(request);
 
-      // 1. GỌI BÁC BẢO VỆ ĐỂ LƯU TRẠNG THÁI VÀ DỮ LIỆU
       await Get.find<AuthService>().saveUserLogin(
         email,
         password,
         rememberMe.value,
       );
 
-      Get.back(); // Tắt Loading
+      // 2. TẮT LOADING KHI THÀNH CÔNG (Trước khi chuyển trang)
+      TFullScreenLoader.stopLoading();
 
       TSnackbars.success(
         title: TTexts.loginSuccessTitle.tr,
@@ -66,31 +68,17 @@ class LoginController extends GetxController {
         }),
       );
 
-      // 2. ĐÁ SANG TRANG HOME
       Get.offAllNamed(AppRoutes.home);
     } catch (e) {
-      Get.back(); // Tắt Loading
+      // 3. TẮT LOADING KHI BỊ LỖI
+      TFullScreenLoader.stopLoading();
+
       TSnackbars.error(
         title: TTexts.loginFailedTitle.tr,
         message: e.toString().replaceAll('Exception: ', ''),
-        actionText: TTexts.tryAgain.tr,
-        onActionPressed: () {
-          Get.back();
-          passwordController.clear();
-        },
       );
     } finally {
       isLoading.value = false;
     }
-  }
-
-  void _showLoadingOverlay() {
-    Get.dialog(
-      const PopScope(
-        canPop: false,
-        child: Center(child: CircularProgressIndicator()),
-      ),
-      barrierDismissible: false,
-    );
   }
 }

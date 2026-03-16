@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
-import 'package:frontend/core/widgets/t_text_form_field.dart';
+import 'package:frontend/core/widgets/t_text_form_field_widget.dart';
 import 'package:get/get.dart'; // Thêm import này
 import 'package:frontend/core/constants/text_strings.dart';
 import 'package:frontend/core/theme/app_sizes.dart';
-import 'package:frontend/core/widgets/t_primary_button.dart';
+import 'package:frontend/core/widgets/t_primary_button_widget.dart';
 
 // Imports nội bộ
 import '../shared/auth_divider_widget.dart';
