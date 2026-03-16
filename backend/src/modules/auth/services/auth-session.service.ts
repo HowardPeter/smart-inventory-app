@@ -65,7 +65,7 @@ class AuthSessionService {
 
     return {
       userId: userProfile.userId,
-      authUserId,
+      authUserId: authUserId,
       email: userProfile.email,
     };
   }

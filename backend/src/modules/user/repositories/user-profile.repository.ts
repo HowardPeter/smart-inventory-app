@@ -6,20 +6,15 @@ export class UserProfileRepository {
   async findByAuthUserId(
     authUserId: string,
   ): Promise<UserProfileAuthDTO | null> {
-    const userProfile = await prisma.userProfile.findUnique({
-      where: { auth_user_id: authUserId },
+    return await prisma.userProfile.findUnique({
+      where: { authUserId },
+      select: {
+        userId: true,
+        authUserId: true,
+        email: true,
+        fullName: true,
+        activeStatus: true,
+      },
     });
-
-    if (!userProfile) {
-      return null;
-    }
-
-    return {
-      userId: userProfile.user_id,
-      authUserId: userProfile.auth_user_id,
-      email: userProfile.email,
-      fullName: userProfile.full_name,
-      activeStatus: userProfile.active_status,
-    };
   }
 }
