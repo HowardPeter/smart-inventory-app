@@ -14,12 +14,13 @@ datasource db {
 }
 
 model UserProfile {
-  user_id      String   @id @default(uuid())
-  auth_user_id String
-  email        String
-  full_name    String
-  created_at   DateTime @default(now())
-  updated_at   DateTime @updatedAt
+  user_id       String   @id @default(uuid())
+  auth_user_id  String   @unique
+  email         String
+  full_name     String
+  created_at    DateTime @default(now())
+  updated_at    DateTime @updatedAt
+  active_status String
 
   stores_owned  Store[]
   transactions  Transaction[]
