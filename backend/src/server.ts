@@ -2,6 +2,7 @@ import express from 'express';
 
 import { errorHandler } from './common/middlewares/index.js';
 import { sendResponse } from './common/utils/index.js';
+import authRoutes from '../src/modules/auth/auth.route.js';
 
 import type { ApiResponse } from './common/types/index.js';
 import type { Request, Response } from 'express';
@@ -14,6 +15,8 @@ app.use(express.json());
 app.get('/api/health', (_req: Request, res: Response<ApiResponse<null>>) => {
   return sendResponse.success(res, null, { message: 'ok' });
 });
+
+app.use('/api/auth', authRoutes);
 
 app.use(errorHandler);
 
