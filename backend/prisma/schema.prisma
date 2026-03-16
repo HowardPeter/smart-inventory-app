@@ -14,11 +14,12 @@ datasource db {
 }
 
 model UserProfile {
-  user_id    String   @id @default(uuid())
-  username   String
-  email      String
-  full_name  String
-  last_login DateTime @default(now())
+  user_id      String   @id @default(uuid())
+  auth_user_id String
+  email        String
+  full_name    String
+  created_at   DateTime @default(now())
+  updated_at   DateTime @updatedAt
 
   stores_owned  Store[]
   transactions  Transaction[]
@@ -33,7 +34,7 @@ model Store {
   timezone      String
   name          String
   created_at    DateTime @default(now())
-  updated_at    DateTime @default(now())
+  updated_at    DateTime @updatedAt
   active_status String
   user_id       String
 
@@ -43,6 +44,19 @@ model Store {
   audit_logs     AuditLog[]
   store_members  StoreMember[]
   hided_defaults HidedDefault[]
+}
+
+model StoreMember {
+  user_id       String
+  store_id      String
+  role          String
+  joined_at     DateTime @default(now())
+  active_status String
+
+  user  UserProfile @relation(fields: [user_id], references: [user_id])
+  store Store       @relation(fields: [store_id], references: [store_id])
+
+  @@id([user_id, store_id])
 }
 
 model Category {
@@ -62,7 +76,7 @@ model Product {
   name          String
   image_url     String
   created_at    DateTime @default(now())
-  updated_at    DateTime @default(now())
+  updated_at    DateTime @updatedAt
   brand         String
   active_status String
   store_id      String
@@ -103,7 +117,7 @@ model ProductPackage {
   active_status      String
   barcode_type       String
   created_at         DateTime @default(now())
-  updated_at         DateTime @default(now())
+  updated_at         DateTime @updatedAt
   unit_id            String
   product_id         String
 
@@ -118,7 +132,7 @@ model Inventory {
   quantity           Int
   reorder_threshold  Int
   last_count         Int
-  updated_at         DateTime @default(now())
+  updated_at         DateTime @updatedAt
   product_package_id String
 
   product_package ProductPackage @relation(fields: [product_package_id], references: [product_package_id])
@@ -169,19 +183,6 @@ model BarcodeApiCache {
   fetched_at DateTime @default(now())
   status     String
   type       String
-}
-
-model StoreMember {
-  user_id       String
-  store_id      String
-  role          String
-  joined_at     DateTime @default(now())
-  active_status String
-
-  user  UserProfile @relation(fields: [user_id], references: [user_id])
-  store Store       @relation(fields: [store_id], references: [store_id])
-
-  @@id([user_id, store_id])
 }
 
 model HidedDefault {
