@@ -13,185 +13,213 @@ datasource db {
   provider = "postgresql"
 }
 
-model UserProfile {
-  user_id       String   @id @default(uuid())
-  auth_user_id  String   @unique
-  email         String
-  full_name     String
-  created_at    DateTime @default(now())
-  updated_at    DateTime @updatedAt
-  active_status String
+enum ActiveStatus {
+  active
+  inactive
+}
 
-  stores_owned  Store[]
-  transactions  Transaction[]
-  sync_queues   SyncQueue[]
-  audit_logs    AuditLog[]
-  store_members StoreMember[]
+enum StoreRole {
+  manager
+  staff
+}
+
+enum TransactionType {
+  import
+  export
+  adjustment
+}
+
+enum TransactionStatus {
+  pending
+  completed
+  cancelled
+}
+
+enum BarcodeType {
+  upc
+  ean
+  code128
+  qr
+}
+
+enum BarcodeStatus {
+  valid
+  invalid
+  not_found
+}
+
+enum AuditActionType {
+  create
+  update
+  delete
+}
+
+model UserProfile {
+  userId       String       @id @default(uuid()) @map("user_id")
+  authUserId   String?      @unique @map("auth_user_id")
+  email        String?
+  fullName     String?      @map("full_name")
+  createdAt    DateTime     @default(now()) @map("created_at")
+  updatedAt    DateTime     @updatedAt @map("updated_at")
+  activeStatus ActiveStatus @map("active_status")
+
+  storesOwned  Store[]
+  transactions Transaction[]
+  auditLogs    AuditLog[]
+  storeMembers StoreMember[]
 }
 
 model Store {
-  store_id      String   @id @default(uuid())
-  address       String
-  timezone      String
-  name          String
-  created_at    DateTime @default(now())
-  updated_at    DateTime @updatedAt
-  active_status String
-  user_id       String
+  storeId      String       @id @default(uuid()) @map("store_id")
+  address      String?
+  timezone     String?
+  name         String?
+  createdAt    DateTime     @default(now()) @map("created_at")
+  updatedAt    DateTime     @updatedAt @map("updated_at")
+  activeStatus ActiveStatus @map("active_status")
+  userId       String       @map("user_id")
 
-  owner          UserProfile    @relation(fields: [user_id], references: [user_id])
-  categories     Category[]
-  products       Product[]
-  audit_logs     AuditLog[]
-  store_members  StoreMember[]
-  hided_defaults HidedDefault[]
+  owner         UserProfile    @relation(fields: [userId], references: [userId])
+  categories    Category[]
+  products      Product[]
+  auditLogs     AuditLog[]
+  storeMembers  StoreMember[]
+  hidedDefaults HidedDefault[]
 }
 
 model StoreMember {
-  user_id       String
-  store_id      String
-  role          String
-  joined_at     DateTime @default(now())
-  active_status String
+  userId       String       @map("user_id")
+  storeId      String       @map("store_id")
+  role         StoreRole
+  joinedAt     DateTime     @default(now()) @map("joined_at")
+  activeStatus ActiveStatus @map("active_status")
 
-  user  UserProfile @relation(fields: [user_id], references: [user_id])
-  store Store       @relation(fields: [store_id], references: [store_id])
+  user  UserProfile @relation(fields: [userId], references: [userId])
+  store Store       @relation(fields: [storeId], references: [storeId])
 
-  @@id([user_id, store_id])
+  @@id([userId, storeId])
 }
 
 model Category {
-  category_id String @id @default(uuid())
+  categoryId  String  @id @default(uuid()) @map("category_id")
   name        String
-  description String
-  is_default  String
-  store_id    String
+  description String?
+  isDefault   Boolean @map("is_default")
+  storeId     String? @map("store_id")
 
-  store          Store          @relation(fields: [store_id], references: [store_id])
-  products       Product[]
-  hided_defaults HidedDefault[]
+  store         Store?         @relation(fields: [storeId], references: [storeId])
+  products      Product[]
+  hidedDefaults HidedDefault[]
 }
 
 model Product {
-  product_id    String   @id @default(uuid())
-  name          String
-  image_url     String
-  created_at    DateTime @default(now())
-  updated_at    DateTime @updatedAt
-  brand         String
-  active_status String
-  store_id      String
-  category_id   String
+  productId    String       @id @default(uuid()) @map("product_id")
+  name         String
+  imageUrl     String?      @map("image_url")
+  brand        String?
+  activeStatus ActiveStatus @map("active_status")
+  createdAt    DateTime     @default(now()) @map("created_at")
+  updatedAt    DateTime     @updatedAt @map("updated_at")
+  storeId      String       @map("store_id")
+  categoryId   String       @map("category_id")
 
-  store            Store            @relation(fields: [store_id], references: [store_id])
-  category         Category         @relation(fields: [category_id], references: [category_id])
-  product_packages ProductPackage[]
+  store           Store            @relation(fields: [storeId], references: [storeId])
+  category        Category         @relation(fields: [categoryId], references: [categoryId])
+  productPackages ProductPackage[]
 }
 
 model Transaction {
-  transaction_id String   @id @default(uuid())
-  type           String
-  created_at     DateTime @default(now())
-  note           String
-  status         String
-  total_price    Decimal  @db.Decimal(18, 2)
-  user_id        String
+  transactionId String            @id @default(uuid()) @map("transaction_id")
+  type          TransactionType
+  note          String?
+  status        TransactionStatus
+  createdAt     DateTime          @default(now()) @map("created_at")
+  totalPrice    Decimal           @map("total_price") @db.Decimal(18, 2)
+  userId        String            @map("user_id")
 
-  user                UserProfile         @relation(fields: [user_id], references: [user_id])
-  transaction_details TransactionDetail[]
+  user               UserProfile         @relation(fields: [userId], references: [userId])
+  transactionDetails TransactionDetail[]
 }
 
 model Unit {
-  unit_id String @id @default(uuid())
-  code    String
-  name    String
+  unitId String @id @default(uuid()) @map("unit_id")
+  code   String
+  name   String
 
-  product_packages ProductPackage[]
+  productPackages ProductPackage[]
 }
 
 model ProductPackage {
-  product_package_id String   @id @default(uuid())
-  barcode_value      String
-  display_name       String
-  import_price       Decimal  @db.Decimal(18, 2)
-  selling_price      Decimal  @db.Decimal(18, 2)
-  active_status      String
-  barcode_type       String
-  created_at         DateTime @default(now())
-  updated_at         DateTime @updatedAt
-  unit_id            String
-  product_id         String
+  productPackageId String       @id @default(uuid()) @map("product_package_id")
+  displayName      String?      @map("display_name")
+  importPrice      Decimal?     @map("import_price") @db.Decimal(18, 2)
+  sellingPrice     Decimal?     @map("selling_price") @db.Decimal(18, 2)
+  activeStatus     ActiveStatus @map("active_status")
+  barcodeValue     String?      @map("barcode_value")
+  barcodeType      BarcodeType? @map("barcode_type")
+  createdAt        DateTime     @default(now()) @map("created_at")
+  updatedAt        DateTime     @updatedAt @map("updated_at")
+  unitId           String       @map("unit_id")
+  productId        String       @map("product_id")
 
-  unit                Unit                @relation(fields: [unit_id], references: [unit_id])
-  product             Product             @relation(fields: [product_id], references: [product_id])
-  inventories         Inventory[]
-  transaction_details TransactionDetail[]
+  unit               Unit                @relation(fields: [unitId], references: [unitId])
+  product            Product             @relation(fields: [productId], references: [productId])
+  inventories        Inventory[]
+  transactionDetails TransactionDetail[]
 }
 
 model Inventory {
-  inventory_id       String   @id @default(uuid())
-  quantity           Int
-  reorder_threshold  Int
-  last_count         Int
-  updated_at         DateTime @updatedAt
-  product_package_id String
+  inventoryId      String   @id @default(uuid()) @map("inventory_id")
+  quantity         Int
+  reorderThreshold Int?     @map("reorder_threshold")
+  lastCount        Int?     @map("last_count")
+  updatedAt        DateTime @updatedAt @map("updated_at")
+  productPackageId String   @map("product_package_id")
 
-  product_package ProductPackage @relation(fields: [product_package_id], references: [product_package_id])
+  productPackage ProductPackage @relation(fields: [productPackageId], references: [productPackageId])
 }
 
 model TransactionDetail {
-  quantity           Int
-  unit_price         Decimal @db.Decimal(18, 2)
-  transaction_id     String
-  product_package_id String
+  quantity         Int
+  unitPrice        Decimal @map("unit_price") @db.Decimal(18, 2)
+  transactionId    String  @map("transaction_id")
+  productPackageId String  @map("product_package_id")
 
-  transaction     Transaction    @relation(fields: [transaction_id], references: [transaction_id])
-  product_package ProductPackage @relation(fields: [product_package_id], references: [product_package_id])
+  transaction    Transaction    @relation(fields: [transactionId], references: [transactionId])
+  productPackage ProductPackage @relation(fields: [productPackageId], references: [productPackageId])
 
-  @@id([transaction_id, product_package_id])
-}
-
-model SyncQueue {
-  queue_id    String   @id @default(uuid())
-  created_at  DateTime @default(now())
-  queue_type  String
-  payload     Json
-  status      String
-  action_type String
-  user_id     String
-
-  user UserProfile @relation(fields: [user_id], references: [user_id])
+  @@id([transactionId, productPackageId])
 }
 
 model AuditLog {
-  event_id     String   @id @default(uuid())
-  action_type  String
-  entity_type  String
-  old_value    Json
-  new_value    Json
-  performed_at DateTime @default(now())
-  user_id      String
-  store_id     String
+  eventId     String           @id @default(uuid()) @map("event_id")
+  actionType  AuditActionType? @map("action_type")
+  entityType  String?          @map("entity_type")
+  oldValue    Json?            @map("old_value")
+  newValue    Json?            @map("new_value")
+  performedAt DateTime         @default(now()) @map("performed_at")
+  userId      String           @map("user_id")
+  storeId     String           @map("store_id")
 
-  user  UserProfile @relation(fields: [user_id], references: [user_id])
-  store Store       @relation(fields: [store_id], references: [store_id])
+  user  UserProfile @relation(fields: [userId], references: [userId])
+  store Store       @relation(fields: [storeId], references: [storeId])
 }
 
 model BarcodeApiCache {
-  barcode    String   @id
-  payload    Json
-  provider   String
-  fetched_at DateTime @default(now())
-  status     String
-  type       String
+  barcode   String        @id @unique
+  payload   Json
+  provider  String?
+  type      BarcodeType?
+  status    BarcodeStatus
+  fetchedAt DateTime      @default(now()) @map("fetched_at")
 }
 
 model HidedDefault {
-  store_id    String
-  category_id String
+  storeId    String @map("store_id")
+  categoryId String @map("category_id")
 
-  store    Store    @relation(fields: [store_id], references: [store_id])
-  category Category @relation(fields: [category_id], references: [category_id])
+  store    Store    @relation(fields: [storeId], references: [storeId])
+  category Category @relation(fields: [categoryId], references: [categoryId])
 
-  @@id([store_id, category_id])
+  @@id([storeId, categoryId])
 }
