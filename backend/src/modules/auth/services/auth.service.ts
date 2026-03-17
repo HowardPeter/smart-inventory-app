@@ -1,32 +1,69 @@
+import { sendVerifyEmail } from './mail.service.js';
 import { supabase } from '../../../config/supabaseClient.js';
 import { prisma } from '../../../db/prismaClient.js';
 
 import type { RegisterDto } from '../../auth/dtos/register-email-pw.dto.js';
 
-export const registerUser = async (dto: RegisterDto) => {
+export const registerUserService = async (dto: RegisterDto) => {
   const { email, password, fullName } = dto;
 
-  // 1️⃣ tạo user trong Supabase Auth
-  const { data, error } = await supabase.auth.admin.createUser({
-    email,
-    password,
-    email_confirm: false,
-  });
+  const normalizedEmail = email.toLowerCase().trim();
 
-  if (error) {
-    throw new Error(error.message);
+  let supabaseUserId: string | null = null;
+
+  try {
+    const { data, error } = await supabase.auth.admin.createUser({
+      email: normalizedEmail,
+      password,
+      email_confirm: false,
+    });
+
+    if (error) {
+      if (error.message.includes('already')) {
+        throw new Error('Email already registered');
+      }
+      throw new Error(error.message);
+    }
+
+    supabaseUserId = data.user.id;
+
+    const { data: linkData, error: linkError } =
+      await supabase.auth.admin.generateLink({
+        type: 'invite',
+        email: normalizedEmail,
+        options: {
+          redirectTo: 'http://127.0.0.1:3000/auth/callback',
+        },
+      });
+
+    if (linkError) {
+      throw new Error(linkError.message);
+    }
+
+    const verifyLink = linkData?.properties?.action_link;
+
+    if (!verifyLink) {
+      throw new Error('Failed to generate verify link');
+    }
+
+    await sendVerifyEmail(normalizedEmail, verifyLink);
+
+    const profile = await prisma.userProfile.create({
+      data: {
+        auth_user_id: supabaseUserId,
+        email: normalizedEmail,
+        full_name: fullName.trim(),
+      },
+    });
+
+    return profile;
+  } catch (error) {
+    console.error('REGISTER ERROR:', error);
+
+    if (supabaseUserId) {
+      await supabase.auth.admin.deleteUser(supabaseUserId);
+    }
+
+    throw error;
   }
-
-  const supabaseUserId = data.user.id;
-
-  // 2️⃣ lưu user vào database
-  const user = await prisma.userProfile.create({
-    data: {
-      auth_user_id: supabaseUserId,
-      email,
-      full_name: fullName,
-    },
-  });
-
-  return user;
 };
