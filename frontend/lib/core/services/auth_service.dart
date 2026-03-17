@@ -1,54 +1,50 @@
+// file: lib/core/services/auth_service.dart
+
+import 'package:frontend/routes/app_routes.dart';
 import 'package:get/get.dart';
 import 'package:get_storage/get_storage.dart';
-import 'package:flutter_secure_storage/flutter_secure_storage.dart';
-import 'package:frontend/routes/app_routes.dart';
 
 class AuthService extends GetxService {
-  final _storage = GetStorage();
-  final _secureStorage = const FlutterSecureStorage();
+  final storage = GetStorage();
 
-  // Biến theo dõi trạng thái đăng nhập toàn cục
+  // 1. Biến quản lý trạng thái
   final RxBool isLoggedIn = false.obs;
 
-  /// Khởi chạy khi mở App để kiểm tra trạng thái
-  Future<AuthService> init() async {
-    final savedEmail = _storage.read('REMEMBER_EMAIL');
-    final savedPassword = await _secureStorage.read(key: 'REMEMBER_PASSWORD');
+  // 2. TẠO BIẾN LƯU EMAIL (Để UI tự động lắng nghe)
+  final RxString currentUserEmail = ''.obs;
 
-    // Nếu có mật khẩu trong két sắt -> Đã đăng nhập
-    if (savedEmail != null && savedPassword != null) {
-      isLoggedIn.value = true;
-    }
+  Future<AuthService> init() async {
+    // Lúc app vừa mở lên, móc ổ cứng ra xem trước đây có lưu email không
+    isLoggedIn.value = storage.read('IS_LOGGED_IN') ?? false;
+    currentUserEmail.value = storage.read('USER_EMAIL') ?? '';
     return this;
   }
 
-  /// Hàm lưu thông tin (Controller sẽ gọi hàm này khi Login thành công)
+  // Hàm lưu dữ liệu khi Login
   Future<void> saveUserLogin(
     String email,
     String password,
     bool rememberMe,
   ) async {
-    isLoggedIn.value = true; // Bật cờ đăng nhập
-
     if (rememberMe) {
-      _storage.write('REMEMBER_EMAIL', email);
-      await _secureStorage.write(key: 'REMEMBER_PASSWORD', value: password);
-    } else {
-      // Nếu không tick Remember Me, ta chỉ cho vào App nhưng không lưu ổ cứng
-      _storage.remove('REMEMBER_EMAIL');
-      await _secureStorage.delete(key: 'REMEMBER_PASSWORD');
+      // GHI VÀO Ổ CỨNG (Để lần sau tắt app mở lại vẫn còn)
+      await storage.write('IS_LOGGED_IN', true);
+      await storage.write('USER_EMAIL', email); // Nhãn bắt buộc là 'USER_EMAIL'
     }
+
+    // GHI VÀO RAM (Để giao diện Home hiện ngay lập tức)
+    isLoggedIn.value = true;
+    currentUserEmail.value = email;
   }
 
-  /// Hàm Đăng xuất
   Future<void> logout() async {
-    // Xóa sạch bộ nhớ
-    await _storage.remove('REMEMBER_EMAIL');
-    await _secureStorage.delete(key: 'REMEMBER_PASSWORD');
+    // Xóa sạch dữ liệu khi đăng xuất
+    await storage.remove('IS_LOGGED_IN');
+    await storage.remove('USER_EMAIL');
 
     isLoggedIn.value = false;
+    currentUserEmail.value = '';
 
-    // Đá về trang Login
-    Get.offAllNamed(AppRoutes.login);
+    Get.offAllNamed(AppRoutes.login); // Đá về trang login
   }
 }

@@ -24,22 +24,22 @@ class LoginFormWidget extends GetView<LoginController> {
         const AuthTabToggleWidget(isLogin: true),
         const SizedBox(height: AppSizes.p24),
 
-        // 2. Ô Email (Đã gắn controller)
+        // 2. Ô Email
         TTextFormField(
-          controller: controller.emailController, // Lấy từ LoginController
+          controller: controller.emailController, 
           label: TTexts.emailLabel.tr,
           hintText: TTexts.emailHint.tr,
         ),
         const SizedBox(height: AppSizes.p16),
 
-        // 3. Ô Password (Bọc Obx để cập nhật icon mắt)
+        // 3. Ô Password 
         Obx(
           () => TTextFormField(
-            controller: controller.passwordController, // Lấy từ LoginController
+            controller: controller.passwordController,
             label: TTexts.passwordLabel.tr,
             hintText: TTexts.passwordHint.tr,
             obscureText:
-                controller.isPasswordHidden.value, // Đọc state từ Controller
+                controller.isPasswordHidden.value,
             suffixIcon: IconButton(
               icon: Icon(
                 controller.isPasswordHidden.value

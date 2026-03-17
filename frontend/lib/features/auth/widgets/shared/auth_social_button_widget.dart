@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:frontend/features/auth/controllers/login_controller.dart';
 import 'package:get/get.dart';
 import 'package:frontend/core/constants/image_strings.dart';
 import 'package:frontend/core/constants/text_strings.dart';
@@ -6,7 +7,7 @@ import 'package:frontend/core/theme/app_colors.dart';
 import 'package:frontend/core/theme/app_sizes.dart';
 
 /// Nút đăng nhập bằng mạng xã hội (Google)
-class AuthSocialButtonWidget extends StatelessWidget {
+class AuthSocialButtonWidget extends GetView<LoginController> {
   const AuthSocialButtonWidget({super.key});
 
   @override
@@ -15,9 +16,7 @@ class AuthSocialButtonWidget extends StatelessWidget {
       width: double.infinity,
       height: 60, // Chiều cao đồng bộ với TPrimaryButton
       child: OutlinedButton(
-        onPressed: () {
-          // TODO: Gọi hàm xử lý đăng nhập Google từ AuthController
-        },
+        onPressed: () => controller.loginWithGoogle(),
         style: OutlinedButton.styleFrom(
           backgroundColor: Colors.white,
           elevation: 0,

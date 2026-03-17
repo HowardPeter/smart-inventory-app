@@ -81,4 +81,55 @@ class LoginController extends GetxController {
       isLoading.value = false;
     }
   }
+
+  Future<void> loginWithGoogle() async {
+    try {
+      TFullScreenLoader.openLoadingDialog(TTexts.loggingIn.tr);
+
+      // 1. Mở popup Google và lấy account
+      final account = await authProvider.signInWithGoogle();
+
+      if (account == null) {
+        TFullScreenLoader.stopLoading();
+        return; // Người dùng bấm hủy
+      }
+
+      // 2. LẤY ID TOKEN ĐỂ SAU NÀY GỬI LÊN SERVER
+      final auth = account.authentication;
+      final String? idToken = auth.idToken;
+
+      debugPrint("=== THÔNG TIN GOOGLE TRẢ VỀ ===");
+      debugPrint("Email: ${account.email}");
+      debugPrint("Name: ${account.displayName}");
+      debugPrint("ID Token: $idToken");
+      debugPrint("===============================");
+
+      /* // SAU NÀY KHI CÓ BACKEND: 
+      // 1. Bạn truyền cái idToken lên server.
+      // 2. Server trả về UserProfileModel.
+      // 3. Bạn lưu thông tin vào AuthService ở đây.
+      */
+
+      // 3. LƯU VÀO KÉT SẮT (REMEMBER ME) ĐỂ APP GHI NHỚ
+      await Get.find<AuthService>().saveUserLogin(
+        account.email,
+        "google_dummy_password",
+        true, // Luôn Remember Me khi login Google
+      );
+
+      TFullScreenLoader.stopLoading();
+
+      // 4. Hiện thông báo và vào Home
+      TSnackbars.success(
+        title: TTexts.loginSuccessTitle.tr,
+        message: 'Đăng nhập Google thành công: ${account.displayName}',
+      );
+
+      Get.offAllNamed(AppRoutes.home);
+    } catch (e) {
+      TFullScreenLoader.stopLoading();
+      debugPrint('❌ Google Auth Error: $e');
+      TSnackbars.error(title: 'Lỗi', message: e.toString());
+    }
+  }
 }
