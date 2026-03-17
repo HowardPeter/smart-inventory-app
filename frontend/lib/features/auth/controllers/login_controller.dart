@@ -95,7 +95,7 @@ class LoginController extends GetxController {
       }
 
       // 2. LẤY ID TOKEN ĐỂ SAU NÀY GỬI LÊN SERVER
-      final auth = account.authentication;
+      final auth = await account.authentication;
       final String? idToken = auth.idToken;
 
       debugPrint("=== THÔNG TIN GOOGLE TRẢ VỀ ===");

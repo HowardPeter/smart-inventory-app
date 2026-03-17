@@ -24,11 +24,11 @@ class AppTheme {
     scaffoldBackgroundColor: AppColors.background,
 
     // 2. Cấu hình Component cơ bản (AppBar)
-    appBarTheme: AppBarTheme(
+    appBarTheme: const AppBarTheme(
       backgroundColor: AppColors.surface,
       elevation: 0, // Bỏ bóng mờ
       centerTitle: true,
-      iconTheme: const IconThemeData(color: AppColors.primaryText),
+      iconTheme: IconThemeData(color: AppColors.primaryText),
     ),
 
     // 3. Cấu hình Nút bấm cơ bản (ElevatedButton)

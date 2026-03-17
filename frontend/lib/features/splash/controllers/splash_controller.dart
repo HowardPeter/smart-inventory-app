@@ -90,7 +90,7 @@ class SplashController extends GetxController {
   Future<bool> _checkConnectivityDirectly() async {
     // 1. Kiểm tra xem có đang kết nối phần cứng nào không (Wifi/3G/Ethernet)
     final connectivityResult = await (Connectivity().checkConnectivity());
-    if (connectivityResult.contains(ConnectivityResult.none)) {
+    if (connectivityResult == ConnectivityResult.none) {
       debugPrint('Không bật Wifi/3G');
       return false;
     }

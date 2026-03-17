@@ -9,26 +9,21 @@ class AuthProvider {
   final ApiClient apiClient;
   AuthProvider({required this.apiClient});
 
-  // Khai báo service của GoogleSignIn
-  final GoogleSignIn _googleSignIn = GoogleSignIn.instance;
-
-  // Lấy Client ID
-  final String _serverClientId =
-      '312359689211-1iqfd8ccf58fp2n242tg4bi207in4ts7.apps.googleusercontent.com';
+  // 1. SỬ DỤNG CÁCH KHỞI TẠO CHUẨN CỦA THƯ VIỆN GOOGLE_SIGN_IN
+  final GoogleSignIn _googleSignIn = GoogleSignIn(
+    serverClientId:
+        '312359689211-1iqfd8ccf58fp2n242tg4bi207in4ts7.apps.googleusercontent.com',
+    scopes: ['email', 'profile'],
+  );
 
   /// Hàm đăng nhập Google
   Future<GoogleSignInAccount?> signInWithGoogle() async {
     try {
-      // Khởi tạo GoogleSignIn với serverClientId
-      await _googleSignIn.initialize(serverClientId: _serverClientId);
-
       // Đảm bảo user được chọn lại account
       await _googleSignIn.signOut();
 
-      // Sử dụng .authenticate thay vì .signIn
-      final GoogleSignInAccount account = await _googleSignIn.authenticate(
-        scopeHint: ['email', 'profile'],
-      );
+      // 2. SỬ DỤNG .signIn() CHUẨN CỦA GOOGLE
+      final GoogleSignInAccount? account = await _googleSignIn.signIn();
 
       return account;
     } catch (e) {
@@ -57,21 +52,4 @@ class AuthProvider {
       throw Exception("Email or password was wrong. Please try again!");
     }
   }
-  // Future<UserProfileModel> loginWithEmail(LoginRequestModel request) async {
-  //   try {
-  //     // Dùng apiClient.post thay vì dio.post
-  //     final response = await apiClient.post(
-  //       '/auth/login',
-  //       data: request.toJson(),
-  //     );
-
-  //     if (response.statusCode == 200 || response.statusCode == 201) {
-  //       return UserProfileModel.fromJson(response.data['data']);
-  //     } else {
-  //       throw Exception('Lỗi máy chủ!');
-  //     }
-  //   } catch (e) {
-  //     throw Exception('Đã xảy ra lỗi: $e');
-  //   }
-  // }
 }

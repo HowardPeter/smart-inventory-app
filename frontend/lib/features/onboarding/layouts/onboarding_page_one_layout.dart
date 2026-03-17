@@ -21,7 +21,7 @@ class OnboardingPageOneLayout extends GetView<OnboardingController> {
         children: [
           // 1. Ảnh nền (Ép lún ra khỏi lề phải)
           Align(
-            alignment: FractionalOffset(1.2, 1.0),
+            alignment: const FractionalOffset(1.2, 1.0),
             child: TImageWidget(
               image: TImages.onboardingImages.onboardingContent1,
             ),

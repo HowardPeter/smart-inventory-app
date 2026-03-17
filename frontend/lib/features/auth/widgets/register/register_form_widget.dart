@@ -8,19 +8,19 @@ class RegisterFormWidget extends GetView<RegisterController> {
 
   @override
   Widget build(BuildContext context) {
-    return Column(
+    return const Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         // 1. THANH TRƯỢT (isLogin: false vì đây là trang Sign Up)
-        const AuthTabToggleWidget(isLogin: false),
+        AuthTabToggleWidget(isLogin: false),
 
-        const SizedBox(height: 32),
+        SizedBox(height: 32),
 
         // 2. KHU VỰC FORM ĐĂNG KÝ (Load tức thì)
         Column(
           children: [
             // Tạm thời để Text chờ ráp UI TextFields (Name, Email, Pass,...)
-            const Center(
+            Center(
               child: Text("Đây là Form Đăng Ký", textAlign: TextAlign.center),
             ),
           ],

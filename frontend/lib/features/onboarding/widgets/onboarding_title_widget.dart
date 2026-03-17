@@ -12,7 +12,7 @@ class OnboardingTitleWidget extends StatelessWidget {
   Widget build(BuildContext context) {
     return RichText(
       text: TextSpan(
-        style: TextStyle(
+        style: const TextStyle(
           fontFamily: 'Poppins',
           fontSize: 42,
           color: AppColors.primaryText,
@@ -21,15 +21,15 @@ class OnboardingTitleWidget extends StatelessWidget {
         children: [
           TextSpan(
             text: TTexts.onboardingTitle1Part1.tr,
-            style: TextStyle(fontWeight: FontWeight.w500),
+            style: const TextStyle(fontWeight: FontWeight.w500),
           ),
           TextSpan(
             text: TTexts.onboardingTitle1Part2.tr,
-            style: TextStyle(fontWeight: FontWeight.w400),
+            style: const TextStyle(fontWeight: FontWeight.w400),
           ),
           TextSpan(
             text: TTexts.onboardingTitle1Part3.tr,
-            style: TextStyle(
+            style: const TextStyle(
               color: AppColors.primary,
               fontFamily: 'SuezOne',
               fontSize: 54,
@@ -37,7 +37,7 @@ class OnboardingTitleWidget extends StatelessWidget {
           ),
           TextSpan(
             text: TTexts.onboardingTitle1Part4.tr,
-            style: TextStyle(fontWeight: FontWeight.w400),
+            style: const TextStyle(fontWeight: FontWeight.w400),
           ),
         ],
       ),

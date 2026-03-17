@@ -24,7 +24,7 @@ class OnboardingSkipButtonWidget extends StatelessWidget {
       ),
       child: Text(
         TTexts.onboardingSkip.tr,
-        style: TextStyle(
+        style: const TextStyle(
           fontFamily: 'Poppins',
           fontSize: 16,
           fontWeight: FontWeight.w500,
