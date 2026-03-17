@@ -5,7 +5,7 @@ import { userFacade } from '../../user/user.module.js';
 import { AUTH_HEADER, BEARER_PREFIX } from '../constants/auth.constant.js';
 import { supabaseAuthProvider } from '../providers/supabase-auth.provider.js';
 
-import type { CurrentUser } from '../types/auth-authenticate.types.js';
+import type { CurrentUser } from '../../../common/types/index.js';
 import type { Request } from 'express';
 
 class AuthSessionService {
