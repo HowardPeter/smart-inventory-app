@@ -36,7 +36,7 @@ dependencies:
   flutter_secure_storage: ^9.2.4
   get_storage: ^2.1.1
   google_sign_in: ^6.2.1
-  intl: 0.18.1
+  intl: ^0.18.1
 
 dev_dependencies:
   flutter_test:
