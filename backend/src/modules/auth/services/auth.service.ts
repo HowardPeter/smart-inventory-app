@@ -1,5 +1,5 @@
 import { sendVerifyEmail } from './mail.service.js';
-import { supabase } from '../../../config/supabaseClient.js';
+import { SupabaseProvider } from '../../../config/supabaseClient.js';
 import { prisma } from '../../../db/prismaClient.js';
 
 import type { RegisterDto } from '../../auth/dtos/register-email-pw.dto.js';
@@ -10,6 +10,7 @@ export const registerUserService = async (dto: RegisterDto) => {
   const normalizedEmail = email.toLowerCase().trim();
 
   let supabaseUserId: string | null = null;
+  const supabase = SupabaseProvider.getClient();
 
   try {
     const { data, error } = await supabase.auth.admin.createUser({
