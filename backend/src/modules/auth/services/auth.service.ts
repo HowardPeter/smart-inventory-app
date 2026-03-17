@@ -50,9 +50,10 @@ export const registerUserService = async (dto: RegisterDto) => {
 
     const profile = await prisma.userProfile.create({
       data: {
-        auth_user_id: supabaseUserId,
-        email: normalizedEmail,
-        full_name: fullName.trim(),
+        authUserId: supabaseUserId,
+        email: email,
+        fullName: fullName.trim(),
+        activeStatus: 'active',
       },
     });
 
