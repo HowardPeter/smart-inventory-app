@@ -13,7 +13,7 @@ class TImageWidget extends StatelessWidget {
   // 2. Constructor
   const TImageWidget({
     super.key,
-    required this.image,
+    required this.image, 
     this.width,
     this.height,
     this.fit = BoxFit.contain,

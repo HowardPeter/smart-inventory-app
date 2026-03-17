@@ -1,13 +1,15 @@
 import 'package:dio/dio.dart';
+import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:frontend/core/constants/app_constants.dart';
 
 class ApiClient {
   late Dio dio;
+  final _secureStorage = const FlutterSecureStorage();
 
   ApiClient() {
     dio = Dio(
       BaseOptions(
-        baseUrl: AppConstants.baseUrl,
+        baseUrl: AppConstants.baseUrl, // Dùng baseUrl của bạn
         connectTimeout: const Duration(
           milliseconds: AppConstants.connectionTimeout,
         ),
@@ -18,25 +20,19 @@ class ApiClient {
       ),
     );
 
-    // Cấu hình Interceptor để tự động gắn Token và in log bắt lỗi
     dio.interceptors.add(
       InterceptorsWrapper(
         onRequest: (options, handler) async {
-          // Lấy token từ local storage (ví dụ SharedPreferences hoặc GetStorage)
-          // SharedPreferences prefs = await SharedPreferences.getInstance();
-          // String? token = prefs.getString(AppConstants.tokenKey);
-          String? token = "YOUR_TOKEN_HERE"; // Tạm thời hardcode để test
+          // Lấy token thật từ Két sắt
+          String? token = await _secureStorage.read(key: 'ACCESS_TOKEN');
 
-          options.headers['Authorization'] = 'Bearer $token';
-
+          if (token!.isNotEmpty) {
+            options.headers['Authorization'] = 'Bearer $token';
+          }
           return handler.next(options);
         },
-        onResponse: (response, handler) {
-          return handler.next(response);
-        },
-        onError: (DioException e, handler) {
-          return handler.next(e);
-        },
+        onResponse: (response, handler) => handler.next(response),
+        onError: (DioException e, handler) => handler.next(e),
       ),
     );
   }

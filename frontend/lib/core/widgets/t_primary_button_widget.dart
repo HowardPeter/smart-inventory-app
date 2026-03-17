@@ -11,6 +11,9 @@ class TPrimaryButton extends StatelessWidget {
     this.backgroundColor = AppColors.primary, // Mặc định dùng màu cam SI
     this.textColor = Colors.white,
     this.width = double.infinity, // Mặc định trải dài toàn màn hình
+    this.height = 60.0, // Thêm tùy chỉnh chiều cao
+    this.borderRadius = AppSizes.radius12, // Thêm tùy chỉnh độ bo góc
+    this.fontSize = 14.0, // Thêm tùy chỉnh cỡ chữ
   });
 
   final String text;
@@ -19,12 +22,15 @@ class TPrimaryButton extends StatelessWidget {
   final Color backgroundColor;
   final Color textColor;
   final double width;
+  final double height; // Khai báo biến
+  final double borderRadius; // Khai báo biến
+  final double fontSize; // Khai báo biến
 
   @override
   Widget build(BuildContext context) {
     return SizedBox(
       width: width,
-      height: 60, // Chiều cao tiêu chuẩn cho nút bấm lớn
+      height: height, // Gắn biến height vào đây
       child: ElevatedButton(
         onPressed: onPressed,
         style: ElevatedButton.styleFrom(
@@ -32,7 +38,9 @@ class TPrimaryButton extends StatelessWidget {
           foregroundColor: textColor,
           elevation: 0,
           shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(AppSizes.radius12),
+            borderRadius: BorderRadius.circular(
+              borderRadius,
+            ), // Gắn biến borderRadius vào đây
           ),
           padding: const EdgeInsets.symmetric(horizontal: AppSizes.p20),
         ),
@@ -51,7 +59,7 @@ class TPrimaryButton extends StatelessWidget {
               text,
               style: TextStyle(
                 fontFamily: 'Poppins',
-                fontSize: 18,
+                fontSize: fontSize, // Gắn biến fontSize vào đây
                 fontWeight: FontWeight.w600,
                 color: textColor,
               ),

@@ -1,42 +1,41 @@
 import 'package:flutter/material.dart';
 import 'package:frontend/routes/app_routes.dart';
 import 'package:get/get.dart';
+import 'package:get_storage/get_storage.dart';
 
 class OnboardingController extends GetxController {
-  // 1. Final variables (Controllers & Dependencies)
   final PageController pageController = PageController();
-
-  // 2. State variables (Reactive)
   final RxInt currentPage = 0.obs;
+  final _storage = GetStorage(); // Khởi tạo Storage
 
-  // 3. Lifecycle methods
   @override
   void onClose() {
     pageController.dispose();
     super.onClose();
   }
 
-  // 4. Public methods (Business Logic)
-
-  /// Cập nhật state trang hiện tại khi người dùng vuốt màn hình
   void onPageChanged(int index) {
     currentPage.value = index;
   }
 
-  /// Xử lý chuyển trang tiếp theo hoặc hoàn thành Onboarding
+  /// Hàm dùng chung để đánh dấu đã xem xong Onboarding và vào Login
+  void _completeOnboarding() {
+    _storage.write('IS_FIRST_TIME', false);
+    Get.offAllNamed(AppRoutes.login);
+  }
+
   void onNextPressed() {
     if (currentPage.value < 2) {
       pageController.nextPage(
         duration: const Duration(milliseconds: 500),
-        curve: Curves.easeInOut, // Luôn có dấu phẩy đuôi ở thuộc tính cuối
+        curve: Curves.easeInOut,
       );
     } else {
-      Get.offAllNamed(AppRoutes.login);
+      _completeOnboarding(); // Trang cuối thì hoàn thành
     }
   }
 
-  /// Xử lý bỏ qua Onboarding, tiến thẳng vào app
   void onSkipPressed() {
-    Get.offAllNamed(AppRoutes.login);
+    _completeOnboarding(); // Bấm skip thì hoàn thành luôn
   }
 }
