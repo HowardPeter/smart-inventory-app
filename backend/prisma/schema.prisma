@@ -61,7 +61,7 @@ model UserProfile {
   fullName     String?      @map("full_name")
   createdAt    DateTime     @default(now()) @map("created_at")
   updatedAt    DateTime     @updatedAt @map("updated_at")
-  activeStatus ActiveStatus @map("active_status")
+  activeStatus ActiveStatus @default(active) @map("active_status")
 
   storesOwned  Store[]
   transactions Transaction[]
@@ -76,7 +76,7 @@ model Store {
   name         String?
   createdAt    DateTime     @default(now()) @map("created_at")
   updatedAt    DateTime     @updatedAt @map("updated_at")
-  activeStatus ActiveStatus @map("active_status")
+  activeStatus ActiveStatus @default(active) @map("active_status")
   userId       String       @map("user_id")
 
   owner         UserProfile    @relation(fields: [userId], references: [userId])
@@ -92,7 +92,7 @@ model StoreMember {
   storeId      String       @map("store_id")
   role         StoreRole
   joinedAt     DateTime     @default(now()) @map("joined_at")
-  activeStatus ActiveStatus @map("active_status")
+  activeStatus ActiveStatus @default(active) @map("active_status")
 
   user  UserProfile @relation(fields: [userId], references: [userId])
   store Store       @relation(fields: [storeId], references: [storeId])
@@ -117,7 +117,7 @@ model Product {
   name         String
   imageUrl     String?      @map("image_url")
   brand        String?
-  activeStatus ActiveStatus @map("active_status")
+  activeStatus ActiveStatus @default(active) @map("active_status")
   createdAt    DateTime     @default(now()) @map("created_at")
   updatedAt    DateTime     @updatedAt @map("updated_at")
   storeId      String       @map("store_id")
@@ -154,7 +154,7 @@ model ProductPackage {
   displayName      String?      @map("display_name")
   importPrice      Decimal?     @map("import_price") @db.Decimal(18, 2)
   sellingPrice     Decimal?     @map("selling_price") @db.Decimal(18, 2)
-  activeStatus     ActiveStatus @map("active_status")
+  activeStatus     ActiveStatus @default(active) @map("active_status")
   barcodeValue     String?      @map("barcode_value")
   barcodeType      BarcodeType? @map("barcode_type")
   createdAt        DateTime     @default(now()) @map("created_at")
