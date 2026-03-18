@@ -1,10 +1,9 @@
 import { authSessionService } from '../services/auth-session.service.js';
 
-import type { AuthenticatedRequest } from '../../../common/types/index.js';
-import type { NextFunction, Response } from 'express';
+import type { Request, NextFunction, Response } from 'express';
 
 export const authenticate = async (
-  req: AuthenticatedRequest,
+  req: Request,
   _res: Response,
   next: NextFunction,
 ): Promise<void> => {
