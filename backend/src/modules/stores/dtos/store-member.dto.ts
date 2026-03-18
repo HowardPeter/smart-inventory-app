@@ -1,3 +1,3 @@
-import type {StoreMember} from '../types/store.type.js';
+import type { StoreMember } from '../types/store.type.js';
 
-export type StoreMembershipResponseDto = Omit<StoreMember, 'joinedAt'>;
+export type StoreMembershipResponseDto = Omit<StoreMember, 'joinedAt' | 'activeStatus'>;
