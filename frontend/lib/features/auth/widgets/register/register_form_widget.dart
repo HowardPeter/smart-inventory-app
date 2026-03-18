@@ -1,6 +1,13 @@
 import 'package:flutter/material.dart';
-import 'package:get/get.dart';
+import 'package:frontend/features/auth/widgets/register/register_password_strength_indicator_widget.dart';
+import 'package:frontend/features/auth/widgets/shared/auth_social_button_widget.dart';
 import 'package:frontend/features/auth/widgets/shared/auth_tab_toggle_widget.dart';
+import 'package:get/get.dart';
+import 'package:frontend/core/constants/text_strings.dart';
+import 'package:frontend/core/theme/app_colors.dart';
+import 'package:frontend/core/theme/app_sizes.dart';
+import 'package:frontend/core/widgets/t_primary_button_widget.dart';
+import 'package:frontend/core/widgets/t_text_form_field_widget.dart';
 import 'package:frontend/features/auth/controllers/register_controller.dart';
 
 class RegisterFormWidget extends GetView<RegisterController> {
@@ -8,22 +15,94 @@ class RegisterFormWidget extends GetView<RegisterController> {
 
   @override
   Widget build(BuildContext context) {
-    return const Column(
+    return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        // 1. THANH TRƯỢT (isLogin: false vì đây là trang Sign Up)
-        AuthTabToggleWidget(isLogin: false),
+        const AuthTabToggleWidget(isLogin: false),
+        const SizedBox(height: AppSizes.p24),
 
-        SizedBox(height: 32),
+        // 1. Email
+        TTextFormField(
+          controller: controller.emailController,
+          label: TTexts.emailLabel.tr,
+          hintText: TTexts.emailHint.tr,
+        ),
+        const SizedBox(height: AppSizes.p24),
 
-        // 2. KHU VỰC FORM ĐĂNG KÝ (Load tức thì)
-        Column(
+        // 2. Password + Thanh đo
+        Obx(() => Column(
+              children: [
+                TTextFormField(
+                  controller: controller.passwordController,
+                  label: TTexts.passwordLabel.tr,
+                  hintText: TTexts.passwordHint.tr,
+                  isObscure: controller.isPasswordHidden.value,
+                  suffixIcon: IconButton(
+                    icon: Icon(
+                      controller.isPasswordHidden.value
+                          ? Icons.visibility_off_outlined
+                          : Icons.visibility_outlined,
+                      color: AppColors.subText,
+                    ),
+                    onPressed: controller.togglePasswordVisibility,
+                  ),
+                  onChanged: (value) => controller.checkPasswordStrength(value),
+                ),
+                RegisterPasswordStrengthIndicatorWidget(
+                    strength: controller.passwordStrength.value),
+              ],
+            )),
+        const SizedBox(height: AppSizes.p16),
+
+        // 3. Confirm Password
+        Obx(() => TTextFormField(
+              controller: controller.confirmPasswordController,
+              label: TTexts.confirmPasswordLabel.tr,
+              hintText: TTexts.confirmPasswordHint.tr,
+              isObscure: controller.isConfirmPasswordHidden.value,
+              suffixIcon: IconButton(
+                icon: Icon(
+                  controller.isConfirmPasswordHidden.value
+                      ? Icons.visibility_off_outlined
+                      : Icons.visibility_outlined,
+                  color: AppColors.subText,
+                ),
+                onPressed: controller.toggleConfirmPasswordVisibility,
+              ),
+            )),
+        const SizedBox(height: AppSizes.p32),
+
+        // 4. Nút Đăng ký
+        Obx(() => TPrimaryButton(
+              text: controller.isLoading.value
+                  ? TTexts.registering.tr
+                  : TTexts.registerBtn.tr,
+              backgroundColor: AppColors.primary,
+              onPressed:
+                  controller.isLoading.value ? null : controller.register,
+            )),
+        const SizedBox(height: AppSizes.p24),
+
+        // 5. Divider "Or"
+        Row(
           children: [
-            // Tạm thời để Text chờ ráp UI TextFields (Name, Email, Pass,...)
-            Center(
-              child: Text("Đây là Form Đăng Ký", textAlign: TextAlign.center),
+            Expanded(child: Divider(color: Colors.grey.shade300, thickness: 1)),
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: AppSizes.p16),
+              child: Text(
+                TTexts.authOrDivider.tr,
+                style: const TextStyle(color: AppColors.subText, fontSize: 12),
+              ),
             ),
+            Expanded(child: Divider(color: Colors.grey.shade300, thickness: 1)),
           ],
+        ),
+        const SizedBox(height: AppSizes.p24),
+
+        // 6. Nút Register với Google (Gọi Component vừa tái sử dụng)
+        AuthSocialButtonWidget(
+          title: TTexts.registerWithGoogle.tr,
+          onPressed: () => controller.registerWithGoogle(),
         ),
       ],
     );

@@ -37,7 +37,7 @@ class ForgotPasswordFormWidget extends GetView<ForgotPasswordController> {
         Center(
           child: TImageWidget(
             image: TImages.authImages.forgotPasswordContent1,
-            height: 180,
+            height: 200,
           ),
         ),
         const SizedBox(height: AppSizes.p32),
@@ -52,7 +52,7 @@ class ForgotPasswordFormWidget extends GetView<ForgotPasswordController> {
         // Nút Gửi Email (Nút chính)
         Obx(() => TPrimaryButton(
               text: controller.isLoading.value
-                  ? 'Sending...'
+                  ? TTexts.emailSending
                   : TTexts.forgotPasswordBtn.tr,
               onPressed:
                   controller.isLoading.value ? null : controller.sendResetLink,

@@ -29,7 +29,7 @@ class ForgotPasswordController extends GetxController {
     isLoading.value = true;
 
     try {
-      TFullScreenLoader.openLoadingDialog('Checking email...');
+      TFullScreenLoader.openLoadingDialog(TTexts.checkingEmail.tr);
 
       await authProvider.sendPasswordResetEmail(email);
 

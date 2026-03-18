@@ -24,7 +24,7 @@ class VerifyEmailHeaderWidget extends StatelessWidget {
         const SizedBox(height: 24),
         TImageWidget(
           image: TImages.authImages.verifyEmailContent1,
-          height: 180,
+          height: 200,
         ),
       ],
     );

@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
+import 'package:frontend/core/constants/text_strings.dart';
 import 'package:frontend/core/widgets/t_snackbars_widget.dart';
 import 'package:get/get.dart';
 import 'package:frontend/features/auth/providers/auth_provider.dart';
@@ -50,15 +51,15 @@ class VerifyEmailController extends GetxController {
       await authProvider.sendPasswordResetEmail(email);
 
       TSnackbars.success(
-        title: 'Email Sent',
-        message: 'A new reset link has been sent to $email.',
+        title: TTexts.successTitle.tr,
+        message: TTexts.resendEmailSuccessMessage.trParams({'email': email}),
       );
 
       // Gửi thành công thì bắt đầu đếm ngược lại từ đầu
       startTimer();
     } catch (e) {
       TSnackbars.error(
-        title: 'Error',
+        title: TTexts.errorTitle.tr,
         message: e.toString().replaceAll('Exception: ', ''),
       );
     } finally {
@@ -68,13 +69,12 @@ class VerifyEmailController extends GetxController {
 
   /// Hàm mở ứng dụng Email
   Future<void> openMailApp() async {
-    // 2. SỬA THÀNH OpenMailAppPlus TẠI ĐÂY
     var result = await OpenMailAppPlus.openMailApp();
 
     if (!result.didOpen && !result.canOpen) {
       TSnackbars.error(
-        title: 'Error',
-        message: 'Not finding any kind of email.',
+        title: TTexts.errorTitle.tr,
+        message: TTexts.emailAppNotFound.tr,
       );
     } else if (!result.didOpen && result.canOpen) {
       showDialog(
@@ -82,7 +82,7 @@ class VerifyEmailController extends GetxController {
         builder: (_) {
           return MailAppPickerDialog(
             mailApps: result.options,
-            title: 'Pick an email',
+            title: TTexts.pickEmailApp.tr,
           );
         },
       );

@@ -26,20 +26,19 @@ class LoginFormWidget extends GetView<LoginController> {
 
         // 2. Ô Email
         TTextFormField(
-          controller: controller.emailController, 
+          controller: controller.emailController,
           label: TTexts.emailLabel.tr,
           hintText: TTexts.emailHint.tr,
         ),
         const SizedBox(height: AppSizes.p16),
 
-        // 3. Ô Password 
+        // 3. Ô Password
         Obx(
           () => TTextFormField(
             controller: controller.passwordController,
             label: TTexts.passwordLabel.tr,
             hintText: TTexts.passwordHint.tr,
-            obscureText:
-                controller.isPasswordHidden.value,
+            isObscure: controller.isPasswordHidden.value,
             suffixIcon: IconButton(
               icon: Icon(
                 controller.isPasswordHidden.value
@@ -68,7 +67,9 @@ class LoginFormWidget extends GetView<LoginController> {
         const AuthDividerWidget(),
         const SizedBox(height: AppSizes.p24),
 
-        const AuthSocialButtonWidget(),
+        AuthSocialButtonWidget(
+            title: TTexts.continueWithGoogle.tr,
+            onPressed: () => controller.loginWithGoogle())
       ],
     );
   }

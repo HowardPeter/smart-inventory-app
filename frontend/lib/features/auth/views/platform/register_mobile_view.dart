@@ -11,7 +11,6 @@ class RegisterMobileView extends GetView<RegisterController> {
   @override
   Widget build(BuildContext context) {
     return AuthStandardLayout(
-      // Điền trực tiếp Text tĩnh (Hoặc bạn có thể đưa vào TTexts sau)
       title: TTexts.registerTitle.tr,
       subtitle: TTexts.registerSubtitle.tr,
       showBackButton: false,

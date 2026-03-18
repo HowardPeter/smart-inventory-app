@@ -12,6 +12,12 @@ class AppTranslations extends Translations {
           TTexts.errorAccessRestrictedSubtitle:
               'This application is exclusively optimized for Smartphones. Please access via a mobile device or a standard desktop web browser for the full experience.',
           TTexts.exit: 'Exit',
+          TTexts.successTitle: 'Success',
+          TTexts.errorTitle: 'Error',
+          TTexts.weak: 'Weak',
+          TTexts.fair: 'Fair',
+          TTexts.good: 'Good',
+          TTexts.strong: 'Strong',
 
           TTexts.splashSlogan: 'Smart Inventory, Smarter Business',
           TTexts.splashVersion: 'Version',
@@ -45,6 +51,10 @@ class AppTranslations extends Translations {
 
           // Auth
           TTexts.authOrDivider: "Or",
+          TTexts.authentication: 'Authentication',
+          TTexts.canceled: 'Canceled',
+          TTexts.googleSignInCanceled: 'Google Sign-In was canceled.',
+          TTexts.checkingEmail: 'Checking email...',
 
           // Login
           TTexts.loginWelcomeTitle: 'Welcome Back',
@@ -76,6 +86,23 @@ class AppTranslations extends Translations {
           TTexts.registerTitle: 'Create an Account',
           TTexts.registerSubtitle:
               'Sign up today to start managing your inventory.',
+          TTexts.confirmPasswordLabel: 'Confirm Password',
+          TTexts.confirmPasswordHint: '********',
+          TTexts.registerBtn: 'Register',
+          TTexts.registering: 'Registering...',
+          TTexts.registerWithGoogle: 'Register with Google',
+          TTexts.registerErrorEmptyFieldsTitle: 'Missing Information',
+          TTexts.registerErrorEmptyFieldsMessage:
+              'Please fill in all required fields to continue.',
+          TTexts.registerErrorPasswordMismatchTitle: 'Password Mismatch',
+          TTexts.registerErrorPasswordMismatchMessage:
+              'The passwords you entered do not match. Please try again.',
+          TTexts.registerSuccessTitle: 'Account Created',
+          TTexts.registerSuccessMessage:
+              'Welcome aboard! Please check your email to verify your account.',
+          TTexts.registerFailedTitle: 'Registration Failed',
+          TTexts.resendEmailSuccessMessage:
+              'A new reset link has been sent to @email.',
 
           // Forgot Password
           TTexts.forgetPasswordTitle: 'Forgot Password?',
@@ -87,11 +114,12 @@ class AppTranslations extends Translations {
           TTexts.emailSentTitle: 'Email Sent',
           TTexts.emailSentMessage: 'Reset link has been sent to @email',
           TTexts.emailSendFailed: 'Cannot send email. Please try again later.',
+          TTexts.emailSending: 'Sending...',
 
           // Verify Email
           TTexts.verifyEmailTitle: 'Verify Email',
           TTexts.verifyEmailSubtitle:
-              'Congratulations! Your account awaits: verify your email.',
+              'Almost there! Please verify your email to get started.',
           TTexts.verifyEmailInnerTitle: 'Verify your email address',
           TTexts.verifyEmailMessageP1:
               'A email to reset your password has been successfully sent to the email address ',
@@ -101,6 +129,8 @@ class AppTranslations extends Translations {
           TTexts.resendEmail: 'Resend Email',
           TTexts.backToLogin: 'Back to Login',
           TTexts.resendEmailIn: 'after ',
+          TTexts.emailAppNotFound: 'Not finding any kind of email.',
+          TTexts.pickEmailApp: 'Pick an email',
         },
       };
 }

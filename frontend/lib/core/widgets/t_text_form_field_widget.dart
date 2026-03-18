@@ -8,16 +8,18 @@ class TTextFormField extends StatelessWidget {
     super.key,
     required this.label,
     required this.hintText,
-    this.obscureText = false,
+    this.isObscure = false, // Đổi tên từ obscureText thành isObscure
     this.suffixIcon,
     this.controller,
+    this.onChanged, // Thêm thuộc tính này
   });
 
   final String label;
   final String hintText;
-  final bool obscureText;
-  final Widget? suffixIcon; // Để chứa icon con mắt mở/nhắm
+  final bool isObscure; // Đổi tên ở đây
+  final Widget? suffixIcon;
   final TextEditingController? controller;
+  final Function(String)? onChanged; // Khai báo kiểu function nhận vào String
 
   @override
   Widget build(BuildContext context) {
@@ -36,7 +38,8 @@ class TTextFormField extends StatelessWidget {
         const SizedBox(height: AppSizes.p8),
         TextFormField(
           controller: controller,
-          obscureText: obscureText,
+          obscureText: isObscure, // Sử dụng biến mới
+          onChanged: onChanged, // Truyền giá trị vào TextFormField gốc
           style: const TextStyle(
             fontFamily: 'Poppins',
             fontSize: 14,
@@ -61,9 +64,7 @@ class TTextFormField extends StatelessWidget {
               borderRadius: BorderRadius.circular(AppSizes.radius8),
               borderSide: const BorderSide(color: AppColors.primary),
             ),
-            // XỬ LÝ HIỂN THỊ NÚT X
-            // Nếu có truyền suffixIcon (như con mắt) thì dùng.
-            // Nếu không, tự động kiểm tra và build nút X
+            // Logic hiển thị suffixIcon
             suffixIcon: suffixIcon ?? _buildClearButton(),
           ),
         ),
@@ -71,29 +72,32 @@ class TTextFormField extends StatelessWidget {
     );
   }
 
-  /// Nút Xóa nhanh (Chỉ hiển thị khi có controller và đang có chữ)
+  /// Nút Xóa nhanh (Chỉ hiển thị khi không phải ô mật khẩu và có chữ)
   Widget? _buildClearButton() {
-    // Nếu không truyền controller thì không thể xóa chữ được -> ẩn nút
-    if (controller == null) return null;
+    if (controller == null || isObscure) {
+      return null; // Không hiện nút X nếu là ô mật khẩu
+    }
 
     return ValueListenableBuilder<TextEditingValue>(
       valueListenable: controller!,
       builder: (context, value, child) {
-        // Hễ có chữ là hiện ra nút IconButton X
         if (value.text.isNotEmpty) {
           return IconButton(
             icon: const Icon(
               Icons.cancel,
               color: Colors.grey,
               size: 20,
-            ), // Dùng icon cancel bo tròn cho đẹp
+            ),
             onPressed: () {
-              controller!.clear(); // Bấm vào là xóa trắng ô nhập
+              controller!.clear();
+              if (onChanged != null) {
+                onChanged!("");
+              }
             },
-            splashColor: Colors.transparent, // Tắt hiệu ứng loang lổ khi bấm
+            splashColor: Colors.transparent,
           );
         }
-        return const SizedBox.shrink(); // Ẩn đi khi không có chữ
+        return const SizedBox.shrink();
       },
     );
   }

@@ -13,13 +13,13 @@ class TPrimaryButton extends StatelessWidget {
     this.width = double.infinity,
     this.height = 52.0,
     this.borderRadius = AppSizes.radius12,
-    this.fontSize = 16.0,
+    this.fontSize = 14.0,
     this.isOutlined = false,
     this.borderColor,
   });
 
   final String text;
-  final VoidCallback? onPressed; // Đổi thành nullable để hỗ trợ disable nút
+  final VoidCallback? onPressed; 
   final IconData? icon;
   final Color backgroundColor;
   final Color textColor;

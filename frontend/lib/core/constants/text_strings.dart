@@ -6,6 +6,12 @@ class TTexts {
   static const String appName = "app_name";
   static const String group21 = "group_21";
   static const String tryAgain = "try_again";
+  static const String successTitle = "success_title";
+  static const String errorTitle = "error_title";
+  static const String weak = "weak";
+  static const String fair = "fair";
+  static const String good = "good";
+  static const String strong = "strong";
 
   // -- Error / Restricted Access
   static const String errorAccessRestrictedTitle =
@@ -51,6 +57,10 @@ class TTexts {
 
   // -- Auth
   static const String authOrDivider = "auth_or_divider";
+  static const String authentication = "authentication";
+  static const String canceled = "canceled";
+  static const String googleSignInCanceled = "google_sign_in_canceled";
+  static const String checkingEmail = "checking_email";
 
   // -- Login Screen
   static const String loginWelcomeTitle = "login_welcome_title";
@@ -83,6 +93,25 @@ class TTexts {
   // -- Register Screen
   static const String registerTitle = "register_title";
   static const String registerSubtitle = "register_subtitle";
+  static const String confirmPasswordLabel = "confirm_password_label";
+  static const String confirmPasswordHint = "confirm_password_hint";
+  static const String registerBtn = "register_btn";
+  static const String registering = "registering";
+  static const String registerWithGoogle = "register_with_google";
+  // -- Register Error / Success Messages
+  static const String registerErrorEmptyFieldsTitle =
+      "register_error_empty_fields_title";
+  static const String registerErrorEmptyFieldsMessage =
+      "register_error_empty_fields_message";
+  static const String registerErrorPasswordMismatchTitle =
+      "register_error_password_mismatch_title";
+  static const String registerErrorPasswordMismatchMessage =
+      "register_error_password_mismatch_message";
+  static const String registerSuccessTitle = "register_success_title";
+  static const String registerSuccessMessage = "register_success_message";
+  static const String registerFailedTitle = "register_failed_title";
+  static const String resendEmailSuccessMessage =
+      "resend_email_success_message";
 
   // -- Forgot Password Screen
   static const String forgetPasswordTitle = "forget_password_title";
@@ -93,6 +122,7 @@ class TTexts {
   static const String emailSentTitle = "email_sent_title";
   static const String emailSentMessage = "email_sent_message";
   static const String emailSendFailed = "email_send_failed";
+  static const String emailSending = "email_sending";
 
   // -- Verify Email Screen
   static const String verifyEmailTitle = "verify_email_title";
@@ -104,4 +134,6 @@ class TTexts {
   static const String backToLogin = "back_to_login";
   static const String resendEmail = "resend_email";
   static const String resendEmailIn = "resend_email_in";
+  static const String emailAppNotFound = "email_app_not_found";
+  static const String pickEmailApp = "pick_email_app";
 }
