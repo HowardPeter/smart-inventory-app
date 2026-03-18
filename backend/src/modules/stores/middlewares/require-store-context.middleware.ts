@@ -1,13 +1,13 @@
 import { StatusCodes } from 'http-status-codes';
 
 import { CustomError } from '../../../common/errors/index.js';
+import { requireReqUser } from '../../../common/utils/index.js';
 import { storeMemberService } from '../store.module.js';
 
-import type { AuthorizedRequest } from '../../../common/types/index.js';
-import type { Response, NextFunction } from 'express';
+import type { Request, Response, NextFunction } from 'express';
 
 export const requireStoreContext = async (
-  req: AuthorizedRequest,
+  req: Request,
   _res: Response,
   next: NextFunction,
 ): Promise<void> => {
@@ -21,8 +21,10 @@ export const requireStoreContext = async (
       });
     }
 
+    const currentUser = requireReqUser(req);
+
     const membership = await storeMemberService.getMembershipByUserIdAndStoreId(
-      req.user.userId,
+      currentUser.userId,
       storeId,
     );
 

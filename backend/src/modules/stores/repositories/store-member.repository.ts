@@ -7,18 +7,16 @@ export class StoreMemberRepository {
     userId: string,
     storeId: string,
   ): Promise<StoreMembershipResponseDto | null> {
-    return prisma.storeMember.findUnique({
+    return prisma.storeMember.findFirst({
       where: {
-        userId_storeId: {
-          userId,
-          storeId,
-        },
+        userId,
+        storeId,
+        activeStatus: 'active',
       },
       select: {
         userId: true,
         storeId: true,
         role: true,
-        activeStatus: true,
       },
     });
   }

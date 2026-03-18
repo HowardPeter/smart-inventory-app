@@ -30,10 +30,6 @@ export class StoreMemberService {
       return null;
     }
 
-    if (membership.activeStatus !== 'active') {
-      return null;
-    }
-
     return membership;
   }
 }
