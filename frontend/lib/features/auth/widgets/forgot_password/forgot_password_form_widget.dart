@@ -18,14 +18,20 @@ class ForgotPasswordFormWidget extends GetView<ForgotPasswordController> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(
-          TTexts.verifyEmailInnerTitle.tr,
-          style: const TextStyle(
-            fontFamily: 'Poppins',
-            fontSize: 16,
-            fontWeight: FontWeight.w500,
-            color: AppColors.primaryText,
+        Center(
+          child: Text(
+            TTexts.forgotPasswordInnerTitle.tr,
+            style: const TextStyle(
+              fontFamily: 'Poppins',
+              fontSize: 16,
+              fontWeight: FontWeight.w500,
+              color: AppColors.primaryText,
+            ),
           ),
+        ),
+
+        const SizedBox(
+          height: AppSizes.p24,
         ),
 
         Center(
@@ -53,11 +59,11 @@ class ForgotPasswordFormWidget extends GetView<ForgotPasswordController> {
             )),
         const SizedBox(height: AppSizes.p16),
 
-        // Nút Quay Lại (Nút viền cực kỳ gọn gàng)
+        // Nút Quay Lại
         TPrimaryButton(
           text: TTexts.goBack.tr,
-          isOutlined: true, // Kích hoạt chế độ viền
-          textColor: AppColors.primaryText, // Đổi chữ thành màu đen
+          isOutlined: true,
+          textColor: AppColors.primaryText,
           onPressed: () => Get.back(),
         ),
       ],

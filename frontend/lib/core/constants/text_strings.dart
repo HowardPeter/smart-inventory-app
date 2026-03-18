@@ -88,6 +88,7 @@ class TTexts {
   static const String forgetPasswordTitle = "forget_password_title";
   static const String forgetPasswordSubtitle = "forget_password_subtitle";
   static const String forgotPasswordBtn = "forgot_password_btn";
+  static const String forgotPasswordInnerTitle = 'forgot_password_inner_title';
   static const String goBack = "go_back";
   static const String emailSentTitle = "email_sent_title";
   static const String emailSentMessage = "email_sent_message";
@@ -100,6 +101,7 @@ class TTexts {
   static const String verifyEmailMessageP1 = "verify_email_message_p1";
   static const String verifyEmailMessageP2 = "verify_email_message_p2";
   static const String goToGmail = "go_to_gmail";
+  static const String backToLogin = "back_to_login";
   static const String resendEmail = "resend_email";
   static const String resendEmailIn = "resend_email_in";
 }

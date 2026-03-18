@@ -91,7 +91,7 @@ class LoginController extends GetxController {
 
       if (account == null) {
         TFullScreenLoader.stopLoading();
-        return; // Người dùng bấm hủy
+        return;
       }
 
       // 2. LẤY ID TOKEN ĐỂ SAU NÀY GỬI LÊN SERVER
@@ -104,32 +104,33 @@ class LoginController extends GetxController {
       debugPrint("ID Token: $idToken");
       debugPrint("===============================");
 
-      /* // SAU NÀY KHI CÓ BACKEND: 
-      // 1. Bạn truyền cái idToken lên server.
-      // 2. Server trả về UserProfileModel.
-      // 3. Bạn lưu thông tin vào AuthService ở đây.
-      */
-
       // 3. LƯU VÀO KÉT SẮT (REMEMBER ME) ĐỂ APP GHI NHỚ
       await Get.find<AuthService>().saveUserLogin(
         account.email,
         "google_dummy_password",
-        true, // Luôn Remember Me khi login Google
+        true,
       );
 
       TFullScreenLoader.stopLoading();
 
-      // 4. Hiện thông báo và vào Home
+      // 4. HIỆN THÔNG BÁO THÀNH CÔNG
       TSnackbars.success(
         title: TTexts.loginSuccessTitle.tr,
-        message: 'Đăng nhập Google thành công: ${account.displayName}',
+        message: TTexts.loginSuccessMessage.trParams({
+          'name': account.displayName ?? account.email,
+        }),
       );
 
       Get.offAllNamed(AppRoutes.home);
     } catch (e) {
       TFullScreenLoader.stopLoading();
       debugPrint('❌ Google Auth Error: $e');
-      TSnackbars.error(title: 'Lỗi', message: e.toString());
+
+      // 5. BÁO LỖI
+      TSnackbars.error(
+        title: TTexts.loginFailedTitle.tr,
+        message: e.toString().replaceAll('Exception: ', ''),
+      );
     }
   }
 }

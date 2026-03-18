@@ -82,6 +82,7 @@ class AppTranslations extends Translations {
           TTexts.forgetPasswordSubtitle:
               'Enter your email to receive a secure password reset link.',
           TTexts.forgotPasswordBtn: 'Send to my email',
+          TTexts.forgotPasswordInnerTitle: 'Enter your email',
           TTexts.goBack: 'Go back',
           TTexts.emailSentTitle: 'Email Sent',
           TTexts.emailSentMessage: 'Reset link has been sent to @email',
@@ -98,6 +99,7 @@ class AppTranslations extends Translations {
               '. Please check your inbox and junk folder. If you cannot find the email, try resending the link from the previous screen.',
           TTexts.goToGmail: 'Go to Gmail',
           TTexts.resendEmail: 'Resend Email',
+          TTexts.backToLogin: 'Back to Login',
           TTexts.resendEmailIn: 'after ',
         },
       };

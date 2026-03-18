@@ -14,25 +14,30 @@ class AuthProvider {
 
   // Đưa Client ID ra một biến riêng cho gọn
   final String _serverClientId =
-      '312359689211-1iqfd8ccf58fp2n242tg4bi207in4ts7.apps.googleusercontent.com';
+      '312359689211-rb6t26nfeqc5pmv268qgj9so090ov7cm.apps.googleusercontent.com';
 
   /// Hàm đăng nhập Google
   Future<GoogleSignInAccount?> signInWithGoogle() async {
     try {
-      // 2. CẬP NHẬT BẢN 7.2.0: Phải initialize trước khi dùng
       await _googleSignIn.initialize(serverClientId: _serverClientId);
 
-      // Đảm bảo user được chọn lại account
-      await _googleSignIn.signOut();
-
-      // 3. CẬP NHẬT BẢN 7.2.0: Sử dụng authenticate() thay vì signIn()
       final GoogleSignInAccount account = await _googleSignIn.authenticate(
         scopeHint: ['email', 'profile'],
       );
 
       return account;
     } catch (e) {
-      debugPrint('Lỗi Google Sign-In: $e');
+      final errorStr = e.toString().toLowerCase();
+
+      if (errorStr.contains('canceled') ||
+          errorStr.contains('sign_in_canceled')) {
+        debugPrint('Người dùng chủ động đóng popup chọn tài khoản Google.');
+        // Trả về null một cách êm đẹp, KHÔNG ném lỗi (rethrow)
+        return null;
+      }
+
+      // Nếu là lỗi thật sự (mất mạng, sai client ID...) thì mới ném ra ngoài
+      debugPrint('Lỗi Google Sign-In thực sự: $e');
       rethrow;
     }
   }

@@ -30,6 +30,8 @@ class AppLogos {
   final String appLogoWhiteCS = 'assets/logos/app-icon-white-cs.png';
 
   final String googleLogo = 'assets/logos/google-logo.png';
+
+  final String gmailLogo = 'assets/logos/gmail-logo.png';
 }
 
 class CoreImages {

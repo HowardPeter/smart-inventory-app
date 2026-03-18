@@ -1,7 +1,9 @@
 import 'dart:async';
+import 'package:flutter/material.dart';
 import 'package:frontend/core/widgets/t_snackbars_widget.dart';
 import 'package:get/get.dart';
 import 'package:frontend/features/auth/providers/auth_provider.dart';
+import 'package:open_mail_app_plus/open_mail_app_plus.dart';
 
 class VerifyEmailController extends GetxController {
   final AuthProvider authProvider;
@@ -64,11 +66,27 @@ class VerifyEmailController extends GetxController {
     }
   }
 
-  void openMailApp() {
-    TSnackbars.info(
-      title: 'Open Mail',
-      message: 'This feature will open the Mail app on your device.',
-    );
+  /// Hàm mở ứng dụng Email
+  Future<void> openMailApp() async {
+    // 2. SỬA THÀNH OpenMailAppPlus TẠI ĐÂY
+    var result = await OpenMailAppPlus.openMailApp();
+
+    if (!result.didOpen && !result.canOpen) {
+      TSnackbars.error(
+        title: 'Error',
+        message: 'Not finding any kind of email.',
+      );
+    } else if (!result.didOpen && result.canOpen) {
+      showDialog(
+        context: Get.context!,
+        builder: (_) {
+          return MailAppPickerDialog(
+            mailApps: result.options,
+            title: 'Pick an email',
+          );
+        },
+      );
+    }
   }
 
   @override
