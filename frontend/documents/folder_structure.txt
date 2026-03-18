@@ -1,0 +1,40 @@
+lib/
+├── core/                           # Thành phần cốt lõi, dùng chung toàn app
+│   ├── constants/                  # Hằng số hệ thống
+│   │   ├── dimension.dart          # Breakpoints (600, 1440)
+│   │   ├── image_strings.dart      # Đường dẫn assets/images
+│   │   ├── models/                     # 📦 MODELS DÙNG CHUNG TOÀN APP
+│   │   │   └── user_model.dart         # Thông tin người dùng (dùng ở Home, Profile...)        
+│   │   ├── text_strings.dart       # Keys cho Localization (TTexts)
+│   │   └── api_endpoints.dart      # URL API
+│   ├── layouts/                    # CẤU TRÚC (Engine) điều phối Responsive
+│   │   ├── t_responsive_layout.dart # Bộ lọc Mobile/Tablet/Web
+│   │   └── t_size_error_layout.dart # Màn hình chặn thiết bị không hỗ trợ
+│   ├── localization/               # Đa ngôn ngữ (AppTranslations)
+│   ├── network/                    # Cấu hình API Client
+│   ├── theme/                      # UI Design System (Colors, Sizes, Theme)
+│   ├── utils/                      # Hàm tiện ích (Formatters, Validators)
+│   └── widgets/                    # Các thành phần UI nguyên tử (Atomic Components)
+│       ├── buttons/                # TPrimaryButton, TBackButton
+│       └── t_image_widget.dart     # Widget hiển thị ảnh dùng chung
+│
+├── features/                       # Các tính năng (Modules) độc lập
+│   ├── auth/                       # Module Xác thực
+│   │   ├── bindings/               
+│   │   │   ├── login_binding.dart  # Chỉ tiêm LoginController
+│   │   │   └── signup_binding.dart # Chỉ tiêm RegisterController
+│   │   ├── controllers/            # 🧠 CHIA NHỎ CONTROLLER
+│   │   │   ├── login_controller.dart
+│   │   │   ├── register_controller.dart
+│   │   │   └── verify_email_controller.dart
+│   │   ├── models/                 # 📦 MODELS DÙNG RIÊNG CHO AUTH
+│   │   │   ├── login_request_model.dart
+│   │   │   └── register_request_model.dart
+│   │   ├── services/               # 🔌 GIAO TIẾP VỚI BACKEND
+│   │   │   └── auth_service.dart   # Gọi API (POST /login, POST /register)
+│   │   ├── layouts/                # Giao diện chi tiết (đã làm)
+│   │   ├── views/                  # Điều phối màn hình (đã làm)
+│   │   └── widgets/
+│
+├── routes/                         # Quản lý định tuyến (AppPages, AppRoutes)
+└── main.dart                       # Điểm khởi chạy ứng dụng
