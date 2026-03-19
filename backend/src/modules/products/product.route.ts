@@ -2,6 +2,7 @@ import { Router } from 'express';
 
 import { productController } from './product.module.js';
 import {
+  validateGetProducts,
   validateCreateProduct,
   validateDeleteProduct,
   validateGetProductById,
@@ -19,6 +20,7 @@ productRouter.use(authenticate, requireStoreContext);
 productRouter.get(
   '/',
   requirePermission(PERMISSION.PRODUCT_READ),
+  validateGetProducts,
   asyncWrapper(productController.getProductById),
 );
 

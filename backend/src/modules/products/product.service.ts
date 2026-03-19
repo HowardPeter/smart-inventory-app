@@ -2,12 +2,18 @@ import { StatusCodes } from 'http-status-codes';
 
 import { ProductRepository } from './product.repository.js';
 import { CustomError } from '../../common/errors/index.js';
+import {
+  normalizePagination,
+  buildPaginatedResponse,
+} from '../../common/utils/index.js';
 import { CategoryRepository } from '../categories/index.js';
 
 import type {
   CreateProductData,
   DetailProductResponseDto,
   UpdateProductDto,
+  ListProductsQueryDto,
+  ListProductsResponseDto,
 } from './product.dto.js';
 
 export class ProductService {
@@ -33,8 +39,19 @@ export class ProductService {
     }
   }
 
-  async getAllbyStoreId(storeId: string): Promise<DetailProductResponseDto[]> {
-    return await this.productRepository.findManyByStoreId(storeId);
+  async getProductsbyStoreId(
+    storeId: string,
+    query: ListProductsQueryDto,
+  ): Promise<ListProductsResponseDto> {
+    const normalizedPagination = normalizePagination(query);
+
+    const { items, totalItems } =
+      await this.productRepository.findManyByStoreId(storeId, {
+        ...query,
+        ...normalizedPagination,
+      });
+
+    return buildPaginatedResponse(items, totalItems, normalizedPagination);
   }
 
   async getProductById(

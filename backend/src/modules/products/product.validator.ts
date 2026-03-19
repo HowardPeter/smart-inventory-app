@@ -57,6 +57,15 @@ const updateProductBodySchema = z
     'Request body cannot be empty',
   );
 
+const listProductsQuerySchema = z.object({
+  page: z.coerce.number().int().min(1).optional().default(1),
+  limit: z.coerce.number().int().min(1).max(100).optional().default(10),
+  sortBy: z.enum(['name', 'createdAt', 'updatedAt']).optional().default('createdAt'),
+  sortOrder: z.enum(['asc', 'desc']).optional().default('desc'),
+  categoryId: z.string().uuid('Invalid categoryId').optional(),
+  brand: z.string().trim().min(1).max(255).optional(),
+});
+
 const validateSchema = <T>(schema: z.ZodSchema<T>, data: unknown): T => {
   const result = schema.safeParse(data);
 
@@ -68,6 +77,15 @@ const validateSchema = <T>(schema: z.ZodSchema<T>, data: unknown): T => {
   }
 
   return result.data;
+};
+
+export const validateGetProducts = (
+  req: Request,
+  _res: Response,
+  next: NextFunction,
+): void => {
+  req.query = validateSchema(listProductsQuerySchema, req.query) as unknown as Request['query'];
+  next();
 };
 
 export const validateCreateProduct = (

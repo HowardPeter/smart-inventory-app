@@ -11,6 +11,7 @@ import type {
   CreateProductData,
   ProductResponseDto,
   UpdateProductDto,
+  ListProductsQueryDto,
 } from './product.dto.js';
 import type { ApiResponse } from '../../common/types/index.js';
 import type { Request, Response } from 'express';
@@ -24,7 +25,10 @@ export class ProductController {
   ): Promise<void> => {
     const storeId = requireReqStoreContext(req).storeId;
 
-    const products = await this.productService.getAllbyStoreId(storeId);
+    const products = await this.productService.getProductsbyStoreId(
+      storeId,
+      req.query as unknown as ListProductsQueryDto,
+    );
 
     sendResponse.success(res, products, { status: StatusCodes.OK });
   };

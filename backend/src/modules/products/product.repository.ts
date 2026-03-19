@@ -1,41 +1,79 @@
+import {
+  normalizePagination,
+  getPaginationSkip,
+} from '../../common/utils/index.js';
 import { prisma } from '../../db/prismaClient.js';
 
 import type {
   CreateProductData,
   UpdateProductDto,
   DetailProductResponseDto,
+  ListProductsQueryDto,
+  ProductListItemDto,
 } from './product.dto.js';
+import type { Prisma } from '../../../src/generated/prisma/client.js';
 
 export class ProductRepository {
   async findManyByStoreId(
     storeId: string,
-  ): Promise<DetailProductResponseDto[]> {
-    return await prisma.product.findMany({
-      where: {
-        storeId,
-        activeStatus: 'active',
-      },
-      orderBy: {
-        name: 'desc',
-      },
-      select: {
-        productId: true,
-        name: true,
-        imageUrl: true,
-        brand: true,
-        activeStatus: true,
-        createdAt: true,
-        updatedAt: true,
-        storeId: true,
-        category: {
-          select: {
-            categoryId: true,
-            name: true,
-            description: true,
+    query: ListProductsQueryDto,
+  ): Promise<{ items: ProductListItemDto[]; totalItems: number }> {
+    const { page, limit } = normalizePagination(query);
+    const {
+      sortBy = 'name',
+      sortOrder = 'desc',
+      categoryId,
+      brand,
+    } = query;
+
+    const where: Prisma.ProductWhereInput = {
+      storeId,
+      activeStatus: 'active',
+      ...(categoryId && { categoryId }),
+      ...(brand && {
+        brand: {
+          equals: brand,
+          mode: 'insensitive',
+        },
+      }),
+    };
+
+    // INFO: $transaction - chạy nhiều query trong 1 transaction
+    const [items, totalItems] = await prisma.$transaction([
+      prisma.product.findMany({
+        where,
+        orderBy: {
+          [sortBy]: sortOrder,
+        },
+        skip: getPaginationSkip({ page, limit }),
+        take: limit,
+        select: {
+          productId: true,
+          name: true,
+          imageUrl: true,
+          brand: true,
+          activeStatus: true,
+          createdAt: true,
+          updatedAt: true,
+          storeId: true,
+          category: {
+            select: {
+              categoryId: true,
+              name: true,
+              description: true,
+            },
           },
         },
-      },
-    });
+      }),
+      prisma.product.count({
+        where,
+      }),
+    ]);
+
+    return {
+      items,
+      totalItems,
+    };
   }
 
   async findOne(
