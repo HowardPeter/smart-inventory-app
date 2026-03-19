@@ -19,21 +19,18 @@ export class ProductRepository {
     query: ListProductsQueryDto,
   ): Promise<{ items: ProductListItemDto[]; totalItems: number }> {
     const { page, limit } = normalizePagination(query);
-    const {
-      sortBy = 'name',
-      sortOrder = 'desc',
-      categoryId,
-      brand,
-    } = query;
+    const { sortBy = 'name', sortOrder = 'desc', categoryId, brand } = query;
 
     const where: Prisma.ProductWhereInput = {
       storeId,
       activeStatus: 'active',
+
+      // nếu có giá trị thì thêm, undefined thì thôi
       ...(categoryId && { categoryId }),
       ...(brand && {
         brand: {
           equals: brand,
-          mode: 'insensitive',
+          mode: 'insensitive', // không phân biệt hoa thường
         },
       }),
     };
