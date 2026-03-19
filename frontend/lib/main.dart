@@ -7,6 +7,7 @@ import 'package:frontend/routes/app_pages.dart';
 import 'package:get/get.dart';
 import 'package:device_preview/device_preview.dart';
 import 'package:get_storage/get_storage.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
 import 'core/theme/app_theme.dart';
 // import 'core/network/api_client.dart'; // Sau này mở ra để inject ApiClient
 
@@ -24,6 +25,11 @@ void main() async {
   // Việc dùng putAsync giúp App chờ AuthService check ổ cứng xong mới chạy tiếp
   await Get.putAsync(() => AuthService().init());
   // ---------------------------------------------------------
+  // 3. Khởi tạo supabase để kích hoạt các tính năng authen
+  await Supabase.initialize(
+    url: 'http://10.0.2.2:54321',
+    anonKey: 'sb_publishable_ACJWlzQHlZjBrEguHvfOxg_3BJgxAaH',
+  );
 
   runApp(
     // Bọc toàn bộ app trong DevicePreview

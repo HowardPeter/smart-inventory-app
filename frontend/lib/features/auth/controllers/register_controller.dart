@@ -95,19 +95,23 @@ class RegisterController extends GetxController {
 
       // SAU NÀY: Chỗ này sẽ gọi authProvider.registerWithEmail(request)
       // Tạm thời giả lập chờ mạng 2 giây
-      await Future.delayed(const Duration(seconds: 2));
-
-      TFullScreenLoader.stopLoading();
-
-      // Hiện thông báo thành công
-      TSnackbars.success(
-        title: TTexts.registerSuccessTitle.tr,
-        message: TTexts.registerSuccessMessage.tr,
+      // await Future.delayed(const Duration(seconds: 2));
+      final response = await authProvider.register(
+        email: email,
+        password: password,
       );
 
-      // Chuyển hướng sang trang Xác thực Email (Gửi kèm email qua Arguments)
-      Get.toNamed(AppRoutes.verifyEmail,
-          arguments: emailController.text.trim());
+      TFullScreenLoader.stopLoading();
+      if (response.user != null) {
+        // Hiện thông báo thành công
+        TSnackbars.success(
+          title: TTexts.registerSuccessTitle.tr,
+          message: TTexts.registerSuccessMessage.tr,
+        );
+        // Chuyển hướng sang trang Xác thực Email (Gửi kèm email qua Arguments)
+        Get.toNamed(AppRoutes.verifyEmail,
+            arguments: emailController.text.trim());
+      }
     } catch (e) {
       TFullScreenLoader.stopLoading();
       TSnackbars.error(
