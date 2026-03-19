@@ -69,7 +69,7 @@ class AppPages {
     GetPage(
       name: AppRoutes.home,
       page: () => const HomeView(),
-      binding: HomeBinding(), // Tiêm vũ khí cho Home
+      binding: HomeBinding(),
     ),
   ];
 }

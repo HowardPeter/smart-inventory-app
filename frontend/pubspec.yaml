@@ -26,6 +26,7 @@ dependencies:
   # UI & Design
   # ----------------------------------------------------
   cupertino_icons: ^1.0.8
+  fl_chart: ^1.2.0
 
   # ----------------------------------------------------
   # Utils & Helpers
@@ -56,6 +57,7 @@ flutter:
     - assets/images/auth/
     - assets/images/core/
     - assets/images/onboarding/
+    - assets/mock_data/
 
   # Fonts phải nằm lùi vào 2 space bên trong flutter:
   fonts:

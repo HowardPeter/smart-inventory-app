@@ -1,3 +1,4 @@
+import 'package:frontend/core/controllers/user_controller.dart';
 import 'package:get/get.dart';
 import 'package:frontend/core/network/app_client.dart';
 
@@ -6,5 +7,6 @@ class InitialBinding extends Bindings {
   void dependencies() {
     // Khởi tạo ApiClient và ép nó sống vĩnh viễn (permanent: true)
     Get.put(ApiClient(), permanent: true);
+    Get.put(UserController(), permanent: true);
   }
 }

@@ -1,0 +1,23 @@
+{
+  "user_profile": {
+    "user_id": "u-123",
+    "auth_user_id": "auth-abc",
+    "email": "phat@iecs.vn",
+    "full_name": "Phát Nguyễn",
+    "role": "staff",
+    "created_at": "2026-01-20T08:00:00Z"
+  },
+  "active_store": {
+    "store_id": "s-123",
+    "name": "Smart Iphone 1 - CN1"
+  },
+  "transactions": [
+    { "transaction_id": "T1", "total_price": 1500.0, "type": "sale", "created_at": "2026-03-20T09:00:00Z" },
+    { "transaction_id": "T2", "total_price": 2500.0, "type": "sale", "created_at": "2026-03-20T11:30:00Z" },
+    { "transaction_id": "T3", "total_price": -500.0, "type": "refund", "created_at": "2026-03-20T13:00:00Z" },
+    { "transaction_id": "T4", "total_price": 3200.0, "type": "sale", "created_at": "2026-03-20T17:00:00Z" },
+    { "transaction_id": "T5", "total_price": 4000.0, "type": "sale", "created_at": "2026-03-19T10:00:00Z" },
+    { "transaction_id": "T6", "total_price": 2800.0, "type": "sale", "created_at": "2026-03-18T14:00:00Z" },
+    { "transaction_id": "T7", "total_price": -1200.0, "type": "adjustment", "created_at": "2026-03-17T14:00:00Z" }
+  ]
+}
