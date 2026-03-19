@@ -1,5 +1,5 @@
-export interface RegisterDto {
-  email: string;
-  password: string;
-  fullName: string;
-}
+// export interface RegisterDto {
+//   email: string;
+//   password: string;
+//   fullName: string;
+// }
