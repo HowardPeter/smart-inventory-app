@@ -47,4 +47,5 @@ class AuthService extends GetxService {
 
     Get.offAllNamed(AppRoutes.login); // Đá về trang login
   }
+  
 }

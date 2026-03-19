@@ -43,7 +43,6 @@ class AuthProvider {
     }
   }
 
-
   Future<void> sendPasswordResetEmail(String email) async {
     // 1. Giả lập gọi API mất 2 giây (để UI hiện vòng xoay Loading)
     await Future.delayed(const Duration(seconds: 2));
@@ -76,6 +75,19 @@ class AuthProvider {
     return await supabase.auth.signInWithPassword(
       email: email,
       password: password,
+    );
+  }
+
+  Future<void> sendResetPasswordEmail(String email) async {
+    await supabase.auth.resetPasswordForEmail(
+      email,
+      redirectTo: 'io.supabase.flutter://reset-password',
+    );
+  }
+
+  Future<void> updatePassword(String newPassword) async {
+    await supabase.auth.updateUser(
+      UserAttributes(password: newPassword),
     );
   }
 }
