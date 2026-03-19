@@ -43,19 +43,19 @@ class AuthProvider {
     }
   }
 
-  Future<void> sendPasswordResetEmail(String email) async {
-    // 1. Giả lập gọi API mất 2 giây (để UI hiện vòng xoay Loading)
-    await Future.delayed(const Duration(seconds: 2));
+  // Future<void> sendPasswordResetEmail(String email) async {
+  //   // 1. Giả lập gọi API mất 2 giây (để UI hiện vòng xoay Loading)
+  //   await Future.delayed(const Duration(seconds: 2));
 
-    // 2. Fake Logic: KIỂM TRA ĐÍCH DANH EMAIL
-    if (email == "admin@gmail.com") {
-      // Nếu đúng là admin@gmail.com -> Không làm gì cả (Hàm kết thúc thành công)
-      return;
-    } else {
-      // Nếu nhập bất cứ email nào khác -> Ném ra lỗi
-      throw Exception("Mail not exists.");
-    }
-  }
+  //   // 2. Fake Logic: KIỂM TRA ĐÍCH DANH EMAIL
+  //   if (email == "admin@gmail.com") {
+  //     // Nếu đúng là admin@gmail.com -> Không làm gì cả (Hàm kết thúc thành công)
+  //     return;
+  //   } else {
+  //     // Nếu nhập bất cứ email nào khác -> Ném ra lỗi
+  //     throw Exception("Mail not exists.");
+  //   }
+  // }
 
   Future<AuthResponse> register({
     required String email,
@@ -89,5 +89,9 @@ class AuthProvider {
     await supabase.auth.updateUser(
       UserAttributes(password: newPassword),
     );
+  }
+
+  Future<void> logout() async {
+    await supabase.auth.signOut();
   }
 }
