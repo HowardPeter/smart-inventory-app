@@ -6,6 +6,7 @@ import 'package:frontend/core/widgets/t_snackbars_widget.dart';
 import 'package:frontend/core/constants/text_strings.dart';
 import 'package:frontend/core/services/auth_service.dart';
 import 'package:frontend/routes/app_routes.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
 import '../models/login_request_model.dart';
 
 class LoginController extends GetxController {
@@ -50,7 +51,25 @@ class LoginController extends GetxController {
 
     try {
       final request = LoginRequestModel(email: email, password: password);
-      final userProfile = await authProvider.loginWithEmail(request);
+      final res = await authProvider.login(
+          email: request.email, password: request.password);
+
+      final user = res.user;
+
+      if (user == null) {
+        Get.snackbar("Error", "Login thất bại");
+        return;
+      }
+
+      if (user.emailConfirmedAt == null) {
+        await Supabase.instance.client.auth.signOut();
+
+        Get.snackbar(
+          "Warning",
+          "Vui lòng xác thực email trước khi đăng nhập",
+        );
+        return;
+      }
 
       await Get.find<AuthService>().saveUserLogin(
         email,
@@ -64,7 +83,7 @@ class LoginController extends GetxController {
       TSnackbars.success(
         title: TTexts.loginSuccessTitle.tr,
         message: TTexts.loginSuccessMessage.trParams({
-          'name': userProfile.fullName,
+          'name': email.split('@')[0],
         }),
       );
 
