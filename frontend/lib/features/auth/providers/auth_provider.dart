@@ -1,8 +1,7 @@
 import 'package:flutter/foundation.dart';
-import 'package:frontend/core/models/user_profile_model.dart';
 import 'package:frontend/core/network/app_client.dart';
 import 'package:google_sign_in/google_sign_in.dart';
-import '../models/login_request_model.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
 
 class AuthProvider {
   // Bắt buộc phải truyền ApiClient vào khi khởi tạo
@@ -11,6 +10,8 @@ class AuthProvider {
 
   // 1. CẬP NHẬT BẢN 7.2.0: Sử dụng GoogleSignIn.instance
   final GoogleSignIn _googleSignIn = GoogleSignIn.instance;
+
+  final supabase = Supabase.instance.client;
 
   // Đưa Client ID ra một biến riêng cho gọn
   final String _serverClientId =
@@ -42,26 +43,6 @@ class AuthProvider {
     }
   }
 
-  Future<UserProfileModel> loginWithEmail(LoginRequestModel request) async {
-    // --- BẮT ĐẦU ĐOẠN CODE TEST ---
-    // Giả lập chờ mạng 1.5 giây để xem vòng xoay Loading
-    await Future.delayed(const Duration(milliseconds: 1500));
-
-    if (request.email == "admin@gmail.com" && request.password == "123456") {
-      // Trả về data đúng cấu trúc bảng UserProfile trong database của bạn
-      return UserProfileModel.fromJson({
-        "user_id": "u-123456-789",
-        "auth_user_id": "auth-abc-xyz",
-        "email": "admin@gmail.com",
-        "full_name": "Admin Group 21",
-        "created_at": DateTime.now().toIso8601String(),
-        "updated_at": DateTime.now().toIso8601String(),
-      });
-    } else {
-      // Trả về lỗi nếu nhập sai
-      throw Exception("Email or password was wrong. Please try again!");
-    }
-  }
 
   Future<void> sendPasswordResetEmail(String email) async {
     // 1. Giả lập gọi API mất 2 giây (để UI hiện vòng xoay Loading)
@@ -75,5 +56,26 @@ class AuthProvider {
       // Nếu nhập bất cứ email nào khác -> Ném ra lỗi
       throw Exception("Mail not exists.");
     }
+  }
+
+  Future<AuthResponse> register({
+    required String email,
+    required String password,
+  }) async {
+    return await supabase.auth.signUp(
+      email: email,
+      password: password,
+      emailRedirectTo: 'io.supabase.flutter://login-callback',
+    );
+  }
+
+  Future<AuthResponse> login({
+    required String email,
+    required String password,
+  }) async {
+    return await supabase.auth.signInWithPassword(
+      email: email,
+      password: password,
+    );
   }
 }
