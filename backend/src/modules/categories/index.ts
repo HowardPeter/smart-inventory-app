@@ -1,1 +1,2 @@
-export { CategoryRepository } from '../categories/repositories/category.repository.js';
+export { CategoryRepository } from './repositories/category.repository.js';
+export { categoryRouter } from './category.route.js';
