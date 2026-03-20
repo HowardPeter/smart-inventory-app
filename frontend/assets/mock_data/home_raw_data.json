@@ -2,9 +2,9 @@
   "user_profile": {
     "user_id": "u-123",
     "auth_user_id": "auth-abc",
-    "email": "phat@iecs.vn",
-    "full_name": "Phát Nguyễn",
-    "role": "staff",
+    "email": "admin@gmail.com",
+    "full_name": "John Doe",
+    "role": "manager",
     "created_at": "2026-01-20T08:00:00Z"
   },
   "active_store": {
@@ -81,79 +81,55 @@
       "inventory_id": "INV-001",
       "quantity": 150,
       "reorder_threshold": 20,
-      "product_package": {
-        "product_package_id": "PKG-001",
-        "display_name": "Coca Cola 320ml",
-        "import_price": 5.0,
-        "selling_price": 8.0
-      }
+      "product_package": { "product_package_id": "PKG-001", "display_name": "Coca Cola 320ml", "import_price": 5.0, "selling_price": 8.0 }
     },
     {
       "inventory_id": "INV-002",
       "quantity": 5,
       "reorder_threshold": 15,
-      "product_package": {
-        "product_package_id": "PKG-002",
-        "display_name": "Bánh mì Sandwich",
-        "import_price": 12.0,
-        "selling_price": 20.0
-      }
+      "product_package": { "product_package_id": "PKG-002", "display_name": "Bánh mì Sandwich", "import_price": 12.0, "selling_price": 20.0 }
     },
     {
       "inventory_id": "INV-003",
       "quantity": 0,
       "reorder_threshold": 10,
-      "product_package": {
-        "product_package_id": "PKG-003",
-        "display_name": "Sữa tươi Vinamilk",
-        "import_price": 6.5,
-        "selling_price": 10.0
-      }
+      "product_package": { "product_package_id": "PKG-003", "display_name": "Sữa tươi Vinamilk", "import_price": 6.5, "selling_price": 10.0 }
     },
-
     {
       "inventory_id": "INV-004",
       "quantity": 80,
       "reorder_threshold": 25,
-      "product_package": {
-        "product_package_id": "PKG-004",
-        "display_name": "Pepsi 330ml",
-        "import_price": 5.5,
-        "selling_price": 9.0
-      }
+      "product_package": { "product_package_id": "PKG-004", "display_name": "Pepsi 330ml", "import_price": 5.5, "selling_price": 9.0 }
     },
     {
       "inventory_id": "INV-005",
       "quantity": 12,
       "reorder_threshold": 20,
-      "product_package": {
-        "product_package_id": "PKG-005",
-        "display_name": "Snack Khoai Tây",
-        "import_price": 7.0,
-        "selling_price": 12.0
-      }
+      "product_package": { "product_package_id": "PKG-005", "display_name": "Snack Khoai Tây", "import_price": 7.0, "selling_price": 12.0 }
     },
     {
       "inventory_id": "INV-006",
       "quantity": 2,
       "reorder_threshold": 10,
-      "product_package": {
-        "product_package_id": "PKG-006",
-        "display_name": "Nước suối Lavie",
-        "import_price": 3.0,
-        "selling_price": 6.0
-      }
+      "product_package": { "product_package_id": "PKG-006", "display_name": "Nước suối Lavie", "import_price": 3.0, "selling_price": 6.0 }
     },
     {
       "inventory_id": "INV-007",
       "quantity": 0,
       "reorder_threshold": 8,
-      "product_package": {
-        "product_package_id": "PKG-007",
-        "display_name": "Trà sữa đóng chai",
-        "import_price": 10.0,
-        "selling_price": 18.0
-      }
+      "product_package": { "product_package_id": "PKG-007", "display_name": "Trà sữa đóng chai", "import_price": 10.0, "selling_price": 18.0 }
+    },
+    {
+      "inventory_id": "INV-008",
+      "quantity": 50,
+      "reorder_threshold": 15,
+      "product_package": { "product_package_id": "PKG-008", "display_name": "Kẹo cao su Doublemint", "import_price": 2.0, "selling_price": 5.0 }
+    },
+    {
+      "inventory_id": "INV-009",
+      "quantity": 8,
+      "reorder_threshold": 24,
+      "product_package": { "product_package_id": "PKG-009", "display_name": "Nước tăng lực Redbull", "import_price": 10.0, "selling_price": 15.0 }
     }
   ]
 }

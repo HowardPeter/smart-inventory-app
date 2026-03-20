@@ -160,4 +160,6 @@ class TTexts {
   static const String homeItems = "home_items";
   static const String homeOnlyLeft = "home_only_left";
   static const String homeTapToViewAll = "home_tap_to_view_all";
+  static const String homeInStock = "home_in_stock";
+  static const String homeOutOfStock = "home_out_of_stock";
 }

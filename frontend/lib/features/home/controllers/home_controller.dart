@@ -222,4 +222,17 @@ class HomeController extends GetxController {
     sortedList.sort((a, b) => b.createdAt.compareTo(a.createdAt));
     return sortedList.take(3).toList();
   }
+
+  // --- BỔ SUNG LOGIC LOW STOCK ALERTS ---
+  List<InventoryModel> get lowStockItems {
+    // Lọc các item có số lượng <= mức cảnh báo
+    var lowStockList = inventories
+        .where((item) => item.quantity <= item.reorderThreshold)
+        .toList();
+
+    // Sắp xếp: Thằng nào quantity = 0 (hết sạch) lên đầu, sau đó tăng dần
+    lowStockList.sort((a, b) => a.quantity.compareTo(b.quantity));
+
+    return lowStockList;
+  }
 }

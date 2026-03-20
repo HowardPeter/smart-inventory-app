@@ -30,7 +30,6 @@ final Map<String, String> enHome = {
   TTexts.homeInboundShipment: "Inbound Shipment",
   TTexts.homeOutboundDelivery: "Outbound Delivery",
   TTexts.homeStockAdjustment: "Stock Adjustment",
-  
 
   // Quick Actions
   TTexts.homeQuickActions: "Quick Actions",
@@ -44,4 +43,6 @@ final Map<String, String> enHome = {
   TTexts.homeOnlyLeft:
       "Only @quantity left", // Sử dụng @quantity để truyền tham số
   TTexts.homeTapToViewAll: "Tap to view all",
+  TTexts.homeInStock: "In stock",
+  TTexts.homeOutOfStock: "Ouf of stock",
 };
