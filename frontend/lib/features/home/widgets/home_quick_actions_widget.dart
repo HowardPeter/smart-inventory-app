@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:frontend/core/layouts/t_barcode_scanner_layout.dart';
 import 'package:get/get.dart';
 import 'package:frontend/core/constants/text_strings.dart';
 import 'package:frontend/core/theme/app_colors.dart';
@@ -48,7 +49,90 @@ class HomeQuickActionsWidget extends StatelessWidget {
                   label: TTexts.homeScanBarcode.tr,
                   color: Colors.blue,
                   bgColor: AppColors.toastInfoBg,
-                  onTap: () {},
+                  onTap: () {
+                    // MỞ MÀN HÌNH QUÉT MÃ VẠCH KHI BẤM NÚT NÀY
+                    Get.to(() => TBarcodeScannerLayout(
+                          title: TTexts.homeScanBarcode.tr,
+                          onScanned: (code) {
+                            // Tạm thời tắt màn hình quét và hiển thị BottomSheet chứa mã
+                            Get.back(); // Đóng camera
+
+                            Get.bottomSheet(
+                              Container(
+                                padding: const EdgeInsets.all(24),
+                                decoration: const BoxDecoration(
+                                  color: Colors.white,
+                                  borderRadius: BorderRadius.vertical(
+                                    top: Radius.circular(AppSizes.radius24),
+                                  ),
+                                ),
+                                child: Column(
+                                  mainAxisSize: MainAxisSize.min,
+                                  children: [
+                                    Container(
+                                      width: 40,
+                                      height: 4,
+                                      decoration: BoxDecoration(
+                                        color: Colors.grey.shade300,
+                                        borderRadius: BorderRadius.circular(2),
+                                      ),
+                                    ),
+                                    const SizedBox(height: 20),
+                                    const Icon(Icons.qr_code_2_rounded,
+                                        size: 60, color: Colors.blue),
+                                    const SizedBox(height: 16),
+                                    const Text(
+                                      'Mã vạch quét được',
+                                      style: TextStyle(
+                                        fontFamily: 'Poppins',
+                                        fontSize: 14,
+                                        color: AppColors.subText,
+                                      ),
+                                    ),
+                                    const SizedBox(height: 4),
+                                    Text(
+                                      code,
+                                      style: const TextStyle(
+                                        fontFamily: 'Poppins',
+                                        fontSize: 20,
+                                        fontWeight: FontWeight.bold,
+                                        color: AppColors.primaryText,
+                                      ),
+                                    ),
+                                    const SizedBox(height: 24),
+                                    SizedBox(
+                                      width: double.infinity,
+                                      child: ElevatedButton(
+                                        style: ElevatedButton.styleFrom(
+                                          backgroundColor: Colors.blue,
+                                          padding: const EdgeInsets.symmetric(
+                                              vertical: 14),
+                                          shape: RoundedRectangleBorder(
+                                            borderRadius:
+                                                BorderRadius.circular(12),
+                                          ),
+                                        ),
+                                        onPressed: () {
+                                          Get.back();
+                                          // TODO: huyển sang màn hình Chi tiết sản phẩm ở đây
+                                        },
+                                        child: const Text(
+                                          'Tìm kiếm sản phẩm',
+                                          style: TextStyle(
+                                            fontFamily: 'Poppins',
+                                            fontWeight: FontWeight.bold,
+                                            color: Colors.white,
+                                          ),
+                                        ),
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            );
+                          },
+                        ));
+                  },
                 ),
                 const SizedBox(width: AppSizes.p12),
                 _buildActionChip(
@@ -56,7 +140,9 @@ class HomeQuickActionsWidget extends StatelessWidget {
                   label: TTexts.homeAddProduct.tr,
                   color: AppColors.primary,
                   bgColor: AppColors.toastWarningBg,
-                  onTap: () {},
+                  onTap: () {
+                    // TODO: Chuyển sang màn hình thêm sản phẩm
+                  },
                 ),
                 const SizedBox(width: AppSizes.p12),
                 _buildActionChip(
@@ -64,7 +150,9 @@ class HomeQuickActionsWidget extends StatelessWidget {
                   label: TTexts.homeViewReports.tr,
                   color: Colors.purple,
                   bgColor: const Color(0xFFF3E8FF),
-                  onTap: () {},
+                  onTap: () {
+                    // TODO: Chuyển sang màn hình báo cáo
+                  },
                 ),
               ],
             ),

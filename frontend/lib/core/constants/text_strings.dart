@@ -12,6 +12,7 @@ class TTexts {
   static const String fair = "fair";
   static const String good = "good";
   static const String strong = "strong";
+  static const String barCodeScan = "bar_code_scan";
 
   // -- Error / Restricted Access
   static const String errorAccessRestrictedTitle =

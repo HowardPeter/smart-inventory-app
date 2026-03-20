@@ -27,4 +27,5 @@ final Map<String, String> enCore = {
   TTexts.netErrorPrimaryBtn: 'Check my Wifi',
   TTexts.netErrorSecondaryBtn: 'Got it!',
   TTexts.netErrorWaiting: 'Waiting for network...',
+  TTexts.barCodeScan: 'Bar Code Scan',
 };
