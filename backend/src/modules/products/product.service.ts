@@ -73,7 +73,7 @@ export class ProductService {
   async createProduct(
     data: CreateProductData,
   ): Promise<DetailProductResponseDto> {
-    const category = await this.categoryRepository.findOne(data.categoryId);
+    const category = await this.categoryRepository.findById(data.categoryId);
 
     if (!category) {
       throw new CustomError({
@@ -93,7 +93,7 @@ export class ProductService {
     await this.checkProductExisted(storeId, productId);
 
     if (data.categoryId) {
-      const category = await this.categoryRepository.findOne(data.categoryId);
+      const category = await this.categoryRepository.findById(data.categoryId);
 
       if (!category) {
         throw new CustomError({

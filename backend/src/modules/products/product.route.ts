@@ -17,39 +17,35 @@ const productRouter = Router();
 
 productRouter.use(authenticate, requireStoreContext);
 
-productRouter.get(
-  '/',
-  requirePermission(PERMISSION.PRODUCT_READ),
-  validateGetProducts,
-  asyncWrapper(productController.getProducts),
-);
+productRouter
+  .route('/')
+  .get(
+    requirePermission(PERMISSION.PRODUCT_READ),
+    validateGetProducts,
+    asyncWrapper(productController.getProducts),
+  )
+  .post(
+    requirePermission(PERMISSION.PRODUCT_WRITE),
+    validateCreateProduct,
+    asyncWrapper(productController.createProduct),
+  );
 
-productRouter.get(
-  '/:productId',
-  requirePermission(PERMISSION.PRODUCT_READ),
-  validateGetProductById,
-  asyncWrapper(productController.getProductById),
-);
-
-productRouter.post(
-  '/',
-  requirePermission(PERMISSION.PRODUCT_WRITE),
-  validateCreateProduct,
-  asyncWrapper(productController.createProduct),
-);
-
-productRouter.patch(
-  '/:productId',
-  requirePermission(PERMISSION.PRODUCT_WRITE),
-  validateUpdateProduct,
-  asyncWrapper(productController.updateProduct),
-);
-
-productRouter.delete(
-  '/:productId',
-  requirePermission(PERMISSION.PRODUCT_WRITE),
-  validateDeleteProduct,
-  asyncWrapper(productController.softDeleteProduct),
-);
+productRouter
+  .route('/:productId')
+  .get(
+    requirePermission(PERMISSION.PRODUCT_READ),
+    validateGetProductById,
+    asyncWrapper(productController.getProductById),
+  )
+  .patch(
+    requirePermission(PERMISSION.PRODUCT_WRITE),
+    validateUpdateProduct,
+    asyncWrapper(productController.updateProduct),
+  )
+  .delete(
+    requirePermission(PERMISSION.PRODUCT_WRITE),
+    validateDeleteProduct,
+    asyncWrapper(productController.softDeleteProduct),
+  );
 
 export { productRouter };
