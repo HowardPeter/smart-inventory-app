@@ -1,10 +1,13 @@
 import 'package:flutter/material.dart';
+import 'package:frontend/core/widgets/t_empty_state_widget.dart';
 import 'package:get/get.dart';
 import 'package:frontend/core/constants/text_strings.dart';
 import 'package:frontend/core/theme/app_colors.dart';
-import 'home_transaction_item_widget.dart'; // Import Item bên trên
+import 'package:frontend/features/home/controllers/home_controller.dart';
+import 'package:intl/intl.dart';
+import 'home_transaction_item_widget.dart';
 
-class HomeTransactionListWidget extends StatelessWidget {
+class HomeTransactionListWidget extends GetView<HomeController> {
   const HomeTransactionListWidget({super.key});
 
   @override
@@ -21,30 +24,77 @@ class HomeTransactionListWidget extends StatelessWidget {
               color: AppColors.primaryText),
         ),
         const SizedBox(height: 16),
-        HomeTransactionItemWidget(
-          icon: Icons.download_rounded,
-          iconColor: AppColors.stockIn,
-          title: TTexts.homeInboundShipment.tr,
-          time: "10:45 AM",
-          amount: "+150",
-          isPositive: true,
-        ),
-        HomeTransactionItemWidget(
-          icon: Icons.upload_rounded,
-          iconColor: AppColors.stockOut,
-          title: TTexts.homeOutboundDelivery.tr,
-          time: "02:15 PM",
-          amount: "-45",
-          isPositive: false,
-        ),
-        HomeTransactionItemWidget(
-          icon: Icons.sync_alt_rounded,
-          iconColor: AppColors.primary,
-          title: TTexts.homeStockAdjustment.tr,
-          time: "04:30 PM",
-          amount: "-5",
-          isPositive: false,
-        ),
+        Obx(() {
+          if (controller.recentTransactions.isEmpty) {
+            return TEmptyStateWidget(
+              icon: Icons.receipt_long_outlined,
+              title: TTexts.emptyTransactionTitle.tr,
+              subtitle: TTexts.emptyTransactionSubtitle.tr,
+            );
+          }
+
+          return Column(
+            children: controller.recentTransactions.map((t) {
+              // 1. SỬ DỤNG TRỰC TIẾP THUỘC TÍNH TỪ MODEL
+              final type = t.type;
+              final date = t.createdAt;
+              final formattedTime = DateFormat('hh:mm a').format(date);
+
+              final details = t.details;
+
+              // Tính tổng số lượng từ List<HomeTransactionDetailModel>
+              int totalQuantity = 0;
+              for (var detail in details) {
+                // detail.quantity đã là int từ Model, chỉ cần gọi .abs()
+                totalQuantity += detail.quantity.abs();
+              }
+
+              IconData icon;
+              Color color;
+              String title;
+              bool isPositive;
+              String displayAmount = totalQuantity.toString();
+
+              // 2. LOGIC XUẤT/NHẬP KHO (INVENTORY FLOW)
+              if (type == 'sale') {
+                icon = Icons.upload_rounded;
+                color = AppColors.stockOut;
+                title = TTexts.homeOutboundDelivery.tr;
+                isPositive = false;
+                displayAmount = "-$displayAmount";
+              } else if (type == 'refund' || type == 'import') {
+                icon = Icons.download_rounded;
+                color = AppColors.stockIn;
+                title = TTexts.homeInboundShipment.tr;
+                isPositive = true;
+                displayAmount = "+$displayAmount";
+              } else {
+                icon = Icons.sync_alt_rounded;
+                color = AppColors.primary;
+                title = TTexts.homeStockAdjustment.tr;
+
+                // Tính tổng quantity giữ nguyên dấu để biết là điều chỉnh âm hay dương
+                int rawQuantitySum = 0;
+                for (var detail in details) {
+                  rawQuantitySum += detail.quantity;
+                }
+
+                isPositive = rawQuantitySum >= 0;
+                displayAmount =
+                    isPositive ? "+$displayAmount" : "-$displayAmount";
+              }
+
+              return HomeTransactionItemWidget(
+                icon: icon,
+                iconColor: color,
+                title: title,
+                time: formattedTime,
+                amount: displayAmount,
+                isPositive: isPositive,
+              );
+            }).toList(),
+          );
+        }),
       ],
     );
   }

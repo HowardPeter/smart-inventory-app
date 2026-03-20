@@ -149,6 +149,9 @@ class TTexts {
   static const String homeInboundShipment = "home_inbound_shipment";
   static const String homeOutboundDelivery = "home_outbound_delivery";
   static const String homeStockAdjustment = "home_stock_adjustment";
+  // Empty State
+  static const String emptyTransactionTitle = "empty_transaction_title";
+  static const String emptyTransactionSubtitle = "empty_transaction_subtitle";
   static const String homeQuickActions = "home_quick_actions";
   static const String homeScanBarcode = "home_scan_barcode";
   static const String homeAddProduct = "home_add_product";
