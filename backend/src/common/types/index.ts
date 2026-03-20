@@ -3,5 +3,5 @@ export type {
   ApiErrorResponse,
   ApiResponse,
 } from './api-response.type.js';
-export type { PaginationQuery, PaginationMeta } from './pagination.type.js';
+export type * from './pagination.type.js';
 export * from './authorize-request.type.js';
