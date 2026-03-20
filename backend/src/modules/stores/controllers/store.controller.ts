@@ -1,12 +1,11 @@
 import { StatusCodes } from 'http-status-codes';
 
-import { StoreService } from './services/store.service.js';
-import { CustomError } from '../../common/errors/index.js';
-import { requireReqUser, sendResponse } from '../../common/utils/index.js';
+import { requireReqUser, sendResponse } from '../../../common/utils/index.js';
+import { StoreService } from '../services/store.service.js';
 
-import type { StoreResponseDto } from './dtos/store.dto.js';
-import type { CreateStoreDto, UpdateStoreDto } from './dtos/store.dto.js';
-import type { ApiResponse } from '../../common/types/index.js';
+import type { ApiResponse } from '../../../common/types/index.js';
+import type { StoreResponseDto } from '../dtos/store.dto.js';
+import type { CreateStoreDto, UpdateStoreDto } from '../dtos/store.dto.js';
 import type { Request, Response } from 'express';
 
 export class StoreController {
@@ -29,13 +28,6 @@ export class StoreController {
   ): Promise<void> => {
     const userId = requireReqUser(req).userId;
 
-    if (!userId) {
-      throw new CustomError({
-        message: 'Cannot get user ID',
-        status: StatusCodes.UNAUTHORIZED,
-      });
-    }
-
     const { storeId } = req.params;
 
     const store = await this.storeService.getStoreById(
@@ -52,16 +44,12 @@ export class StoreController {
   ): Promise<void> => {
     const userId = requireReqUser(req).userId;
 
-    if (!userId) {
-      throw new CustomError({
-        message: 'Cannot get user ID',
-        status: StatusCodes.UNAUTHORIZED,
-      });
-    }
-
     const payload = req.body as CreateStoreDto;
 
-    const createdStore = await this.storeService.createStore(userId, payload);
+    const createdStore = await this.storeService.createNewStore(
+      userId,
+      payload,
+    );
 
     sendResponse.success(res, createdStore, { status: StatusCodes.CREATED });
   };
@@ -71,13 +59,6 @@ export class StoreController {
     res: Response<ApiResponse<StoreResponseDto>>,
   ): Promise<void> => {
     const userId = requireReqUser(req).userId;
-
-    if (!userId) {
-      throw new CustomError({
-        message: 'Cannot get user ID',
-        status: StatusCodes.UNAUTHORIZED,
-      });
-    }
 
     const { storeId } = req.params;
     const payload = req.body as UpdateStoreDto;
@@ -91,22 +72,15 @@ export class StoreController {
     sendResponse.success(res, updatedStore, { status: StatusCodes.OK });
   };
 
-  disableStore = async (
+  softDeleteStore = async (
     req: Request,
     res: Response<ApiResponse<StoreResponseDto>>,
   ): Promise<void> => {
     const userId = requireReqUser(req).userId;
 
-    if (!userId) {
-      throw new CustomError({
-        message: 'Cannot get user ID',
-        status: StatusCodes.UNAUTHORIZED,
-      });
-    }
-
     const { storeId } = req.params;
 
-    await this.storeService.disableStore(storeId as string, userId);
+    await this.storeService.softDeleteStore(storeId as string, userId);
 
     sendResponse.success(res, null, { status: StatusCodes.OK });
   };

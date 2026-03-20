@@ -48,7 +48,7 @@ class VerifyEmailController extends GetxController {
 
     isResending.value = true;
     try {
-      await authProvider.sendPasswordResetEmail(email);
+      await authProvider.sendResetPasswordEmail(email);
 
       TSnackbars.success(
         title: TTexts.successTitle.tr,

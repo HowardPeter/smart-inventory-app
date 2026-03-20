@@ -39,6 +39,8 @@ export const requireStoreContext = async (
       storeId,
       role: membership.role,
     };
+
+    next();
   } catch (error) {
     next(error);
   }

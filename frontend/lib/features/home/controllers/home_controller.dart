@@ -1,22 +1,36 @@
 import 'dart:convert';
 import 'dart:math';
 import 'package:flutter/services.dart';
-import 'package:frontend/core/models/inventory_model.dart';
-import 'package:frontend/core/models/user_profile_model.dart';
-import 'package:frontend/features/home/model/home_inventory_transaction_model.dart';
+import 'package:flutter/widgets.dart';
 import 'package:get/get.dart';
 import 'package:fl_chart/fl_chart.dart';
+
 import 'package:frontend/core/constants/text_strings.dart';
 import 'package:frontend/core/controllers/user_controller.dart';
-// Đừng quên import Model giao dịch của bạn vào đây
+import 'package:frontend/core/models/inventory_model.dart';
+import 'package:frontend/core/models/user_profile_model.dart';
+import 'package:frontend/core/services/auth_service.dart'; // Cần cho hàm logout
+import 'package:frontend/features/auth/providers/user_profile_provider.dart';
+import 'package:frontend/features/home/model/home_inventory_transaction_model.dart';
 
 class HomeController extends GetxController {
-  final RxBool isLoading = true.obs;
+  // ==========================================
+  // 1. CÁC BIẾN STATE (GỘP TỪ HEAD VÀ MAIN)
+  // ==========================================
 
-  // Đã chuyển từ Map<String, dynamic> sang xài Model
+  // Từ HEAD (Quản lý Dashboard)
+  final RxBool isLoading = true.obs;
   final RxList<HomeInventoryTransactionModel> transactions =
       <HomeInventoryTransactionModel>[].obs;
   final RxList<InventoryModel> inventories = <InventoryModel>[].obs;
+
+  // Từ MAIN (Quản lý User)
+  var userProfile = Rxn<UserProfileModel>();
+  final UserProfileProvider userProfileProvider = UserProfileProvider();
+
+  // ==========================================
+  // 2. LIFECYCLE VÀ GETTERS CƠ BẢN
+  // ==========================================
 
   String get greetingText {
     final hour = DateTime.now().hour;
@@ -28,8 +42,33 @@ class HomeController extends GetxController {
   @override
   void onInit() {
     super.onInit();
+    // Chạy song song cả load data ảo và lấy profile thật
     loadAllHomeData();
+    getMyProfile();
   }
+
+  // ==========================================
+  // 3. LOGIC TỪ NHÁNH MAIN (API & AUTH)
+  // ==========================================
+
+  Future<void> getMyProfile() async {
+    try {
+      final profile = await userProfileProvider.fetchMyProfile();
+      userProfile.value = profile;
+      debugPrint("Data user model: ${userProfile.value!.fullName}");
+    } catch (e) {
+      debugPrint("Lỗi Không thể lấy thông tin cá nhân: ${e.toString()}");
+    }
+  }
+
+  void logout() {
+    // Gọi thẳng hàm logout của Service
+    Get.find<AuthService>().logout();
+  }
+
+  // ==========================================
+  // 4. LOGIC TỪ NHÁNH HEAD (DASHBOARD & CHARTS)
+  // ==========================================
 
   Future<void> loadAllHomeData() async {
     try {
@@ -38,7 +77,7 @@ class HomeController extends GetxController {
           await rootBundle.loadString('assets/mock_data/home_raw_data.json');
       final data = json.decode(response);
 
-      // Load User
+      // Load User (Dùng cho mock data - có thể cân nhắc bỏ nếu dùng API thật)
       UserController.instance.currentUser.value =
           UserProfileModel.fromJson(data['user_profile']);
 
@@ -62,7 +101,6 @@ class HomeController extends GetxController {
   }
 
   // --- LOGIC TÍNH TOÁN KHOẢNG CHIA (INTERVAL) CHO 5 MỐC ---
-// --- LOGIC TÍNH TOÁN KHOẢNG CHIA (INTERVAL) CHO 5 MỐC ---
   Map<String, double> _calculateAxisLimits(List<double> values) {
     if (values.isEmpty) return {'min': -1.0, 'max': 4.0, 'interval': 1.25};
 

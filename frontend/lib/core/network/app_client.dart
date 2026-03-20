@@ -1,10 +1,10 @@
 import 'package:dio/dio.dart';
-import 'package:flutter_secure_storage/flutter_secure_storage.dart';
+import 'package:flutter/material.dart';
 import 'package:frontend/core/constants/app_constants.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
 
 class ApiClient {
   late Dio dio;
-  final _secureStorage = const FlutterSecureStorage();
 
   ApiClient() {
     dio = Dio(
@@ -23,10 +23,12 @@ class ApiClient {
     dio.interceptors.add(
       InterceptorsWrapper(
         onRequest: (options, handler) async {
-          // Lấy token thật từ Két sắt
-          String? token = await _secureStorage.read(key: 'ACCESS_TOKEN');
+          //Lấy token từ supabase
+          final session = Supabase.instance.client.auth.currentSession;
+          final token = session?.accessToken;
+          debugPrint("DEBUG TOKEN: $token");
 
-          if (token!.isNotEmpty) {
+          if (token != null && token.isNotEmpty) {
             options.headers['Authorization'] = 'Bearer $token';
           }
           return handler.next(options);

@@ -31,7 +31,8 @@ class ForgotPasswordController extends GetxController {
     try {
       TFullScreenLoader.openLoadingDialog(TTexts.checkingEmail.tr);
 
-      await authProvider.sendPasswordResetEmail(email);
+      //await authProvider.sendPasswordResetEmail(email);
+      await authProvider.sendResetPasswordEmail(email);
 
       // Tắt màn hình Loading xoay xoay
       TFullScreenLoader.stopLoading();

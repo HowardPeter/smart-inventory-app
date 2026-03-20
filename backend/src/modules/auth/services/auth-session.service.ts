@@ -69,6 +69,17 @@ class AuthSessionService {
       email: userProfile.email,
     };
   }
+
+  public async verifyOnlyToken(req: Request) {
+    const accessToken = this.extractAccessToken(req);
+    const { user: supabaseUser } =
+      await supabaseAuthProvider.verifyAccessToken(accessToken);
+
+    return {
+      authUserId: supabaseUser.id,
+      email: supabaseUser.email,
+    };
+  }
 }
 
 export const authSessionService = new AuthSessionService();

@@ -1,6 +1,8 @@
 import { StatusCodes } from 'http-status-codes';
 
 import { CustomError } from '../../../common/errors/index.js';
+import { prisma } from '../../../db/prismaClient.js'; // gọi prisma để dùng cơ chế $transaction
+import { StoreMemberRepository } from '../repositories/store-member.repository.js';
 import { StoreRepository } from '../repositories/store.repository.js';
 
 import type {
@@ -69,13 +71,29 @@ export class StoreService {
     return store;
   }
 
-  public async createStore(
+  public async createNewStore(
     userId: string,
     data: CreateStoreDto,
   ): Promise<StoreResponseDto> {
-    return await this.storeRepository.createOne({
-      ...data,
-      userId,
+    /* dùng hàm $transaction để chạy nhiều query trong một lệnh,
+    $transaction hỗ trợ cơ chế Either ALL succeed hoặc ALL rollback */
+    return await prisma.$transaction(async (tx) => {
+      const storeRepositoryTx = new StoreRepository(tx);
+      const storeMemberRepositoryTx = new StoreMemberRepository(tx);
+
+      const createdStore = await storeRepositoryTx.createOne({
+        ...data,
+        userId,
+      });
+
+      // gán role manager cho user khi tạo store thành công
+      await storeMemberRepositoryTx.createOne({
+        userId,
+        storeId: createdStore.storeId,
+        role: 'manager',
+      });
+
+      return createdStore;
     });
   }
 
@@ -108,7 +126,7 @@ export class StoreService {
     return updatedStore;
   }
 
-  public async disableStore(storeId: string, userId: string): Promise<void> {
+  public async softDeleteStore(storeId: string, userId: string): Promise<void> {
     const existingStore = await this.storeRepository.findByIdAndUserId(
       storeId,
       userId,
