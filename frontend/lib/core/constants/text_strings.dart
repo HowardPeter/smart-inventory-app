@@ -12,6 +12,7 @@ class TTexts {
   static const String fair = "fair";
   static const String good = "good";
   static const String strong = "strong";
+  static const String barCodeScan = "bar_code_scan";
 
   // -- Error / Restricted Access
   static const String errorAccessRestrictedTitle =
@@ -24,7 +25,6 @@ class TTexts {
   static const String splashSlogan = "splash_slogan";
   static const String splashVersion = "splash_version";
   static const String splashDevelopedBy = "splash_developed_by";
-  // -- Splash Loading Messages
   static const String splashLoadingStart = "splash_loading_start";
   static const String splashLoadingInternet = "splash_loading_internet";
   static const String splashLoadingSettings = "splash_loading_settings";
@@ -40,18 +40,12 @@ class TTexts {
 
   // -- Onboarding
   static const String onboardingSkip = "onboarding_skip";
-
-  // Page 1
   static const String onboardingTitle1Part1 = "onboarding_title_1_p1";
   static const String onboardingTitle1Part2 = "onboarding_title_1_p2";
   static const String onboardingTitle1Part3 = "onboarding_title_1_p3";
   static const String onboardingTitle1Part4 = "onboarding_title_1_p4";
-
-  // Page 2
   static const String onboardingTitle2 = "onboarding_title_2";
   static const String onboardingSubtitle2 = "onboarding_subtitle_2";
-
-  // Page 3
   static const String onboardingTitle3 = "onboarding_title_3";
   static const String onboardingSubtitle3 = "onboarding_subtitle_3";
 
@@ -76,8 +70,6 @@ class TTexts {
   static const String loginBtn = "login_btn";
   static const String loggingIn = "logging";
   static const String continueWithGoogle = "continue_with_google";
-
-  // Các câu thông báo (Snackbar/Toast) cho Login
   static const String loginErrorEmptyFieldsTitle =
       "login_error_empty_fields_title";
   static const String loginErrorEmptyFieldsMessage =
@@ -98,7 +90,6 @@ class TTexts {
   static const String registerBtn = "register_btn";
   static const String registering = "registering";
   static const String registerWithGoogle = "register_with_google";
-  // -- Register Error / Success Messages
   static const String registerErrorEmptyFieldsTitle =
       "register_error_empty_fields_title";
   static const String registerErrorEmptyFieldsMessage =
@@ -113,7 +104,7 @@ class TTexts {
   static const String resendEmailSuccessMessage =
       "resend_email_success_message";
 
-  // -- Forgot Password Screen
+  // -- Forgot Password & Verify
   static const String forgetPasswordTitle = "forget_password_title";
   static const String forgetPasswordSubtitle = "forget_password_subtitle";
   static const String forgotPasswordBtn = "forgot_password_btn";
@@ -123,8 +114,6 @@ class TTexts {
   static const String emailSentMessage = "email_sent_message";
   static const String emailSendFailed = "email_send_failed";
   static const String emailSending = "email_sending";
-
-  // -- Verify Email Screen
   static const String verifyEmailTitle = "verify_email_title";
   static const String verifyEmailSubtitle = "verify_email_subtitle";
   static const String verifyEmailInnerTitle = "verify_email_inner_title";
@@ -136,4 +125,42 @@ class TTexts {
   static const String resendEmailIn = "resend_email_in";
   static const String emailAppNotFound = "email_app_not_found";
   static const String pickEmailApp = "pick_email_app";
+
+  // -- Home
+  static const String homeRoleManagerTooltip = "home_role_manager_tooltip";
+  static const String homeRoleStaffTooltip = "home_role_staff_tooltip";
+  static const String goodMorning = "goodMorning";
+  static const String goodAfternoon = "goodAfternoon";
+  static const String goodEvening = "goodEvening";
+  static const String homeDailyOverview = "home_daily_overview";
+  static const String homeTodaysRevenue = "home_todays_revenue";
+  static const String homeProfitLossWeek = "home_profit_loss_week";
+  static const String homeVsYesterday = "home_vs_yesterday";
+  static const String homeThisWeek = "home_this_week";
+  static const String homeRevenueTitle = "home_revenue_title";
+  static const String homeProfit = "home_profit";
+  static const String homeLoss = "home_loss";
+  static const String homeInventoryOverview = "home_inventory_overview";
+  static const String homeTotalItems = "home_total_items";
+  static const String homeStockIn = "home_stock_in";
+  static const String homeStockOut = "home_stock_out";
+  static const String homeTodaysTransactions = "home_todays_transactions";
+  static const String homeTapToViewMoreHistory =
+      "home_tap_to_view_more_history";
+  static const String homeInboundShipment = "home_inbound_shipment";
+  static const String homeOutboundDelivery = "home_outbound_delivery";
+  static const String homeStockAdjustment = "home_stock_adjustment";
+  // Empty State
+  static const String emptyTransactionTitle = "empty_transaction_title";
+  static const String emptyTransactionSubtitle = "empty_transaction_subtitle";
+  static const String homeQuickActions = "home_quick_actions";
+  static const String homeScanBarcode = "home_scan_barcode";
+  static const String homeAddProduct = "home_add_product";
+  static const String homeViewReports = "home_view_reports";
+  static const String homeLowStockAlerts = "home_low_stock_alerts";
+  static const String homeItems = "home_items";
+  static const String homeOnlyLeft = "home_only_left";
+  static const String homeTapToViewAll = "home_tap_to_view_all";
+  static const String homeInStock = "home_in_stock";
+  static const String homeOutOfStock = "home_out_of_stock";
 }

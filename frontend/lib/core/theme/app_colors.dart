@@ -9,14 +9,24 @@ class AppColors {
   static const Color white = Color(0xFFFFFFFF);
   static const Color softGrey = Color(0xFF6C757D);
 
-  // Màu nền và Card
-  static const Color surface = Color(0xFFF8F9FA);
-  static const Color background = Color(0xFFFFFFFF);
+  // Nền và Thẻ
+  static const Color surface = Color(0xFFF8F9FA); // Xám nhạt
+  static const Color background = Color(0xFFFFFFFF); // Trắng
 
   // Màu chữ
   static const Color primaryText = Color(0xFF1A1C23);
   static const Color subText = Color(0xFF6C757D);
   static const Color whiteText = Color(0xFFFFFFFF);
+
+  // ==========================================
+  // THÊM MỚI: Màu Trạng thái & Gradient Dự án
+  // ==========================================
+  static const Color gradientOrangeStart = Color(0xFFFF8A00); // 0%
+  static const Color gradientOrangeEnd = Color(0xFFFFB057); // 100%
+
+  // Trạng thái (Nhập/Xuất, Lời/Lỗ)
+  static const Color stockIn = Color(0xFF48CA93); // Xanh lá
+  static const Color stockOut = Color(0xFFCA5048); // Đỏ
 
   // ==========================================
   // Màu Toast & Snackbar (Pastel Background & Gradient Icons)
