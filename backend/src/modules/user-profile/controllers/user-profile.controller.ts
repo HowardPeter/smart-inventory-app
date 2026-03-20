@@ -33,4 +33,19 @@ export class UserProfileController {
       status: StatusCodes.CREATED,
     });
   };
+
+  getMyProfile = async (
+    req: Request,
+    res: Response<ApiResponse<UserProfileResponseDto>>,
+  ): Promise<void> => {
+    const user = requireReqUser(req);
+
+    const profile = await this.userProfileService.getUserProfile(
+      user.authUserId!,
+    );
+
+    sendResponse.success(res, profile, {
+      status: StatusCodes.OK,
+    });
+  };
 }

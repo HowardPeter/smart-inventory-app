@@ -1,36 +1,27 @@
-/// Model ánh xạ chính xác với bảng UserProfile trong Prisma Schema
 class UserProfileModel {
+  final String userId;
+  final String authUserId;
+  final String email;
+  final String fullName;
+  final String activeStatus;
+
   UserProfileModel({
     required this.userId,
     required this.authUserId,
     required this.email,
     required this.fullName,
-    this.createdAt,
-    this.updatedAt,
+    required this.activeStatus,
   });
 
-  final String userId;
-  final String authUserId;
-  final String email;
-  final String fullName;
-  final DateTime? createdAt;
-  final DateTime? updatedAt;
-
+  // Chuyển từ JSON (từ API) sang Object
   factory UserProfileModel.fromJson(Map<String, dynamic> json) {
     return UserProfileModel(
-      // Ánh xạ chính xác key JSON từ Backend (chữ thường, có dấu gạch dưới như schema)
-      userId: json['user_id'] ?? '',
-      authUserId: json['auth_user_id'] ?? '',
+      userId: json['userId'] ?? '',
+      authUserId: json['authUserId'] ?? '',
       email: json['email'] ?? '',
-      fullName: json['full_name'] ?? 'Unknown User',
-
-      // Xử lý an toàn cho kiểu DateTime
-      createdAt: json['created_at'] != null
-          ? DateTime.parse(json['created_at'])
-          : null,
-      updatedAt: json['updated_at'] != null
-          ? DateTime.parse(json['updated_at'])
-          : null,
+      // CHÚ Ý: Phải khớp 100% với key 'fullName' từ JSON của server
+      fullName: json['fullName'] ?? 'Unknown User',
+      activeStatus: json['activeStatus'] ?? '',
     );
   }
 }
