@@ -10,7 +10,7 @@ import { PERMISSION, requirePermission } from '../access-control/index.js';
 import { authenticate } from '../auth/index.js';
 import { requireStoreContext } from '../stores/index.js';
 
-export const categoryRouter = Router();
+const categoryRouter = Router();
 
 categoryRouter.use(authenticate, requireStoreContext);
 
@@ -43,3 +43,5 @@ categoryRouter.patch(
   requirePermission(PERMISSION.CATEGORY_WRITE),
   asyncWrapper(categoryController.softDeleteOne),
 );
+
+export { categoryRouter };
