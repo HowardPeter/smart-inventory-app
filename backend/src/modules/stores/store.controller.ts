@@ -1,7 +1,6 @@
 import { StatusCodes } from 'http-status-codes';
 
 import { StoreService } from './services/store.service.js';
-import { CustomError } from '../../common/errors/index.js';
 import { requireReqUser, sendResponse } from '../../common/utils/index.js';
 
 import type { StoreResponseDto } from './dtos/store.dto.js';
@@ -29,13 +28,6 @@ export class StoreController {
   ): Promise<void> => {
     const userId = requireReqUser(req).userId;
 
-    if (!userId) {
-      throw new CustomError({
-        message: 'Cannot get user ID',
-        status: StatusCodes.UNAUTHORIZED,
-      });
-    }
-
     const { storeId } = req.params;
 
     const store = await this.storeService.getStoreById(
@@ -52,13 +44,6 @@ export class StoreController {
   ): Promise<void> => {
     const userId = requireReqUser(req).userId;
 
-    if (!userId) {
-      throw new CustomError({
-        message: 'Cannot get user ID',
-        status: StatusCodes.UNAUTHORIZED,
-      });
-    }
-
     const payload = req.body as CreateStoreDto;
 
     const createdStore = await this.storeService.createStore(userId, payload);
@@ -71,13 +56,6 @@ export class StoreController {
     res: Response<ApiResponse<StoreResponseDto>>,
   ): Promise<void> => {
     const userId = requireReqUser(req).userId;
-
-    if (!userId) {
-      throw new CustomError({
-        message: 'Cannot get user ID',
-        status: StatusCodes.UNAUTHORIZED,
-      });
-    }
 
     const { storeId } = req.params;
     const payload = req.body as UpdateStoreDto;
@@ -96,13 +74,6 @@ export class StoreController {
     res: Response<ApiResponse<StoreResponseDto>>,
   ): Promise<void> => {
     const userId = requireReqUser(req).userId;
-
-    if (!userId) {
-      throw new CustomError({
-        message: 'Cannot get user ID',
-        status: StatusCodes.UNAUTHORIZED,
-      });
-    }
 
     const { storeId } = req.params;
 

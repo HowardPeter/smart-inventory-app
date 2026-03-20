@@ -2,7 +2,7 @@ import { StatusCodes } from 'http-status-codes';
 
 import { CustomError } from '../errors/custom-error.js';
 
-import type { CurrentUser } from '../types/index.js';
+import type { CurrentUser, StoreContext } from '../types/index.js';
 import type { Request } from 'express';
 
 /* util để fix lỗi req.user undefined,
@@ -17,4 +17,15 @@ export const requireReqUser = (req: Request): CurrentUser => {
   }
 
   return req.user;
+};
+
+export const requireReqStoreContext = (req: Request): StoreContext => {
+  if (!req.storeContext) {
+    throw new CustomError({
+      message: 'Cannot get store ID',
+      status: StatusCodes.BAD_REQUEST,
+    });
+  }
+
+  return req.storeContext;
 };

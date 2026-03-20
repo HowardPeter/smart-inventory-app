@@ -8,26 +8,29 @@ import { authenticate } from '../auth/index.js';
 
 const storeRouter = Router();
 
-storeRouter.use(authenticate, requireStoreContext);
+storeRouter.use(authenticate);
+
+storeRouter.get('/', asyncWrapper(storeController.getStores));
 
 storeRouter.get(
-  '/',
-  requirePermission(PERMISSION.STORE_READ),
-  asyncWrapper(storeController.getStores),
-);
-storeRouter.get(
   '/:storeId',
+  requireStoreContext,
   requirePermission(PERMISSION.STORE_READ),
   asyncWrapper(storeController.getStoreById),
 );
+
 storeRouter.post('/', asyncWrapper(storeController.createStore));
+
 storeRouter.patch(
   '/:storeId',
+  requireStoreContext,
   requirePermission(PERMISSION.STORE_WRITE),
   asyncWrapper(storeController.updateStore),
 );
+
 storeRouter.patch(
   '/:storeId/disable',
+  requireStoreContext,
   requirePermission(PERMISSION.STORE_WRITE),
   asyncWrapper(storeController.disableStore),
 );
