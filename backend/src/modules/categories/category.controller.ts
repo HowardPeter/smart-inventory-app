@@ -1,90 +1,98 @@
-import { CategoryService } from '../../modules/categories/services/category.service.js';
+import { StatusCodes } from 'http-status-codes';
 
+import { CategoriesService } from './category.service.js';
+import {
+  sendResponse,
+  requireReqStoreContext,
+} from '../../common/utils/index.js';
+
+import type {
+  CategoryResponseDto,
+  CreateCategoryDto,
+  UpdateCategoryDto,
+} from './category.dto.js';
+import type { ApiResponse } from '../../common/types/index.js';
 import type { Request, Response } from 'express';
 
-const categoryService = new CategoryService();
-
 export class CategoryController {
-  async createCategory(req: Request, res: Response) {
-    try {
-      const { name, description, storeId } = req.body;
+  constructor(private readonly categoryService: CategoriesService) {}
 
-      const category = await categoryService.createCategory({
-        name,
-        description,
-        storeId,
-      });
+  findAll = async (
+    req: Request,
+    res: Response<ApiResponse<CategoryResponseDto[]>>,
+  ): Promise<void> => {
+    const storeId = requireReqStoreContext(req).storeId;
+    const categories = await this.categoryService.findAll(storeId);
 
-      return res.status(201).json({
-        success: true,
-        data: category,
-      });
-    } catch (error: any) {
-      return res.status(400).json({
-        success: false,
-        message: error.message,
-      });
-    }
-  }
+    sendResponse.success(res, categories, {
+      status: StatusCodes.OK,
+    });
+  };
 
-  async updateCategory(req: Request, res: Response) {
-    try {
-      const { categoryId } = req.params;
+  createOne = async (
+    req: Request,
+    res: Response<ApiResponse<CategoryResponseDto>>,
+  ): Promise<void> => {
+    const storeId = requireReqStoreContext(req).storeId;
+    const payload = req.body as CreateCategoryDto;
 
-      const updatedCategory = await categoryService.updateCategory(
-        String(categoryId),
-        req.body,
-      );
+    const createdCategory = await this.categoryService.createOne(
+      storeId,
+      payload,
+    );
 
-      return res.status(200).json({
-        success: true,
-        data: updatedCategory,
-      });
-    } catch (error: any) {
-      return res.status(400).json({
-        success: false,
-        message: error.message,
-      });
-    }
-  }
+    sendResponse.success(res, createdCategory, {
+      status: StatusCodes.CREATED,
+    });
+  };
 
-  async deleteCategory(req: Request, res: Response) {
-    try {
-      const { categoryId } = req.params;
+  updateOne = async (
+    req: Request,
+    res: Response<ApiResponse<CategoryResponseDto>>,
+  ): Promise<void> => {
+    const storeId = requireReqStoreContext(req).storeId;
+    const { categoryId } = req.params;
+    const payload = req.body as UpdateCategoryDto;
 
-      await categoryService.deleteCategory(String(categoryId));
+    const updatedCategory = await this.categoryService.updateOne(
+      storeId,
+      categoryId as string,
+      payload,
+    );
 
-      return res.status(200).json({
-        success: true,
-        message: 'Category deleted successfully',
-      });
-    } catch (error: any) {
-      return res.status(400).json({
-        success: false,
-        message: error.message,
-      });
-    }
-  }
+    sendResponse.success(res, updatedCategory, {
+      status: StatusCodes.OK,
+    });
+  };
 
-  async getCategories(req: Request, res: Response) {
-    try {
-      const { keyword, page, limit } = req.query;
+  softDeleteOne = async (
+    req: Request,
+    res: Response<ApiResponse<null>>,
+  ): Promise<void> => {
+    const storeId = requireReqStoreContext(req).storeId;
+    const { categoryId } = req.params;
 
-      const result = await categoryService.getCategories({
-        keyword: keyword as string,
-        page: page ? Number(page) : undefined,
-        limit: limit ? Number(limit) : undefined,
-      });
+    await this.categoryService.softDeleteDefault(storeId, categoryId as string);
 
-      return res.status(200).json({
-        success: true,
-        ...result,
-      });
-    } catch (error: any) {
-      return res.status(400).json({
-        success: false,
-        message: error.message,
-      });
-    }
-  }
+    sendResponse.success(res, null, {
+      status: StatusCodes.OK,
+    });
+  };
+
+  deleteCustomCategory = async (
+    req: Request,
+    res: Response<ApiResponse<null>>,
+  ): Promise<void> => {
+    const storeId = requireReqStoreContext(req).storeId;
+    const { categoryId } = req.params;
+
+    await this.categoryService.deleteCustomCategory(
+      storeId,
+      categoryId as string,
+    );
+
+    sendResponse.success(res, null, {
+      status: StatusCodes.OK,
+    });
+  };
 }

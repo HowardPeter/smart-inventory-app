@@ -5,3 +5,8 @@ export type Category = {
   isDefault: boolean;
   storeId: string | null;
 };
+
+export type HidedDefault = {
+  storeId: string;
+  categoryId: string;
+};
