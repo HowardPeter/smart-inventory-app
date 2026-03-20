@@ -64,7 +64,7 @@ class AuthProvider {
     return await supabase.auth.signUp(
       email: email,
       password: password,
-      emailRedirectTo: 'io.supabase.flutter://login-callback',
+      emailRedirectTo: 'https://smart-inventory-web-fawn.vercel.app/welcome',
     );
   }
 
@@ -81,7 +81,7 @@ class AuthProvider {
   Future<void> sendResetPasswordEmail(String email) async {
     await supabase.auth.resetPasswordForEmail(
       email,
-      redirectTo: 'io.supabase.flutter://reset-password',
+      redirectTo: 'https://smart-inventory-web-fawn.vercel.app/reset-password',
     );
   }
 
