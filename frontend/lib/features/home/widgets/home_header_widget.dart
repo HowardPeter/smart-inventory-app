@@ -56,9 +56,9 @@ class HomeHeaderWidget extends StatelessWidget {
 
           // BADGE ROLE VỚI TOOLTIP ĐỘNG TỪ TTEXTS
           Obx(() {
-            final role =
-                userController.currentUser.value?.role.toLowerCase() ?? 'staff';
-            final isManager = role == 'manager' || role == 'admin';
+            const role = 'manager';
+            // userController.currentUser.value?.role.toLowerCase() ?? 'staff';
+            const isManager = role == 'manager' || role == 'admin';
 
             // Lấy nội dung Tooltip từ TTexts
             final String tooltipMessage = isManager
@@ -70,7 +70,7 @@ class HomeHeaderWidget extends StatelessWidget {
                 ? [AppColors.primary, AppColors.secondPrimary]
                 : [const Color(0xFFFF9900), const Color(0xFFFFCC00)];
 
-            final IconData roleIcon = isManager
+            const IconData roleIcon = isManager
                 ? Icons.admin_panel_settings_rounded
                 : Icons.badge_rounded;
 
@@ -97,7 +97,7 @@ class HomeHeaderWidget extends StatelessWidget {
                     ),
                   ],
                 ),
-                child: Icon(roleIcon, color: Colors.white, size: 26),
+                child: const Icon(roleIcon, color: Colors.white, size: 26),
               ),
             );
           }),

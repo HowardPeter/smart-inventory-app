@@ -17,14 +17,13 @@ class UserController extends GetxController {
 
       // Fake data khớp chính xác với UserProfileModel và Prisma Schema của bạn
       currentUser.value = UserProfileModel(
-        userId: 'u-123',
-        authUserId: 'auth-abc',
-        email: email, // Sử dụng email truyền vào
-        fullName: 'Phát Nguyễn',
-        role: 'manager', // Role chuẩn: manager hoặc staff
-        createdAt: DateTime.parse("2026-01-20T08:00:00Z"),
-        updatedAt: DateTime.now(), // Thêm updatedAt cho đầy đủ model
-      );
+          userId: 'u-123',
+          authUserId: 'auth-abc',
+          email: email, 
+          fullName: 'Phát Nguyễn',
+          createdAt: DateTime.parse("2026-01-20T08:00:00Z"),
+          updatedAt: DateTime.now(), 
+          activeStatus: 'active');
     } catch (e) {
       Get.snackbar(
         'Lỗi hệ thống',

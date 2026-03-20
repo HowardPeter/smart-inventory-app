@@ -12,7 +12,7 @@ class UserProfileModel {
     required this.authUserId,
     required this.email,
     required this.fullName,
-    required this.activeStatus, // Thêm vào constructor
+    required this.activeStatus,
     this.createdAt,
     this.updatedAt,
   });
