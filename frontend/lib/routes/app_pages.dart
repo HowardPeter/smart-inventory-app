@@ -8,6 +8,7 @@ import 'package:frontend/features/auth/views/register_view.dart';
 import 'package:frontend/features/auth/views/verify_email_view.dart';
 import 'package:frontend/features/home/bindings/home_binding.dart';
 import 'package:frontend/features/home/views/home_view.dart';
+import 'package:frontend/features/navigation/views/navigation_view.dart';
 import 'package:frontend/features/onboarding/bindings/onboarding_binding.dart';
 import 'package:get/get.dart';
 
@@ -64,6 +65,12 @@ class AppPages {
       page: () => const VerifyEmailView(),
       binding: VerfiEmailBinding(),
       transition: Transition.fadeIn,
+    ),
+
+    GetPage(
+      name: AppRoutes.main,
+      page: () => const NavigationView(),
+      // Nếu Navigation có binding riêng thì gọi ở đây
     ),
 
     GetPage(

@@ -1,9 +1,9 @@
 // lib/core/widgets/t_barcode_scanner_layout.dart
 import 'package:flutter/material.dart';
+import 'package:frontend/core/widgets/t_custom_header_widget.dart';
 import 'package:mobile_scanner/mobile_scanner.dart';
 import 'package:get/get.dart';
 import 'package:frontend/core/controllers/barcode_scanner_controller.dart';
-import 'package:frontend/core/widgets/t_custom_header_widget.dart';
 
 class TBarcodeScannerLayout extends StatefulWidget {
   final String title;

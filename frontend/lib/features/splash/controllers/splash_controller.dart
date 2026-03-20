@@ -166,7 +166,6 @@ class SplashController extends GetxController {
   }
 
   void _navigateToNextScreen() {
-    // Logic Onboarding -> Home -> Login của bạn ở đây (Giữ nguyên)
     final storage = GetStorage();
     final authService = Get.find<AuthService>();
     final isFirstTime = storage.read('IS_FIRST_TIME') ?? true;
@@ -174,7 +173,8 @@ class SplashController extends GetxController {
     if (isFirstTime) {
       Get.offAllNamed(AppRoutes.onboarding);
     } else if (authService.isLoggedIn.value) {
-      Get.offAllNamed(AppRoutes.home);
+      // SỬA Ở ĐÂY: Đá user vào trang Main (Chứa thanh Navigation)
+      Get.offAllNamed(AppRoutes.main);
     } else {
       Get.offAllNamed(AppRoutes.login);
     }
