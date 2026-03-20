@@ -1,8 +1,8 @@
+import type { DbClient } from '../../../common/types/index.js';
 import type {
   StoreMembershipResponseDto,
   CreateStoreMembershipDto,
 } from '../dtos/store-member.dto.js';
-import type { DbClient } from '../types/db.type.js';
 
 export class StoreMemberRepository {
   /* tạo constructor cho các repository có dùng cơ chế $transaction,
