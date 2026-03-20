@@ -8,7 +8,6 @@ class HomeView extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final authService = Get.find<AuthService>();
-
     return Scaffold(
       appBar: AppBar(
         title: const Text('Trang chủ Smart Inventory'),
@@ -35,8 +34,7 @@ class HomeView extends StatelessWidget {
             // KHOẢNG TRẮNG CHỨA THÔNG TIN NGƯỜI DÙNG
             Container(
               padding: const EdgeInsets.all(20),
-              width:
-                  MediaQuery.of(context).size.width *
+              width: MediaQuery.of(context).size.width *
                   0.8, // Chiều rộng 80% màn hình
               decoration: BoxDecoration(
                 color: Colors.white,
