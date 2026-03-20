@@ -28,11 +28,11 @@ storeRouter.patch(
   asyncWrapper(storeController.updateStore),
 );
 
-storeRouter.patch(
-  '/:storeId/disable',
+storeRouter.delete(
+  '/:storeId',
   requireStoreContext,
   requirePermission(PERMISSION.STORE_WRITE),
-  asyncWrapper(storeController.disableStore),
+  asyncWrapper(storeController.softDeleteStore),
 );
 
 export { storeRouter };

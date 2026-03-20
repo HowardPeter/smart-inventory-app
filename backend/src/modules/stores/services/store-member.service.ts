@@ -4,6 +4,7 @@ import { CustomError } from '../../../common/errors/index.js';
 
 import type { StoreMembershipResponseDto } from '../dtos/store-member.dto.js';
 import type { StoreMemberRepository } from '../repositories/store-member.repository.js';
+import type { StoreRole } from '../types/store.type.js';
 
 export class StoreMemberService {
   constructor(private readonly storeMemberRepository: StoreMemberRepository) {}
@@ -21,7 +22,7 @@ export class StoreMemberService {
     }
 
     const membership =
-      await this.storeMemberRepository.findMembershipByUserIdAndStoreId(
+      await this.storeMemberRepository.findOneByUserIdAndStoreId(
         userId,
         storeId,
       );
@@ -31,5 +32,25 @@ export class StoreMemberService {
     }
 
     return membership;
+  }
+
+  async createNewMembership(
+    userId: string,
+    storeId: string,
+    role: StoreRole,
+  ): Promise<StoreMembershipResponseDto> {
+    if (!userId || !storeId) {
+      throw new CustomError({
+        message:
+          'User ID and Store ID are required to fetch membership information',
+        status: StatusCodes.BAD_REQUEST,
+      });
+    }
+
+    return await this.storeMemberRepository.createOne({
+      userId,
+      storeId,
+      role,
+    });
   }
 }
