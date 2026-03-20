@@ -1,7 +1,6 @@
-import { StatusCodes } from 'http-status-codes';
 import { z } from 'zod';
 
-import { CustomError } from '../../common/errors/index.js';
+import { validateSchema } from '../../common/utils/index.js';
 
 import type { NextFunction, Request, Response } from 'express';
 
@@ -58,19 +57,6 @@ const listProductsQuerySchema = z.object({
   categoryId: z.string().uuid('Invalid categoryId').optional(),
   brand: z.string().trim().min(1).max(255).optional(),
 });
-
-const validateSchema = <T>(schema: z.ZodSchema<T>, data: unknown): T => {
-  const result = schema.safeParse(data);
-
-  if (!result.success) {
-    throw new CustomError({
-      message: result.error.issues[0]?.message ?? 'Invalid data',
-      status: StatusCodes.BAD_REQUEST,
-    });
-  }
-
-  return result.data;
-};
 
 export const validateGetProducts = (
   req: Request,
