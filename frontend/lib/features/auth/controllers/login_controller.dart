@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:frontend/core/utils/t_full_screen_loader.dart';
 import 'package:frontend/features/auth/providers/auth_provider.dart';
+import 'package:frontend/features/auth/providers/user_profile_provider.dart';
 import 'package:get/get.dart';
 import 'package:frontend/core/widgets/t_snackbars_widget.dart';
 import 'package:frontend/core/constants/text_strings.dart';
@@ -70,6 +71,9 @@ class LoginController extends GetxController {
         );
         return;
       }
+
+//Tạo user profile cho lần đăng nhập lần đầu
+      await UserProfileProvider().createUserProfile();
 
       await Get.find<AuthService>().saveUserLogin(
         email,
