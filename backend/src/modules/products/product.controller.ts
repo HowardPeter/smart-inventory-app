@@ -12,6 +12,7 @@ import type {
   ProductResponseDto,
   UpdateProductDto,
   ListProductsQueryDto,
+  ListProductsResponseDto,
 } from './product.dto.js';
 import type { ApiResponse } from '../../common/types/index.js';
 import type { Request, Response } from 'express';
@@ -21,13 +22,13 @@ export class ProductController {
 
   getProducts = async (
     req: Request,
-    res: Response<ApiResponse<ProductResponseDto>>,
+    res: Response<ApiResponse<ListProductsResponseDto>>,
   ): Promise<void> => {
     const storeId = requireReqStoreContext(req).storeId;
 
     const products = await this.productService.getProductsbyStoreId(
       storeId,
-      req.query as unknown as ListProductsQueryDto,
+      res.locals.validatedQuery as unknown as ListProductsQueryDto,
     );
 
     sendResponse.success(res, products, { status: StatusCodes.OK });

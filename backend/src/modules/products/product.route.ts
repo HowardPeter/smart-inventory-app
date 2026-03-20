@@ -21,7 +21,7 @@ productRouter.get(
   '/',
   requirePermission(PERMISSION.PRODUCT_READ),
   validateGetProducts,
-  asyncWrapper(productController.getProductById),
+  asyncWrapper(productController.getProducts),
 );
 
 productRouter.get(

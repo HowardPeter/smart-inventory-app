@@ -1,5 +1,4 @@
-import { prisma } from '../../../db/prismaClient.js';
-
+import type { DbClient } from '../../../common/types/index.js';
 import type {
   StoreResponseDto,
   CreateStoreDto,
@@ -8,8 +7,13 @@ import type {
 } from '../dtos/store.dto.js';
 
 export class StoreRepository {
+  /* tạo constructor cho các repository có dùng cơ chế $transaction,
+  truyền prisma global (prismaClient.ts) lúc bình thường
+  và truyền `tx` cho các hàm transaction */
+  constructor(private readonly db: DbClient) {}
+
   async findManybyUserId(userId: string): Promise<ListRawStoreDto[]> {
-    return await prisma.store.findMany({
+    return await this.db.store.findMany({
       where: {
         activeStatus: 'active',
         storeMembers: {
@@ -42,9 +46,9 @@ export class StoreRepository {
   }
 
   async findById(storeId: string): Promise<StoreResponseDto | null> {
-    return await prisma.store.findFirst({
+    return await this.db.store.findFirst({
       where: {
-        storeId: storeId,
+        storeId,
         activeStatus: 'active',
       },
       select: {
@@ -64,7 +68,7 @@ export class StoreRepository {
     storeId: string,
     userId: string,
   ): Promise<StoreResponseDto | null> {
-    return await prisma.store.findFirst({
+    return await this.db.store.findFirst({
       where: {
         storeId,
         activeStatus: 'active',
@@ -89,7 +93,7 @@ export class StoreRepository {
   }
 
   async createOne(data: CreateStoreDto): Promise<StoreResponseDto> {
-    return await prisma.store.create({
+    return await this.db.store.create({
       data,
       select: {
         storeId: true,
@@ -108,7 +112,7 @@ export class StoreRepository {
     storeId: string,
     data: UpdateStoreDto,
   ): Promise<StoreResponseDto | null> {
-    return await prisma.store.update({
+    return await this.db.store.update({
       where: { storeId },
       data,
       select: {
@@ -125,7 +129,7 @@ export class StoreRepository {
   }
 
   async disableOne(storeId: string): Promise<boolean> {
-    const disableStore = await prisma.store.update({
+    const disableStore = await this.db.store.update({
       where: { storeId: storeId },
       data: {
         activeStatus: 'inactive',

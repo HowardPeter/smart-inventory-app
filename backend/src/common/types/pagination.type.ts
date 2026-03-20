@@ -9,3 +9,29 @@ export interface PaginationMeta {
   totalItems: number;
   totalPages: number;
 }
+
+export type SortOrder = 'asc' | 'desc';
+
+/* dto dùng ghép các dto của query pagination trong các module
+vd:
+export type ListProductsQueryDto = ListPaginationQueryDto<ProductSortBy> &
+  Partial<Pick<Product, 'categoryId' | 'brand'>>;
+--> ListProductsQueryDto = {
+      page?: number;
+      limit?: number;
+      sortBy?: ProductSortBy;
+      sortOrder?: SortOrder;
+      categoryId?: string;
+      brand?: string;
+    }
+*/
+export type ListPaginationQueryDto<T> = PaginationQuery & {
+  sortBy?: T;
+  sortOrder?: SortOrder;
+};
+
+// dto dùng chung để in response các hàm service có pagination
+export type PaginationResponseDto<T> = {
+  items: T[];
+  meta: PaginationMeta;
+};

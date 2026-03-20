@@ -1,5 +1,5 @@
 type ActiveStatus = 'active' | 'inactive';
-type StoreRole = 'manager' | 'staff';
+export type StoreRole = 'manager' | 'staff';
 
 export type Store = {
   storeId: string;
