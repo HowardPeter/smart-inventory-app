@@ -20,30 +20,28 @@ class UserProfileModel {
   // Chuyển từ JSON (Backend) sang Model (Flutter)
   factory UserProfileModel.fromJson(Map<String, dynamic> json) {
     return UserProfileModel(
-      userId: json['user_id'] ?? '',
-      authUserId: json['auth_user_id'] ?? '',
+      userId: json['userId'] ?? '',
+      authUserId: json['authUserId'] ?? '',
       email: json['email'] ?? '',
-      fullName: json['full_name'] ?? 'Unknown User',
-      activeStatus: json['active_status'] ?? 'inactive', // Map thêm trường này
-      createdAt: json['created_at'] != null
-          ? DateTime.parse(json['created_at'])
-          : null,
-      updatedAt: json['updated_at'] != null
-          ? DateTime.parse(json['updated_at'])
-          : null,
+      fullName: json['fullName'] ?? 'Unknown User',
+      activeStatus: json['activeStatus'] ?? 'inactive', // Map thêm trường này
+      createdAt:
+          json['createdAt'] != null ? DateTime.parse(json['createdAt']) : null,
+      updatedAt:
+          json['updatedAt'] != null ? DateTime.parse(json['updatedAt']) : null,
     );
   }
 
   // Chuyển từ Model sang JSON (để gửi lên Backend nếu cần)
   Map<String, dynamic> toJson() {
     return {
-      'user_id': userId,
-      'auth_user_id': authUserId,
+      'userId': userId,
+      'authUserId': authUserId,
       'email': email,
-      'full_name': fullName,
-      'active_status': activeStatus,
-      'created_at': createdAt?.toIso8601String(),
-      'updated_at': updatedAt?.toIso8601String(),
+      'fullName': fullName,
+      'activeStatus': activeStatus,
+      'createdAt': createdAt?.toIso8601String(),
+      'updatedAt': updatedAt?.toIso8601String(),
     };
   }
 

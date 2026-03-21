@@ -25,7 +25,16 @@ class HomeTransactionListWidget extends GetView<HomeController> {
         ),
         const SizedBox(height: 16),
         Obx(() {
-          if (controller.recentTransactions.isEmpty) {
+          // code cũ của m nè
+          // if (controller.recentTransactions.isEmpty) {
+          //   return TEmptyStateWidget(
+          //     icon: Icons.receipt_long_outlined,
+          //     title: TTexts.emptyTransactionTitle.tr,
+          //     subtitle: TTexts.emptyTransactionSubtitle.tr,
+          //   );
+          // }
+// Lắng nghe trực tiếp vào transactions.obs
+          if (controller.transactions.isEmpty) {
             return TEmptyStateWidget(
               icon: Icons.receipt_long_outlined,
               title: TTexts.emptyTransactionTitle.tr,
@@ -33,8 +42,12 @@ class HomeTransactionListWidget extends GetView<HomeController> {
             );
           }
 
+          // Sau đó mới dùng getter để lấy 3 item gần nhất để hiển thị
+          final recentList = controller.recentTransactions;
+
           return Column(
-            children: controller.recentTransactions.map((t) {
+            // children: controller.recentTransactions.map((t) {
+            children: recentList.map((t) {
               // 1. SỬ DỤNG TRỰC TIẾP THUỘC TÍNH TỪ MODEL
               final type = t.type;
               final date = t.createdAt;

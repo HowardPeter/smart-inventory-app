@@ -56,8 +56,9 @@ class HomeHeaderWidget extends StatelessWidget {
 
           // BADGE ROLE VỚI TOOLTIP ĐỘNG TỪ TTEXTS
           Obx(() {
+            final _ = homeController.isLoading.value;
             const role = 'manager';
-            // userController.currentUser.value?.role.toLowerCase() ?? 'staff';
+          //  userController.currentUser.value?.role.toLowerCase() ?? 'staff';
             const isManager = role == 'manager' || role == 'admin';
 
             // Lấy nội dung Tooltip từ TTexts

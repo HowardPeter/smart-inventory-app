@@ -55,7 +55,8 @@ class HomeController extends GetxController {
     try {
       final profile = await userProfileProvider.fetchMyProfile();
       userProfile.value = profile;
-      debugPrint("Data user model: ${userProfile.value!.fullName}");
+      debugPrint(
+          "Data user model: ${userProfile.value!.fullName + userProfile.value!.email}");
     } catch (e) {
       debugPrint("Lỗi Không thể lấy thông tin cá nhân: ${e.toString()}");
     }
