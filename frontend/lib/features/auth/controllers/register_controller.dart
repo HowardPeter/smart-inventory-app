@@ -5,7 +5,6 @@ import 'package:frontend/core/widgets/t_snackbars_widget.dart';
 import 'package:frontend/core/constants/text_strings.dart';
 import 'package:frontend/routes/app_routes.dart';
 import 'package:frontend/features/auth/providers/auth_provider.dart';
-// import '../models/register_request_model.dart'; // Mở ra khi bạn tạo model này
 
 class RegisterController extends GetxController {
   final AuthProvider authProvider;
@@ -21,8 +20,7 @@ class RegisterController extends GetxController {
   final RxBool isPasswordHidden = true.obs;
   final RxBool isConfirmPasswordHidden = true.obs;
   final RxBool isLoading = false.obs;
-  final RxInt passwordStrength =
-      0.obs; // 0: Trống, 1: Weak, 2: Fair, 3: Good, 4: Strong
+  final RxInt passwordStrength = 0.obs;
 
   @override
   void onClose() {
@@ -38,31 +36,28 @@ class RegisterController extends GetxController {
   void toggleConfirmPasswordVisibility() =>
       isConfirmPasswordHidden.value = !isConfirmPasswordHidden.value;
 
-  /// Thuật toán kiểm tra độ mạnh mật khẩu theo thời gian thực
   void checkPasswordStrength(String password) {
     if (password.isEmpty) {
       passwordStrength.value = 0;
     } else if (password.length < 6) {
-      passwordStrength.value = 1; // Weak
+      passwordStrength.value = 1;
     } else if (password.length < 10) {
-      passwordStrength.value = 2; // Fair
+      passwordStrength.value = 2;
     } else if (!password.contains(RegExp(r'[0-9]')) ||
         !password.contains(RegExp(r'[A-Z]'))) {
-      passwordStrength.value = 3; // Good (thiếu số hoặc chữ hoa)
+      passwordStrength.value = 3;
     } else {
-      passwordStrength.value = 4; // Strong (Dài, có số và chữ hoa)
+      passwordStrength.value = 4;
     }
   }
 
   // --- HÀM XỬ LÝ LOGIC API ---
 
-  /// Đăng ký bằng Email & Mật khẩu
   Future<void> register() async {
     final email = emailController.text.trim();
     final password = passwordController.text;
     final confirmPassword = confirmPasswordController.text;
 
-    // 1. Validate: Không được bỏ trống
     if (email.isEmpty || password.isEmpty || confirmPassword.isEmpty) {
       TSnackbars.warning(
         title: TTexts.registerErrorEmptyFieldsTitle.tr,
@@ -71,7 +66,6 @@ class RegisterController extends GetxController {
       return;
     }
 
-// 2. Validate: Kiểm tra định dạng Email
     if (!GetUtils.isEmail(email)) {
       TSnackbars.error(
         title: TTexts.loginErrorInvalidEmailTitle.tr,
@@ -80,7 +74,6 @@ class RegisterController extends GetxController {
       return;
     }
 
-    // 2. Validate: Mật khẩu xác nhận phải khớp
     if (password != confirmPassword) {
       TSnackbars.error(
         title: TTexts.registerErrorPasswordMismatchTitle.tr,
@@ -93,9 +86,6 @@ class RegisterController extends GetxController {
       isLoading.value = true;
       TFullScreenLoader.openLoadingDialog(TTexts.registering.tr);
 
-      // SAU NÀY: Chỗ này sẽ gọi authProvider.registerWithEmail(request)
-      // Tạm thời giả lập chờ mạng 2 giây
-      // await Future.delayed(const Duration(seconds: 2));
       final response = await authProvider.register(
         email: email,
         password: password,
@@ -103,12 +93,10 @@ class RegisterController extends GetxController {
 
       TFullScreenLoader.stopLoading();
       if (response.user != null) {
-        // Hiện thông báo thành công
         TSnackbars.success(
           title: TTexts.registerSuccessTitle.tr,
           message: TTexts.registerSuccessMessage.tr,
         );
-        // Chuyển hướng sang trang Xác thực Email (Gửi kèm email qua Arguments)
         Get.toNamed(AppRoutes.verifyEmail,
             arguments: emailController.text.trim());
       }
@@ -123,37 +111,48 @@ class RegisterController extends GetxController {
     }
   }
 
-  /// Đăng ký/Đăng nhập bằng Google (Dùng chung logic với màn Login)
+  /// Đăng ký/Đăng nhập bằng Google
   Future<void> registerWithGoogle() async {
     try {
       TFullScreenLoader.openLoadingDialog(TTexts.loggingIn.tr);
 
-      final account = await authProvider.signInWithGoogle();
+      // Nhận về AuthResponse thay vì GoogleSignInAccount
+      final response = await authProvider.signInWithGoogle();
 
-      if (account == null) {
+      if (response == null || response.user == null) {
         TFullScreenLoader.stopLoading();
-        TSnackbars.warning(
-          title: TTexts.canceled,
-          message: TTexts.googleSignInCanceled,
-        );
+        // Bỏ qua cảnh báo tắt popup để tránh spam UI, hoặc bật lại nếu bạn muốn
         return;
       }
 
-      final auth = account.authentication;
-      final String? idToken = auth.idToken;
+      final user = response.user!;
 
-      debugPrint("=== GOOGLE REGISTER ===");
-      debugPrint("Email: ${account.email}");
-      debugPrint("Token: $idToken");
+      debugPrint("=== GOOGLE REGISTER SUCCESS ===");
+      debugPrint("Email: ${user.email}");
+      debugPrint("ID: ${user.id}");
 
       TFullScreenLoader.stopLoading();
 
-      TSnackbars.success(
-        title: TTexts.registerSuccessTitle.tr,
-        message: TTexts.registerSuccessMessage.tr,
-      );
+      if (response.user != null) {
+        // THÊM ĐOẠN NÀY: Kiểm tra nếu identities rỗng nghĩa là email đã tồn tại
+        if (response.user!.identities != null &&
+            response.user!.identities!.isEmpty) {
+          TSnackbars.error(
+            title: TTexts.registerFailedTitle.tr,
+            message: "Email này đã được đăng ký. Vui lòng đăng nhập!",
+          );
+          return;
+        }
 
-      Get.offAllNamed(AppRoutes.home);
+        // Hiện thông báo thành công và chuyển trang như cũ
+        TSnackbars.success(
+          title: "Đăng ký thành công!",
+          message: "Vui lòng chọn đăng nhập lại bằng tài khoản google.",
+        );
+        Get.toNamed(
+          AppRoutes.login,
+        );
+      }
     } catch (e) {
       TFullScreenLoader.stopLoading();
       TSnackbars.error(
