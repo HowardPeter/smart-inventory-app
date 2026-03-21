@@ -139,13 +139,25 @@ export class StoreService {
       });
     }
 
-    const isDisabled = await this.storeRepository.disableOne(storeId);
+    await this.storeRepository.disableOne(storeId);
 
-    if (!isDisabled) {
-      throw new CustomError({
-        message: 'Store disable failed',
-        status: StatusCodes.INTERNAL_SERVER_ERROR,
-      });
-    }
+    /*
+      NOTE: disable luôn các membership có trong store
+      NOTE: tuy nhiên có thể dẫn tới lẫn logic khi có function restore store:
+        - membership inactive vì user bị remove?
+        - hay vì store bị disable?
+    */
+    // await prisma.$transaction(async (tx) => {
+    //   const storeRepositoryTx = new StoreRepository(tx);
+    //   const storeMemberRepositoryTx = new StoreMemberRepository(tx);
+
+    //   await storeRepositoryTx.disableOne(storeId);
+
+    //   const storeMemberships =
+    //     await storeMemberRepositoryTx.findAllByStoreId(storeId);
+
+    //   await storeMemberRepositoryTx
+    //          .disableAllStoreMembership(storeMemberships);
+    // });
   }
 }
