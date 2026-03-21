@@ -1,3 +1,11 @@
+---
+name: Task
+about: Task cho FE / BE / Testing
+title: "[TYPE] Tên chức năng"
+labels: ''
+assignees: ''
+---
+
 ## Tiêu đề
 <Tên chức năng + mô tả ngắn nếu cần>
 
