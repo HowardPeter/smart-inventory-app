@@ -52,7 +52,7 @@ class ForgotPasswordFormWidget extends GetView<ForgotPasswordController> {
         // Nút Gửi Email (Nút chính)
         Obx(() => TPrimaryButton(
               text: controller.isLoading.value
-                  ? TTexts.emailSending
+                  ? TTexts.emailSending.tr
                   : TTexts.forgotPasswordBtn.tr,
               onPressed:
                   controller.isLoading.value ? null : controller.sendResetLink,

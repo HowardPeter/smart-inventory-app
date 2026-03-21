@@ -14,6 +14,11 @@ final Map<String, String> enAuth = {
   TTexts.onboardingSubtitle3:
       'Make data-driven decisions effortlessly. Sync your inventory across all devices securely and watch your efficiency grow.',
 
+  // -- Error / Restricted Access
+  TTexts.errorTimeoutTitle: 'Connection Timeout',
+  TTexts.errorTimeoutMessage:
+      'The server took too long to respond. Please check your network and try again.',
+
   // General Auth
   TTexts.authOrDivider: "Or",
   TTexts.authentication: 'Authentication',
@@ -43,6 +48,12 @@ final Map<String, String> enAuth = {
   TTexts.loginSuccessTitle: 'Welcome Back',
   TTexts.loginSuccessMessage: 'Login successful: @name',
   TTexts.loginFailedTitle: 'Login Failed',
+  TTexts.loginErrorInvalidCredentialsTitle: 'Login Failed',
+  TTexts.loginErrorInvalidCredentialsMessage:
+      'Invalid email or password. Please try again.',
+  TTexts.loginWarningUnverifiedTitle: 'Email Not Verified',
+  TTexts.loginWarningUnverifiedMessage:
+      'Please verify your email address before logging in.',
 
   // Register
   TTexts.registerTitle: 'Create an Account',
@@ -63,6 +74,13 @@ final Map<String, String> enAuth = {
       'Welcome aboard! Please check your email to verify your account.',
   TTexts.registerFailedTitle: 'Registration Failed',
   TTexts.resendEmailSuccessMessage: 'A new reset link has been sent to @email.',
+  // Thêm vào vùng Register
+  TTexts.registerErrorUserExistsTitle: 'Account Exists',
+  TTexts.registerErrorUserExistsMessage:
+      'An account with this email already exists. Please log in instead.',
+  TTexts.registerErrorWeakPasswordTitle: 'Weak Password',
+  TTexts.registerErrorWeakPasswordMessage:
+      'Your password is too weak. Please use a stronger password.',
 
   // Forgot Password / Verify
   TTexts.forgetPasswordTitle: 'Forgot Password?',

@@ -7,18 +7,20 @@ class TTexts {
   static const String group21 = "group_21";
   static const String tryAgain = "try_again";
   static const String successTitle = "success_title";
-  static const String errorTitle = "error_title";
   static const String weak = "weak";
   static const String fair = "fair";
   static const String good = "good";
   static const String strong = "strong";
   static const String barCodeScan = "bar_code_scan";
 
-  // -- Error / Restricted Access
-  static const String errorAccessRestrictedTitle =
-      "error_access_restricted_title";
-  static const String errorAccessRestrictedSubtitle =
-      "error_access_restricted_subtitle";
+// -- Error / Restricted Access
+  static const String errorTitle = "error_title";
+  static const String errorAccessRestrictedTitle = "error_access_restricted_title";
+  static const String errorAccessRestrictedSubtitle = "error_access_restricted_subtitle";
+  static const String errorTimeoutTitle = "error_timeout_title";
+  static const String errorTimeoutMessage = "error_timeout_message";
+  static const String errorTooManyRequestsTitle = "error_too_many_requests_title";
+  static const String errorTooManyRequestsMessage = "error_too_many_requests_message";
   static const String exit = "exit";
 
   // -- Splash Screen
@@ -81,6 +83,14 @@ class TTexts {
   static const String loginSuccessTitle = "login_success_title";
   static const String loginSuccessMessage = "login_success_message";
   static const String loginFailedTitle = "login_failed_title";
+  static const String loginErrorInvalidCredentialsTitle =
+      "login_error_invalid_credentials_title";
+  static const String loginErrorInvalidCredentialsMessage =
+      "login_error_invalid_credentials_message";
+  static const String loginWarningUnverifiedTitle =
+      "login_warning_unverified_title";
+  static const String loginWarningUnverifiedMessage =
+      "login_warning_unverified_message";
 
   // -- Register Screen
   static const String registerTitle = "register_title";
@@ -103,6 +113,14 @@ class TTexts {
   static const String registerFailedTitle = "register_failed_title";
   static const String resendEmailSuccessMessage =
       "resend_email_success_message";
+  static const String registerErrorUserExistsTitle =
+      "register_error_user_exists_title";
+  static const String registerErrorUserExistsMessage =
+      "register_error_user_exists_message";
+  static const String registerErrorWeakPasswordTitle =
+      "register_error_weak_password_title";
+  static const String registerErrorWeakPasswordMessage =
+      "register_error_weak_password_message";
 
   // -- Forgot Password & Verify
   static const String forgetPasswordTitle = "forget_password_title";

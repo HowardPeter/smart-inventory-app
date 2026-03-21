@@ -1,11 +1,14 @@
+import 'dart:async';
+import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:supabase_flutter/supabase_flutter.dart'; // Import Supabase để bắt AuthException
+
 import 'package:frontend/core/infrastructure/utils/t_full_screen_loader.dart';
 import 'package:frontend/core/ui/widgets/t_snackbars_widget.dart';
 import 'package:frontend/core/infrastructure/constants/text_strings.dart';
 import 'package:frontend/routes/app_routes.dart';
 import 'package:frontend/features/auth/providers/auth_provider.dart';
-// import '../models/register_request_model.dart'; // Mở ra khi bạn tạo model này
 
 class RegisterController extends GetxController {
   final AuthProvider authProvider;
@@ -30,7 +33,6 @@ class RegisterController extends GetxController {
   void toggleConfirmPasswordVisibility() =>
       isConfirmPasswordHidden.value = !isConfirmPasswordHidden.value;
 
-  /// Thuật toán kiểm tra độ mạnh mật khẩu theo thời gian thực
   void checkPasswordStrength(String password) {
     if (password.isEmpty) {
       passwordStrength.value = 0;
@@ -63,7 +65,7 @@ class RegisterController extends GetxController {
       return;
     }
 
-// 2. Validate: Kiểm tra định dạng Email
+    // 2. Validate: Kiểm tra định dạng Email
     if (!GetUtils.isEmail(email)) {
       TSnackbars.error(
         title: TTexts.loginErrorInvalidEmailTitle.tr,
@@ -72,7 +74,7 @@ class RegisterController extends GetxController {
       return;
     }
 
-    // 2. Validate: Mật khẩu xác nhận phải khớp
+    // 3. Validate: Mật khẩu xác nhận phải khớp
     if (password != confirmPassword) {
       TSnackbars.error(
         title: TTexts.registerErrorPasswordMismatchTitle.tr,
@@ -85,15 +87,16 @@ class RegisterController extends GetxController {
       isLoading.value = true;
       TFullScreenLoader.openLoadingDialog(TTexts.registering.tr);
 
-      // SAU NÀY: Chỗ này sẽ gọi authProvider.registerWithEmail(request)
-      // Tạm thời giả lập chờ mạng 2 giây
-      // await Future.delayed(const Duration(seconds: 2));
-      final response = await authProvider.register(
-        email: email,
-        password: password,
-      );
+      // GỌI API KÈM TIMEOUT 15 GIÂY
+      final response = await authProvider
+          .register(
+            email: email,
+            password: password,
+          )
+          .timeout(const Duration(seconds: 15));
 
       TFullScreenLoader.stopLoading();
+
       if (response.user != null) {
         // Hiện thông báo thành công
         TSnackbars.success(
@@ -101,21 +104,58 @@ class RegisterController extends GetxController {
           message: TTexts.registerSuccessMessage.tr,
         );
         // Chuyển hướng sang trang Xác thực Email (Gửi kèm email qua Arguments)
-        Get.toNamed(AppRoutes.verifyEmail,
-            arguments: emailController.text.trim());
+        Get.toNamed(AppRoutes.verifyEmail, arguments: email);
       }
-    } catch (e) {
+    } on AuthException catch (e) {
+      // BẮT LỖI TỪ SUPABASE (Trùng email, mật khẩu yếu...)
+      TFullScreenLoader.stopLoading();
+      final errorMsg = e.message.toLowerCase();
+
+      if (errorMsg.contains('already registered') ||
+          errorMsg.contains('already exists')) {
+        TSnackbars.error(
+          title: TTexts.registerErrorUserExistsTitle.tr,
+          message: TTexts.registerErrorUserExistsMessage.tr,
+        );
+      } else if (errorMsg.contains('weak password') ||
+          errorMsg.contains('password should be')) {
+        TSnackbars.error(
+          title: TTexts.registerErrorWeakPasswordTitle.tr,
+          message: TTexts.registerErrorWeakPasswordMessage.tr,
+        );
+      } else {
+        TSnackbars.error(
+          title: TTexts.registerFailedTitle.tr,
+          message: e.message,
+        );
+      }
+    } on TimeoutException catch (_) {
+      // BẮT LỖI QUÁ HẠN THỜI GIAN
       TFullScreenLoader.stopLoading();
       TSnackbars.error(
-        title: TTexts.registerFailedTitle.tr,
-        message: e.toString().replaceAll('Exception: ', ''),
+        title: TTexts.errorTimeoutTitle.tr,
+        message: TTexts.errorTimeoutMessage.tr,
+      );
+    } on SocketException catch (_) {
+      // BẮT LỖI MẤT MẠNG LÚC ĐANG GỌI API
+      TFullScreenLoader.stopLoading();
+      TSnackbars.error(
+        title: TTexts.netErrorTitle.tr,
+        message: TTexts.netErrorDescription.tr,
+      );
+    } catch (e) {
+      // BẮT CÁC LỖI KHÁC
+      TFullScreenLoader.stopLoading();
+      TSnackbars.error(
+        title: TTexts.errorTitle.tr,
+        message: e.toString(),
       );
     } finally {
       isLoading.value = false;
     }
   }
 
-  /// Đăng ký/Đăng nhập bằng Google (Dùng chung logic với màn Login)
+  /// Đăng ký/Đăng nhập bằng Google
   Future<void> registerWithGoogle() async {
     try {
       TFullScreenLoader.openLoadingDialog(TTexts.loggingIn.tr);
@@ -125,18 +165,14 @@ class RegisterController extends GetxController {
       if (account == null) {
         TFullScreenLoader.stopLoading();
         TSnackbars.warning(
-          title: TTexts.canceled,
-          message: TTexts.googleSignInCanceled,
+          title: TTexts.canceled.tr,
+          message: TTexts.googleSignInCanceled.tr,
         );
         return;
       }
 
-      final auth = account.authentication;
-      final String? idToken = auth.idToken;
-
-      debugPrint("=== GOOGLE REGISTER ===");
-      debugPrint("Email: ${account.email}");
-      debugPrint("Token: $idToken");
+      // final auth = account.authentication;
+      // final String? idToken = auth.idToken;
 
       TFullScreenLoader.stopLoading();
 
@@ -145,7 +181,13 @@ class RegisterController extends GetxController {
         message: TTexts.registerSuccessMessage.tr,
       );
 
-      Get.offAllNamed(AppRoutes.home);
+      Get.offAllNamed(AppRoutes.main);
+    } on SocketException catch (_) {
+      TFullScreenLoader.stopLoading();
+      TSnackbars.error(
+        title: TTexts.netErrorTitle.tr,
+        message: TTexts.netErrorDescription.tr,
+      );
     } catch (e) {
       TFullScreenLoader.stopLoading();
       TSnackbars.error(
