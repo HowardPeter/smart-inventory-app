@@ -1,4 +1,4 @@
-import type { Category } from './categoty.type.js';
+import type { Category } from './category.type.js';
 
 export type CategoryResponseDto = Category;
 

@@ -128,14 +128,12 @@ export class StoreRepository {
     });
   }
 
-  async disableOne(storeId: string): Promise<boolean> {
-    const disableStore = await this.db.store.update({
+  async disableOne(storeId: string): Promise<void> {
+    await this.db.store.update({
       where: { storeId: storeId },
       data: {
         activeStatus: 'inactive',
       },
     });
-
-    return disableStore !== null ? true : false;
   }
 }
