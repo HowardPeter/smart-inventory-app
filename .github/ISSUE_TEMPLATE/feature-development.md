@@ -1,11 +1,3 @@
----
-name: Task
-about: Task đơn lẻ cho FE / BE / Testing
-title: "[TYPE] Tên chức năng ngắn gọn"
-labels: ''
-assignees: ''
----
-
 ## Tiêu đề
 <Tên chức năng + mô tả ngắn nếu cần>
 
