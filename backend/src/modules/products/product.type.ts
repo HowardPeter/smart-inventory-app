@@ -9,5 +9,5 @@ export type Product = {
   createdAt: Date;
   updatedAt: Date;
   storeId: string;
-  categoryId: string | null;
+  categoryId: string;
 };
