@@ -2,7 +2,7 @@ import 'dart:async';
 import 'dart:io';
 
 import 'package:flutter/material.dart';
-import 'package:frontend/core/infrastructure/utils/t_full_screen_loader.dart';
+import 'package:frontend/core/infrastructure/utils/full_screen_loader_utils.dart';
 import 'package:frontend/core/state/services/user_service.dart';
 import 'package:frontend/features/auth/providers/auth_provider.dart';
 import 'package:frontend/core/state/provider/user_profile_provider.dart';
@@ -45,7 +45,7 @@ class LoginController extends GetxController {
 
     // 1. GỌI LOADING GIAO DIỆN MỚI
     isLoading.value = true;
-    TFullScreenLoader.openLoadingDialog(TTexts.loggingIn.tr);
+    FullScreenLoaderUtils.openLoadingDialog(TTexts.loggingIn.tr);
 
     try {
       final request = LoginRequestModel(email: email, password: password);
@@ -68,7 +68,7 @@ class LoginController extends GetxController {
       if (user.emailConfirmedAt == null) {
         await Supabase.instance.client.auth.signOut();
 
-        TFullScreenLoader
+        FullScreenLoaderUtils
             .stopLoading(); // Phải tắt loading trước khi hiện cảnh báo
         TSnackbars.warning(
           title: TTexts.loginWarningUnverifiedTitle.tr,
@@ -95,7 +95,7 @@ class LoginController extends GetxController {
       );
 
       // 2. TẮT LOADING KHI THÀNH CÔNG
-      TFullScreenLoader.stopLoading();
+      FullScreenLoaderUtils.stopLoading();
 
       TSnackbars.success(
         title: TTexts.loginSuccessTitle.tr,
@@ -107,7 +107,7 @@ class LoginController extends GetxController {
       Get.offAllNamed(AppRoutes.main);
     } on AuthException catch (e) {
       // BẮT LỖI SUPABASE (Sai pass, user không tồn tại...)
-      TFullScreenLoader.stopLoading();
+      FullScreenLoaderUtils.stopLoading();
 
       // Kiểm tra code lỗi hoặc message từ Supabase
       if (e.message.contains('Invalid login credentials') ||
@@ -124,21 +124,21 @@ class LoginController extends GetxController {
       }
     } on TimeoutException catch (_) {
       // BẮT LỖI QUÁ HẠN THỜI GIAN
-      TFullScreenLoader.stopLoading();
+      FullScreenLoaderUtils.stopLoading();
       TSnackbars.error(
         title: TTexts.errorTimeoutTitle.tr,
         message: TTexts.errorTimeoutMessage.tr,
       );
     } on SocketException catch (_) {
       // BẮT LỖI MẤT MẠNG LÚC ĐANG GỌI API
-      TFullScreenLoader.stopLoading();
+      FullScreenLoaderUtils.stopLoading();
       TSnackbars.error(
         title: TTexts.netErrorTitle.tr,
         message: TTexts.netErrorDescription.tr,
       );
     } catch (e) {
       // BẮT CÁC LỖI CÒN LẠI
-      TFullScreenLoader.stopLoading();
+      FullScreenLoaderUtils.stopLoading();
       TSnackbars.error(
         title: TTexts.errorTitle.tr,
         message: e.toString(),
@@ -150,13 +150,13 @@ class LoginController extends GetxController {
 
   Future<void> loginWithGoogle() async {
     try {
-      TFullScreenLoader.openLoadingDialog(TTexts.loggingIn.tr);
+      FullScreenLoaderUtils.openLoadingDialog(TTexts.loggingIn.tr);
 
       // 1. Mở popup Google và lấy account
       final account = await authProvider.signInWithGoogle();
 
       if (account == null) {
-        TFullScreenLoader.stopLoading();
+        FullScreenLoaderUtils.stopLoading();
         return;
       }
 
@@ -177,7 +177,7 @@ class LoginController extends GetxController {
         true,
       );
 
-      TFullScreenLoader.stopLoading();
+      FullScreenLoaderUtils.stopLoading();
 
       // 4. HIỆN THÔNG BÁO THÀNH CÔNG
       TSnackbars.success(
@@ -189,7 +189,7 @@ class LoginController extends GetxController {
 
       Get.offAllNamed(AppRoutes.main);
     } catch (e) {
-      TFullScreenLoader.stopLoading();
+      FullScreenLoaderUtils.stopLoading();
       debugPrint('❌ Google Auth Error: $e');
 
       // 5. BÁO LỖI

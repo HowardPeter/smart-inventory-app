@@ -11,16 +11,31 @@ class TTexts {
   static const String fair = "fair";
   static const String good = "good";
   static const String strong = "strong";
+
+  // -- Network Error Dialog
+  static const String netErrorTitle = "net_error_title";
+  static const String netErrorDescription = "net_error_description";
+  static const String netErrorReloadBtn = "net_error_reload_btn";
+  static const String netErrorCheckWifiBtn = "net_error_check_wifi_btn";
+  static const String netErrorWaiting = "net_error_waiting";
+  static const String netChecking = "net_checking";
+  static const String netErrorRetryFailedMessage =
+      "net_error_retry_failed_message"; 
+
   static const String barCodeScan = "bar_code_scan";
 
 // -- Error / Restricted Access
   static const String errorTitle = "error_title";
-  static const String errorAccessRestrictedTitle = "error_access_restricted_title";
-  static const String errorAccessRestrictedSubtitle = "error_access_restricted_subtitle";
+  static const String errorAccessRestrictedTitle =
+      "error_access_restricted_title";
+  static const String errorAccessRestrictedSubtitle =
+      "error_access_restricted_subtitle";
   static const String errorTimeoutTitle = "error_timeout_title";
   static const String errorTimeoutMessage = "error_timeout_message";
-  static const String errorTooManyRequestsTitle = "error_too_many_requests_title";
-  static const String errorTooManyRequestsMessage = "error_too_many_requests_message";
+  static const String errorTooManyRequestsTitle =
+      "error_too_many_requests_title";
+  static const String errorTooManyRequestsMessage =
+      "error_too_many_requests_message";
   static const String exit = "exit";
 
   // -- Splash Screen
@@ -32,13 +47,6 @@ class TTexts {
   static const String splashLoadingSettings = "splash_loading_settings";
   static const String splashLoadingServices = "splash_loading_services";
   static const String splashLoadingUser = "splash_loading_user";
-
-  // -- Network Error Dialog
-  static const String netErrorTitle = "net_error_title";
-  static const String netErrorDescription = "net_error_description";
-  static const String netErrorPrimaryBtn = "net_error_primary_btn";
-  static const String netErrorSecondaryBtn = "net_error_secondary_btn";
-  static const String netErrorWaiting = "net_error_waiting";
 
   // -- Onboarding
   static const String onboardingSkip = "onboarding_skip";

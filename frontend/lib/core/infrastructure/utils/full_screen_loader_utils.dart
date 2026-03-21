@@ -5,7 +5,7 @@ import 'package:frontend/core/ui/theme/app_colors.dart';
 import 'package:frontend/core/ui/theme/app_sizes.dart';
 
 /// Lớp tiện ích gộp chung UI và Logic Loading
-class TFullScreenLoader {
+class FullScreenLoaderUtils {
   /// Mở hộp thoại Loading
   static void openLoadingDialog(String text) {
     Get.dialog(

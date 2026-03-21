@@ -3,16 +3,28 @@ import 'package:frontend/core/infrastructure/constants/text_strings.dart';
 final Map<String, String> enCore = {
   TTexts.appName: 'Smart Inventory',
   TTexts.group21: "Group 21",
+
+  // -- Global Errors
+  TTexts.errorTitle: 'Error',
+  TTexts.successTitle: 'Success',
   TTexts.errorAccessRestrictedTitle: 'Access Restricted',
   TTexts.errorAccessRestrictedSubtitle:
       'This application is exclusively optimized for Smartphones. Please access via a mobile device or a standard desktop web browser for the full experience.',
+  TTexts.errorTimeoutTitle: 'Connection Timeout',
+  TTexts.errorTimeoutMessage:
+      'The server took too long to respond. Please check your network and try again.',
+  TTexts.errorTooManyRequestsTitle: 'Too Many Requests',
+  TTexts.errorTooManyRequestsMessage:
+      'You have requested too many times. Please wait a moment before trying again.',
   TTexts.exit: 'Exit',
-  TTexts.successTitle: 'Success',
-  TTexts.errorTitle: 'Error',
+
+  // -- Password Strength
   TTexts.weak: 'Weak',
   TTexts.fair: 'Fair',
   TTexts.good: 'Good',
   TTexts.strong: 'Strong',
+
+  // -- Splash Screen
   TTexts.splashSlogan: 'Smart Inventory, Smarter Business',
   TTexts.splashVersion: 'Version',
   TTexts.splashDevelopedBy: 'Developed by Group 21',
@@ -21,11 +33,17 @@ final Map<String, String> enCore = {
   TTexts.splashLoadingSettings: 'Loading system settings...',
   TTexts.splashLoadingServices: 'Loading core services...',
   TTexts.splashLoadingUser: 'Verifying user data...',
+
+  // -- Network Error Dialog (Đã cập nhật giao diện bắt buộc)
   TTexts.netErrorTitle: 'No Internet Connection',
   TTexts.netErrorDescription:
-      'You are offline. Your actions will not be saved to the cloud. Do you want to continue offline or check your connection?',
-  TTexts.netErrorPrimaryBtn: 'Check my Wifi',
-  TTexts.netErrorSecondaryBtn: 'Got it!',
+      'This app requires an active internet connection to sync inventory data. Please check your network and try again.',
+  TTexts.netErrorReloadBtn: 'Reload', // Nút mới
+  TTexts.netErrorCheckWifiBtn: 'Check WiFi Settings', // Nút mới
+  TTexts.netChecking: 'Checking connection...',
   TTexts.netErrorWaiting: 'Waiting for network...',
+  TTexts.netErrorRetryFailedMessage:
+      'Still no internet connection. Please try again.', // THÊM DÒNG NÀY
+
   TTexts.barCodeScan: 'Bar Code Scan',
 };

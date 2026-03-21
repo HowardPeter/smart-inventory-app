@@ -4,7 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:supabase_flutter/supabase_flutter.dart'; // Import Supabase để bắt AuthException
 
-import 'package:frontend/core/infrastructure/utils/t_full_screen_loader.dart';
+import 'package:frontend/core/infrastructure/utils/full_screen_loader_utils.dart';
 import 'package:frontend/core/ui/widgets/t_snackbars_widget.dart';
 import 'package:frontend/core/infrastructure/constants/text_strings.dart';
 import 'package:frontend/routes/app_routes.dart';
@@ -85,7 +85,7 @@ class RegisterController extends GetxController {
 
     try {
       isLoading.value = true;
-      TFullScreenLoader.openLoadingDialog(TTexts.registering.tr);
+      FullScreenLoaderUtils.openLoadingDialog(TTexts.registering.tr);
 
       // GỌI API KÈM TIMEOUT 15 GIÂY
       final response = await authProvider
@@ -95,7 +95,7 @@ class RegisterController extends GetxController {
           )
           .timeout(const Duration(seconds: 15));
 
-      TFullScreenLoader.stopLoading();
+      FullScreenLoaderUtils.stopLoading();
 
       if (response.user != null) {
         // Hiện thông báo thành công
@@ -108,7 +108,7 @@ class RegisterController extends GetxController {
       }
     } on AuthException catch (e) {
       // BẮT LỖI TỪ SUPABASE (Trùng email, mật khẩu yếu...)
-      TFullScreenLoader.stopLoading();
+      FullScreenLoaderUtils.stopLoading();
       final errorMsg = e.message.toLowerCase();
 
       if (errorMsg.contains('already registered') ||
@@ -131,21 +131,21 @@ class RegisterController extends GetxController {
       }
     } on TimeoutException catch (_) {
       // BẮT LỖI QUÁ HẠN THỜI GIAN
-      TFullScreenLoader.stopLoading();
+      FullScreenLoaderUtils.stopLoading();
       TSnackbars.error(
         title: TTexts.errorTimeoutTitle.tr,
         message: TTexts.errorTimeoutMessage.tr,
       );
     } on SocketException catch (_) {
       // BẮT LỖI MẤT MẠNG LÚC ĐANG GỌI API
-      TFullScreenLoader.stopLoading();
+      FullScreenLoaderUtils.stopLoading();
       TSnackbars.error(
         title: TTexts.netErrorTitle.tr,
         message: TTexts.netErrorDescription.tr,
       );
     } catch (e) {
       // BẮT CÁC LỖI KHÁC
-      TFullScreenLoader.stopLoading();
+      FullScreenLoaderUtils.stopLoading();
       TSnackbars.error(
         title: TTexts.errorTitle.tr,
         message: e.toString(),
@@ -158,12 +158,12 @@ class RegisterController extends GetxController {
   /// Đăng ký/Đăng nhập bằng Google
   Future<void> registerWithGoogle() async {
     try {
-      TFullScreenLoader.openLoadingDialog(TTexts.loggingIn.tr);
+      FullScreenLoaderUtils.openLoadingDialog(TTexts.loggingIn.tr);
 
       final account = await authProvider.signInWithGoogle();
 
       if (account == null) {
-        TFullScreenLoader.stopLoading();
+        FullScreenLoaderUtils.stopLoading();
         TSnackbars.warning(
           title: TTexts.canceled.tr,
           message: TTexts.googleSignInCanceled.tr,
@@ -174,7 +174,7 @@ class RegisterController extends GetxController {
       // final auth = account.authentication;
       // final String? idToken = auth.idToken;
 
-      TFullScreenLoader.stopLoading();
+      FullScreenLoaderUtils.stopLoading();
 
       TSnackbars.success(
         title: TTexts.registerSuccessTitle.tr,
@@ -183,13 +183,13 @@ class RegisterController extends GetxController {
 
       Get.offAllNamed(AppRoutes.main);
     } on SocketException catch (_) {
-      TFullScreenLoader.stopLoading();
+      FullScreenLoaderUtils.stopLoading();
       TSnackbars.error(
         title: TTexts.netErrorTitle.tr,
         message: TTexts.netErrorDescription.tr,
       );
     } catch (e) {
-      TFullScreenLoader.stopLoading();
+      FullScreenLoaderUtils.stopLoading();
       TSnackbars.error(
         title: TTexts.registerFailedTitle.tr,
         message: e.toString().replaceAll('Exception: ', ''),
