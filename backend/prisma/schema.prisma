@@ -121,10 +121,10 @@ model Product {
   createdAt    DateTime     @default(now()) @map("created_at")
   updatedAt    DateTime     @updatedAt @map("updated_at")
   storeId      String       @map("store_id")
-  categoryId   String       @map("category_id")
+  categoryId   String?       @map("category_id")
 
   store           Store            @relation(fields: [storeId], references: [storeId])
-  category        Category         @relation(fields: [categoryId], references: [categoryId])
+  category        Category?         @relation(fields: [categoryId], references: [categoryId])
   productPackages ProductPackage[]
 }
 

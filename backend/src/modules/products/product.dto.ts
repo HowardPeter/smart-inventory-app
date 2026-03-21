@@ -3,7 +3,7 @@ import type {
   ListPaginationQueryDto,
   PaginationResponseDto,
 } from '../../common/types/index.js';
-import type { Category } from '../categories/categoty.type.js';
+import type { Category } from '../categories/index.js';
 
 export type ProductResponseDto = Product;
 
