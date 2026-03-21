@@ -1,55 +1,36 @@
 ---
-name: Feature Development
-about: This template is used for feature development
-title: FEATURE
+name: Task
+about: Task đơn lẻ cho FE / BE / Testing
+title: "[TYPE] Tên chức năng ngắn gọn"
 labels: ''
 assignees: ''
+---
+
+## Tiêu đề
+<Tên chức năng + mô tả ngắn nếu cần>
 
 ---
 
-## Title
-UC-XX-XX: <Use Case Name>
+## Task Type
+- [ ] Backend
+- [ ] Frontend
+- [ ] Testing
 
 ---
 
-## Description
-Implement use case based on SRS section <X.X>.
-
-Brief description of the use case.
-
----
-
-## Functional Requirements
-- Requirement 1
-- Requirement 2
-- Requirement 3
-
----
-
-## Tasks
-
-### Backend
-- [ ] Create API endpoint
-- [ ] Implement service logic
-- [ ] Validate request data
-- [ ] Handle error cases
-- [ ] Update Prisma schema (if needed)
-
-### Frontend
-- [ ] Create UI component/screen
-- [ ] Connect API
-- [ ] Handle loading and error states
-
-### Test
-- [ ] API manual test
-- [ ] Edge cases test
-- [ ] Verify business logic
+## Assumptions & Details (nếu có)
+- Context / use case liên quan
+- API / module liên quan
+- Input / Output chính
+- Rule / business logic cần lưu ý
+- Giả định
 
 ---
 
 ## Definition of Done
-- [ ] Feature implemented
-- [ ] API working correctly
-- [ ] UI working correctly
-- [ ] Manual test passed
-- [ ] Code pushed and merged
+- [ ] Code hoàn thành
+- [ ] Đúng business logic
+- [ ] Không lỗi (happy case)
+- [ ] Handle basic edge cases
+- [ ] Đã test (manual hoặc unit nếu có)
+- [ ] Đã push code / tạo PR
