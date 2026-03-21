@@ -1,11 +1,13 @@
 // file: lib/core/services/auth_service.dart
 
+import 'package:frontend/features/auth/providers/auth_provider.dart';
 import 'package:frontend/routes/app_routes.dart';
 import 'package:get/get.dart';
 import 'package:get_storage/get_storage.dart';
 
 class AuthService extends GetxService {
   final storage = GetStorage();
+  late final AuthProvider authProvider;
 
   // 1. Biến quản lý trạng thái
   final RxBool isLoggedIn = false.obs;
@@ -38,6 +40,8 @@ class AuthService extends GetxService {
   }
 
   Future<void> logout() async {
+    // Gọi log out của supabase
+    authProvider.logout();
     // Xóa sạch dữ liệu khi đăng xuất
     await storage.remove('IS_LOGGED_IN');
     await storage.remove('USER_EMAIL');
@@ -47,5 +51,4 @@ class AuthService extends GetxService {
 
     Get.offAllNamed(AppRoutes.login); // Đá về trang login
   }
-  
 }
