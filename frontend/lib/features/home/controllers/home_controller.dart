@@ -5,12 +5,10 @@ import 'package:flutter/widgets.dart';
 import 'package:get/get.dart';
 import 'package:fl_chart/fl_chart.dart';
 
-import 'package:frontend/core/constants/text_strings.dart';
-import 'package:frontend/core/controllers/user_controller.dart';
-import 'package:frontend/core/models/inventory_model.dart';
-import 'package:frontend/core/models/user_profile_model.dart';
-import 'package:frontend/core/services/auth_service.dart'; // Cần cho hàm logout
-import 'package:frontend/features/auth/providers/user_profile_provider.dart';
+import 'package:frontend/core/infrastructure/constants/text_strings.dart';
+import 'package:frontend/core/infrastructure/models/inventory_model.dart';
+import 'package:frontend/core/infrastructure/models/user_profile_model.dart';
+import 'package:frontend/core/state/provider/user_profile_provider.dart';
 import 'package:frontend/features/home/model/home_inventory_transaction_model.dart';
 
 class HomeController extends GetxController {
@@ -62,11 +60,6 @@ class HomeController extends GetxController {
     }
   }
 
-  void logout() {
-    // Gọi thẳng hàm logout của Service
-    Get.find<AuthService>().logout();
-  }
-
   // ==========================================
   // 4. LOGIC TỪ NHÁNH HEAD (DASHBOARD & CHARTS)
   // ==========================================
@@ -77,10 +70,6 @@ class HomeController extends GetxController {
       final String response =
           await rootBundle.loadString('assets/mock_data/home_raw_data.json');
       final data = json.decode(response);
-
-      // Load User (Dùng cho mock data - có thể cân nhắc bỏ nếu dùng API thật)
-      UserController.instance.currentUser.value =
-          UserProfileModel.fromJson(data['user_profile']);
 
       // Parse Transactions sang Model
       if (data['transactions'] != null) {

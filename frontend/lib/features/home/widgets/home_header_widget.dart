@@ -1,9 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:frontend/core/constants/text_strings.dart';
-import 'package:frontend/core/theme/app_colors.dart';
-import 'package:frontend/core/theme/app_sizes.dart';
-import 'package:frontend/core/controllers/user_controller.dart';
+import 'package:frontend/core/infrastructure/constants/text_strings.dart';
+import 'package:frontend/core/ui/theme/app_colors.dart';
+import 'package:frontend/core/ui/theme/app_sizes.dart';
 import 'package:frontend/features/home/controllers/home_controller.dart';
 
 class HomeHeaderWidget extends StatelessWidget {
@@ -11,7 +10,6 @@ class HomeHeaderWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final userController = UserController.instance;
     final homeController = Get.find<HomeController>();
 
     return Padding(
@@ -25,12 +23,11 @@ class HomeHeaderWidget extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Obx(() {
-                  final fullName =
-                      userController.currentUser.value?.fullName ?? 'Guest';
-                  final firstName = fullName.trim().split(' ').last;
+                  final user = homeController.userProfile.value;
+                  final displayName = user?.fullName ?? 'Guest';
 
                   return Text(
-                    '${homeController.greetingText}, $firstName',
+                    '${homeController.greetingText}, $displayName',
                     style: const TextStyle(
                       fontFamily: 'Poppins',
                       fontSize: 22,
@@ -58,7 +55,7 @@ class HomeHeaderWidget extends StatelessWidget {
           Obx(() {
             final _ = homeController.isLoading.value;
             const role = 'manager';
-          //  userController.currentUser.value?.role.toLowerCase() ?? 'staff';
+            //  userController.currentUser.value?.role.toLowerCase() ?? 'staff';
             const isManager = role == 'manager' || role == 'admin';
 
             // Lấy nội dung Tooltip từ TTexts

@@ -1,13 +1,14 @@
 import 'dart:io';
 import 'package:flutter/material.dart';
-import 'package:frontend/core/constants/text_strings.dart';
-import 'package:frontend/core/widgets/t_custom_dialog.dart';
+import 'package:frontend/core/infrastructure/constants/text_strings.dart';
+import 'package:frontend/core/state/services/user_service.dart';
+import 'package:frontend/core/ui/widgets/t_custom_dialog.dart';
 import 'package:get/get.dart';
 import 'package:get_storage/get_storage.dart';
 import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:app_settings/app_settings.dart';
 import 'package:frontend/routes/app_routes.dart';
-import 'package:frontend/core/services/auth_service.dart';
+import 'package:frontend/core/state/services/store_service.dart';
 
 class SplashController extends GetxController {
   // 1. State variables
@@ -25,7 +26,7 @@ class SplashController extends GetxController {
     // 2. Cập nhật danh sách Tasks dùng Locale
     final List<Map<String, dynamic>> tasks = [
       {
-        'message': TTexts.splashLoadingInternet.tr, // Dùng .tr ở đây
+        'message': TTexts.splashLoadingInternet.tr,
         'action': _checkInternetConnection,
       },
       {
@@ -125,49 +126,44 @@ class SplashController extends GetxController {
 
   // TÁC VỤ 3: Load các core Service của hệ thống
   Future<void> _initCoreServices() async {
-    await Get.putAsync(() => AuthService().init());
+    await Get.putAsync(() => StoreService().init());
   }
 
   /// TÁC VỤ 4: Xác thực Token với Server (Fake API)
   Future<void> _checkUserAuthentication() async {
-    final authService = Get.find<AuthService>();
+    final storeService = Get.find<StoreService>();
 
-    // 1. Nếu ổ cứng báo là CHƯA từng đăng nhập -> Bỏ qua, không cần lên Server hỏi mất công
-    if (!authService.isLoggedIn.value) {
-      await Future.delayed(
-        const Duration(milliseconds: 300),
-      ); // Delay cho mượt UI
+    // 1. Nếu chưa từng đăng nhập -> Bỏ qua
+    if (!storeService.isLoggedIn.value) {
+      await Future.delayed(const Duration(milliseconds: 300));
       return;
     }
 
-    // 2. Nếu ổ cứng báo ĐÃ đăng nhập -> Mang Token lên Server kiểm tra (Verify)
+    // 2. Nếu đã đăng nhập -> Lấy data User mới nhất từ Backend đắp vào RAM
     try {
-      // TODO: Sau này có API thật, sẽ gọi: await Get.find<AuthProvider>().verifyToken();
+      final userService = Get.find<UserService>();
 
-      // Hiện tại: Mô phỏng việc gọi API lên Server mất 1.5 giây
-      await Future.delayed(const Duration(milliseconds: 1500));
+      // Hàm này vừa verify token (thông qua việc gọi API), vừa lưu data user vào RAM
+      final isProfileLoaded = await userService.fetchAndSaveProfile();
 
-      // Giả lập logic: Nếu thành công, Server trả về OK -> Giữ nguyên trạng thái isLoggedIn = true
-      debugPrint('Xác thực thành công: Token còn hạn hợp lệ!');
-
-      /* // TEST TRƯỜNG HỢP TOKEN HẾT HẠN, \ MỞ COMMENT DÒNG DƯỚI ĐÂY:
-      // throw Exception('Token expired'); 
-      */
+      if (isProfileLoaded) {
+        debugPrint('Xác thực và tải profile thành công!');
+      } else {
+        // Nếu API trả về false (do token hết hạn, user bị khóa...) -> Bắn lỗi để chạy vào catch
+        throw Exception('Token expired or profile not found');
+      }
     } catch (e) {
-      // 3. Nếu Server báo lỗi (Token hết hạn, User bị khóa, hoặc lỗi mạng lúc check)
       debugPrint('Xác thực thất bại: $e');
 
-      // GỌI BÁC BẢO VỆ XÓA SẠCH DỮ LIỆU VÀ ĐÁ VỀ TRẠNG THÁI CHƯA ĐĂNG NHẬP
-      await authService.logout();
-
-      // Lưu ý: Lúc này authService.isLoggedIn.value đã biến thành false.
-      // Khi hàm _navigateToNextScreen() chạy, nó sẽ tự động ném user về trang Login.
+      // 3. Nếu Server báo lỗi -> Xóa sạch dữ liệu và đá về trạng thái chưa đăng nhập
+      await storeService.clearAuthData();
+      // Lúc này authService.isLoggedIn.value đã = false, hàm _navigateToNextScreen sẽ tự đá về Login
     }
   }
 
   void _navigateToNextScreen() {
     final storage = GetStorage();
-    final authService = Get.find<AuthService>();
+    final authService = Get.find<StoreService>();
     final isFirstTime = storage.read('IS_FIRST_TIME') ?? true;
 
     if (isFirstTime) {

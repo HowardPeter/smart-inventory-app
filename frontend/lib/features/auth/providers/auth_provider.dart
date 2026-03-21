@@ -1,5 +1,5 @@
 import 'package:flutter/foundation.dart';
-import 'package:frontend/core/network/app_client.dart';
+import 'package:frontend/core/infrastructure/network/app_client.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 

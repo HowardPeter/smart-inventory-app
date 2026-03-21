@@ -1,17 +1,17 @@
 import 'package:flutter/material.dart';
-import 'package:frontend/core/theme/app_colors.dart';
+import 'package:frontend/core/ui/theme/app_colors.dart';
+import 'package:frontend/core/ui/theme/app_sizes.dart';
+import 'package:frontend/features/profile/views/profile_view.dart';
 import 'package:get/get.dart';
 import 'package:iconsax_flutter/iconsax_flutter.dart';
 import 'package:frontend/features/navigation/controllers/navigation_controller.dart';
 import 'package:frontend/features/home/views/home_view.dart';
 
-class NavigationMobileView extends StatelessWidget {
+class NavigationMobileView extends GetView<NavigationController> {
   const NavigationMobileView({super.key});
 
   @override
   Widget build(BuildContext context) {
-    final controller = Get.put(NavigationController());
-
     return Scaffold(
       backgroundColor: AppColors.background,
       body: Stack(
@@ -24,7 +24,7 @@ class NavigationMobileView extends StatelessWidget {
                   Center(child: Text('Inventory Screen')), // Tab 1
                   Center(child: Text('Transaction / Scan')), // Tab 2
                   Center(child: Text('Reports')), // Tab 3
-                  Center(child: Text('Profile')), // Tab 4
+                  ProfileView()
                 ],
               )),
 
@@ -40,8 +40,9 @@ class NavigationMobileView extends StatelessWidget {
                 children: [
                   // NỀN NAV (Không dùng Obx ở đây nữa)
                   Container(
-                    height: 80,
-                    padding: const EdgeInsets.symmetric(horizontal: 10),
+                    height: AppSizes.bottomNavHeight,
+                    padding:
+                        const EdgeInsets.symmetric(horizontal: AppSizes.p12),
                     decoration: BoxDecoration(
                       color: AppColors.surface,
                       borderRadius: const BorderRadius.vertical(
@@ -50,7 +51,7 @@ class NavigationMobileView extends StatelessWidget {
                       boxShadow: [
                         BoxShadow(
                           color: Colors.black.withOpacity(0.04),
-                          blurRadius: 20,
+                          blurRadius: AppSizes.radius20,
                           offset: const Offset(0, -6),
                         ),
                       ],

@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 
-import 'package:frontend/core/theme/app_colors.dart';
-import 'package:frontend/core/theme/app_sizes.dart';
-import 'package:frontend/core/widgets/t_image_widget.dart';
+import 'package:frontend/core/ui/theme/app_colors.dart';
+import 'package:frontend/core/ui/theme/app_sizes.dart';
+import 'package:frontend/core/ui/widgets/t_image_widget.dart';
 import '../widgets/onboarding_next_button_widget.dart';
 import '../widgets/onboarding_skip_button_widget.dart';
 

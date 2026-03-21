@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:frontend/features/splash/widgets/splash_moving_box_widget.dart';
 import 'package:get/get.dart';
 
-import 'package:frontend/core/theme/app_colors.dart';
+import 'package:frontend/core/ui/theme/app_colors.dart';
 import '../controllers/splash_controller.dart';
 
 class SplashLoadingBar extends GetView<SplashController> {

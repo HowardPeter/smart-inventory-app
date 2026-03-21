@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
-import 'package:frontend/core/theme/app_colors.dart';
+import 'package:frontend/core/ui/theme/app_colors.dart';
 import '../controllers/onboarding_controller.dart';
 
 /// Widget hiển thị các chấm chỉ số trang (Dots Indicator) cho Onboarding

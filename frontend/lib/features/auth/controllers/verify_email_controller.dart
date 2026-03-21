@@ -1,7 +1,7 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
-import 'package:frontend/core/constants/text_strings.dart';
-import 'package:frontend/core/widgets/t_snackbars_widget.dart';
+import 'package:frontend/core/infrastructure/constants/text_strings.dart';
+import 'package:frontend/core/ui/widgets/t_snackbars_widget.dart';
 import 'package:get/get.dart';
 import 'package:frontend/features/auth/providers/auth_provider.dart';
 import 'package:open_mail_app_plus/open_mail_app_plus.dart';
@@ -16,7 +16,6 @@ class VerifyEmailController extends GetxController {
 
   // Trạng thái đếm ngược 45s
   var timerCountdown = 45.obs;
-  Timer? _timer;
 
   // Trạng thái loading khi bấm Resend
   var isResending = false.obs;
@@ -33,13 +32,6 @@ class VerifyEmailController extends GetxController {
 
   void startTimer() {
     timerCountdown.value = 45;
-    _timer = Timer.periodic(const Duration(seconds: 1), (timer) {
-      if (timerCountdown.value > 0) {
-        timerCountdown.value--;
-      } else {
-        timer.cancel(); // Dừng đồng hồ khi về 0
-      }
-    });
   }
 
   void resendEmail() async {
@@ -87,11 +79,5 @@ class VerifyEmailController extends GetxController {
         },
       );
     }
-  }
-
-  @override
-  void onClose() {
-    _timer?.cancel(); // Nhớ hủy timer khi thoát trang để tránh tràn bộ nhớ
-    super.onClose();
   }
 }

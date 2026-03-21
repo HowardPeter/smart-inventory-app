@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
-import 'package:frontend/core/constants/image_strings.dart';
-import 'package:frontend/core/widgets/t_image_widget.dart';
+import 'package:frontend/core/infrastructure/constants/image_strings.dart';
+import 'package:frontend/core/ui/widgets/t_image_widget.dart';
 import 'package:get/get.dart';
 
-import 'package:frontend/core/theme/app_sizes.dart';
+import 'package:frontend/core/ui/theme/app_sizes.dart';
 import 'package:frontend/features/onboarding/controllers/onboarding_controller.dart';
 import 'package:frontend/features/onboarding/widgets/onboarding_next_button_widget.dart';
 import 'package:frontend/features/onboarding/widgets/onboarding_skip_button_widget.dart';

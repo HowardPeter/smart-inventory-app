@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:frontend/core/layouts/t_responsive_layout.dart';
+import 'package:frontend/core/ui/layouts/t_responsive_layout.dart';
 import 'platform/splash_mobile_view.dart';
 
 class SplashView extends StatelessWidget {

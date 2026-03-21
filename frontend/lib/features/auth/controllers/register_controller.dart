@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:frontend/core/utils/t_full_screen_loader.dart';
-import 'package:frontend/core/widgets/t_snackbars_widget.dart';
-import 'package:frontend/core/constants/text_strings.dart';
+import 'package:frontend/core/infrastructure/utils/t_full_screen_loader.dart';
+import 'package:frontend/core/ui/widgets/t_snackbars_widget.dart';
+import 'package:frontend/core/infrastructure/constants/text_strings.dart';
 import 'package:frontend/routes/app_routes.dart';
 import 'package:frontend/features/auth/providers/auth_provider.dart';
 // import '../models/register_request_model.dart'; // Mở ra khi bạn tạo model này
@@ -23,14 +23,6 @@ class RegisterController extends GetxController {
   final RxBool isLoading = false.obs;
   final RxInt passwordStrength =
       0.obs; // 0: Trống, 1: Weak, 2: Fair, 3: Good, 4: Strong
-
-  @override
-  void onClose() {
-    emailController.dispose();
-    passwordController.dispose();
-    confirmPasswordController.dispose();
-    super.onClose();
-  }
 
   // --- HÀM XỬ LÝ GIAO DIỆN ---
   void togglePasswordVisibility() =>

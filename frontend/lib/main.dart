@@ -1,14 +1,15 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:frontend/core/bindings/initial_binding.dart';
-import 'package:frontend/core/localization/app_translations.dart';
-import 'package:frontend/core/services/auth_service.dart';
+import 'package:frontend/core/infrastructure/localization/app_translations.dart';
+import 'package:frontend/core/state/bindings/initial_binding.dart';
+import 'package:frontend/core/state/services/store_service.dart';
+import 'package:frontend/core/state/services/user_service.dart';
 import 'package:frontend/routes/app_pages.dart';
 import 'package:get/get.dart';
 import 'package:device_preview/device_preview.dart';
 import 'package:get_storage/get_storage.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
-import 'core/theme/app_theme.dart';
+import 'core/ui/theme/app_theme.dart';
 // import 'core/network/api_client.dart'; // Sau này mở ra để inject ApiClient
 
 void main() async {
@@ -23,7 +24,8 @@ void main() async {
   await GetStorage.init();
   // 2. Khởi tạo AuthService một cách bất đồng bộ
   // Việc dùng putAsync giúp App chờ AuthService check ổ cứng xong mới chạy tiếp
-  await Get.putAsync(() => AuthService().init());
+  await Get.putAsync(() => StoreService().init());
+  await Get.putAsync(() => UserService().init());
   // ---------------------------------------------------------
   // 3. Khởi tạo supabase để kích hoạt các tính năng authen
   await Supabase.initialize(

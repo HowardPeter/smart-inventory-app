@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
-import 'package:frontend/core/utils/t_full_screen_loader.dart';
-import 'package:frontend/core/widgets/t_snackbars_widget.dart';
+import 'package:frontend/core/infrastructure/utils/t_full_screen_loader.dart';
+import 'package:frontend/core/ui/widgets/t_snackbars_widget.dart';
 import 'package:frontend/routes/app_routes.dart';
 import 'package:get/get.dart';
 import 'package:frontend/features/auth/providers/auth_provider.dart';
-import 'package:frontend/core/constants/text_strings.dart';
+import 'package:frontend/core/infrastructure/constants/text_strings.dart';
 
 class ForgotPasswordController extends GetxController {
   final AuthProvider authProvider;
@@ -64,11 +64,5 @@ class ForgotPasswordController extends GetxController {
     if (Get.isDialogOpen == true) {
       Get.back();
     }
-  }
-
-  @override
-  void onClose() {
-    emailController.dispose();
-    super.onClose();
   }
 }

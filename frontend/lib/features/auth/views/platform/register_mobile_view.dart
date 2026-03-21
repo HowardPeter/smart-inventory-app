@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:frontend/core/constants/text_strings.dart';
+import 'package:frontend/core/infrastructure/constants/text_strings.dart';
 import 'package:frontend/features/auth/widgets/register/register_form_widget.dart';
 import 'package:get/get.dart';
 import 'package:frontend/features/auth/layouts/auth_standard_layout.dart';

@@ -6,10 +6,10 @@ import 'package:frontend/features/auth/widgets/verify_email/verify_email_message
 import 'package:frontend/features/auth/widgets/verify_email/verify_email_resend_email_button_widget.dart';
 import 'package:get/get.dart';
 
-import 'package:frontend/core/widgets/t_primary_button_widget.dart'; // 1. IMPORT WIDGET CỦA BẠN
-import 'package:frontend/core/theme/app_sizes.dart';
-import 'package:frontend/core/theme/app_colors.dart';
-import 'package:frontend/core/constants/text_strings.dart';
+import 'package:frontend/core/ui/widgets/t_primary_button_widget.dart'; // 1. IMPORT WIDGET CỦA BẠN
+import 'package:frontend/core/ui/theme/app_sizes.dart';
+import 'package:frontend/core/ui/theme/app_colors.dart';
+import 'package:frontend/core/infrastructure/constants/text_strings.dart';
 import 'package:frontend/routes/app_routes.dart';
 import 'package:frontend/features/auth/controllers/verify_email_controller.dart';
 

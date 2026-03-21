@@ -9,4 +9,5 @@ class AppRoutes {
   static const verifyEmail = '/verify_email';
   static const main = '/main';
   static const home = '/home';
+  static const profile = '/profile';
 }

@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:frontend/core/theme/app_colors.dart';
+import 'package:frontend/core/ui/theme/app_colors.dart';
 
 class HomeTransactionItemWidget extends StatelessWidget {
   final IconData icon;

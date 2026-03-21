@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
-import 'package:frontend/core/utils/t_full_screen_loader.dart';
+import 'package:frontend/core/infrastructure/utils/t_full_screen_loader.dart';
 import 'package:frontend/features/auth/providers/auth_provider.dart';
-import 'package:frontend/features/auth/providers/user_profile_provider.dart';
+import 'package:frontend/core/state/provider/user_profile_provider.dart';
 import 'package:get/get.dart';
-import 'package:frontend/core/widgets/t_snackbars_widget.dart';
-import 'package:frontend/core/constants/text_strings.dart';
-import 'package:frontend/core/services/auth_service.dart';
+import 'package:frontend/core/ui/widgets/t_snackbars_widget.dart';
+import 'package:frontend/core/infrastructure/constants/text_strings.dart';
+import 'package:frontend/core/state/services/store_service.dart';
 import 'package:frontend/routes/app_routes.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import '../models/login_request_model.dart';
@@ -22,13 +22,6 @@ class LoginController extends GetxController {
   final RxBool isPasswordHidden = true.obs;
   final RxBool rememberMe = false.obs;
   final RxBool isLoading = false.obs;
-
-  @override
-  void onClose() {
-    emailController.dispose();
-    passwordController.dispose();
-    super.onClose();
-  }
 
   void togglePasswordVisibility() =>
       isPasswordHidden.value = !isPasswordHidden.value;
@@ -75,7 +68,7 @@ class LoginController extends GetxController {
 //Tạo user profile cho lần đăng nhập lần đầu
       await UserProfileProvider().createUserProfile();
 
-      await Get.find<AuthService>().saveUserLogin(
+      await Get.find<StoreService>().saveUserLogin(
         email,
         password,
         rememberMe.value,
@@ -91,7 +84,7 @@ class LoginController extends GetxController {
         }),
       );
 
-      Get.offAllNamed(AppRoutes.home);
+      Get.offAllNamed(AppRoutes.main);
     } catch (e) {
       // 3. TẮT LOADING KHI BỊ LỖI
       TFullScreenLoader.stopLoading();
@@ -128,7 +121,7 @@ class LoginController extends GetxController {
       debugPrint("===============================");
 
       // 3. LƯU VÀO KÉT SẮT (REMEMBER ME) ĐỂ APP GHI NHỚ
-      await Get.find<AuthService>().saveUserLogin(
+      await Get.find<StoreService>().saveUserLogin(
         account.email,
         "google_dummy_password",
         true,
@@ -144,7 +137,7 @@ class LoginController extends GetxController {
         }),
       );
 
-      Get.offAllNamed(AppRoutes.home);
+      Get.offAllNamed(AppRoutes.main);
     } catch (e) {
       TFullScreenLoader.stopLoading();
       debugPrint('❌ Google Auth Error: $e');

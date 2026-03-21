@@ -2,8 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:frontend/features/auth/controllers/login_controller.dart';
 import 'package:frontend/routes/app_routes.dart';
 import 'package:get/get.dart';
-import 'package:frontend/core/constants/text_strings.dart';
-import 'package:frontend/core/theme/app_colors.dart';
+import 'package:frontend/core/infrastructure/constants/text_strings.dart';
+import 'package:frontend/core/ui/theme/app_colors.dart';
 
 class LoginRememberMeWidget extends GetView<LoginController> {
   const LoginRememberMeWidget({super.key});

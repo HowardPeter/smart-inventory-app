@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
-import 'package:frontend/core/layouts/t_barcode_scanner_layout.dart';
+import 'package:frontend/core/ui/layouts/t_barcode_scanner_layout.dart';
 import 'package:get/get.dart';
-import 'package:frontend/core/constants/text_strings.dart';
-import 'package:frontend/core/theme/app_colors.dart';
-import 'package:frontend/core/theme/app_sizes.dart';
+import 'package:frontend/core/infrastructure/constants/text_strings.dart';
+import 'package:frontend/core/ui/theme/app_colors.dart';
+import 'package:frontend/core/ui/theme/app_sizes.dart';
 
 class HomeQuickActionsWidget extends StatelessWidget {
   const HomeQuickActionsWidget({super.key});

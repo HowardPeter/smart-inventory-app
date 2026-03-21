@@ -1,0 +1,20 @@
+import 'package:get/get.dart';
+import 'package:frontend/features/navigation/controllers/navigation_controller.dart';
+import 'package:frontend/features/home/controllers/home_controller.dart';
+import 'package:frontend/features/profile/controllers/profile_controller.dart';
+// import các controller khác của các tab...
+
+class NavigationBinding extends Bindings {
+  @override
+  void dependencies() {
+    // 1. Controller của Nav thì put ngay để dùng
+    Get.put(NavigationController());
+
+    // 2. Các Controller của Tab con thì dùng lazyPut.
+    // Chúng sẽ chỉ được khởi tạo trên RAM khi View tương ứng gọi Get.find()
+    Get.lazyPut(() => HomeController());
+    Get.lazyPut(() => ProfileController());
+    // Get.lazyPut(() => InventoryController());
+    // Get.lazyPut(() => ReportsController());
+  }
+}
