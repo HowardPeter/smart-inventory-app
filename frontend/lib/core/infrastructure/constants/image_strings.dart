@@ -6,6 +6,9 @@ class TImages {
   // App Logos & General Icons
   static const appLogos = AppLogos();
 
+  // Icon Images
+  static const iconImages = IconImages();
+
   // Core Images
   static const coreImages = CoreImages();
 
@@ -32,6 +35,12 @@ class AppLogos {
   final String googleLogo = 'assets/logos/google-logo.png';
 
   final String gmailLogo = 'assets/logos/gmail-logo.png';
+}
+
+class IconImages {
+  const IconImages();
+
+  final String plusIcon = 'assets/icons/plus.png';
 }
 
 class CoreImages {

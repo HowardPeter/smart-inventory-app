@@ -11,6 +11,12 @@ class TTexts {
   static const String fair = "fair";
   static const String good = "good";
   static const String strong = "strong";
+  static const String errorServerTitle = "error_server_title";
+  static const String errorServerMessage = "error_server_message";
+  static const String errorNotFoundTitle = "error_not_found_title";
+  static const String errorNotFoundMessage = "error_not_found_message";
+  static const String errorUnknownTitle = "error_unknown_title";
+  static const String errorUnknownMessage = "error_unknown_message";
 
   // -- Network Error Dialog
   static const String netErrorTitle = "net_error_title";
@@ -20,7 +26,7 @@ class TTexts {
   static const String netErrorWaiting = "net_error_waiting";
   static const String netChecking = "net_checking";
   static const String netErrorRetryFailedMessage =
-      "net_error_retry_failed_message"; 
+      "net_error_retry_failed_message";
 
   static const String barCodeScan = "bar_code_scan";
 
@@ -151,6 +157,19 @@ class TTexts {
   static const String resendEmailIn = "resend_email_in";
   static const String emailAppNotFound = "email_app_not_found";
   static const String pickEmailApp = "pick_email_app";
+
+// -- Workspace Selection
+  static const String workspaceSelectionTitle = "workspace_selection_title";
+  static const String workspaceSelectionSubtitle =
+      "workspace_selection_subtitle";
+  static const String joinAWorkspace = "join_a_workspace";
+  static const String createYourWorkspace = "create_your_workspace";
+  static const String requestAccess = "request_access";
+  static const String requestAccessDesc = "request_access_desc";
+  static const String needHelp = "need_help";
+  static const String whatIsWorkspace = "what_is_workspace";
+  static const String workspaceDescription = "workspace_description";
+  static const String understood = "understood";
 
   // -- Home
   static const String homeRoleManagerTooltip = "home_role_manager_tooltip";

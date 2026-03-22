@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:frontend/core/infrastructure/constants/image_strings.dart';
 import 'package:frontend/core/ui/theme/app_colors.dart';
 import 'package:frontend/core/ui/theme/app_sizes.dart';
 import 'package:frontend/features/profile/views/profile_view.dart';
@@ -82,6 +83,7 @@ class NavigationMobileView extends GetView<NavigationController> {
                   ),
 
                   // NÚT GIỮA
+                  // NÚT GIỮA
                   Positioned(
                     bottom: 30,
                     child: GestureDetector(
@@ -110,11 +112,17 @@ class NavigationMobileView extends GetView<NavigationController> {
                                 ),
                               ],
                             ),
-                            child: const Icon(
-                              Icons.qr_code_scanner_rounded,
-                              color: Colors.white,
-                              size: 26,
+
+                            // --- PHẦN CODE ĐƯỢC THAY THẾ ---
+                            child: Center(
+                              child: Image.asset(
+                                TImages.iconImages.plusIcon,
+                                width: 26,
+                                height: 26,
+                                color: AppColors.white,
+                              ),
                             ),
+                            // ------------------------------
                           ),
                         );
                       }),

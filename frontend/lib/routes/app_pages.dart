@@ -11,6 +11,8 @@ import 'package:frontend/features/navigation/bindings/navigation_binding.dart';
 import 'package:frontend/features/navigation/views/navigation_view.dart';
 import 'package:frontend/features/onboarding/bindings/onboarding_binding.dart';
 import 'package:frontend/features/profile/views/profile_view.dart';
+import 'package:frontend/features/workspace/bindings/store_selection_binding.dart';
+import 'package:frontend/features/workspace/views/store_selection_view.dart';
 import 'package:get/get.dart';
 
 import 'package:frontend/routes/app_routes.dart';
@@ -71,6 +73,30 @@ class AppPages {
       binding: VerfiEmailBinding(),
       transition: Transition.fadeIn,
     ),
+
+    // -- Store Selection
+    GetPage(
+      name: AppRoutes.storeSelection,
+      page: () => const StoreSelectionView(),
+      binding: StoreSelectionBinding(),
+      transition: Transition.fadeIn,
+    ),
+
+    // -- Create Store
+    // GetPage(
+    //   name: AppRoutes.createStore,
+    //   page: () => const CreateStoreView(),
+    //   // binding: CreateStoreBinding(),
+    //   transition: Transition.rightToLeft,
+    // ),
+
+    // // -- Join Store
+    // GetPage(
+    //   name: AppRoutes.joinStore,
+    //   page: () => const JoinStoreView(),
+    //   // binding: JoinStoreBinding(),
+    //   transition: Transition.rightToLeft,
+    // ),
 
     // -- Main (Navigation)
     GetPage(

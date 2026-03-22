@@ -1,21 +1,25 @@
 class StoreModel {
   final String storeId;
   final String name;
-  final String address;
+  final String? address;
+  final String role;
   final String activeStatus;
 
-  StoreModel(
-      {required this.storeId,
-      required this.name,
-      required this.address,
-      required this.activeStatus});
+  StoreModel({
+    required this.storeId,
+    required this.name,
+    this.address,
+    required this.role,
+    required this.activeStatus,
+  });
 
   factory StoreModel.fromJson(Map<String, dynamic> json) {
     return StoreModel(
-      storeId: json['store_id'] ?? '',
-      name: json['name'] ?? '',
-      address: json['address'] ?? '',
-      activeStatus: json['active_status'] ?? '',
+      storeId: json['storeId'] ?? '',
+      name: json['name'] ?? 'Unknown Store',
+      address: json['address'],
+      role: json['role'] ?? 'staff',
+      activeStatus: json['activeStatus'] ?? 'active',
     );
   }
 }

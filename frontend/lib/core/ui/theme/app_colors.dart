@@ -8,6 +8,7 @@ class AppColors {
   static const Color secondPrimary = Color(0xFFFFB057);
   static const Color white = Color(0xFFFFFFFF);
   static const Color softGrey = Color(0xFF6C757D);
+  static const Color divider = Color(0xFFDEDEDE);
 
   // Nền và Thẻ
   static const Color surface = Color(0xFFF8F9FA); // Xám nhạt

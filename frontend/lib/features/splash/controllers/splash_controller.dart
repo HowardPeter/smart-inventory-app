@@ -128,7 +128,7 @@ class SplashController extends GetxController {
       Get.offAllNamed(AppRoutes.onboarding);
     } else if (authService.isLoggedIn.value) {
       // SỬA Ở ĐÂY: Đá user vào trang Main (Chứa thanh Navigation)
-      Get.offAllNamed(AppRoutes.main);
+      Get.offAllNamed(AppRoutes.storeSelection);
     } else {
       Get.offAllNamed(AppRoutes.login);
     }

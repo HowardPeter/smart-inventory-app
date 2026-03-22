@@ -17,6 +17,13 @@ final Map<String, String> enCore = {
   TTexts.errorTooManyRequestsMessage:
       'You have requested too many times. Please wait a moment before trying again.',
   TTexts.exit: 'Exit',
+  TTexts.errorServerTitle: 'Server Error',
+  TTexts.errorServerMessage:
+      'Our servers are currently facing an issue. Please try again later.',
+  TTexts.errorNotFoundTitle: 'Not Found',
+  TTexts.errorNotFoundMessage: 'The requested data could not be found.',
+  TTexts.errorUnknownTitle: 'Unknown Error',
+  TTexts.errorUnknownMessage: 'An unexpected error occurred. Please try again.',
 
   // -- Password Strength
   TTexts.weak: 'Weak',

@@ -6,7 +6,6 @@ import 'package:frontend/core/ui/theme/app_colors.dart';
 import 'package:frontend/core/ui/theme/app_sizes.dart';
 import 'package:frontend/features/home/controllers/home_controller.dart';
 
-// Đổi sang GetView để lắng nghe Controller
 class HomeLowStockAlertsWidget extends GetView<HomeController> {
   const HomeLowStockAlertsWidget({super.key});
 
@@ -82,8 +81,6 @@ class HomeLowStockAlertsWidget extends GetView<HomeController> {
                 ],
               ),
             ),
-
-            // SỬ DỤNG WIDGET CHUNG Ở ĐÂY
             TCustomFadeOverlayWidget(
               text: TTexts.homeTapToViewAll.tr,
               onTap: () {
