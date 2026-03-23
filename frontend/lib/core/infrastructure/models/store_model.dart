@@ -22,4 +22,15 @@ class StoreModel {
       activeStatus: json['activeStatus'] ?? 'active',
     );
   }
+
+  // ---> THÊM PHƯƠNG THỨC NÀY VÀO <---
+  Map<String, dynamic> toJson() {
+    return {
+      'storeId': storeId,
+      'name': name,
+      'address': address,
+      'role': role,
+      'activeStatus': activeStatus,
+    };
+  }
 }

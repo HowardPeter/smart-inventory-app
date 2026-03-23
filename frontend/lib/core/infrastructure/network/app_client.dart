@@ -1,6 +1,7 @@
 import 'package:dio/dio.dart';
-import 'package:flutter/material.dart';
+// import 'package:flutter/material.dart';
 import 'package:frontend/core/infrastructure/constants/app_constants.dart';
+import 'package:get_storage/get_storage.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 class ApiClient {
@@ -26,11 +27,17 @@ class ApiClient {
           //Lấy token từ supabase
           final session = Supabase.instance.client.auth.currentSession;
           final token = session?.accessToken;
-          debugPrint("DEBUG TOKEN: $token");
+          // debugPrint("DEBUG TOKEN: $token");
 
           if (token != null && token.isNotEmpty) {
             options.headers['Authorization'] = 'Bearer $token';
           }
+
+          final storeId = GetStorage().read('STORE_ID');
+          if (storeId != null && storeId.toString().isNotEmpty) {
+            options.headers['x-store-id'] = storeId;
+          }
+
           return handler.next(options);
         },
         onResponse: (response, handler) => handler.next(response),

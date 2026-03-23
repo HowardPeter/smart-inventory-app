@@ -121,14 +121,20 @@ class SplashController extends GetxController {
 
   void _navigateToNextScreen() {
     final storage = GetStorage();
-    final authService = Get.find<StoreService>();
+    final storeService = Get.find<StoreService>();
     final isFirstTime = storage.read('IS_FIRST_TIME') ?? true;
 
     if (isFirstTime) {
       Get.offAllNamed(AppRoutes.onboarding);
-    } else if (authService.isLoggedIn.value) {
-      // SỬA Ở ĐÂY: Đá user vào trang Main (Chứa thanh Navigation)
-      Get.offAllNamed(AppRoutes.storeSelection);
+    } else if (storeService.isLoggedIn.value) {
+      // KIỂM TRA XEM ĐÃ CÓ CỬA HÀNG CHƯA
+      if (storeService.currentStoreId.value.isNotEmpty) {
+        // Có rồi -> Vào thẳng Home bỏ qua màn chọn
+        Get.offAllNamed(AppRoutes.main);
+      } else {
+        // Chưa có -> Bắt chọn cửa hàng
+        Get.offAllNamed(AppRoutes.storeSelection);
+      }
     } else {
       Get.offAllNamed(AppRoutes.login);
     }
