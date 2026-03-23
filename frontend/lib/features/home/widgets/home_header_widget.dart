@@ -1,17 +1,18 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:frontend/core/constants/text_strings.dart';
-import 'package:frontend/core/theme/app_colors.dart';
-import 'package:frontend/core/theme/app_sizes.dart';
-import 'package:frontend/core/controllers/user_controller.dart';
+import 'package:frontend/core/infrastructure/constants/text_strings.dart';
+import 'package:frontend/core/ui/theme/app_colors.dart';
+import 'package:frontend/core/ui/theme/app_sizes.dart';
 import 'package:frontend/features/home/controllers/home_controller.dart';
+
+// THÊM IMPORT STORE SERVICE ĐỂ LẤY ROLE
+import 'package:frontend/core/state/services/store_service.dart';
 
 class HomeHeaderWidget extends StatelessWidget {
   const HomeHeaderWidget({super.key});
 
   @override
   Widget build(BuildContext context) {
-    final userController = UserController.instance;
     final homeController = Get.find<HomeController>();
 
     return Padding(
@@ -25,12 +26,11 @@ class HomeHeaderWidget extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Obx(() {
-                  final fullName =
-                      userController.currentUser.value?.fullName ?? 'Guest';
-                  final firstName = fullName.trim().split(' ').last;
+                  final user = homeController.userProfile.value;
+                  final displayName = user?.fullName ?? 'Guest';
 
                   return Text(
-                    '${homeController.greetingText}, $firstName',
+                    '${homeController.greetingText}, $displayName',
                     style: const TextStyle(
                       fontFamily: 'Poppins',
                       fontSize: 22,
@@ -54,32 +54,32 @@ class HomeHeaderWidget extends StatelessWidget {
           ),
           const SizedBox(width: AppSizes.p12),
 
-          // BADGE ROLE VỚI TOOLTIP ĐỘNG TỪ TTEXTS
+          // BADGE ROLE
           Obx(() {
-            final _ = homeController.isLoading.value;
-            const role = 'manager';
-          //  userController.currentUser.value?.role.toLowerCase() ?? 'staff';
-            const isManager = role == 'manager' || role == 'admin';
+            // Lấy role từ StoreService (RAM)
+            final storeService = Get.find<StoreService>();
+            final role = storeService.currentRole.value.toLowerCase();
+
+            // Phân quyền UI Manager/Staff
+            final isManager = role == 'manager';
 
             // Lấy nội dung Tooltip từ TTexts
             final String tooltipMessage = isManager
                 ? TTexts.homeRoleManagerTooltip.tr
                 : TTexts.homeRoleStaffTooltip.tr;
-
-            // Định nghĩa Gradient & Icon
+                
             final List<Color> gradientColors = isManager
                 ? [AppColors.primary, AppColors.secondPrimary]
                 : [const Color(0xFFFF9900), const Color(0xFFFFCC00)];
 
-            const IconData roleIcon = isManager
+            final IconData roleIcon = isManager
                 ? Icons.admin_panel_settings_rounded
                 : Icons.badge_rounded;
 
             return Tooltip(
-              message: tooltipMessage, // Hiển thị tooltip dựa trên role
-              triggerMode:
-                  TooltipTriggerMode.tap, // Chạm vào là hiện ngay trên mobile
-              preferBelow: false, // Hiện phía trên icon cho đỡ vướng tay
+              message: tooltipMessage,
+              triggerMode: TooltipTriggerMode.tap,
+              preferBelow: false,
               child: Container(
                 width: 48,
                 height: 48,
@@ -98,7 +98,7 @@ class HomeHeaderWidget extends StatelessWidget {
                     ),
                   ],
                 ),
-                child: const Icon(roleIcon, color: Colors.white, size: 26),
+                child: Icon(roleIcon, color: Colors.white, size: 26),
               ),
             );
           }),

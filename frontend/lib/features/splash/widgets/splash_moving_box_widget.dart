@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:frontend/core/theme/app_colors.dart';
+import 'package:frontend/core/ui/theme/app_colors.dart';
 
 /// Widget chiếc hộp hàng hóa với hiệu ứng nghiêng (tilt) khi di chuyển
 class SplashMovingBoxWidget extends StatelessWidget {

@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:frontend/core/constants/image_strings.dart';
-import 'package:frontend/core/theme/app_colors.dart';
-import 'package:frontend/core/theme/app_sizes.dart';
+import 'package:frontend/core/infrastructure/constants/image_strings.dart';
+import 'package:frontend/core/ui/theme/app_colors.dart';
+import 'package:frontend/core/ui/theme/app_sizes.dart';
 
 /// Nút đăng nhập/Đăng ký bằng mạng xã hội (Google) có thể tái sử dụng
 class AuthSocialButtonWidget extends StatelessWidget {

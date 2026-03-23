@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:frontend/core/widgets/t_image_widget.dart';
-import 'package:frontend/core/constants/image_strings.dart';
-import 'package:frontend/core/constants/text_strings.dart';
-import 'package:frontend/core/theme/app_colors.dart';
+import 'package:frontend/core/ui/widgets/t_image_widget.dart';
+import 'package:frontend/core/infrastructure/constants/image_strings.dart';
+import 'package:frontend/core/infrastructure/constants/text_strings.dart';
+import 'package:frontend/core/ui/theme/app_colors.dart';
 
 class VerifyEmailHeaderWidget extends StatelessWidget {
   const VerifyEmailHeaderWidget({super.key});

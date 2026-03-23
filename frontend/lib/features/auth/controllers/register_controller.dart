@@ -1,8 +1,12 @@
+import 'dart:async';
+import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:frontend/core/utils/t_full_screen_loader.dart';
-import 'package:frontend/core/widgets/t_snackbars_widget.dart';
-import 'package:frontend/core/constants/text_strings.dart';
+import 'package:supabase_flutter/supabase_flutter.dart'; // Import Supabase để bắt AuthException
+
+import 'package:frontend/core/infrastructure/utils/full_screen_loader_utils.dart';
+import 'package:frontend/core/ui/widgets/t_snackbars_widget.dart';
+import 'package:frontend/core/infrastructure/constants/text_strings.dart';
 import 'package:frontend/routes/app_routes.dart';
 import 'package:frontend/features/auth/providers/auth_provider.dart';
 
@@ -21,14 +25,6 @@ class RegisterController extends GetxController {
   final RxBool isConfirmPasswordHidden = true.obs;
   final RxBool isLoading = false.obs;
   final RxInt passwordStrength = 0.obs;
-
-  @override
-  void onClose() {
-    emailController.dispose();
-    passwordController.dispose();
-    confirmPasswordController.dispose();
-    super.onClose();
-  }
 
   // --- HÀM XỬ LÝ GIAO DIỆN ---
   void togglePasswordVisibility() =>
@@ -59,23 +55,25 @@ class RegisterController extends GetxController {
     final confirmPassword = confirmPasswordController.text;
 
     if (email.isEmpty || password.isEmpty || confirmPassword.isEmpty) {
-      TSnackbars.warning(
+      TSnackbarsWidget.warning(
         title: TTexts.registerErrorEmptyFieldsTitle.tr,
         message: TTexts.registerErrorEmptyFieldsMessage.tr,
       );
       return;
     }
 
+    // 2. Validate: Kiểm tra định dạng Email
     if (!GetUtils.isEmail(email)) {
-      TSnackbars.error(
+      TSnackbarsWidget.error(
         title: TTexts.loginErrorInvalidEmailTitle.tr,
         message: TTexts.loginErrorInvalidEmailMessage.tr,
       );
       return;
     }
 
+    // 3. Validate: Mật khẩu xác nhận phải khớp
     if (password != confirmPassword) {
-      TSnackbars.error(
+      TSnackbarsWidget.error(
         title: TTexts.registerErrorPasswordMismatchTitle.tr,
         message: TTexts.registerErrorPasswordMismatchMessage.tr,
       );
@@ -84,27 +82,70 @@ class RegisterController extends GetxController {
 
     try {
       isLoading.value = true;
-      TFullScreenLoader.openLoadingDialog(TTexts.registering.tr);
+      FullScreenLoaderUtils.openLoadingDialog(TTexts.registering.tr);
 
-      final response = await authProvider.register(
-        email: email,
-        password: password,
-      );
+      // GỌI API KÈM TIMEOUT 15 GIÂY
+      final response = await authProvider
+          .register(
+            email: email,
+            password: password,
+          )
+          .timeout(const Duration(seconds: 15));
 
-      TFullScreenLoader.stopLoading();
+      FullScreenLoaderUtils.stopLoading();
+
       if (response.user != null) {
-        TSnackbars.success(
+        // Hiện thông báo thành công
+        TSnackbarsWidget.success(
           title: TTexts.registerSuccessTitle.tr,
           message: TTexts.registerSuccessMessage.tr,
         );
-        Get.toNamed(AppRoutes.verifyEmail,
-            arguments: emailController.text.trim());
+        // Chuyển hướng sang trang Xác thực Email (Gửi kèm email qua Arguments)
+        Get.toNamed(AppRoutes.verifyEmail, arguments: email);
       }
+    } on AuthException catch (e) {
+      // BẮT LỖI TỪ SUPABASE (Trùng email, mật khẩu yếu...)
+      FullScreenLoaderUtils.stopLoading();
+      final errorMsg = e.message.toLowerCase();
+
+      if (errorMsg.contains('already registered') ||
+          errorMsg.contains('already exists')) {
+        TSnackbarsWidget.error(
+          title: TTexts.registerErrorUserExistsTitle.tr,
+          message: TTexts.registerErrorUserExistsMessage.tr,
+        );
+      } else if (errorMsg.contains('weak password') ||
+          errorMsg.contains('password should be')) {
+        TSnackbarsWidget.error(
+          title: TTexts.registerErrorWeakPasswordTitle.tr,
+          message: TTexts.registerErrorWeakPasswordMessage.tr,
+        );
+      } else {
+        TSnackbarsWidget.error(
+          title: TTexts.registerFailedTitle.tr,
+          message: e.message,
+        );
+      }
+    } on TimeoutException catch (_) {
+      // BẮT LỖI QUÁ HẠN THỜI GIAN
+      FullScreenLoaderUtils.stopLoading();
+      TSnackbarsWidget.error(
+        title: TTexts.errorTimeoutTitle.tr,
+        message: TTexts.errorTimeoutMessage.tr,
+      );
+    } on SocketException catch (_) {
+      // BẮT LỖI MẤT MẠNG LÚC ĐANG GỌI API
+      FullScreenLoaderUtils.stopLoading();
+      TSnackbarsWidget.error(
+        title: TTexts.netErrorTitle.tr,
+        message: TTexts.netErrorDescription.tr,
+      );
     } catch (e) {
-      TFullScreenLoader.stopLoading();
-      TSnackbars.error(
-        title: TTexts.registerFailedTitle.tr,
-        message: e.toString().replaceAll('Exception: ', ''),
+      // BẮT CÁC LỖI KHÁC
+      FullScreenLoaderUtils.stopLoading();
+      TSnackbarsWidget.error(
+        title: TTexts.errorTitle.tr,
+        message: e.toString(),
       );
     } finally {
       isLoading.value = false;
@@ -114,13 +155,13 @@ class RegisterController extends GetxController {
   /// Đăng ký/Đăng nhập bằng Google
   Future<void> registerWithGoogle() async {
     try {
-      TFullScreenLoader.openLoadingDialog(TTexts.loggingIn.tr);
+      FullScreenLoaderUtils.openLoadingDialog(TTexts.loggingIn.tr);
 
       // Nhận về AuthResponse thay vì GoogleSignInAccount
       final response = await authProvider.signInWithGoogle();
 
       if (response == null || response.user == null) {
-        TFullScreenLoader.stopLoading();
+        FullScreenLoaderUtils.stopLoading();
         // Bỏ qua cảnh báo tắt popup để tránh spam UI, hoặc bật lại nếu bạn muốn
         return;
       }
@@ -131,31 +172,31 @@ class RegisterController extends GetxController {
       debugPrint("Email: ${user.email}");
       debugPrint("ID: ${user.id}");
 
-      TFullScreenLoader.stopLoading();
+      FullScreenLoaderUtils.stopLoading();
 
       if (response.user != null) {
         // THÊM ĐOẠN NÀY: Kiểm tra nếu identities rỗng nghĩa là email đã tồn tại
         if (response.user!.identities != null &&
             response.user!.identities!.isEmpty) {
-          TSnackbars.error(
+          TSnackbarsWidget.error(
             title: TTexts.registerFailedTitle.tr,
-            message: "Email này đã được đăng ký. Vui lòng đăng nhập!",
+            message: TTexts.registerErrorEmailExistsMessage.tr,
           );
           return;
         }
 
         // Hiện thông báo thành công và chuyển trang như cũ
-        TSnackbars.success(
-          title: "Đăng ký thành công!",
-          message: "Vui lòng chọn đăng nhập lại bằng tài khoản google.",
+        TSnackbarsWidget.success(
+          title: TTexts.registerSuccessTitle.tr,
+          message: TTexts.registerGoogleSuccessMessage.tr,
         );
         Get.toNamed(
           AppRoutes.login,
         );
       }
     } catch (e) {
-      TFullScreenLoader.stopLoading();
-      TSnackbars.error(
+      FullScreenLoaderUtils.stopLoading();
+      TSnackbarsWidget.error(
         title: TTexts.registerFailedTitle.tr,
         message: e.toString().replaceAll('Exception: ', ''),
       );

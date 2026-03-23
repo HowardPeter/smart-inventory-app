@@ -1,12 +1,11 @@
 import 'package:flutter/material.dart';
-import 'package:frontend/core/widgets/t_custom_fade_overlay_widget.dart';
+import 'package:frontend/core/ui/widgets/t_custom_fade_overlay_widget.dart';
 import 'package:get/get.dart';
-import 'package:frontend/core/constants/text_strings.dart';
-import 'package:frontend/core/theme/app_colors.dart';
-import 'package:frontend/core/theme/app_sizes.dart';
+import 'package:frontend/core/infrastructure/constants/text_strings.dart';
+import 'package:frontend/core/ui/theme/app_colors.dart';
+import 'package:frontend/core/ui/theme/app_sizes.dart';
 import 'package:frontend/features/home/controllers/home_controller.dart';
 
-// Đổi sang GetView để lắng nghe Controller
 class HomeLowStockAlertsWidget extends GetView<HomeController> {
   const HomeLowStockAlertsWidget({super.key});
 
@@ -82,8 +81,6 @@ class HomeLowStockAlertsWidget extends GetView<HomeController> {
                 ],
               ),
             ),
-
-            // SỬ DỤNG WIDGET CHUNG Ở ĐÂY
             TCustomFadeOverlayWidget(
               text: TTexts.homeTapToViewAll.tr,
               onTap: () {

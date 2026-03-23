@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
-import 'package:frontend/core/widgets/t_text_form_field_widget.dart';
+import 'package:frontend/core/ui/widgets/t_text_form_field_widget.dart';
 import 'package:get/get.dart'; // Thêm import này
-import 'package:frontend/core/constants/text_strings.dart';
-import 'package:frontend/core/theme/app_sizes.dart';
-import 'package:frontend/core/widgets/t_primary_button_widget.dart';
+import 'package:frontend/core/infrastructure/constants/text_strings.dart';
+import 'package:frontend/core/ui/theme/app_sizes.dart';
+import 'package:frontend/core/ui/widgets/t_primary_button_widget.dart';
 
 // Imports nội bộ
 import '../shared/auth_divider_widget.dart';
@@ -25,7 +25,7 @@ class LoginFormWidget extends GetView<LoginController> {
         const SizedBox(height: AppSizes.p24),
 
         // 2. Ô Email
-        TTextFormField(
+        TTextFormFieldWidget(
           controller: controller.emailController,
           label: TTexts.emailLabel.tr,
           hintText: TTexts.emailHint.tr,
@@ -34,7 +34,7 @@ class LoginFormWidget extends GetView<LoginController> {
 
         // 3. Ô Password
         Obx(
-          () => TTextFormField(
+          () => TTextFormFieldWidget(
             controller: controller.passwordController,
             label: TTexts.passwordLabel.tr,
             hintText: TTexts.passwordHint.tr,
@@ -58,7 +58,7 @@ class LoginFormWidget extends GetView<LoginController> {
         const SizedBox(height: AppSizes.p24),
 
         // 5. Nút Login (Đã gọi được controller.login)
-        TPrimaryButton(
+        TPrimaryButtonWidget(
           text: TTexts.loginBtn.tr,
           onPressed: () => controller.login(),
         ),

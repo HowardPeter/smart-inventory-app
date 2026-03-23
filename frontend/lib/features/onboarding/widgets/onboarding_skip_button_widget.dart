@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:frontend/core/constants/text_strings.dart';
+import 'package:frontend/core/infrastructure/constants/text_strings.dart';
 
-import 'package:frontend/core/theme/app_colors.dart';
-import 'package:frontend/core/theme/app_sizes.dart';
+import 'package:frontend/core/ui/theme/app_colors.dart';
+import 'package:frontend/core/ui/theme/app_sizes.dart';
 import 'package:get/get.dart';
 
 /// Widget nút 'Skip' cho phép bỏ qua các màn hình giới thiệu

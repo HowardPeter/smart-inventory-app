@@ -1,0 +1,7 @@
+category_id,name,description,store_id,is_default
+cat_1,Electronics,Smartphones laptops and accessories,store_1,TRUE
+cat_2,Apparel,Clothing and fashion items,store_1,FALSE
+cat_3,Food & Beverage,Consumable goods and drinks,store_1,FALSE
+cat_4,Office Supplies,Stationery and office equipment,store_1,FALSE
+cat_5,Furniture,Home and office furniture,store_1,FALSE
+cat_6,Accessories,Phone and tech accessories,store_1,FALSE

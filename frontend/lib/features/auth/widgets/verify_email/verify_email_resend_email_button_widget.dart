@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:frontend/core/constants/text_strings.dart';
-import 'package:frontend/core/theme/app_colors.dart';
-import 'package:frontend/core/theme/app_sizes.dart';
+import 'package:frontend/core/infrastructure/constants/text_strings.dart';
+import 'package:frontend/core/ui/theme/app_colors.dart';
+import 'package:frontend/core/ui/theme/app_sizes.dart';
 import 'package:frontend/features/auth/controllers/verify_email_controller.dart';
 
 class VerifyEmailResendEmailButton extends GetView<VerifyEmailController> {
@@ -42,7 +42,7 @@ class VerifyEmailResendEmailButton extends GetView<VerifyEmailController> {
                       TTexts.resendEmail.tr,
                       style: TextStyle(
                         fontFamily: 'Poppins',
-                        fontSize: 16,
+                        fontSize: 14,
                         fontWeight: FontWeight.w600,
                         color: isTimerZero
                             ? AppColors.primaryText

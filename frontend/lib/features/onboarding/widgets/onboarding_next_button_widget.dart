@@ -1,8 +1,8 @@
 import 'dart:math' as math;
 import 'package:flutter/material.dart';
 
-import 'package:frontend/core/theme/app_colors.dart';
-import 'package:frontend/core/theme/app_sizes.dart';
+import 'package:frontend/core/ui/theme/app_colors.dart';
+import 'package:frontend/core/ui/theme/app_sizes.dart';
 
 /// Widget nút điều hướng tiếp theo trong màn hình Onboarding
 /// Bao gồm hiệu ứng xoay 360 độ và thanh tiến trình vòng tròn co giãn

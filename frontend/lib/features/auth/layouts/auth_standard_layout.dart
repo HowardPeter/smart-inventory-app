@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart'; // Thêm thư viện quản lý System UI
-import 'package:frontend/core/theme/app_colors.dart';
-import 'package:frontend/core/theme/app_sizes.dart';
+import 'package:frontend/core/ui/theme/app_colors.dart';
+import 'package:frontend/core/ui/theme/app_sizes.dart';
 
 // Đảm bảo đường dẫn này trỏ đúng vào thư mục shared của bạn
 import 'package:frontend/features/auth/widgets/shared/auth_header_widget.dart';

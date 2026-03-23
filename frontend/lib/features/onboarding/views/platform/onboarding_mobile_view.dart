@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
-import 'package:frontend/core/constants/image_strings.dart';
-import 'package:frontend/core/constants/text_strings.dart';
-import 'package:frontend/core/theme/app_sizes.dart';
+import 'package:frontend/core/infrastructure/constants/image_strings.dart';
+import 'package:frontend/core/infrastructure/constants/text_strings.dart';
+import 'package:frontend/core/ui/theme/app_sizes.dart';
 import '../../controllers/onboarding_controller.dart';
 import '../../layouts/onboarding_page_one_layout.dart';
 import '../../layouts/onboarding_standard_layout.dart';

@@ -1,4 +1,4 @@
-import 'package:frontend/core/network/app_client.dart';
+import 'package:frontend/core/infrastructure/network/app_client.dart';
 import 'package:frontend/features/auth/controllers/login_controller.dart';
 import 'package:frontend/features/auth/providers/auth_provider.dart';
 import 'package:get/get.dart';

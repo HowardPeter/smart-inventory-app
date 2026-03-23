@@ -1,13 +1,13 @@
 import 'package:flutter/material.dart';
-import 'package:frontend/core/widgets/t_custom_fade_overlay_widget.dart';
+import 'package:frontend/core/ui/widgets/t_custom_fade_overlay_widget.dart';
 import 'package:frontend/features/home/widgets/home_inventory_header_widget.dart';
 import 'package:frontend/features/home/widgets/home_inventory_legend_widget.dart';
 import 'package:frontend/features/home/widgets/home_inventory_progress_widget.dart';
 import 'package:frontend/features/home/widgets/home_transaction_list_widget.dart';
 import 'package:get/get.dart';
-import 'package:frontend/core/constants/text_strings.dart';
-import 'package:frontend/core/theme/app_colors.dart';
-import 'package:frontend/core/theme/app_sizes.dart';
+import 'package:frontend/core/infrastructure/constants/text_strings.dart';
+import 'package:frontend/core/ui/theme/app_colors.dart';
+import 'package:frontend/core/ui/theme/app_sizes.dart';
 
 class HomeInventoryOverviewWidget extends StatelessWidget {
   const HomeInventoryOverviewWidget({super.key});

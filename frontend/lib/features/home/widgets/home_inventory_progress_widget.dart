@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:frontend/core/theme/app_colors.dart';
+import 'package:frontend/core/ui/theme/app_colors.dart';
 import 'package:frontend/features/home/controllers/home_controller.dart';
 
 class HomeInventoryProgressWidget extends GetView<HomeController> {

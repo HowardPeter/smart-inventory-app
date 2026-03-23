@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:frontend/core/constants/image_strings.dart';
-import 'package:frontend/core/theme/app_sizes.dart';
+import 'package:frontend/core/infrastructure/constants/image_strings.dart';
+import 'package:frontend/core/ui/theme/app_sizes.dart';
 
 /// Header chuẩn cho mọi màn hình Auth (Nền cam, Logo, Tiêu đề)
 class AuthHeaderWidget extends StatelessWidget {

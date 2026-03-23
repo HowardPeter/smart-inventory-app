@@ -6,10 +6,20 @@ import 'package:frontend/features/auth/views/forgot_password_view.dart';
 import 'package:frontend/features/auth/views/login_view.dart';
 import 'package:frontend/features/auth/views/register_view.dart';
 import 'package:frontend/features/auth/views/verify_email_view.dart';
-import 'package:frontend/features/home/bindings/home_binding.dart';
 import 'package:frontend/features/home/views/home_view.dart';
+import 'package:frontend/features/navigation/bindings/navigation_binding.dart';
 import 'package:frontend/features/navigation/views/navigation_view.dart';
 import 'package:frontend/features/onboarding/bindings/onboarding_binding.dart';
+import 'package:frontend/features/profile/views/profile_view.dart';
+import 'package:frontend/features/workspace/bindings/add_members_binding.dart';
+import 'package:frontend/features/workspace/bindings/create_store_binding.dart';
+import 'package:frontend/features/workspace/bindings/join_store_binding.dart';
+import 'package:frontend/features/workspace/bindings/store_selection_binding.dart';
+import 'package:frontend/features/workspace/views/add_members_view.dart';
+import 'package:frontend/features/workspace/views/create_store_view.dart';
+import 'package:frontend/features/workspace/views/join_store_view.dart';
+import 'package:frontend/features/workspace/views/store_selection_view.dart';
+import 'package:frontend/features/workspace/views/workspace_ready_view.dart';
 import 'package:get/get.dart';
 
 import 'package:frontend/routes/app_routes.dart';
@@ -24,14 +34,14 @@ class AppPages {
   static const initial = AppRoutes.splash;
 
   static final routes = [
-    // Khai báo màn hình Splash
+    // -- Splash
     GetPage(
       name: AppRoutes.splash,
       page: () => const SplashView(),
       binding: SplashBinding(),
     ),
 
-    // Giữ nguyên các màn hình khác
+    // -- On boarding
     GetPage(
       name: AppRoutes.onboarding,
       page: () => const OnboardingView(),
@@ -39,6 +49,7 @@ class AppPages {
       transition: Transition.fadeIn,
     ),
 
+    // -- Login
     GetPage(
       name: AppRoutes.login,
       page: () => const LoginView(),
@@ -46,6 +57,7 @@ class AppPages {
       transition: Transition.fadeIn,
     ),
 
+    // -- Register
     GetPage(
       name: AppRoutes.register,
       page: () => const RegisterView(),
@@ -53,6 +65,7 @@ class AppPages {
       transition: Transition.fadeIn,
     ),
 
+    // -- Forgot password
     GetPage(
       name: AppRoutes.forgotPassword,
       page: () => const ForgotPasswordView(),
@@ -60,6 +73,7 @@ class AppPages {
       transition: Transition.fadeIn,
     ),
 
+    // -- Verify email
     GetPage(
       name: AppRoutes.verifyEmail,
       page: () => const VerifyEmailView(),
@@ -67,16 +81,58 @@ class AppPages {
       transition: Transition.fadeIn,
     ),
 
+    // -- Store Selection
+    GetPage(
+      name: AppRoutes.storeSelection,
+      page: () => const StoreSelectionView(),
+      binding: StoreSelectionBinding(),
+      transition: Transition.fadeIn,
+    ),
+
+    // -- Create Store
+    GetPage(
+      name: AppRoutes.createStore,
+      page: () => const CreateStoreView(),
+      binding: CreateStoreBinding(),
+      transition: Transition.cupertino,
+    ),
+
+    // -- Workspace Ready
+    GetPage(
+      name: AppRoutes.workspaceReady,
+      page: () => const WorkspaceReadyView(),
+      transition: Transition.cupertino,
+    ),
+
+    // -- Join Store
+    GetPage(
+      name: AppRoutes.joinStore,
+      page: () => const JoinStoreView(),
+      binding: JoinStoreBinding(),
+      transition: Transition.rightToLeft,
+    ),
+    // -- Add member
+    GetPage(
+      name: AppRoutes.addMembers,
+      page: () => const AddMembersView(),
+      binding: AddMembersBinding(),
+      transition: Transition.rightToLeft,
+    ),
+
+    // -- Main (Navigation)
     GetPage(
       name: AppRoutes.main,
       page: () => const NavigationView(),
-      // Nếu Navigation có binding riêng thì gọi ở đây
+      binding: NavigationBinding(),
     ),
 
+    // -- Home
     GetPage(
       name: AppRoutes.home,
       page: () => const HomeView(),
-      binding: HomeBinding(),
     ),
+
+    // -- Profile
+    GetPage(name: AppRoutes.profile, page: () => const ProfileView()),
   ];
 }
