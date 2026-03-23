@@ -23,7 +23,6 @@ class StoreModel {
     );
   }
 
-  // ---> THÊM PHƯƠNG THỨC NÀY VÀO <---
   Map<String, dynamic> toJson() {
     return {
       'storeId': storeId,

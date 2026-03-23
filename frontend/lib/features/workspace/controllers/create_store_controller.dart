@@ -1,4 +1,3 @@
-// lib/features/workspace/controllers/create_store_controller.dart
 import 'package:flutter/material.dart';
 import 'package:flutter_timezone/flutter_timezone.dart';
 import 'package:frontend/core/infrastructure/constants/text_strings.dart';
@@ -14,6 +13,7 @@ import 'package:frontend/routes/app_routes.dart';
 import 'package:frontend/core/ui/widgets/t_snackbars_widget.dart';
 import 'package:frontend/core/ui/widgets/t_custom_dialog_widget.dart';
 import 'package:latlong2/latlong.dart';
+import 'package:frontend/core/state/services/store_service.dart';
 
 class CreateStoreController extends GetxController {
   // --- CONTROLLERS ---
@@ -30,6 +30,9 @@ class CreateStoreController extends GetxController {
 
   final _dio = Dio();
   late final WorkspaceProvider _workspaceProvider;
+
+  // GỌI STORE SERVICE ĐỂ LƯU DATA
+  late final _storeService = Get.find<StoreService>();
 
   @override
   void onInit() {
@@ -99,7 +102,6 @@ class CreateStoreController extends GetxController {
 
       bool serviceEnabled = await Geolocator.isLocationServiceEnabled();
       if (!serviceEnabled) {
-        // ĐÃ THAY BẰNG TTEXTS
         TSnackbarsWidget.error(
             title: TTexts.gpsOffTitle.tr, message: TTexts.gpsOffMessage.tr);
         return;
@@ -131,7 +133,6 @@ class CreateStoreController extends GetxController {
       }
     } catch (e) {
       debugPrint("GPS Error: $e");
-      // ĐÃ THAY BẰNG TTEXTS
       TSnackbarsWidget.error(
           title: TTexts.errorTitle.tr, message: TTexts.locationErrorMessage.tr);
     } finally {
@@ -143,7 +144,6 @@ class CreateStoreController extends GetxController {
   void onTryCreateWorkspace() {
     final name = nameController.text.trim();
     if (name.isEmpty) {
-      // ĐÃ THAY BẰNG TTEXTS
       TSnackbarsWidget.warning(
           title: TTexts.errorTitle.tr, message: TTexts.storeNameEmptyError.tr);
       return;
@@ -151,16 +151,15 @@ class CreateStoreController extends GetxController {
 
     Get.dialog(
       TCustomDialogWidget(
-        // ĐÃ THAY BẰNG TTEXTS
         title: TTexts.confirmCreateStoreTitle.tr,
         description: "${TTexts.confirmCreateStoreMessage.tr} '$name'?",
         icon: const Text('🤔', style: TextStyle(fontSize: 40)),
-        primaryButtonText: TTexts.create.tr, // Lấy chữ "Create" từ core
+        primaryButtonText: TTexts.create.tr,
         onPrimaryPressed: () {
           Get.back();
           _executeCreate(name);
         },
-        secondaryButtonText: TTexts.cancel.tr, // Lấy chữ "Cancel" từ core
+        secondaryButtonText: TTexts.cancel.tr,
         onSecondaryPressed: () => Get.back(),
       ),
     );
@@ -169,11 +168,8 @@ class CreateStoreController extends GetxController {
   Future<void> _executeCreate(String name) async {
     try {
       isLoading.value = true;
-
-      // ĐÃ DÙNG TTEXTS ĐỂ HIỆN CHỮ "Creating your workspace..."
       FullScreenLoaderUtils.openLoadingDialog(TTexts.creatingWorkspace.tr);
 
-      // --- 1. LẤY MÚI GIỜ HIỆN TẠI CỦA THIẾT BỊ ---
       String currentTimezone = 'Asia/Ho_Chi_Minh';
       try {
         final dynamic tz = await FlutterTimezone.getLocalTimezone();
@@ -190,11 +186,18 @@ class CreateStoreController extends GetxController {
         "timezone": currentTimezone,
       };
 
-      await _workspaceProvider.createStore(payload);
+      // 1. NHẬN KẾT QUẢ TỪ API
+      final createdStore = await _workspaceProvider.createStore(payload);
+
+      // 2. NGAY LẬP TỨC LƯU STORE MỚI VÀO BỘ NHỚ
+      await _storeService.saveSelectedStore(
+          createdStore.storeId, createdStore.name);
 
       FullScreenLoaderUtils.stopLoading();
 
-      Get.offNamed(AppRoutes.workspaceReady, arguments: {'storeName': name});
+      // 3. CHUYỂN SANG MÀN SUCCESS (Chỉ cần truyền name để hiển thị UI)
+      Get.offNamed(AppRoutes.workspaceReady,
+          arguments: {'storeName': createdStore.name});
     } catch (e) {
       FullScreenLoaderUtils.stopLoading();
 

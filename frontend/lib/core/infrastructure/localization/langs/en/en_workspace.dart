@@ -43,7 +43,7 @@ final Map<String, String> enWorkspace = {
       "Please turn on location services in your system settings.",
   TTexts.locationErrorMessage:
       "Could not fetch location. Please try again or type manually.",
-      
+
   // -- Invite Code & Join Store
   TTexts.inviteCodeTitle: "Your Invite Code",
   TTexts.inviteCodeSubtitle:
@@ -70,4 +70,26 @@ final Map<String, String> enWorkspace = {
       "You are already a member of this workspace.",
   TTexts.joinSuccessTitle: "Successfully Joined!",
   TTexts.joinSuccessMessage: "Welcome to the workspace.",
+
+  // -- Add Members Screen
+  TTexts.addMembersTitle: "Manage Members",
+  TTexts.addMembersSubtitle:
+      "View and manage your team members and their roles within this workspace.",
+  TTexts.membersCount: "Members",
+  TTexts.roleManager: "Manager",
+  TTexts.roleStaff: "Staff",
+  TTexts.youBadge: "You",
+
+  TTexts.generateInviteCodeBtn: "Generate Invite Code",
+  TTexts.generateCodeDialogTitle: "Generate New Code?",
+  TTexts.generateCodeDialogMessage:
+      "Are you sure you want to generate a new invite code? Any previous unredeemed codes will be invalidated.",
+  TTexts.confirmGenerate: "Generate",
+  TTexts.generatingCode: "Generating secure code...",
+  TTexts.generatedAt: "Generated: ",
+  TTexts.expiresAt: "Expires in: 24 hours",
+  TTexts.activeInviteCodeTitle: "Active Invite Code",
+  TTexts.emptyMemberTitle: "No Members Yet",
+  TTexts.emptyMemberSubtitle:
+      "Generate an invite code and share it with your team to start collaborating.",
 };

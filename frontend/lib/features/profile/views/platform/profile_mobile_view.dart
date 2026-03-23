@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:frontend/core/infrastructure/constants/text_strings.dart';
 import 'package:frontend/core/ui/widgets/t_bottom_nav_spacer_widget.dart';
 import 'package:get/get.dart';
 import 'package:frontend/features/profile/controllers/profile_controller.dart';
@@ -124,7 +125,41 @@ class ProfileMobileView extends GetView<ProfileController> {
 
             const SizedBox(height: AppSizes.p32),
 
-            // 6. Nút: Đổi cửa hàng (Quay lại màn Store Selection)
+            // 6. Nút: Quản lý thành viên (chỉ hiện khi đã chọn Store)
+            Obx(() {
+              final storeId = storeService.currentStoreId.value;
+              if (storeId.isEmpty) return const SizedBox.shrink();
+
+              return Padding(
+                padding: const EdgeInsets.only(bottom: AppSizes.p16),
+                child: SizedBox(
+                  width: double.infinity,
+                  child: ElevatedButton.icon(
+                    onPressed: () => Get.toNamed(AppRoutes.addMembers),
+                    style: ElevatedButton.styleFrom(
+                      padding: const EdgeInsets.symmetric(vertical: 16),
+                      backgroundColor: AppColors.primary,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                      elevation: 0,
+                    ),
+                    icon: const Icon(Icons.group_add_rounded,
+                        color: Colors.white),
+                    label: Text(
+                      TTexts.addMembers.tr,
+                      style: const TextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.white,
+                      ),
+                    ),
+                  ),
+                ),
+              );
+            }),
+
+            // 7. Nút: Đổi cửa hàng (Quay lại màn Store Selection)
             SizedBox(
               width: double.infinity,
               child: OutlinedButton.icon(

@@ -45,7 +45,7 @@ class WorkspaceReadyInviteCodeWidget extends StatelessWidget {
               Text(
                 inviteCode,
                 style: const TextStyle(
-                  fontFamily: 'Courier',
+                  fontFamily: 'Poppins',
                   fontSize: 24,
                   fontWeight: FontWeight.w900,
                   letterSpacing: 4.0,

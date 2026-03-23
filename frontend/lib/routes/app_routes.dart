@@ -12,6 +12,7 @@ class AppRoutes {
   static const createStore = '/create_store';
   static const workspaceReady = '/workspace_ready';
   static const joinStore = '/join_store';
+  static const addMembers = '/add_members';
 
   static const main = '/main';
   static const home = '/home';

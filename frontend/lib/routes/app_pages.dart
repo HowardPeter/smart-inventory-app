@@ -11,9 +11,11 @@ import 'package:frontend/features/navigation/bindings/navigation_binding.dart';
 import 'package:frontend/features/navigation/views/navigation_view.dart';
 import 'package:frontend/features/onboarding/bindings/onboarding_binding.dart';
 import 'package:frontend/features/profile/views/profile_view.dart';
+import 'package:frontend/features/workspace/bindings/add_members_binding.dart';
 import 'package:frontend/features/workspace/bindings/create_store_binding.dart';
 import 'package:frontend/features/workspace/bindings/join_store_binding.dart';
 import 'package:frontend/features/workspace/bindings/store_selection_binding.dart';
+import 'package:frontend/features/workspace/views/add_members_view.dart';
 import 'package:frontend/features/workspace/views/create_store_view.dart';
 import 'package:frontend/features/workspace/views/join_store_view.dart';
 import 'package:frontend/features/workspace/views/store_selection_view.dart';
@@ -107,6 +109,13 @@ class AppPages {
       name: AppRoutes.joinStore,
       page: () => const JoinStoreView(),
       binding: JoinStoreBinding(),
+      transition: Transition.rightToLeft,
+    ),
+    // -- Add member
+    GetPage(
+      name: AppRoutes.addMembers,
+      page: () => const AddMembersView(),
+      binding: AddMembersBinding(),
       transition: Transition.rightToLeft,
     ),
 

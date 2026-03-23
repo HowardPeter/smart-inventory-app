@@ -6,9 +6,8 @@ import 'package:frontend/core/ui/theme/app_colors.dart';
 import 'package:frontend/core/ui/theme/app_sizes.dart';
 import 'package:frontend/core/infrastructure/constants/text_strings.dart';
 
-class WorkspaceAppBarWidget extends StatelessWidget
-    implements PreferredSizeWidget {
-  const WorkspaceAppBarWidget({super.key});
+class TAppBarWidget extends StatelessWidget implements PreferredSizeWidget {
+  const TAppBarWidget({super.key});
 
   @override
   Widget build(BuildContext context) {

@@ -222,6 +222,26 @@ class TTexts {
   static const String joinSuccessTitle = "join_success_title";
   static const String joinSuccessMessage = "join_success_message";
 
+  // -- Add Members Screen
+  static const String addMembersTitle = "add_members_title";
+  static const String addMembersSubtitle = "add_members_subtitle";
+  static const String membersCount = "members_count";
+  static const String roleManager = "role_manager";
+  static const String roleStaff = "role_staff";
+  static const String youBadge = "you_badge";
+
+  static const String generateInviteCodeBtn = "generate_invite_code_btn";
+  static const String generateCodeDialogTitle = "generate_code_dialog_title";
+  static const String generateCodeDialogMessage =
+      "generate_code_dialog_message";
+  static const String confirmGenerate = "confirm_generate";
+  static const String generatingCode = "generating_code";
+  static const String generatedAt = "generated_at";
+  static const String expiresAt = "expires_at";
+  static const String activeInviteCodeTitle = "active_invite_code_title";
+  static const String emptyMemberTitle = "empty_member_title";
+  static const String emptyMemberSubtitle = "empty_member_subtitle";
+
   // -- Home
   static const String homeRoleManagerTooltip = "home_role_manager_tooltip";
   static const String homeRoleStaffTooltip = "home_role_staff_tooltip";
