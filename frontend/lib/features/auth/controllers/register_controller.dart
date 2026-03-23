@@ -180,15 +180,15 @@ class RegisterController extends GetxController {
             response.user!.identities!.isEmpty) {
           TSnackbarsWidget.error(
             title: TTexts.registerFailedTitle.tr,
-            message: "Email này đã được đăng ký. Vui lòng đăng nhập!",
+            message: TTexts.registerErrorEmailExistsMessage.tr,
           );
           return;
         }
 
         // Hiện thông báo thành công và chuyển trang như cũ
         TSnackbarsWidget.success(
-          title: "Đăng ký thành công!",
-          message: "Vui lòng chọn đăng nhập lại bằng tài khoản google.",
+          title: TTexts.registerSuccessTitle.tr,
+          message: TTexts.registerGoogleSuccessMessage.tr,
         );
         Get.toNamed(
           AppRoutes.login,

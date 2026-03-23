@@ -81,6 +81,10 @@ final Map<String, String> enAuth = {
   TTexts.registerErrorWeakPasswordTitle: 'Weak Password',
   TTexts.registerErrorWeakPasswordMessage:
       'Your password is too weak. Please use a stronger password.',
+  TTexts.registerGoogleSuccessMessage:
+      'Please select login with your Google account again.',
+  TTexts.registerErrorEmailExistsMessage:
+      'This email is already registered. Please log in!',
 
   // Forgot Password / Verify
   TTexts.forgetPasswordTitle: 'Forgot Password?',

@@ -137,6 +137,10 @@ class TTexts {
       "register_error_weak_password_title";
   static const String registerErrorWeakPasswordMessage =
       "register_error_weak_password_message";
+  static const String registerGoogleSuccessMessage =
+      "register_google_success_message";
+  static const String registerErrorEmailExistsMessage =
+      "register_error_email_exists_message";
 
   // -- Forgot Password & Verify
   static const String forgetPasswordTitle = "forget_password_title";
@@ -160,7 +164,7 @@ class TTexts {
   static const String emailAppNotFound = "email_app_not_found";
   static const String pickEmailApp = "pick_email_app";
 
-// -- Workspace Selection
+  // -- Workspace Selection
   static const String workspaceSelectionTitle = "workspace_selection_title";
   static const String workspaceSelectionSubtitle =
       "workspace_selection_subtitle";
