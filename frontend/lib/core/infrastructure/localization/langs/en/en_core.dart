@@ -53,4 +53,7 @@ final Map<String, String> enCore = {
       'Still no internet connection. Please try again.', // THÊM DÒNG NÀY
 
   TTexts.barCodeScan: 'Bar Code Scan',
+
+  TTexts.create: "Create",
+  TTexts.cancel: "Cancel",
 };

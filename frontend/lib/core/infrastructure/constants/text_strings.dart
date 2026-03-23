@@ -11,6 +11,8 @@ class TTexts {
   static const String fair = "fair";
   static const String good = "good";
   static const String strong = "strong";
+  static const String create = "create";
+  static const String cancel = "cancel";
   static const String errorServerTitle = "error_server_title";
   static const String errorServerMessage = "error_server_message";
   static const String errorNotFoundTitle = "error_not_found_title";
@@ -170,6 +172,32 @@ class TTexts {
   static const String whatIsWorkspace = "what_is_workspace";
   static const String workspaceDescription = "workspace_description";
   static const String understood = "understood";
+
+  // -- Create Workspace
+  static const String createStoreTitle = "create_store_title";
+  static const String createStoreSubtitle = "create_store_subtitle";
+  static const String storeNameLabel = "store_name_label";
+  static const String storeNameHint = "store_name_hint";
+  static const String storeAddressLabel = "store_address_label";
+  static const String storeAddressHint = "store_address_hint";
+  static const String storeNameEmptyError = "store_name_empty_error";
+  static const String confirmCreateStoreTitle = "confirm_create_store_title";
+  static const String confirmCreateStoreMessage =
+      "confirm_create_store_message";
+  static const String workspaceCreatedTitle = "workspace_created_title";
+  static const String workspaceCreatedDesc = "workspace_created_desc";
+  static const String youAreManager = "you_are_manager";
+  static const String addMembers = "add_members";
+  static const String goToDashboard = "go_to_dashboard";
+  static const String searchAddressHint = "search_address_hint";
+  static const String useCurrentLocation = "use_current_location";
+  static const String locationStr = "location_str";
+  static const String creatingWorkspace = "creating_workspace";
+  static const String creatingYourWorkspace = "creating_your_workspace";
+  static const String backToWorkspaces = "back_to_workspaces";
+  static const String gpsOffTitle = "gps_off_title";
+  static const String gpsOffMessage = "gps_off_message";
+  static const String locationErrorMessage = "location_error_message";
 
   // -- Home
   static const String homeRoleManagerTooltip = "home_role_manager_tooltip";

@@ -59,7 +59,7 @@ class VerifyEmailController extends GetxController {
           .sendResetPasswordEmail(email)
           .timeout(const Duration(seconds: 15));
 
-      TSnackbars.success(
+      TSnackbarsWidget.success(
         title: TTexts.successTitle.tr,
         message: TTexts.resendEmailSuccessMessage.trParams({'email': email}),
       );
@@ -70,28 +70,28 @@ class VerifyEmailController extends GetxController {
       final errorMsg = e.message.toLowerCase();
       if (errorMsg.contains('rate limit') ||
           errorMsg.contains('too many requests')) {
-        TSnackbars.warning(
+        TSnackbarsWidget.warning(
           title: TTexts.errorTooManyRequestsTitle.tr,
           message: TTexts.errorTooManyRequestsMessage.tr,
         );
       } else {
-        TSnackbars.error(
+        TSnackbarsWidget.error(
           title: TTexts.errorTitle.tr,
           message: e.message,
         );
       }
     } on TimeoutException catch (_) {
-      TSnackbars.error(
+      TSnackbarsWidget.error(
         title: TTexts.errorTimeoutTitle.tr,
         message: TTexts.errorTimeoutMessage.tr,
       );
     } on SocketException catch (_) {
-      TSnackbars.error(
+      TSnackbarsWidget.error(
         title: TTexts.netErrorTitle.tr,
         message: TTexts.netErrorDescription.tr,
       );
     } catch (e) {
-      TSnackbars.error(
+      TSnackbarsWidget.error(
         title: TTexts.errorTitle.tr,
         message: e.toString(),
       );
@@ -104,7 +104,7 @@ class VerifyEmailController extends GetxController {
     var result = await OpenMailAppPlus.openMailApp();
 
     if (!result.didOpen && !result.canOpen) {
-      TSnackbars.error(
+      TSnackbarsWidget.error(
         title: TTexts.errorTitle.tr,
         message: TTexts.emailAppNotFound.tr,
       );

@@ -55,14 +55,7 @@ class StoreSelectionActionButtonsWidget extends StatelessWidget {
         Expanded(
           child: Container(
             decoration: BoxDecoration(
-              gradient: const LinearGradient(
-                colors: [
-                  AppColors.gradientOrangeStart,
-                  AppColors.gradientOrangeEnd
-                ],
-                begin: Alignment.bottomLeft,
-                end: Alignment.topRight,
-              ),
+              color: AppColors.gradientOrangeStart,
               borderRadius: BorderRadius.circular(AppSizes.radius24),
               boxShadow: [
                 BoxShadow(

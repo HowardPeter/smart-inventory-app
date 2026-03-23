@@ -11,8 +11,11 @@ import 'package:frontend/features/navigation/bindings/navigation_binding.dart';
 import 'package:frontend/features/navigation/views/navigation_view.dart';
 import 'package:frontend/features/onboarding/bindings/onboarding_binding.dart';
 import 'package:frontend/features/profile/views/profile_view.dart';
+import 'package:frontend/features/workspace/bindings/create_store_binding.dart';
 import 'package:frontend/features/workspace/bindings/store_selection_binding.dart';
+import 'package:frontend/features/workspace/views/create_store_view.dart';
 import 'package:frontend/features/workspace/views/store_selection_view.dart';
+import 'package:frontend/features/workspace/views/workspace_ready_view.dart';
 import 'package:get/get.dart';
 
 import 'package:frontend/routes/app_routes.dart';
@@ -83,12 +86,19 @@ class AppPages {
     ),
 
     // -- Create Store
-    // GetPage(
-    //   name: AppRoutes.createStore,
-    //   page: () => const CreateStoreView(),
-    //   // binding: CreateStoreBinding(),
-    //   transition: Transition.rightToLeft,
-    // ),
+    GetPage(
+      name: AppRoutes.createStore,
+      page: () => const CreateStoreView(),
+      binding: CreateStoreBinding(),
+      transition: Transition.cupertino,
+    ),
+
+    // -- Workspace Ready
+    GetPage(
+      name: AppRoutes.workspaceReady,
+      page: () => const WorkspaceReadyView(),
+      transition: Transition.cupertino,
+    ),
 
     // // -- Join Store
     // GetPage(

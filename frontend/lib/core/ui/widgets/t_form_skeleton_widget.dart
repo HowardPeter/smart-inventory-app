@@ -3,8 +3,8 @@ import 'package:frontend/core/ui/theme/app_colors.dart';
 import 'package:frontend/core/ui/theme/app_sizes.dart';
 
 /// Hiệu ứng khung xương tải form (Skeleton)
-class TFormSkeleton extends StatelessWidget {
-  const TFormSkeleton({super.key, this.itemCount = 3});
+class TFormSkeletonWidget extends StatelessWidget {
+  const TFormSkeletonWidget({super.key, this.itemCount = 3});
 
   final int itemCount; // Số lượng ô textfield giả muốn hiển thị
 

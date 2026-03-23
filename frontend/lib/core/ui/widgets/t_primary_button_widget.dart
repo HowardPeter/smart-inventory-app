@@ -2,8 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:frontend/core/ui/theme/app_colors.dart';
 import 'package:frontend/core/ui/theme/app_sizes.dart';
 
-class TPrimaryButton extends StatelessWidget {
-  const TPrimaryButton({
+class TPrimaryButtonWidget extends StatelessWidget {
+  const TPrimaryButtonWidget({
     super.key,
     required this.text,
     required this.onPressed,
@@ -19,7 +19,7 @@ class TPrimaryButton extends StatelessWidget {
   });
 
   final String text;
-  final VoidCallback? onPressed; 
+  final VoidCallback? onPressed;
   final IconData? icon;
   final Color backgroundColor;
   final Color textColor;

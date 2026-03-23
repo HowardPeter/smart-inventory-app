@@ -167,7 +167,7 @@ class StoreSelectionMobileView extends GetView<StoreSelectionController> {
                     padding: const EdgeInsets.only(
                       left: AppSizes.p24,
                       right: AppSizes.p24,
-                      bottom: AppSizes.p12,
+                      bottom: AppSizes.p24,
                       top: AppSizes.p24,
                     ),
                     child: StoreSelectionActionButtonsWidget(

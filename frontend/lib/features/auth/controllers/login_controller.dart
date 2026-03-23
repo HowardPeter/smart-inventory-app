@@ -36,7 +36,7 @@ class LoginController extends GetxController {
     final password = passwordController.text;
 
     if (email.isEmpty || password.isEmpty) {
-      TSnackbars.warning(
+      TSnackbarsWidget.warning(
         title: TTexts.loginErrorEmptyFieldsTitle.tr,
         message: TTexts.loginErrorEmptyFieldsMessage.tr,
       );
@@ -70,7 +70,7 @@ class LoginController extends GetxController {
 
         FullScreenLoaderUtils
             .stopLoading(); // Phải tắt loading trước khi hiện cảnh báo
-        TSnackbars.warning(
+        TSnackbarsWidget.warning(
           title: TTexts.loginWarningUnverifiedTitle.tr,
           message: TTexts.loginWarningUnverifiedMessage.tr,
         );
@@ -97,7 +97,7 @@ class LoginController extends GetxController {
       // 2. TẮT LOADING KHI THÀNH CÔNG
       FullScreenLoaderUtils.stopLoading();
 
-      TSnackbars.success(
+      TSnackbarsWidget.success(
         title: TTexts.loginSuccessTitle.tr,
         message: TTexts.loginSuccessMessage.trParams({
           'name': email.split('@')[0],
@@ -112,12 +112,12 @@ class LoginController extends GetxController {
       // Kiểm tra code lỗi hoặc message từ Supabase
       if (e.message.contains('Invalid login credentials') ||
           e.code == 'invalid_credentials') {
-        TSnackbars.error(
+        TSnackbarsWidget.error(
           title: TTexts.loginErrorInvalidCredentialsTitle.tr,
           message: TTexts.loginErrorInvalidCredentialsMessage.tr,
         );
       } else {
-        TSnackbars.error(
+        TSnackbarsWidget.error(
           title: TTexts.loginFailedTitle.tr,
           message: e.message, // Lỗi khác của Supabase
         );
@@ -125,21 +125,21 @@ class LoginController extends GetxController {
     } on TimeoutException catch (_) {
       // BẮT LỖI QUÁ HẠN THỜI GIAN
       FullScreenLoaderUtils.stopLoading();
-      TSnackbars.error(
+      TSnackbarsWidget.error(
         title: TTexts.errorTimeoutTitle.tr,
         message: TTexts.errorTimeoutMessage.tr,
       );
     } on SocketException catch (_) {
       // BẮT LỖI MẤT MẠNG LÚC ĐANG GỌI API
       FullScreenLoaderUtils.stopLoading();
-      TSnackbars.error(
+      TSnackbarsWidget.error(
         title: TTexts.netErrorTitle.tr,
         message: TTexts.netErrorDescription.tr,
       );
     } catch (e) {
       // BẮT CÁC LỖI CÒN LẠI
       FullScreenLoaderUtils.stopLoading();
-      TSnackbars.error(
+      TSnackbarsWidget.error(
         title: TTexts.errorTitle.tr,
         message: e.toString(),
       );
@@ -180,7 +180,7 @@ class LoginController extends GetxController {
       FullScreenLoaderUtils.stopLoading();
 
       // 4. HIỆN THÔNG BÁO THÀNH CÔNG
-      TSnackbars.success(
+      TSnackbarsWidget.success(
         title: TTexts.loginSuccessTitle.tr,
         message: TTexts.loginSuccessMessage.trParams({
           'name': account.displayName ?? account.email,
@@ -193,7 +193,7 @@ class LoginController extends GetxController {
       debugPrint('❌ Google Auth Error: $e');
 
       // 5. BÁO LỖI
-      TSnackbars.error(
+      TSnackbarsWidget.error(
         title: TTexts.loginFailedTitle.tr,
         message: e.toString().replaceAll('Exception: ', ''),
       );

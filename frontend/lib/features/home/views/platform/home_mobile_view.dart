@@ -38,7 +38,7 @@ class HomeMobileScreen extends GetView<HomeController> {
                       HomeQuickActionsWidget(),
                       SizedBox(height: AppSizes.p24),
                       HomeLowStockAlertsWidget(),
-                      TBottomNavSpacer(),
+                      TBottomNavSpacerWidget(),
                     ],
                   ),
                 ),

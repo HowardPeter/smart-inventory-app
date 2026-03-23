@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart'; 
+import 'package:flutter/services.dart';
 import 'package:frontend/core/infrastructure/constants/image_strings.dart';
 import 'package:frontend/core/infrastructure/constants/text_strings.dart';
 import 'package:frontend/core/ui/theme/app_colors.dart';
@@ -70,9 +70,9 @@ class TSizeErrorLayout extends StatelessWidget {
                   // 4. Nút thoát ứng dụng
                   ConstrainedBox(
                     constraints: const BoxConstraints(maxWidth: 300),
-                    child: TPrimaryButton(
-                      text:
-                          TTexts.exit.tr, // Bạn có thể đưa vào TTexts.exit.tr nếu muốn localization
+                    child: TPrimaryButtonWidget(
+                      text: TTexts.exit
+                          .tr, // Bạn có thể đưa vào TTexts.exit.tr nếu muốn localization
                       backgroundColor:
                           AppColors.primary, // Màu xám nhẹ cho nút phụ
                       textColor: AppColors.whiteText,

@@ -50,7 +50,7 @@ class StoreSelectionController extends GetxController with TErrorHandler {
   }
 
   void goToCreateStore() {
-    // Get.toNamed(AppRoutes.createStore);
+    Get.toNamed(AppRoutes.createStore);
   }
 
   void goToJoinStore() {

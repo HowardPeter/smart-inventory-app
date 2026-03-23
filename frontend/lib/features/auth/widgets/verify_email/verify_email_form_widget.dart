@@ -27,7 +27,7 @@ class VerifyEmailFormWidget extends GetView<VerifyEmailController> {
         const SizedBox(height: AppSizes.p32),
         const VerifyEmailGoToGmailButtonWidget(),
         const SizedBox(height: AppSizes.p16),
-        TPrimaryButton(
+        TPrimaryButtonWidget(
           text: TTexts.backToLogin.tr,
           isOutlined: true,
           textColor: AppColors.primaryText,

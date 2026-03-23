@@ -34,7 +34,7 @@ class StoreSelectionHelpBottomWidget extends StatelessWidget {
 
           // Nội dung dặn dò chi tiết
           Text(
-            TTexts.whatIsWorkspace.tr, 
+            TTexts.whatIsWorkspace.tr,
             style: const TextStyle(
               fontSize: 18,
               fontWeight: FontWeight.bold,
@@ -43,7 +43,7 @@ class StoreSelectionHelpBottomWidget extends StatelessWidget {
           ),
           const SizedBox(height: AppSizes.p12),
           Text(
-            TTexts.workspaceDescription.tr, 
+            TTexts.workspaceDescription.tr,
             textAlign: TextAlign.center,
             style: const TextStyle(
               fontSize: 14,
@@ -54,7 +54,7 @@ class StoreSelectionHelpBottomWidget extends StatelessWidget {
           const SizedBox(height: AppSizes.p32),
 
           // Nút xác nhận
-          TPrimaryButton(
+          TPrimaryButtonWidget(
             text: TTexts.understood.tr,
             onPressed: () => Get.back(),
           ),

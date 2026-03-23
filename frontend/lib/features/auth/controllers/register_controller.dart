@@ -58,7 +58,7 @@ class RegisterController extends GetxController {
 
     // 1. Validate: Không được bỏ trống
     if (email.isEmpty || password.isEmpty || confirmPassword.isEmpty) {
-      TSnackbars.warning(
+      TSnackbarsWidget.warning(
         title: TTexts.registerErrorEmptyFieldsTitle.tr,
         message: TTexts.registerErrorEmptyFieldsMessage.tr,
       );
@@ -67,7 +67,7 @@ class RegisterController extends GetxController {
 
     // 2. Validate: Kiểm tra định dạng Email
     if (!GetUtils.isEmail(email)) {
-      TSnackbars.error(
+      TSnackbarsWidget.error(
         title: TTexts.loginErrorInvalidEmailTitle.tr,
         message: TTexts.loginErrorInvalidEmailMessage.tr,
       );
@@ -76,7 +76,7 @@ class RegisterController extends GetxController {
 
     // 3. Validate: Mật khẩu xác nhận phải khớp
     if (password != confirmPassword) {
-      TSnackbars.error(
+      TSnackbarsWidget.error(
         title: TTexts.registerErrorPasswordMismatchTitle.tr,
         message: TTexts.registerErrorPasswordMismatchMessage.tr,
       );
@@ -99,7 +99,7 @@ class RegisterController extends GetxController {
 
       if (response.user != null) {
         // Hiện thông báo thành công
-        TSnackbars.success(
+        TSnackbarsWidget.success(
           title: TTexts.registerSuccessTitle.tr,
           message: TTexts.registerSuccessMessage.tr,
         );
@@ -113,18 +113,18 @@ class RegisterController extends GetxController {
 
       if (errorMsg.contains('already registered') ||
           errorMsg.contains('already exists')) {
-        TSnackbars.error(
+        TSnackbarsWidget.error(
           title: TTexts.registerErrorUserExistsTitle.tr,
           message: TTexts.registerErrorUserExistsMessage.tr,
         );
       } else if (errorMsg.contains('weak password') ||
           errorMsg.contains('password should be')) {
-        TSnackbars.error(
+        TSnackbarsWidget.error(
           title: TTexts.registerErrorWeakPasswordTitle.tr,
           message: TTexts.registerErrorWeakPasswordMessage.tr,
         );
       } else {
-        TSnackbars.error(
+        TSnackbarsWidget.error(
           title: TTexts.registerFailedTitle.tr,
           message: e.message,
         );
@@ -132,21 +132,21 @@ class RegisterController extends GetxController {
     } on TimeoutException catch (_) {
       // BẮT LỖI QUÁ HẠN THỜI GIAN
       FullScreenLoaderUtils.stopLoading();
-      TSnackbars.error(
+      TSnackbarsWidget.error(
         title: TTexts.errorTimeoutTitle.tr,
         message: TTexts.errorTimeoutMessage.tr,
       );
     } on SocketException catch (_) {
       // BẮT LỖI MẤT MẠNG LÚC ĐANG GỌI API
       FullScreenLoaderUtils.stopLoading();
-      TSnackbars.error(
+      TSnackbarsWidget.error(
         title: TTexts.netErrorTitle.tr,
         message: TTexts.netErrorDescription.tr,
       );
     } catch (e) {
       // BẮT CÁC LỖI KHÁC
       FullScreenLoaderUtils.stopLoading();
-      TSnackbars.error(
+      TSnackbarsWidget.error(
         title: TTexts.errorTitle.tr,
         message: e.toString(),
       );
@@ -164,7 +164,7 @@ class RegisterController extends GetxController {
 
       if (account == null) {
         FullScreenLoaderUtils.stopLoading();
-        TSnackbars.warning(
+        TSnackbarsWidget.warning(
           title: TTexts.canceled.tr,
           message: TTexts.googleSignInCanceled.tr,
         );
@@ -176,7 +176,7 @@ class RegisterController extends GetxController {
 
       FullScreenLoaderUtils.stopLoading();
 
-      TSnackbars.success(
+      TSnackbarsWidget.success(
         title: TTexts.registerSuccessTitle.tr,
         message: TTexts.registerSuccessMessage.tr,
       );
@@ -184,13 +184,13 @@ class RegisterController extends GetxController {
       Get.offAllNamed(AppRoutes.main);
     } on SocketException catch (_) {
       FullScreenLoaderUtils.stopLoading();
-      TSnackbars.error(
+      TSnackbarsWidget.error(
         title: TTexts.netErrorTitle.tr,
         message: TTexts.netErrorDescription.tr,
       );
     } catch (e) {
       FullScreenLoaderUtils.stopLoading();
-      TSnackbars.error(
+      TSnackbarsWidget.error(
         title: TTexts.registerFailedTitle.tr,
         message: e.toString().replaceAll('Exception: ', ''),
       );

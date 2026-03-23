@@ -3,23 +3,29 @@ import 'package:frontend/core/ui/theme/app_colors.dart';
 import 'package:frontend/core/ui/theme/app_sizes.dart';
 
 /// Text Input Form Field
-class TTextFormField extends StatelessWidget {
-  const TTextFormField({
+class TTextFormFieldWidget extends StatelessWidget {
+  const TTextFormFieldWidget({
     super.key,
     required this.label,
     required this.hintText,
-    this.isObscure = false, // Đổi tên từ obscureText thành isObscure
+    this.isObscure = false,
     this.suffixIcon,
     this.controller,
-    this.onChanged, // Thêm thuộc tính này
+    this.onChanged,
+    this.validator,
+    this.maxLines = 1,
+    this.prefixIcon,
   });
 
   final String label;
   final String hintText;
-  final bool isObscure; // Đổi tên ở đây
+  final bool isObscure;
   final Widget? suffixIcon;
   final TextEditingController? controller;
-  final Function(String)? onChanged; // Khai báo kiểu function nhận vào String
+  final Function(String)? onChanged;
+  final String? Function(String?)? validator;
+  final int maxLines;
+  final IconData? prefixIcon;
 
   @override
   Widget build(BuildContext context) {
@@ -38,8 +44,10 @@ class TTextFormField extends StatelessWidget {
         const SizedBox(height: AppSizes.p8),
         TextFormField(
           controller: controller,
-          obscureText: isObscure, // Sử dụng biến mới
-          onChanged: onChanged, // Truyền giá trị vào TextFormField gốc
+          obscureText: isObscure,
+          onChanged: onChanged,
+          validator: validator,
+          maxLines: isObscure ? 1 : maxLines,
           style: const TextStyle(
             fontFamily: 'Poppins',
             fontSize: 14,
@@ -64,7 +72,18 @@ class TTextFormField extends StatelessWidget {
               borderRadius: BorderRadius.circular(AppSizes.radius8),
               borderSide: const BorderSide(color: AppColors.primary),
             ),
-            // Logic hiển thị suffixIcon
+            errorBorder: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(AppSizes.radius8),
+              borderSide: const BorderSide(color: AppColors.toastErrorBg),
+            ),
+            focusedErrorBorder: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(AppSizes.radius8),
+              borderSide:
+                  const BorderSide(color: AppColors.toastErrorBg, width: 1.5),
+            ),
+            prefixIcon: prefixIcon != null
+                ? Icon(prefixIcon, color: AppColors.softGrey, size: 20)
+                : null,
             suffixIcon: suffixIcon ?? _buildClearButton(),
           ),
         ),
@@ -72,10 +91,10 @@ class TTextFormField extends StatelessWidget {
     );
   }
 
-  /// Nút Xóa nhanh (Chỉ hiển thị khi không phải ô mật khẩu và có chữ)
+  /// Nút Xóa nhanh
   Widget? _buildClearButton() {
     if (controller == null || isObscure) {
-      return null; // Không hiện nút X nếu là ô mật khẩu
+      return null;
     }
 
     return ValueListenableBuilder<TextEditingValue>(

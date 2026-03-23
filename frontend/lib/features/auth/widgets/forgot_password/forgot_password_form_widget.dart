@@ -42,7 +42,7 @@ class ForgotPasswordFormWidget extends GetView<ForgotPasswordController> {
         ),
         const SizedBox(height: AppSizes.p32),
 
-        TTextFormField(
+        TTextFormFieldWidget(
           controller: controller.emailController,
           label: TTexts.emailLabel.tr,
           hintText: TTexts.emailHint.tr,
@@ -50,7 +50,7 @@ class ForgotPasswordFormWidget extends GetView<ForgotPasswordController> {
         const SizedBox(height: AppSizes.p24),
 
         // Nút Gửi Email (Nút chính)
-        Obx(() => TPrimaryButton(
+        Obx(() => TPrimaryButtonWidget(
               text: controller.isLoading.value
                   ? TTexts.emailSending.tr
                   : TTexts.forgotPasswordBtn.tr,
@@ -60,7 +60,7 @@ class ForgotPasswordFormWidget extends GetView<ForgotPasswordController> {
         const SizedBox(height: AppSizes.p16),
 
         // Nút Quay Lại
-        TPrimaryButton(
+        TPrimaryButtonWidget(
           text: TTexts.goBack.tr,
           isOutlined: true,
           textColor: AppColors.primaryText,

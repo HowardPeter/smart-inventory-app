@@ -22,7 +22,7 @@ class RegisterFormWidget extends GetView<RegisterController> {
         const SizedBox(height: AppSizes.p24),
 
         // 1. Email
-        TTextFormField(
+        TTextFormFieldWidget(
           controller: controller.emailController,
           label: TTexts.emailLabel.tr,
           hintText: TTexts.emailHint.tr,
@@ -32,7 +32,7 @@ class RegisterFormWidget extends GetView<RegisterController> {
         // 2. Password + Thanh đo
         Obx(() => Column(
               children: [
-                TTextFormField(
+                TTextFormFieldWidget(
                   controller: controller.passwordController,
                   label: TTexts.passwordLabel.tr,
                   hintText: TTexts.passwordHint.tr,
@@ -55,7 +55,7 @@ class RegisterFormWidget extends GetView<RegisterController> {
         const SizedBox(height: AppSizes.p16),
 
         // 3. Confirm Password
-        Obx(() => TTextFormField(
+        Obx(() => TTextFormFieldWidget(
               controller: controller.confirmPasswordController,
               label: TTexts.confirmPasswordLabel.tr,
               hintText: TTexts.confirmPasswordHint.tr,
@@ -73,7 +73,7 @@ class RegisterFormWidget extends GetView<RegisterController> {
         const SizedBox(height: AppSizes.p32),
 
         // 4. Nút Đăng ký
-        Obx(() => TPrimaryButton(
+        Obx(() => TPrimaryButtonWidget(
               text: controller.isLoading.value
                   ? TTexts.registering.tr
                   : TTexts.registerBtn.tr,

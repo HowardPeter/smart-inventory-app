@@ -21,7 +21,7 @@ class ForgotPasswordController extends GetxController {
     final email = emailController.text.trim();
 
     if (!GetUtils.isEmail(email)) {
-      TSnackbars.error(
+      TSnackbarsWidget.error(
         title: TTexts.loginErrorInvalidEmailTitle.tr,
         message: TTexts.loginErrorInvalidEmailMessage.tr,
       );
@@ -41,7 +41,7 @@ class ForgotPasswordController extends GetxController {
 
       FullScreenLoaderUtils.stopLoading();
 
-      TSnackbars.success(
+      TSnackbarsWidget.success(
         title: TTexts.emailSentTitle.tr,
         message: TTexts.emailSentMessage.trParams({'email': email}),
       );
@@ -54,31 +54,31 @@ class ForgotPasswordController extends GetxController {
       // Bẫy lỗi nhấn quá nhiều lần (Rate Limit của Supabase)
       if (errorMsg.contains('rate limit') ||
           errorMsg.contains('too many requests')) {
-        TSnackbars.warning(
+        TSnackbarsWidget.warning(
           title: TTexts.errorTooManyRequestsTitle.tr,
           message: TTexts.errorTooManyRequestsMessage.tr,
         );
       } else {
-        TSnackbars.error(
+        TSnackbarsWidget.error(
           title: TTexts.emailSendFailed.tr,
           message: e.message,
         );
       }
     } on TimeoutException catch (_) {
       FullScreenLoaderUtils.stopLoading();
-      TSnackbars.error(
+      TSnackbarsWidget.error(
         title: TTexts.errorTimeoutTitle.tr,
         message: TTexts.errorTimeoutMessage.tr,
       );
     } on SocketException catch (_) {
       FullScreenLoaderUtils.stopLoading();
-      TSnackbars.error(
+      TSnackbarsWidget.error(
         title: TTexts.netErrorTitle.tr,
         message: TTexts.netErrorDescription.tr,
       );
     } catch (e) {
       FullScreenLoaderUtils.stopLoading();
-      TSnackbars.error(
+      TSnackbarsWidget.error(
         title: TTexts.errorTitle.tr,
         message: e.toString(),
       );

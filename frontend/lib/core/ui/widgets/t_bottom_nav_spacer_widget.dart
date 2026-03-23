@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:frontend/core/ui/theme/app_sizes.dart';
 
-class TBottomNavSpacer extends StatelessWidget {
+class TBottomNavSpacerWidget extends StatelessWidget {
   /// Biến này dùng trong trường hợp bạn muốn khoảng trống cao hơn hoặc thấp hơn bình thường một chút
   final double? customHeight;
 
-  const TBottomNavSpacer({
+  const TBottomNavSpacerWidget({
     super.key,
     this.customHeight,
   });

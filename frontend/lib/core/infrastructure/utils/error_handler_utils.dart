@@ -8,7 +8,7 @@ mixin TErrorHandler {
     final error = TExceptions.getErrorMessage(e);
 
     // Gọi Snackbar
-    TSnackbars.error(
+    TSnackbarsWidget.error(
       title: error['title']!,
       message: error['message']!,
     );

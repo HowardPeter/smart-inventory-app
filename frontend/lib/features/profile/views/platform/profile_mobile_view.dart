@@ -84,7 +84,7 @@ class ProfileMobileView extends GetView<ProfileController> {
             ),
 
             // Khoảng trống chống lấp bởi Bottom Navigation Bar
-            const TBottomNavSpacer(),
+            const TBottomNavSpacerWidget(),
           ],
         ),
       ),

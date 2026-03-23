@@ -4,8 +4,8 @@ import 'package:frontend/core/ui/theme/app_colors.dart';
 import 'package:frontend/core/ui/theme/app_sizes.dart';
 
 /// Hộp thoại (Dialog) tùy chỉnh tái sử dụng (Chuẩn UI UI/UX xếp dọc)
-class TCustomDialog extends StatelessWidget {
-  const TCustomDialog({
+class TCustomDialogWidget extends StatelessWidget {
+  const TCustomDialogWidget({
     super.key,
     required this.title,
     required this.description,

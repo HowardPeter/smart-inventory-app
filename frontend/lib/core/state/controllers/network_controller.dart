@@ -6,7 +6,7 @@ import 'package:flutter/material.dart';
 import 'package:frontend/core/ui/widgets/t_snackbars_widget.dart';
 import 'package:get/get.dart';
 import 'package:frontend/core/infrastructure/constants/text_strings.dart';
-import 'package:frontend/core/ui/widgets/t_custom_dialog.dart';
+import 'package:frontend/core/ui/widgets/t_custom_dialog_widget.dart';
 import 'package:frontend/core/infrastructure/utils/full_screen_loader_utils.dart';
 
 class NetworkController extends GetxController {
@@ -73,7 +73,7 @@ class NetworkController extends GetxController {
       PopScope(
         canPop:
             false, // Chống người dùng bấm nút Back (Trở về) trên Android để thoát Dialog
-        child: TCustomDialog(
+        child: TCustomDialogWidget(
           icon: const Text('📡', style: TextStyle(fontSize: 40)),
           title: TTexts.netErrorTitle.tr,
           description: TTexts.netErrorDescription.tr,
@@ -92,7 +92,7 @@ class NetworkController extends GetxController {
               isConnected.value = true;
               _closeNoInternetDialog();
             } else {
-              TSnackbars.error(
+              TSnackbarsWidget.error(
                 title: TTexts.errorTitle.tr,
                 message: TTexts.netErrorRetryFailedMessage.tr,
               );

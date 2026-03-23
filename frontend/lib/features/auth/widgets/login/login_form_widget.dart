@@ -25,7 +25,7 @@ class LoginFormWidget extends GetView<LoginController> {
         const SizedBox(height: AppSizes.p24),
 
         // 2. Ô Email
-        TTextFormField(
+        TTextFormFieldWidget(
           controller: controller.emailController,
           label: TTexts.emailLabel.tr,
           hintText: TTexts.emailHint.tr,
@@ -34,7 +34,7 @@ class LoginFormWidget extends GetView<LoginController> {
 
         // 3. Ô Password
         Obx(
-          () => TTextFormField(
+          () => TTextFormFieldWidget(
             controller: controller.passwordController,
             label: TTexts.passwordLabel.tr,
             hintText: TTexts.passwordHint.tr,
@@ -58,7 +58,7 @@ class LoginFormWidget extends GetView<LoginController> {
         const SizedBox(height: AppSizes.p24),
 
         // 5. Nút Login (Đã gọi được controller.login)
-        TPrimaryButton(
+        TPrimaryButtonWidget(
           text: TTexts.loginBtn.tr,
           onPressed: () => controller.login(),
         ),

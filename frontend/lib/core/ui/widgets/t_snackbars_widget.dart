@@ -3,7 +3,7 @@ import 'package:get/get.dart';
 import 'package:frontend/core/ui/theme/app_colors.dart';
 
 /// Tiện ích hiển thị các thông báo (Toast/Snackbar) toàn cục
-class TSnackbars {
+class TSnackbarsWidget {
   static void _showToast({
     required String title,
     required String message,
