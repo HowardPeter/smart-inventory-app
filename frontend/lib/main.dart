@@ -2,6 +2,8 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:frontend/core/infrastructure/localization/app_translations.dart';
 import 'package:frontend/core/state/bindings/initial_binding.dart';
+import 'package:frontend/core/state/services/auth_service.dart'
+    show AuthService;
 import 'package:frontend/core/state/services/store_service.dart';
 import 'package:frontend/core/state/services/user_service.dart';
 import 'package:frontend/routes/app_pages.dart';
@@ -24,8 +26,9 @@ void main() async {
   await GetStorage.init();
   // 2. Khởi tạo AuthService một cách bất đồng bộ
   // Việc dùng putAsync giúp App chờ AuthService check ổ cứng xong mới chạy tiếp
-  await Get.putAsync(() => StoreService().init());
+  await Get.putAsync(() => AuthService().init());
   await Get.putAsync(() => UserService().init());
+  await Get.putAsync(() => StoreService().init());
   // ---------------------------------------------------------
   // 3. Khởi tạo supabase để kích hoạt các tính năng authen
   await Supabase.initialize(

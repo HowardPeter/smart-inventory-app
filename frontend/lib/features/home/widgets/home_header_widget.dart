@@ -5,6 +5,9 @@ import 'package:frontend/core/ui/theme/app_colors.dart';
 import 'package:frontend/core/ui/theme/app_sizes.dart';
 import 'package:frontend/features/home/controllers/home_controller.dart';
 
+// THÊM IMPORT STORE SERVICE ĐỂ LẤY ROLE
+import 'package:frontend/core/state/services/store_service.dart';
+
 class HomeHeaderWidget extends StatelessWidget {
   const HomeHeaderWidget({super.key});
 
@@ -51,32 +54,32 @@ class HomeHeaderWidget extends StatelessWidget {
           ),
           const SizedBox(width: AppSizes.p12),
 
-          // BADGE ROLE VỚI TOOLTIP ĐỘNG TỪ TTEXTS
+          // BADGE ROLE
           Obx(() {
-            final _ = homeController.isLoading.value;
-            const role = 'manager';
-            //  userController.currentUser.value?.role.toLowerCase() ?? 'staff';
-            const isManager = role == 'manager' || role == 'admin';
+            // Lấy role từ StoreService (RAM)
+            final storeService = Get.find<StoreService>();
+            final role = storeService.currentRole.value.toLowerCase();
+
+            // Phân quyền UI Manager/Staff
+            final isManager = role == 'manager';
 
             // Lấy nội dung Tooltip từ TTexts
             final String tooltipMessage = isManager
                 ? TTexts.homeRoleManagerTooltip.tr
                 : TTexts.homeRoleStaffTooltip.tr;
-
-            // Định nghĩa Gradient & Icon
+                
             final List<Color> gradientColors = isManager
                 ? [AppColors.primary, AppColors.secondPrimary]
                 : [const Color(0xFFFF9900), const Color(0xFFFFCC00)];
 
-            const IconData roleIcon = isManager
+            final IconData roleIcon = isManager
                 ? Icons.admin_panel_settings_rounded
                 : Icons.badge_rounded;
 
             return Tooltip(
-              message: tooltipMessage, // Hiển thị tooltip dựa trên role
-              triggerMode:
-                  TooltipTriggerMode.tap, // Chạm vào là hiện ngay trên mobile
-              preferBelow: false, // Hiện phía trên icon cho đỡ vướng tay
+              message: tooltipMessage,
+              triggerMode: TooltipTriggerMode.tap,
+              preferBelow: false,
               child: Container(
                 width: 48,
                 height: 48,
@@ -95,7 +98,7 @@ class HomeHeaderWidget extends StatelessWidget {
                     ),
                   ],
                 ),
-                child: const Icon(roleIcon, color: Colors.white, size: 26),
+                child: Icon(roleIcon, color: Colors.white, size: 26),
               ),
             );
           }),

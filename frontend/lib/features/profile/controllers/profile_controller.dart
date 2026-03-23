@@ -1,6 +1,6 @@
+import 'package:frontend/core/state/services/auth_service.dart';
 import 'package:get/get.dart';
 import 'package:frontend/routes/app_routes.dart';
-import 'package:frontend/core/state/services/store_service.dart';
 import 'package:frontend/core/state/services/user_service.dart';
 // import 'package:frontend/features/auth/providers/auth_provider.dart';
 
@@ -17,7 +17,7 @@ class ProfileController extends GetxController {
       // await Get.find<AuthProvider>().logout();
 
       // 3. Dọn ổ cứng (Local Storage)
-      await Get.find<StoreService>().clearAuthData();
+      await Get.find<AuthService>().clearAuthData();
 
       // 4. Dọn RAM (UserService)
       userService.clearUser();

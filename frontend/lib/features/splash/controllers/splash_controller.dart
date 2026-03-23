@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:frontend/core/infrastructure/constants/text_strings.dart';
 import 'package:frontend/core/state/controllers/network_controller.dart';
 import 'package:frontend/core/infrastructure/utils/token_utils.dart';
+import 'package:frontend/core/state/services/auth_service.dart';
 import 'package:frontend/core/state/services/user_service.dart';
 import 'package:get/get.dart';
 import 'package:get_storage/get_storage.dart';
@@ -79,13 +80,12 @@ class SplashController extends GetxController {
     await Future.delayed(const Duration(milliseconds: 300));
   }
 
-  /// TÁC VỤ 4: Xác thực Token với Server (Fake API)
   /// TÁC VỤ 4: Xác thực Token với Server
   Future<void> _checkUserAuthentication() async {
-    final storeService = Get.find<StoreService>();
+    final authService = Get.find<AuthService>();
 
     // 1. Nếu chưa từng đăng nhập -> Bỏ qua
-    if (!storeService.isLoggedIn.value) {
+    if (!authService.isLoggedIn.value) {
       await Future.delayed(const Duration(milliseconds: 300));
       return;
     }
@@ -115,19 +115,21 @@ class SplashController extends GetxController {
       debugPrint('Phiên đăng nhập đã chết hoặc có lỗi nghiêm trọng: $e');
 
       // 3. CHỈ XÓA SẠCH DỮ LIỆU KHI CHẮC CHẮN TOKEN ĐÃ HỎNG
-      await storeService.clearAuthData();
+      await authService.clearAuthData();
     }
   }
 
   void _navigateToNextScreen() {
     final storage = GetStorage();
+    final authService = Get.find<AuthService>();
     final storeService = Get.find<StoreService>();
+
     final isFirstTime = storage.read('IS_FIRST_TIME') ?? true;
 
     if (isFirstTime) {
       Get.offAllNamed(AppRoutes.onboarding);
-    } else if (storeService.isLoggedIn.value) {
-      // KIỂM TRA XEM ĐÃ CÓ CỬA HÀNG CHƯA
+    } else if (authService.isLoggedIn.value) {
+      // KIỂM TRA XEM ĐÃ CÓ CỬA HÀNG CHƯA BẰNG STORE SERVICE
       if (storeService.currentStoreId.value.isNotEmpty) {
         // Có rồi -> Vào thẳng Home bỏ qua màn chọn
         Get.offAllNamed(AppRoutes.main);

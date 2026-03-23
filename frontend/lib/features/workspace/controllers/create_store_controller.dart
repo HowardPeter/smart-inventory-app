@@ -191,7 +191,7 @@ class CreateStoreController extends GetxController {
 
       // 2. NGAY LẬP TỨC LƯU STORE MỚI VÀO BỘ NHỚ
       await _storeService.saveSelectedStore(
-          createdStore.storeId, createdStore.name);
+          createdStore.storeId, createdStore.name, createdStore.role);
 
       FullScreenLoaderUtils.stopLoading();
 

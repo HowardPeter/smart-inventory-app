@@ -1,0 +1,30 @@
+product_id,name,image_url,created_at,updated_at,brand,store_id,category_id,active_status
+prod_101,Wireless Mouse,https://example.com/mouse.jpg,2026-03-24 08:30:00,2026-03-24 08:30:00,Logitech,store_1,cat_1,active
+prod_102,Mechanical Keyboard,https://example.com/keyboard.jpg,2026-03-24 09:15:00,2026-03-24 09:15:00,Keychron,store_1,cat_1,active
+prod_103,Gaming Headset,https://example.com/headset.jpg,2026-03-24 09:20:00,2026-03-24 09:20:00,Razer,store_1,cat_1,active
+prod_104,USB-C Hub,,2026-03-24 09:25:00,2026-03-24 09:25:00,Anker,store_1,cat_1,inactive
+
+prod_201,Cotton T-Shirt,,2026-03-24 10:00:00,2026-03-24 10:00:00,Uniqlo,store_1,cat_2,active
+prod_202,Denim Jeans,https://example.com/jeans.jpg,2026-03-24 10:05:00,2026-03-24 10:05:00,Levis,store_1,cat_2,active
+prod_203,Hoodie Jacket,,2026-03-24 10:10:00,2026-03-24 10:10:00,Nike,store_1,cat_2,inactive
+prod_204,Sports Shorts,https://example.com/shorts.jpg,2026-03-24 10:12:00,2026-03-24 10:12:00,Adidas,store_1,cat_2,active
+
+prod_301,Mineral Water 500ml,,2026-03-24 10:45:00,2026-03-24 10:45:00,Aquafina,store_1,cat_3,active
+prod_302,Orange Juice 1L,https://example.com/oj.jpg,2026-03-24 10:50:00,2026-03-24 10:50:00,Tropicana,store_1,cat_3,active
+prod_303,Instant Noodles,,2026-03-24 10:55:00,2026-03-24 10:55:00,Indomie,store_1,cat_3,active
+prod_304,Snack Chips,https://example.com/chips.jpg,2026-03-24 11:00:00,2026-03-24 11:00:00,Lays,store_1,cat_3,inactive
+
+prod_401,A4 Copy Paper,,2026-03-24 11:20:00,2026-03-24 11:20:00,Double A,store_1,cat_4,inactive
+prod_402,Ballpoint Pen Blue,https://example.com/pen.jpg,2026-03-24 11:25:00,2026-03-24 11:25:00,Pilot,store_1,cat_4,active
+prod_403,Notebook A5,,2026-03-24 11:30:00,2026-03-24 11:30:00,Kokuyo,store_1,cat_4,active
+prod_404,Stapler Mini,https://example.com/stapler.jpg,2026-03-24 11:35:00,2026-03-24 11:35:00,Deli,store_1,cat_4,inactive
+
+prod_501,LED Desk Lamp,https://example.com/lamp.jpg,2026-03-24 11:40:00,2026-03-24 11:40:00,Xiaomi,store_1,cat_5,active
+prod_502,Office Chair,,2026-03-24 11:45:00,2026-03-24 11:45:00,IKEA,store_1,cat_5,active
+prod_503,Standing Desk,,2026-03-24 11:50:00,2026-03-24 11:50:00,Flexispot,store_1,cat_5,inactive
+prod_504,Monitor 24 inch,https://example.com/monitor.jpg,2026-03-24 11:55:00,2026-03-24 11:55:00,Dell,store_1,cat_5,active
+
+prod_601,Phone Charger 20W,,2026-03-24 12:00:00,2026-03-24 12:00:00,Apple,store_1,cat_6,active
+prod_602,Power Bank 10000mAh,https://example.com/powerbank.jpg,2026-03-24 12:05:00,2026-03-24 12:05:00,Xiaomi,store_1,cat_6,active
+prod_603,Wireless Earbuds,,2026-03-24 12:10:00,2026-03-24 12:10:00,Samsung,store_1,cat_6,inactive
+prod_604,Smart Watch,https://example.com/watch.jpg,2026-03-24 12:15:00,2026-03-24 12:15:00,Huawei,store_1,cat_6,active

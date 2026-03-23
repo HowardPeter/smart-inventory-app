@@ -83,13 +83,11 @@ class NavigationMobileView extends GetView<NavigationController> {
                   ),
 
                   // NÚT GIỮA
-                  // NÚT GIỮA
                   Positioned(
                     bottom: 30,
                     child: GestureDetector(
                       onTap: () => controller.changeIndex(2),
                       child: Obx(() {
-                        // Bọc Obx sát nhất có thể
                         final isSelected = controller.selectedIndex.value == 2;
                         return AnimatedScale(
                           scale: isSelected ? 1.15 : 1.0,
@@ -98,7 +96,14 @@ class NavigationMobileView extends GetView<NavigationController> {
                             width: 64,
                             height: 64,
                             decoration: BoxDecoration(
-                              color: AppColors.primary,
+                              gradient: const LinearGradient(
+                                begin: Alignment.topLeft,
+                                end: Alignment.bottomRight,
+                                colors: [
+                                  AppColors.primary,
+                                  AppColors.secondPrimary
+                                ],
+                              ),
                               shape: BoxShape.circle,
                               border: Border.all(
                                 color: AppColors.surface,
@@ -112,8 +117,6 @@ class NavigationMobileView extends GetView<NavigationController> {
                                 ),
                               ],
                             ),
-
-                            // --- PHẦN CODE ĐƯỢC THAY THẾ ---
                             child: Center(
                               child: Image.asset(
                                 TImages.iconImages.plusIcon,
@@ -122,7 +125,6 @@ class NavigationMobileView extends GetView<NavigationController> {
                                 color: AppColors.white,
                               ),
                             ),
-                            // ------------------------------
                           ),
                         );
                       }),

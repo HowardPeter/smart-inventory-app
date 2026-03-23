@@ -48,7 +48,7 @@ class JoinStoreController extends GetxController {
 
       // Lưu ID và Tên cửa hàng vừa join được vào bộ nhớ máy
       await _storeService.saveSelectedStore(
-          joinedStore.storeId, joinedStore.name);
+          joinedStore.storeId, joinedStore.name, joinedStore.role);
 
       // Chuyển thẳng vào Home
       Get.offAllNamed(AppRoutes.main);

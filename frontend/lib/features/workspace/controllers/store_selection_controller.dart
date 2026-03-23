@@ -1,7 +1,9 @@
 import 'package:flutter/foundation.dart';
+import 'package:frontend/core/infrastructure/constants/text_strings.dart';
 import 'package:frontend/core/infrastructure/models/store_model.dart';
 import 'package:frontend/core/infrastructure/utils/error_handler_utils.dart';
 import 'package:frontend/core/state/services/store_service.dart';
+import 'package:frontend/core/ui/widgets/t_snackbars_widget.dart';
 import 'package:frontend/features/workspace/provider/workspace_provider.dart';
 import 'package:get/get.dart';
 import 'package:frontend/routes/app_routes.dart';
@@ -54,17 +56,20 @@ class StoreSelectionController extends GetxController with TErrorHandler {
       // Lấy storeId trực tiếp từ thuộc tính của StoreModel
       final String currentId = store.storeId;
       final String currentName = store.name;
+      final String currentRole = store.role;
 
       if (currentId.isEmpty) {
         debugPrint("LỖI CRITICAL: ID Cửa hàng bị rỗng!");
-        Get.snackbar("Lỗi Hệ Thống", "Không tìm thấy ID của cửa hàng này.");
+        TSnackbarsWidget.error(
+            title: TTexts.errorTitle.tr, message: TTexts.errorUnknownMessage);
         return;
       }
 
       debugPrint("LƯU VÀO MÁY STORE_ID: $currentId");
 
       // Lưu vào máy và RAM
-      await _storeService.saveSelectedStore(currentId, currentName);
+      await _storeService.saveSelectedStore(
+          currentId, currentName, currentRole);
 
       // Nhảy vào trang Home
       Get.offAllNamed(AppRoutes.main);
