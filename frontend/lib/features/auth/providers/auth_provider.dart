@@ -4,58 +4,55 @@ import 'package:google_sign_in/google_sign_in.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 class AuthProvider {
-  // Bắt buộc phải truyền ApiClient vào khi khởi tạo
   final ApiClient apiClient;
-  AuthProvider({required this.apiClient});
 
-  // 1. CẬP NHẬT BẢN 7.2.0: Sử dụng GoogleSignIn.instance
-  final GoogleSignIn _googleSignIn = GoogleSignIn.instance;
+  AuthProvider({required this.apiClient});
 
   final supabase = Supabase.instance.client;
 
-  // Đưa Client ID ra một biến riêng cho gọn
   final String _serverClientId =
-      '312359689211-rb6t26nfeqc5pmv268qgj9so090ov7cm.apps.googleusercontent.com';
+      '119247404487-9d27bve8fsfl6loh8468dg21l4io4otq.apps.googleusercontent.com';
 
-  /// Hàm đăng nhập Google
-  Future<GoogleSignInAccount?> signInWithGoogle() async {
+  /// Hàm đăng nhập Google chuẩn cho google_sign_in v7.0.0+
+  Future<AuthResponse?> signInWithGoogle() async {
     try {
-      await _googleSignIn.initialize(serverClientId: _serverClientId);
-
-      final GoogleSignInAccount account = await _googleSignIn.authenticate(
-        scopeHint: ['email', 'profile'],
+      // 1. KHỞI TẠO (Bắt buộc phải gọi initialize trong v7+)
+      await GoogleSignIn.instance.initialize(
+        serverClientId: _serverClientId,
       );
 
-      return account;
+      // 2. MỞ POPUP (Dùng authenticate thay vì signIn)
+      final GoogleSignInAccount googleUser =
+          await GoogleSignIn.instance.authenticate();
+
+      // 3. LẤY THÔNG TIN XÁC THỰC
+      final GoogleSignInAuthentication googleAuth = googleUser.authentication;
+
+      // 4. LẤY ID TOKEN (Không cần accessToken nữa)
+      final String? idToken = googleAuth.idToken;
+
+      if (idToken == null) {
+        throw 'Không tìm thấy ID Token từ Google.';
+      }
+
+      // 5. GỬI LÊN SUPABASE (Supabase không bắt buộc accessToken)
+      return await supabase.auth.signInWithIdToken(
+        provider: OAuthProvider.google,
+        idToken: idToken,
+      );
     } catch (e) {
       final errorStr = e.toString().toLowerCase();
 
       if (errorStr.contains('canceled') ||
           errorStr.contains('sign_in_canceled')) {
         debugPrint('Người dùng chủ động đóng popup chọn tài khoản Google.');
-        // Trả về null một cách êm đẹp, KHÔNG ném lỗi (rethrow)
         return null;
       }
 
-      // Nếu là lỗi thật sự (mất mạng, sai client ID...) thì mới ném ra ngoài
       debugPrint('Lỗi Google Sign-In thực sự: $e');
       rethrow;
     }
   }
-
-  // Future<void> sendPasswordResetEmail(String email) async {
-  //   // 1. Giả lập gọi API mất 2 giây (để UI hiện vòng xoay Loading)
-  //   await Future.delayed(const Duration(seconds: 2));
-
-  //   // 2. Fake Logic: KIỂM TRA ĐÍCH DANH EMAIL
-  //   if (email == "admin@gmail.com") {
-  //     // Nếu đúng là admin@gmail.com -> Không làm gì cả (Hàm kết thúc thành công)
-  //     return;
-  //   } else {
-  //     // Nếu nhập bất cứ email nào khác -> Ném ra lỗi
-  //     throw Exception("Mail not exists.");
-  //   }
-  // }
 
   Future<AuthResponse> register({
     required String email,
@@ -93,5 +90,7 @@ class AuthProvider {
 
   Future<void> logout() async {
     await supabase.auth.signOut();
+    // Đăng xuất Google để lần sau hiện lại popup chọn tài khoản
+    await GoogleSignIn.instance.signOut();
   }
 }

@@ -24,8 +24,7 @@ class RegisterController extends GetxController {
   final RxBool isPasswordHidden = true.obs;
   final RxBool isConfirmPasswordHidden = true.obs;
   final RxBool isLoading = false.obs;
-  final RxInt passwordStrength =
-      0.obs; // 0: Trống, 1: Weak, 2: Fair, 3: Good, 4: Strong
+  final RxInt passwordStrength = 0.obs;
 
   // --- HÀM XỬ LÝ GIAO DIỆN ---
   void togglePasswordVisibility() =>
@@ -37,26 +36,24 @@ class RegisterController extends GetxController {
     if (password.isEmpty) {
       passwordStrength.value = 0;
     } else if (password.length < 6) {
-      passwordStrength.value = 1; // Weak
+      passwordStrength.value = 1;
     } else if (password.length < 10) {
-      passwordStrength.value = 2; // Fair
+      passwordStrength.value = 2;
     } else if (!password.contains(RegExp(r'[0-9]')) ||
         !password.contains(RegExp(r'[A-Z]'))) {
-      passwordStrength.value = 3; // Good (thiếu số hoặc chữ hoa)
+      passwordStrength.value = 3;
     } else {
-      passwordStrength.value = 4; // Strong (Dài, có số và chữ hoa)
+      passwordStrength.value = 4;
     }
   }
 
   // --- HÀM XỬ LÝ LOGIC API ---
 
-  /// Đăng ký bằng Email & Mật khẩu
   Future<void> register() async {
     final email = emailController.text.trim();
     final password = passwordController.text;
     final confirmPassword = confirmPasswordController.text;
 
-    // 1. Validate: Không được bỏ trống
     if (email.isEmpty || password.isEmpty || confirmPassword.isEmpty) {
       TSnackbarsWidget.warning(
         title: TTexts.registerErrorEmptyFieldsTitle.tr,
@@ -160,34 +157,43 @@ class RegisterController extends GetxController {
     try {
       FullScreenLoaderUtils.openLoadingDialog(TTexts.loggingIn.tr);
 
-      final account = await authProvider.signInWithGoogle();
+      // Nhận về AuthResponse thay vì GoogleSignInAccount
+      final response = await authProvider.signInWithGoogle();
 
-      if (account == null) {
+      if (response == null || response.user == null) {
         FullScreenLoaderUtils.stopLoading();
-        TSnackbarsWidget.warning(
-          title: TTexts.canceled.tr,
-          message: TTexts.googleSignInCanceled.tr,
-        );
+        // Bỏ qua cảnh báo tắt popup để tránh spam UI, hoặc bật lại nếu bạn muốn
         return;
       }
 
-      // final auth = account.authentication;
-      // final String? idToken = auth.idToken;
+      final user = response.user!;
+
+      debugPrint("=== GOOGLE REGISTER SUCCESS ===");
+      debugPrint("Email: ${user.email}");
+      debugPrint("ID: ${user.id}");
 
       FullScreenLoaderUtils.stopLoading();
 
-      TSnackbarsWidget.success(
-        title: TTexts.registerSuccessTitle.tr,
-        message: TTexts.registerSuccessMessage.tr,
-      );
+      if (response.user != null) {
+        // THÊM ĐOẠN NÀY: Kiểm tra nếu identities rỗng nghĩa là email đã tồn tại
+        if (response.user!.identities != null &&
+            response.user!.identities!.isEmpty) {
+          TSnackbarsWidget.error(
+            title: TTexts.registerFailedTitle.tr,
+            message: "Email này đã được đăng ký. Vui lòng đăng nhập!",
+          );
+          return;
+        }
 
-      Get.offAllNamed(AppRoutes.main);
-    } on SocketException catch (_) {
-      FullScreenLoaderUtils.stopLoading();
-      TSnackbarsWidget.error(
-        title: TTexts.netErrorTitle.tr,
-        message: TTexts.netErrorDescription.tr,
-      );
+        // Hiện thông báo thành công và chuyển trang như cũ
+        TSnackbarsWidget.success(
+          title: "Đăng ký thành công!",
+          message: "Vui lòng chọn đăng nhập lại bằng tài khoản google.",
+        );
+        Get.toNamed(
+          AppRoutes.login,
+        );
+      }
     } catch (e) {
       FullScreenLoaderUtils.stopLoading();
       TSnackbarsWidget.error(

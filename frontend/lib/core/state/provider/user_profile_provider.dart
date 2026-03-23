@@ -5,12 +5,14 @@ import 'package:frontend/core/infrastructure/network/app_client.dart';
 class UserProfileProvider {
   final _apiClient = ApiClient();
 
-  Future<void> createUserProfile() async {
+  Future<void> createUserProfile({String fullName = ""}) async {
     try {
       await _apiClient.post(
         '/api/auth/me/profile',
         data: {
-          "fullName": "user@${DateTime.now().millisecondsSinceEpoch}",
+          "fullName": fullName != ""
+              ? fullName
+              : "user@${DateTime.now().millisecondsSinceEpoch}",
         },
       );
 
@@ -22,14 +24,12 @@ class UserProfileProvider {
 
   Future<UserProfileModel> fetchMyProfile() async {
     try {
-      // Gọi API GET /auth/me (Endpoint này cần trùng với Route ở Backend)
       final response = await _apiClient.get('/api/auth/me');
-      // print("Dữ liệu từ Server: ${response.data}");
       final Map<String, dynamic> data = response.data['data'];
 
       return UserProfileModel.fromJson(data);
     } catch (e) {
-      rethrow; // Đẩy lỗi về cho Controller xử lý
+      rethrow;
     }
   }
 }
