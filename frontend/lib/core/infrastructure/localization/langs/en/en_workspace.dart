@@ -29,7 +29,7 @@ final Map<String, String> enWorkspace = {
       "Are you sure you want to create a new workspace named",
   TTexts.workspaceCreatedTitle: "Workspace Created!",
   TTexts.workspaceCreatedDesc: "is ready for business.",
-  TTexts.youAreManager: "Workspace Manager",
+  TTexts.youAreManager: "Store Manager",
   TTexts.addMembers: "Add Members",
   TTexts.goToDashboard: "Go to Dashboard",
   TTexts.searchAddressHint: "Search for address...",
@@ -39,6 +39,35 @@ final Map<String, String> enWorkspace = {
   TTexts.creatingWorkspace: "Creating your workspace...",
   TTexts.backToWorkspaces: "Back to Workspaces",
   TTexts.gpsOffTitle: "GPS Disabled",
-  TTexts.gpsOffMessage: "Please turn on location services in your system settings.",
-  TTexts.locationErrorMessage: "Could not fetch location. Please try again or type manually.",
+  TTexts.gpsOffMessage:
+      "Please turn on location services in your system settings.",
+  TTexts.locationErrorMessage:
+      "Could not fetch location. Please try again or type manually.",
+      
+  // -- Invite Code & Join Store
+  TTexts.inviteCodeTitle: "Your Invite Code",
+  TTexts.inviteCodeSubtitle:
+      "Share this code with your staff so they can join this store.",
+  TTexts.inviteCodeCopiedTitle: "Copied!",
+  TTexts.inviteCodeCopiedMessage: "Invite code has been copied to clipboard.",
+
+  TTexts.joinWorkspaceTitle: "Join Workspace",
+  TTexts.joinWorkspaceSubtitle:
+      "Enter the 6-character invite code provided by your Manager to connect to the system.",
+  TTexts.enterInviteCodeLabel: "Invite Code",
+  TTexts.enterInviteCodeHint: "e.g., X7B9Q2",
+  TTexts.joinBtn: "Join Now",
+  TTexts.joiningBtn: "Joining...",
+  TTexts.checkingInviteCode: "Checking invite code...",
+
+  TTexts.joinMissingCodeTitle: "Missing Information",
+  TTexts.joinMissingCodeMessage:
+      "Please enter a valid 6-character invite code.",
+  TTexts.joinInvalidCodeTitle: "Invalid Code",
+  TTexts.joinInvalidCodeMessage: "The invite code is incorrect or has expired.",
+  TTexts.joinAlreadyMemberTitle: "Already a Member",
+  TTexts.joinAlreadyMemberMessage:
+      "You are already a member of this workspace.",
+  TTexts.joinSuccessTitle: "Successfully Joined!",
+  TTexts.joinSuccessMessage: "Welcome to the workspace.",
 };

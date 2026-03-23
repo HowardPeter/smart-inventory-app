@@ -1,5 +1,6 @@
 // lib/features/workspace/views/platform/workspace_ready_mobile_view.dart
 import 'package:flutter/material.dart';
+import 'package:frontend/features/workspace/widgets/workspace_ready/workspace_ready_invite_code_widget.dart';
 import 'package:get/get.dart';
 import 'package:frontend/core/infrastructure/constants/image_strings.dart';
 import 'package:frontend/core/ui/theme/app_colors.dart';
@@ -96,6 +97,9 @@ class WorkspaceReadyMobileView extends StatelessWidget {
                   ),
 
                   const Spacer(),
+
+                  // TODO: Đổi lại và ko fix cứng mã mời nữa
+                  const WorkspaceReadyInviteCodeWidget(inviteCode: "X7B9Q2"),
 
                   // 3. ACTIONS (Gọi widget đã tách)
                   const WorkspaceReadyActionsWidget(),

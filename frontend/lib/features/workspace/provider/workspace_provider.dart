@@ -29,4 +29,18 @@ class WorkspaceProvider {
       rethrow; // Ném lỗi ra để Controller dùng TExceptions xử lý
     }
   }
+
+  Future<StoreModel> joinStore(String inviteCode) async {
+    try {
+      final response = await _apiClient.post('/api/stores/join', data: {
+        'inviteCode': inviteCode,
+      });
+
+      // Lấy thông tin cửa hàng vừa join thành công trả về từ Backend
+      final dynamic data = response.data['data'] ?? response.data;
+      return StoreModel.fromJson(data);
+    } catch (e) {
+      rethrow;
+    }
+  }
 }

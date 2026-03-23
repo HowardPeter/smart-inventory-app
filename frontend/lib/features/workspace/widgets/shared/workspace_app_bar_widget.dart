@@ -6,9 +6,9 @@ import 'package:frontend/core/ui/theme/app_colors.dart';
 import 'package:frontend/core/ui/theme/app_sizes.dart';
 import 'package:frontend/core/infrastructure/constants/text_strings.dart';
 
-class CreateStoreAppBarWidget extends StatelessWidget
+class WorkspaceAppBarWidget extends StatelessWidget
     implements PreferredSizeWidget {
-  const CreateStoreAppBarWidget({super.key});
+  const WorkspaceAppBarWidget({super.key});
 
   @override
   Widget build(BuildContext context) {

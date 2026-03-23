@@ -78,7 +78,7 @@ class StoreSelectionController extends GetxController with TErrorHandler {
   }
 
   void goToJoinStore() {
-    // Get.toNamed(AppRoutes.joinStore);
+    Get.toNamed(AppRoutes.joinStore);
   }
 
   void showHelpBottomSheet() {

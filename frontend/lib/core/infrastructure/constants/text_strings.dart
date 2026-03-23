@@ -199,6 +199,29 @@ class TTexts {
   static const String gpsOffMessage = "gps_off_message";
   static const String locationErrorMessage = "location_error_message";
 
+  // -- Invite Code & Join Store
+  static const String inviteCodeTitle = "invite_code_title";
+  static const String inviteCodeSubtitle = "invite_code_subtitle";
+  static const String inviteCodeCopiedTitle = "invite_code_copied_title";
+  static const String inviteCodeCopiedMessage = "invite_code_copied_message";
+
+  static const String joinWorkspaceTitle = "join_workspace_title";
+  static const String joinWorkspaceSubtitle = "join_workspace_subtitle";
+  static const String enterInviteCodeLabel = "enter_invite_code_label";
+  static const String enterInviteCodeHint = "enter_invite_code_hint";
+  static const String joinBtn = "join_btn";
+  static const String joiningBtn = "joining_btn";
+  static const String checkingInviteCode = "checking_invite_code";
+
+  static const String joinMissingCodeTitle = "join_missing_code_title";
+  static const String joinMissingCodeMessage = "join_missing_code_message";
+  static const String joinInvalidCodeTitle = "join_invalid_code_title";
+  static const String joinInvalidCodeMessage = "join_invalid_code_message";
+  static const String joinAlreadyMemberTitle = "join_already_member_title";
+  static const String joinAlreadyMemberMessage = "join_already_member_message";
+  static const String joinSuccessTitle = "join_success_title";
+  static const String joinSuccessMessage = "join_success_message";
+
   // -- Home
   static const String homeRoleManagerTooltip = "home_role_manager_tooltip";
   static const String homeRoleStaffTooltip = "home_role_staff_tooltip";
@@ -223,6 +246,7 @@ class TTexts {
   static const String homeInboundShipment = "home_inbound_shipment";
   static const String homeOutboundDelivery = "home_outbound_delivery";
   static const String homeStockAdjustment = "home_stock_adjustment";
+
   // Empty State
   static const String emptyTransactionTitle = "empty_transaction_title";
   static const String emptyTransactionSubtitle = "empty_transaction_subtitle";
