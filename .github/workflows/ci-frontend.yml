@@ -30,7 +30,13 @@ jobs:
         with:
           flutter-version: "3.35.4"
           channel: "stable"
-          cache: true # Bật cache để chạy nhanh hơn
+          cache: true 
+
+      - name: Create dummy .env file
+        run: |
+          echo "API_BASE_URL=http://localhost:3000" > .env
+          echo "SUPABASE_URL=http://localhost:54321" >> .env
+          echo "SUPABASE_ANON_KEY=dummy_key" >> .env
 
       - name: Install dependencies
         run: flutter pub get
@@ -55,6 +61,12 @@ jobs:
           flutter-version: "3.35.4"
           channel: "stable"
           cache: true
+
+      - name: Create dummy .env file
+        run: |
+          echo "API_BASE_URL=http://localhost:3000" > .env
+          echo "SUPABASE_URL=http://localhost:54321" >> .env
+          echo "SUPABASE_ANON_KEY=dummy_key" >> .env
 
       - name: Install dependencies
         run: flutter pub get
