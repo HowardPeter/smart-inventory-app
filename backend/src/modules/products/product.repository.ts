@@ -7,6 +7,7 @@ import { prisma } from '../../db/prismaClient.js';
 import type {
   CreateProductData,
   UpdateProductDto,
+  ProductResponseDto,
   DetailProductResponseDto,
   ListProductsQueryDto,
   ProductListItemDto,
@@ -57,7 +58,6 @@ export class ProductRepository {
             select: {
               categoryId: true,
               name: true,
-              description: true,
             },
           },
         },
@@ -77,7 +77,7 @@ export class ProductRepository {
     storeId: string,
     productId: string,
   ): Promise<DetailProductResponseDto | null> {
-    return await prisma.product.findFirst({
+    const detailProduct = await prisma.product.findFirst({
       where: {
         productId,
         storeId,
@@ -96,14 +96,54 @@ export class ProductRepository {
           select: {
             categoryId: true,
             name: true,
-            description: true,
+          },
+        },
+        productPackages: {
+          where: {
+            activeStatus: 'active',
+          },
+          orderBy: {
+            displayName: 'asc',
+          },
+          select: {
+            productPackageId: true,
+            displayName: true,
+            importPrice: true,
+            sellingPrice: true,
+            barcodeValue: true,
+            barcodeType: true,
+            unit: {
+              select: {
+                unitId: true,
+                name: true,
+              },
+            },
+            inventory: {
+              select: {
+                inventoryId: true,
+                quantity: true,
+                reorderThreshold: true,
+              },
+            },
           },
         },
       },
     });
+
+    // convert importPrice, sellingPrice từ Prisma Decimal sang number | null
+    return detailProduct
+      ? {
+          ...detailProduct,
+          productPackages: detailProduct.productPackages.map((packageItem) => ({
+            ...packageItem,
+            importPrice: packageItem.importPrice?.toNumber() ?? null,
+            sellingPrice: packageItem.sellingPrice?.toNumber() ?? null,
+          })),
+        }
+      : null;
   }
 
-  async createOne(data: CreateProductData): Promise<DetailProductResponseDto> {
+  async createOne(data: CreateProductData): Promise<ProductResponseDto> {
     return await prisma.product.create({
       data,
       select: {
@@ -119,7 +159,6 @@ export class ProductRepository {
           select: {
             categoryId: true,
             name: true,
-            description: true,
           },
         },
       },
@@ -129,7 +168,7 @@ export class ProductRepository {
   async updateOne(
     productId: string,
     data: UpdateProductDto,
-  ): Promise<DetailProductResponseDto> {
+  ): Promise<ProductResponseDto> {
     return await prisma.product.update({
       where: { productId },
       data,
@@ -146,7 +185,6 @@ export class ProductRepository {
           select: {
             categoryId: true,
             name: true,
-            description: true,
           },
         },
       },
