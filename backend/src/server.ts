@@ -1,6 +1,6 @@
 import express from 'express';
 
-import { errorHandler } from './common/middlewares/index.js';
+import { errorHandler, pinoLogger } from './common/middlewares/index.js';
 import { sendResponse } from './common/utils/index.js';
 import { categoryRouter } from './modules/categories/index.js';
 import {
@@ -19,8 +19,10 @@ const port = 3000;
 
 app.use(express.json());
 
+app.use(pinoLogger);
+
 app.get('/api/health', (_req: Request, res: Response<ApiResponse<null>>) => {
-  return sendResponse.success(res, null, { message: 'ok' });
+  sendResponse.success(res, null, { message: 'ok' });
 });
 
 app.use('/api/stores', storeRouter);
