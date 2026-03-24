@@ -2,10 +2,14 @@ import express from 'express';
 
 import { errorHandler } from './common/middlewares/index.js';
 import { sendResponse } from './common/utils/index.js';
+import { categoryRouter } from './modules/categories/index.js';
+import {
+  productPackageRouter,
+  productPackageProductRouter,
+} from './modules/product-packages/index.js';
 import { productRouter } from './modules/products/index.js';
 import { storeRouter } from './modules/stores/index.js';
 import { userProfileRouter } from './modules/user-profile/index.js';
-import { categoryRouter } from '../src/modules/categories/index.js';
 
 import type { ApiResponse } from './common/types/index.js';
 import type { Request, Response } from 'express';
@@ -20,9 +24,10 @@ app.get('/api/health', (_req: Request, res: Response<ApiResponse<null>>) => {
 });
 
 app.use('/api/stores', storeRouter);
-app.use('/api/products', productRouter);
+app.use('/api/products', [productRouter, productPackageProductRouter]);
 app.use('/api/categories', categoryRouter);
 app.use('/api/auth', userProfileRouter);
+app.use('/api/product-packages', productPackageRouter);
 
 app.use(errorHandler);
 
