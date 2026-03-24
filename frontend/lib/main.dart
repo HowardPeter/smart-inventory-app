@@ -19,10 +19,13 @@ import 'core/ui/theme/app_theme.dart';
 void main() async {
   // Đảm bảo Flutter core đã được khởi tạo trước khi chạy các setup khác
   WidgetsFlutterBinding.ensureInitialized();
-  await dotenv.load(fileName: ".env");
+  try {
+    await dotenv.load(fileName: ".env");
+  } catch (e) {
+    debugPrint("⚠️ .env not found, using default values");
+  }
   // ---------------------------------------------------------
   // KHỞI TẠO CÁC DỊCH VỤ TOÀN CẦU (GLOBAL SERVICES) Ở ĐÂY
-  // Ví dụ: Get.put(ApiClient());
 
   // 1. Khởi tạo GetStorage
   await GetStorage.init();
