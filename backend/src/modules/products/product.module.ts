@@ -9,5 +9,6 @@ const productService = new ProductService(
   productRepository,
   categoryRepository,
 );
+const productController = new ProductController(productService);
 
-export const productController = new ProductController(productService);
+export { productService, productController };
