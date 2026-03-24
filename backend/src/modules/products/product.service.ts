@@ -10,7 +10,7 @@ import { CategoryRepository } from '../categories/index.js';
 
 import type {
   CreateProductData,
-  DetailProductResponseDto,
+  ProductResponseDto,
   UpdateProductDto,
   ListProductsQueryDto,
   ListProductsResponseDto,
@@ -57,7 +57,7 @@ export class ProductService {
   async getProductById(
     storeId: string,
     productId: string,
-  ): Promise<DetailProductResponseDto> {
+  ): Promise<ProductResponseDto> {
     const product = await this.productRepository.findOne(storeId, productId);
 
     if (!product) {
@@ -72,7 +72,7 @@ export class ProductService {
 
   async createProduct(
     data: CreateProductData,
-  ): Promise<DetailProductResponseDto> {
+  ): Promise<ProductResponseDto> {
     const category = await this.categoryRepository.findById(data.categoryId);
 
     if (!category) {
@@ -89,7 +89,7 @@ export class ProductService {
     storeId: string,
     productId: string,
     data: UpdateProductDto,
-  ): Promise<DetailProductResponseDto> {
+  ): Promise<ProductResponseDto> {
     await this.checkProductExisted(storeId, productId);
 
     if (data.categoryId) {
