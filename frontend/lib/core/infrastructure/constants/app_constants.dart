@@ -1,14 +1,19 @@
-import 'package:flutter_dotenv/flutter_dotenv.dart';
-
 class AppConstants {
-  static String get baseUrl =>
-      dotenv.env['API_BASE_URL'] ?? 'http://10.0.2.2:3000';
+  // Dùng String.fromEnvironment thay cho dotenv
+  static const String baseUrl = String.fromEnvironment(
+    'API_BASE_URL',
+    defaultValue: 'http://10.0.2.2:3000',
+  );
 
-  static String get supabaseUrl =>
-      dotenv.env['SUPABASE_URL'] ?? 'http://10.0.2.2:54321';
+  static const String supabaseUrl = String.fromEnvironment(
+    'SUPABASE_URL',
+    defaultValue: 'http://10.0.2.2:54321',
+  );
 
-  static String get supabaseAnonKey =>
-      dotenv.env['SUPABASE_ANON_KEY'] ?? 'YOUR_SUPABASE_ANON_KEY';
+  static const String supabaseAnonKey = String.fromEnvironment(
+    'SUPABASE_ANON_KEY',
+    defaultValue: 'YOUR_SUPABASE_ANON_KEY',
+  );
 
   // Thời gian chờ API (Timeout)
   static const int connectionTimeout = 15000;
