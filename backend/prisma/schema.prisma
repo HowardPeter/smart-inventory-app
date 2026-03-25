@@ -54,6 +54,12 @@ enum AuditActionType {
   delete
 }
 
+enum AdjustmentType {
+  set
+  increase
+  decrease
+}
+
 model UserProfile {
   userId       String       @id @default(uuid()) @map("user_id")
   authUserId   String?      @unique @map("auth_user_id")
@@ -164,19 +170,34 @@ model ProductPackage {
 
   unit               Unit                @relation(fields: [unitId], references: [unitId])
   product            Product             @relation(fields: [productId], references: [productId])
-  inventories        Inventory[]
+  inventory           Inventory?
   transactionDetails TransactionDetail[]
 }
 
 model Inventory {
-  inventoryId      String   @id @default(uuid()) @map("inventory_id")
+ inventoryId      String   @id @default(uuid()) @map("inventory_id")
   quantity         Int
   reorderThreshold Int?     @map("reorder_threshold")
   lastCount        Int?     @map("last_count")
   updatedAt        DateTime @updatedAt @map("updated_at")
-  productPackageId String   @map("product_package_id")
+  activeStatus     ActiveStatus @default(active) @map("active_status")
+  productPackageId String   @unique @map("product_package_id")
+  productPackage   ProductPackage @relation(fields: [productPackageId], references: [productPackageId])
+  adjustments      InventoryAdjustment[]
+}
 
-  productPackage ProductPackage @relation(fields: [productPackageId], references: [productPackageId])
+model InventoryAdjustment {
+  inventoryAdjustmentId String         @id @default(uuid()) @map("inventory_adjustment_id")
+  inventoryId           String         @map("inventory_id")
+  previousQuantity      Int            @map("previous_quantity")
+  currentQuantity       Int            @map("current_quantity")
+  changedQuantity       Int            @map("changed_quantity")
+  type                  AdjustmentType
+  reason                String?
+  note                  String?
+  createdBy             String         @map("created_by") // Lưu userId người thao tác
+  createdAt             DateTime       @default(now()) @map("created_at")
+  inventory             Inventory      @relation(fields: [inventoryId], references: [inventoryId])
 }
 
 model TransactionDetail {

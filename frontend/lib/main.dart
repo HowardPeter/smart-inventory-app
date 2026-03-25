@@ -33,6 +33,8 @@ void main() async {
   // 3. Khởi tạo supabase để kích hoạt các tính năng authen
   await Supabase.initialize(
     url: 'http://10.0.2.2:54321',
+    // Sử dụng cho tạo máy thật
+    //  url: 'http://192.168.1.26:54321',
     anonKey: 'YOUR_SUPABASE_ANON_KEY',
   );
 

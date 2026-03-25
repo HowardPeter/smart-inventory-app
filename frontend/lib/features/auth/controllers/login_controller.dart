@@ -77,6 +77,9 @@ class LoginController extends GetxController {
       // TẠO PROFILE (Nếu đây là lần đầu)
       await UserProfileProvider().createUserProfile();
 
+      debugPrint(
+          "Token: ${Supabase.instance.client.auth.currentSession!.accessToken}");
+
       // NẠP DỮ LIỆU USER VÀO RAM (UserService)
       final isProfileLoaded =
           await Get.find<UserService>().fetchAndSaveProfile();
