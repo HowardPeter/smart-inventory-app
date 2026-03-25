@@ -338,6 +338,7 @@ export class InventoryRepository {
           entityType: 'Inventory',
           userId: userId,
           storeId: storeId,
+          note: note ?? null,
           oldValue: {
             quantity: currentInventory.quantity,
           },
@@ -346,7 +347,7 @@ export class InventoryRepository {
             changedQuantity: changedQty,
             adjustmentType: type,
             reason: reason ?? null,
-            note: note ?? null,
+            // note: note ?? null,
             productPackageId: currentInventory.productPackageId,
           },
         },

@@ -201,6 +201,7 @@ model AuditLog {
   performedAt DateTime         @default(now()) @map("performed_at")
   userId      String           @map("user_id")
   storeId     String           @map("store_id")
+  note        String?           
 
   user  UserProfile @relation(fields: [userId], references: [userId])
   store Store       @relation(fields: [storeId], references: [storeId])
