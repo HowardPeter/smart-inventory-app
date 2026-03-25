@@ -2,9 +2,9 @@ import {
   getPaginationSkip,
   normalizePagination,
 } from '../../../common/utils/index.js';
-import { prisma } from '../../../db/prismaClient.js';
 import { Prisma } from '../../../generated/prisma/client.js';
 
+import type { DbClient } from '../../../common/types/index.js';
 import type {
   CreateInventoryDto,
   InventoryAdjustmentResponseDto,
@@ -61,6 +61,8 @@ const inventorySelect = {
 với cơ sở dữ liệu (Prisma) cho module Inventory.
 Chỉ chứa logic truy xuất và lưu trữ dữ liệu, không chứa business logic. */
 export class InventoryRepository {
+  constructor(private readonly prisma: DbClient) {}
+
   // Xác định trạng thái tồn kho dựa trên số lượng thực tế và ngưỡng cảnh báo
   private mapInventoryStatus(
     quantity: number,
@@ -164,15 +166,15 @@ export class InventoryRepository {
 
     const where = this.buildInventoryWhere(storeId, query);
 
-    const [rawItems, totalItems] = await prisma.$transaction([
-      prisma.inventory.findMany({
+    const [rawItems, totalItems] = await this.prisma.$transaction([
+      this.prisma.inventory.findMany({
         where,
         orderBy: { [sortBy]: sortOrder },
         skip: getPaginationSkip({ page, limit }),
         take: limit,
         select: inventorySelect,
       }),
-      prisma.inventory.count({ where }),
+      this.prisma.inventory.count({ where }),
     ]);
 
     let items = rawItems.map((item) => this.toInventoryListItem(item));
@@ -226,7 +228,7 @@ export class InventoryRepository {
         ${categoryCondition}
     `;
 
-    const totalRaw = await prisma.$queryRaw<{ count: bigint }[]>`
+    const totalRaw = await this.prisma.$queryRaw<{ count: bigint }[]>`
       SELECT COUNT(i.inventory_id) as count
       ${commonJoinsAndWhere}
     `;
@@ -236,7 +238,7 @@ export class InventoryRepository {
       return { items: [], totalItems: 0 };
     }
 
-    const idsRaw = await prisma.$queryRaw<{ inventory_id: string }[]>`
+    const idsRaw = await this.prisma.$queryRaw<{ inventory_id: string }[]>`
       SELECT i.inventory_id
       ${commonJoinsAndWhere}
       ORDER BY i.updated_at DESC
@@ -245,7 +247,7 @@ export class InventoryRepository {
 
     const inventoryIds = idsRaw.map((row) => row.inventory_id);
 
-    const rawItems = await prisma.inventory.findMany({
+    const rawItems = await this.prisma.inventory.findMany({
       where: {
         inventoryId: { in: inventoryIds },
       },
@@ -262,7 +264,7 @@ export class InventoryRepository {
     storeId: string,
     productPackageId: string,
   ): Promise<InventoryDetailResponseDto | null> {
-    const inventory = await prisma.inventory.findFirst({
+    const inventory = await this.prisma.inventory.findFirst({
       where: {
         productPackageId,
         activeStatus: 'active',
@@ -285,7 +287,7 @@ export class InventoryRepository {
     inventoryId: string,
     data: UpdateInventoryDto,
   ): Promise<InventoryDetailResponseDto> {
-    const inventory = await prisma.inventory.update({
+    const inventory = await this.prisma.inventory.update({
       where: { inventoryId },
       data,
       select: inventorySelect,
@@ -305,7 +307,7 @@ export class InventoryRepository {
   ): Promise<InventoryAdjustmentResponseDto | null> {
     // NOTE: Sử dụng transaction để đảm bảo việc thay đổi số lượng kho
     // và ghi AuditLog luôn thành công hoặc thất bại cùng lúc
-    return await prisma.$transaction(async (tx) => {
+    return await this.prisma.$transaction(async (tx) => {
       const currentInventory = await tx.inventory.findUnique({
         where: { inventoryId },
         select: {
@@ -369,7 +371,7 @@ export class InventoryRepository {
     storeId: string,
     productPackageId: string,
   ): Promise<boolean> {
-    const count = await prisma.productPackage.count({
+    const count = await this.prisma.productPackage.count({
       where: { productPackageId, product: { storeId } },
     });
 
@@ -377,7 +379,7 @@ export class InventoryRepository {
   }
 
   async getInventoryStatusByProductPackageId(productPackageId: string) {
-    return await prisma.inventory.findUnique({
+    return await this.prisma.inventory.findUnique({
       where: { productPackageId },
       select: { inventoryId: true, activeStatus: true },
     });
@@ -389,7 +391,7 @@ export class InventoryRepository {
   ): Promise<InventoryDetailResponseDto> {
     // NOTE: Khôi phục trạng thái kho thay vì tạo dòng mới để tránh vi phạm
     // Unique Constraint của Database
-    const inventory = await prisma.inventory.update({
+    const inventory = await this.prisma.inventory.update({
       where: { inventoryId },
       data: {
         quantity: data.quantity,
@@ -404,7 +406,7 @@ export class InventoryRepository {
   }
 
   async create(data: CreateInventoryDto): Promise<InventoryDetailResponseDto> {
-    const inventory = await prisma.inventory.create({
+    const inventory = await this.prisma.inventory.create({
       data: {
         productPackageId: data.productPackageId,
         quantity: data.quantity,
@@ -417,10 +419,19 @@ export class InventoryRepository {
     return this.toInventoryListItem(inventory);
   }
 
+  async softDeleteOneByPackageId(productPackageId: string): Promise<void> {
+    await this.prisma.inventory.update({
+      where: { productPackageId },
+      data: {
+        activeStatus: 'inactive',
+      },
+    });
+  }
+
   async delete(inventoryId: string): Promise<void> {
     // NOTE: Chỉ cập nhật trạng thái sang inactive
     // để giữ lại toàn bộ lịch sử (soft-delete)
-    await prisma.inventory.update({
+    await this.prisma.inventory.update({
       where: { inventoryId },
       data: { activeStatus: 'inactive' },
     });
