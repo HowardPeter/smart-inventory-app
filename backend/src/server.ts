@@ -2,7 +2,9 @@ import express from 'express';
 
 import { errorHandler, pinoLogger } from './common/middlewares/index.js';
 import { sendResponse } from './common/utils/index.js';
+import { auditLogRouter } from './modules/audit-log/audit-log.route.js';
 import { categoryRouter } from './modules/categories/index.js';
+import { inventoryRouter } from './modules/inventories/inventory.route.js';
 import {
   productPackageRouter,
   productPackageProductRouter,
@@ -30,6 +32,8 @@ app.use('/api/products', [productRouter, productPackageProductRouter]);
 app.use('/api/categories', categoryRouter);
 app.use('/api/auth', userProfileRouter);
 app.use('/api/product-packages', productPackageRouter);
+app.use('/api/inventories', inventoryRouter);
+app.use('/api/audit-logs', auditLogRouter);
 
 app.use(errorHandler);
 
