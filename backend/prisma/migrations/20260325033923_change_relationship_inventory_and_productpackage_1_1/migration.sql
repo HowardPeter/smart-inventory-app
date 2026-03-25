@@ -6,6 +6,3 @@
 */
 -- AlterTable
 ALTER TABLE "Inventory" ADD COLUMN     "active_status" "ActiveStatus" NOT NULL DEFAULT 'active';
-
--- CreateIndex
-CREATE UNIQUE INDEX "Inventory_product_package_id_key" ON "Inventory"("product_package_id");

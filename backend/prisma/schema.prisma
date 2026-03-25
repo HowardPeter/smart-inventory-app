@@ -169,14 +169,15 @@ model ProductPackage {
 }
 
 model Inventory {
- inventoryId      String   @id @default(uuid()) @map("inventory_id")
+  inventoryId      String       @id @default(uuid()) @map("inventory_id")
   quantity         Int
-  reorderThreshold Int?     @map("reorder_threshold")
-  lastCount        Int?     @map("last_count")
-  updatedAt        DateTime @updatedAt @map("updated_at")
+  reorderThreshold Int?         @map("reorder_threshold")
+  lastCount        Int?         @map("last_count")
+  updatedAt        DateTime     @updatedAt @map("updated_at")
   activeStatus     ActiveStatus @default(active) @map("active_status")
-  productPackageId String   @unique @map("product_package_id")
-  productPackage   ProductPackage @relation(fields: [productPackageId], references: [productPackageId])
+  productPackageId String       @unique @map("product_package_id")
+
+  productPackage ProductPackage @relation(fields: [productPackageId], references: [productPackageId])
 }
 
 model TransactionDetail {
