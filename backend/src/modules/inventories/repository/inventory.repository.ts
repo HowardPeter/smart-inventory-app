@@ -15,6 +15,8 @@ import type {
 } from '../dto/inventory.dto.js';
 import type { AdjustmentType, InventoryStatus } from '../inventory.type.js';
 
+// Định nghĩa sẵn object select chung để đồng bộ
+// shape dữ liệu trả về trong toàn bộ các query
 const inventorySelect = {
   inventoryId: true,
   quantity: true,
@@ -55,7 +57,11 @@ const inventorySelect = {
   },
 } satisfies Prisma.InventorySelect;
 
+/* Lớp Repository chịu trách nhiệm tương tác trực tiếp
+với cơ sở dữ liệu (Prisma) cho module Inventory.
+Chỉ chứa logic truy xuất và lưu trữ dữ liệu, không chứa business logic. */
 export class InventoryRepository {
+  // Xác định trạng thái tồn kho dựa trên số lượng thực tế và ngưỡng cảnh báo
   private mapInventoryStatus(
     quantity: number,
     reorderThreshold: number | null,
@@ -101,6 +107,8 @@ export class InventoryRepository {
     };
   }
 
+  // Xây dựng tập điều kiện lọc động
+  // (tìm kiếm theo tên, thương hiệu, hoặc mã vạch)
   private buildInventoryWhere(
     storeId: string,
     query?: Partial<ListInventoriesQueryDto>,
@@ -179,6 +187,9 @@ export class InventoryRepository {
     };
   }
 
+  /* Thực thi truy vấn lấy danh sách hàng hóa sắp hết (Low-Stock) bằng Raw SQL.
+  Lý do: Prisma hiện tại không hỗ trợ việc so sánh trực tiếp giá trị giữa 2 cột
+  cùng một bảng (cụ thể là i.quantity <= i.reorder_threshold). */
   async findLowStockByStoreId(
     storeId: string,
     query: ListInventoriesQueryDto,
@@ -292,6 +303,8 @@ export class InventoryRepository {
     reason?: string | null,
     note?: string | null,
   ): Promise<InventoryAdjustmentResponseDto | null> {
+    // NOTE: Sử dụng transaction để đảm bảo việc thay đổi số lượng kho
+    // và ghi AuditLog luôn thành công hoặc thất bại cùng lúc
     return await prisma.$transaction(async (tx) => {
       const currentInventory = await tx.inventory.findUnique({
         where: { inventoryId },
@@ -374,6 +387,8 @@ export class InventoryRepository {
     inventoryId: string,
     data: CreateInventoryDto,
   ): Promise<InventoryDetailResponseDto> {
+    // NOTE: Khôi phục trạng thái kho thay vì tạo dòng mới để tránh vi phạm
+    // Unique Constraint của Database
     const inventory = await prisma.inventory.update({
       where: { inventoryId },
       data: {
@@ -403,6 +418,8 @@ export class InventoryRepository {
   }
 
   async delete(inventoryId: string): Promise<void> {
+    // NOTE: Chỉ cập nhật trạng thái sang inactive
+    // để giữ lại toàn bộ lịch sử (soft-delete)
     await prisma.inventory.update({
       where: { inventoryId },
       data: { activeStatus: 'inactive' },

@@ -1,3 +1,9 @@
+/* Định nghĩa các schema kiểm tra dữ liệu đầu vào (validation)
+bằng thư viện Zod cho module Inventory.
+Các middleware trong file này sẽ được gắn vào
+Route để chặn các request không hợp lệ
+trước khi chúng đi vào xử lý tại Controller. */
+
 import { z } from 'zod';
 
 import { validateSchema } from '../../../common/utils/index.js';
@@ -8,6 +14,8 @@ const paramsSchema = z.object({
   productPackageId: z.uuid('Invalid productPackageId'),
 });
 
+// Tự động ép kiểu (coerce) và gán giá trị mặc định
+// (default) cho các tham số phân trang, sắp xếp
 const listInventoriesQuerySchema = z.object({
   page: z.coerce.number().int().min(1).optional().default(1),
   limit: z.coerce.number().int().min(1).max(100).optional().default(10),
@@ -26,6 +34,8 @@ const updateInventoryBodySchema = z
     reorderThreshold: z.number().int().min(0).nullable().optional(),
     lastCount: z.number().int().min(0).nullable().optional(),
   })
+  // NOTE: Sử dụng hàm refine để đảm bảo người dùng gửi lên ít nhất 1 trường
+  //  cần cập nhật, tránh payload rỗng
   .refine(
     (data) => Object.keys(data).length > 0,
     'Request body cannot be empty',
@@ -45,6 +55,8 @@ const createInventoryBodySchema = z.object({
   lastCount: z.number().int().min(0).nullable().optional(),
 });
 
+// Middleware lưu trữ kết quả query đã validate
+// an toàn vào res.locals để Controller truy xuất
 export const validateGetInventories = (
   req: Request,
   res: Response,
@@ -109,6 +121,7 @@ export const validateCreateInventory = (
   next: NextFunction,
 ): void => {
   req.body = validateSchema(createInventoryBodySchema, req.body);
+
   next();
 };
 
@@ -118,5 +131,6 @@ export const validateDeleteInventory = (
   next: NextFunction,
 ): void => {
   req.params = validateSchema(paramsSchema, req.params);
+
   next();
 };

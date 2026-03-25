@@ -18,9 +18,15 @@ import type {
   UpdateInventoryDto,
 } from '../dto/inventory.dto.js';
 
+/* Service xử lý business logic cho module Inventory.
+Chịu trách nhiệm kiểm tra tính hợp lệ của dữ liệu,
+áp dụng các ràng buộc nghiệp vụ
+trước khi gọi Repository để thao tác với cơ sở dữ liệu. */
 export class InventoryService {
   constructor(private readonly inventoryRepository: InventoryRepository) {}
 
+  // Hàm helper dùng chung để kiểm tra sự tồn tại của kho hàng,
+  // ném lỗi 404 nếu không tìm thấy
   private async getExistingInventory(
     storeId: string,
     productPackageId: string,
@@ -106,6 +112,7 @@ export class InventoryService {
 
     let nextQuantity = existingInventory.quantity;
 
+    // NOTE: Tính toán số lượng tồn kho mới dựa trên loại điều chỉnh
     if (data.type === 'set') {
       nextQuantity = data.quantity;
     } else if (data.type === 'increase') {
@@ -114,6 +121,7 @@ export class InventoryService {
       nextQuantity = existingInventory.quantity - data.quantity;
     }
 
+    // Đảm bảo số lượng tồn kho không được phép âm theo quy định nghiệp vụ
     if (nextQuantity < 0) {
       throw new CustomError({
         message: 'Inventory quantity cannot be negative',
@@ -145,6 +153,8 @@ export class InventoryService {
     storeId: string,
     data: CreateInventoryDto,
   ): Promise<InventoryDetailResponseDto> {
+    // Kiểm tra xem sản phẩm có thực sự thuộc quyền sở hữu
+    // của cửa hàng hiện tại không
     const isBelongsToStore =
       await this.inventoryRepository.checkProductPackageBelongsToStore(
         storeId,
@@ -158,6 +168,8 @@ export class InventoryService {
       });
     }
 
+    // Kiểm tra trạng thái tồn kho hiện tại
+    // để quyết định luồng tạo mới hoặc khôi phục
     const existingInventory =
       await this.inventoryRepository.getInventoryStatusByProductPackageId(
         data.productPackageId,
@@ -171,6 +183,8 @@ export class InventoryService {
           status: StatusCodes.CONFLICT,
         });
       } else {
+        // Khôi phục lại kho đã bị xóa mềm (inactive)
+        // thay vì tạo mới để tránh lỗi duplicate khóa unique
         return await this.inventoryRepository.restoreInventory(
           existingInventory.inventoryId,
           data,
@@ -178,6 +192,7 @@ export class InventoryService {
       }
     }
 
+    // Nếu dữ liệu chưa từng tồn tại, tiến hành tạo mới hoàn toàn
     return await this.inventoryRepository.create(data);
   }
 

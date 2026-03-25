@@ -20,6 +20,9 @@ import type {
 } from '../dto/inventory.dto.js';
 import type { Request, Response } from 'express';
 
+/* Controller xử lý các luồng request liên quan đến quản lý kho (Inventory),
+bao gồm tra cứu, thiết lập cấu hình và
+điều chỉnh số lượng tồn kho thực tế của cửa hàng. */
 export class InventoryController {
   constructor(private readonly inventoryService: InventoryService) {}
 
@@ -43,6 +46,8 @@ export class InventoryController {
   ): Promise<void> => {
     const storeId = requireReqStoreContext(req).storeId;
 
+    // Truy vấn danh sách các mặt hàng có số lượng chạm
+    // hoặc dưới mức cảnh báo (reorderThreshold)
     const inventories =
       await this.inventoryService.getLowStockInventoriesByStoreId(
         storeId,
@@ -75,6 +80,8 @@ export class InventoryController {
     const storeId = requireReqStoreContext(req).storeId;
     const { productPackageId } = req.params;
 
+    // Chỉ cập nhật thông số cấu hình kho
+    // (reorderThreshold, lastCount), không can thiệp số lượng
     const inventory = await this.inventoryService.updateInventory(
       storeId,
       productPackageId as string,
@@ -92,6 +99,9 @@ export class InventoryController {
     const userId = requireReqUser(req).userId;
     const { productPackageId } = req.params;
 
+    /* Xử lý điều chỉnh số lượng kho (nhập/xuất/cân bằng).
+    NOTE: Luồng này bắt buộc truyền userId để
+    lưu lịch sử vào AuditLog nhằm mục đích kiểm toán. */
     const adjustedInventory = await this.inventoryService.adjustInventory(
       storeId,
       productPackageId as string,
@@ -125,6 +135,8 @@ export class InventoryController {
     const storeId = requireReqStoreContext(req).storeId;
     const { productPackageId } = req.params;
 
+    // NOTE: Theo quy định hệ thống, đây là thao tác xóa mềm
+    // (soft-delete) để bảo toàn dữ liệu lịch sử
     await this.inventoryService.deleteInventory(
       storeId,
       productPackageId as string,
