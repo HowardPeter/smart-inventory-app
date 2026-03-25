@@ -5,7 +5,6 @@ import {
   buildPaginatedResponse,
   normalizePagination,
 } from '../../../common/utils/index.js';
-import { prisma } from '../../../db/prismaClient.js';
 import { InventoryRepository } from '../repository/inventory.repository.js';
 
 import type {
@@ -18,7 +17,6 @@ import type {
   LowStockInventoriesResponseDto,
   UpdateInventoryDto,
 } from '../dto/inventory.dto.js';
-import type { AdjustmentType } from '../inventory.type.js';
 
 export class InventoryService {
   constructor(private readonly inventoryRepository: InventoryRepository) {}
@@ -110,13 +108,9 @@ export class InventoryService {
 
     if (data.type === 'set') {
       nextQuantity = data.quantity;
-    }
-
-    if (data.type === 'increase') {
+    } else if (data.type === 'increase') {
       nextQuantity = existingInventory.quantity + data.quantity;
-    }
-
-    if (data.type === 'decrease') {
+    } else if (data.type === 'decrease') {
       nextQuantity = existingInventory.quantity - data.quantity;
     }
 
@@ -127,128 +121,63 @@ export class InventoryService {
       });
     }
 
-    return await this.inventoryRepository.adjustQuantity(
+    const result = await this.inventoryRepository.adjustQuantity(
+      storeId,
       existingInventory.inventoryId,
       data.type,
-      data.quantity,
+      nextQuantity,
       userId,
       data.reason,
       data.note,
     );
-  }
 
-  async adjustQuantity(
-    inventoryId: string,
-    type: AdjustmentType,
-    quantity: number,
-    userId: string,
-    reason?: string | null,
-    note?: string | null,
-  ): Promise<InventoryAdjustmentResponseDto> {
-    return await prisma.$transaction(async (tx) => {
-      const currentInventory = await tx.inventory.findUnique({
-        where: { inventoryId },
-        select: {
-          inventoryId: true,
-          quantity: true,
-          updatedAt: true,
-          productPackageId: true,
-        },
+    if (!result) {
+      throw new CustomError({
+        message: 'Failed to adjust inventory. Record might have been removed.',
+        status: StatusCodes.NOT_FOUND,
       });
+    }
 
-      if (!currentInventory) {
-        throw new Error('Inventory not found');
-      }
-
-      let nextQuantity = currentInventory.quantity;
-
-      switch (type) {
-        case 'set':
-          nextQuantity = quantity;
-          break;
-        case 'increase':
-          nextQuantity = currentInventory.quantity + quantity;
-          break;
-        case 'decrease':
-          nextQuantity = currentInventory.quantity - quantity;
-          break;
-        default:
-          nextQuantity = currentInventory.quantity;
-          break;
-      }
-
-      const changedQty = nextQuantity - currentInventory.quantity;
-
-      // Cập nhật số lượng
-      const updatedInventory = await tx.inventory.update({
-        where: { inventoryId },
-        data: { quantity: nextQuantity },
-        select: {
-          quantity: true,
-          updatedAt: true,
-          productPackageId: true,
-        },
-      });
-
-      // LƯU LỊCH SỬ ĐIỀU CHỈNH
-      await tx.inventoryAdjustment.create({
-        data: {
-          inventoryId,
-          previousQuantity: currentInventory.quantity,
-          currentQuantity: updatedInventory.quantity,
-          changedQuantity: changedQty,
-          type: type,
-          reason: reason ?? null,
-          note: note ?? null,
-          createdBy: userId,
-        },
-      });
-
-      return {
-        productPackageId: updatedInventory.productPackageId,
-        previousQuantity: currentInventory.quantity,
-        currentQuantity: updatedInventory.quantity,
-        changedQuantity: changedQty,
-        adjustmentType: type,
-        reason: reason ?? null,
-        note: note ?? null,
-        updatedAt: updatedInventory.updatedAt,
-      };
-    });
+    return result;
   }
 
   async createInventory(
     storeId: string,
     data: CreateInventoryDto,
   ): Promise<InventoryDetailResponseDto> {
-    // 1. Kiểm tra ProductPackage có tồn tại và thuộc về Store này không
-    const productPackage = await prisma.productPackage.findFirst({
-      where: {
-        productPackageId: data.productPackageId,
-        product: { storeId },
-      },
-    });
+    const isBelongsToStore =
+      await this.inventoryRepository.checkProductPackageBelongsToStore(
+        storeId,
+        data.productPackageId,
+      );
 
-    if (!productPackage) {
+    if (!isBelongsToStore) {
       throw new CustomError({
         message: 'Product Package not found or does not belong to this store',
         status: StatusCodes.NOT_FOUND,
       });
     }
 
-    // 2. Kiểm tra xem mã hàng này đã có kho chưa
-    const existingInventory = await prisma.inventory.findFirst({
-      where: { productPackageId: data.productPackageId },
-    });
+    const existingInventory =
+      await this.inventoryRepository.getInventoryStatusByProductPackageId(
+        data.productPackageId,
+      );
 
     if (existingInventory) {
-      throw new CustomError({
-        message: 'Inventory record already exists for this Product Package',
-        status: StatusCodes.CONFLICT,
-      });
+      if (existingInventory.activeStatus === 'active') {
+        throw new CustomError({
+          message:
+            'Inventory record already exists and is active for this Product Package',
+          status: StatusCodes.CONFLICT,
+        });
+      } else {
+        return await this.inventoryRepository.restoreInventory(
+          existingInventory.inventoryId,
+          data,
+        );
+      }
     }
 
-    // 3. Tiến hành tạo mới
     return await this.inventoryRepository.create(data);
   }
 
@@ -256,7 +185,6 @@ export class InventoryService {
     storeId: string,
     productPackageId: string,
   ): Promise<void> {
-    // Tái sử dụng hàm getExistingInventory để đảm bảo nó tồn tại và đúng Store
     const existingInventory = await this.getExistingInventory(
       storeId,
       productPackageId,

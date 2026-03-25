@@ -120,28 +120,15 @@ export class InventoryRepository {
           }),
           ...(keyword && {
             OR: [
-              {
-                name: {
-                  contains: keyword,
-                  mode: 'insensitive',
-                },
-              },
-              {
-                brand: {
-                  contains: keyword,
-                  mode: 'insensitive',
-                },
-              },
+              { name: { contains: keyword, mode: 'insensitive' } },
+              { brand: { contains: keyword, mode: 'insensitive' } },
               {
                 productPackages: {
                   some: {
                     activeStatus: 'active',
                     OR: [
                       {
-                        displayName: {
-                          contains: keyword,
-                          mode: 'insensitive',
-                        },
+                        displayName: { contains: keyword, mode: 'insensitive' },
                       },
                       {
                         barcodeValue: {
@@ -172,16 +159,12 @@ export class InventoryRepository {
     const [rawItems, totalItems] = await prisma.$transaction([
       prisma.inventory.findMany({
         where,
-        orderBy: {
-          [sortBy]: sortOrder,
-        },
+        orderBy: { [sortBy]: sortOrder },
         skip: getPaginationSkip({ page, limit }),
         take: limit,
         select: inventorySelect,
       }),
-      prisma.inventory.count({
-        where,
-      }),
+      prisma.inventory.count({ where }),
     ]);
 
     let items = rawItems.map((item) => this.toInventoryListItem(item));
@@ -204,7 +187,6 @@ export class InventoryRepository {
     const skip = getPaginationSkip({ page, limit });
     const { keyword, categoryId } = query;
 
-    // 1. Build điều kiện RAW SQL động
     let keywordCondition = Prisma.empty;
 
     if (keyword) {
@@ -216,13 +198,10 @@ export class InventoryRepository {
     let categoryCondition = Prisma.empty;
 
     if (categoryId) {
-      // Dùng hàm CAST của SQL để ép kiểu cả 2 vế về UUID
       categoryCondition = Prisma.sql`AND CAST(p.category_id AS uuid) = CAST(${categoryId} AS uuid)`;
     }
 
-    // 2. Query Total Items bằng Raw SQL để đếm chính xác số lượng trong DB
-    const totalRaw = await prisma.$queryRaw<{ count: bigint }[]>`
-      SELECT COUNT(i.inventory_id) as count
+    const commonJoinsAndWhere = Prisma.sql`
       FROM "Inventory" i
       INNER JOIN "ProductPackage" pp ON i.product_package_id = pp.product_package_id
       INNER JOIN "Product" p ON pp.product_id = p.product_id
@@ -235,27 +214,20 @@ export class InventoryRepository {
         ${keywordCondition}
         ${categoryCondition}
     `;
+
+    const totalRaw = await prisma.$queryRaw<{ count: bigint }[]>`
+      SELECT COUNT(i.inventory_id) as count
+      ${commonJoinsAndWhere}
+    `;
     const totalItems = Number(totalRaw[0]?.count || 0);
 
-    // Bỏ qua lấy data nếu count = 0
     if (totalItems === 0) {
       return { items: [], totalItems: 0 };
     }
 
-    // 3. Query danh sách Inventory IDs (Đã phân trang Limit/Offset đúng chuẩn)
     const idsRaw = await prisma.$queryRaw<{ inventory_id: string }[]>`
       SELECT i.inventory_id
-      FROM "Inventory" i
-      INNER JOIN "ProductPackage" pp ON i.product_package_id = pp.product_package_id
-      INNER JOIN "Product" p ON pp.product_id = p.product_id
-      WHERE CAST(p.store_id AS uuid) = CAST(${storeId} AS uuid)
-        AND i.active_status = 'active'::"ActiveStatus"
-        AND p.active_status = 'active'::"ActiveStatus"
-        AND pp.active_status = 'active'::"ActiveStatus"
-        AND i.reorder_threshold IS NOT NULL
-        AND i.quantity <= i.reorder_threshold
-        ${keywordCondition}
-        ${categoryCondition}
+      ${commonJoinsAndWhere}
       ORDER BY i.updated_at DESC
       LIMIT ${limit} OFFSET ${skip}
     `;
@@ -267,16 +239,12 @@ export class InventoryRepository {
         inventoryId: { in: inventoryIds },
       },
       select: inventorySelect,
-      // Đảm bảo kết quả trả về đúng theo thứ tự ngày update mới nhất
       orderBy: { updatedAt: 'desc' },
     });
 
     const items = rawItems.map((item) => this.toInventoryListItem(item));
 
-    return {
-      items,
-      totalItems,
-    };
+    return { items, totalItems };
   }
 
   async findOneByProductPackageId(
@@ -289,10 +257,7 @@ export class InventoryRepository {
         activeStatus: 'active',
         productPackage: {
           activeStatus: 'active',
-          product: {
-            storeId,
-            activeStatus: 'active',
-          },
+          product: { storeId, activeStatus: 'active' },
         },
       },
       select: inventorySelect,
@@ -310,9 +275,7 @@ export class InventoryRepository {
     data: UpdateInventoryDto,
   ): Promise<InventoryDetailResponseDto> {
     const inventory = await prisma.inventory.update({
-      where: {
-        inventoryId,
-      },
+      where: { inventoryId },
       data,
       select: inventorySelect,
     });
@@ -321,18 +284,17 @@ export class InventoryRepository {
   }
 
   async adjustQuantity(
+    storeId: string,
     inventoryId: string,
     type: AdjustmentType,
-    quantity: number,
+    nextQuantity: number,
     userId: string,
     reason?: string | null,
     note?: string | null,
-  ): Promise<InventoryAdjustmentResponseDto> {
+  ): Promise<InventoryAdjustmentResponseDto | null> {
     return await prisma.$transaction(async (tx) => {
       const currentInventory = await tx.inventory.findUnique({
-        where: {
-          inventoryId,
-        },
+        where: { inventoryId },
         select: {
           inventoryId: true,
           quantity: true,
@@ -342,33 +304,14 @@ export class InventoryRepository {
       });
 
       if (!currentInventory) {
-        throw new Error('Inventory not found');
+        return null;
       }
 
-      let nextQuantity = currentInventory.quantity;
-
-      switch (type) {
-        case 'set':
-          nextQuantity = quantity;
-          break;
-        case 'increase':
-          nextQuantity = currentInventory.quantity + quantity;
-          break;
-        case 'decrease':
-          nextQuantity = currentInventory.quantity - quantity;
-          break;
-        default:
-          nextQuantity = currentInventory.quantity;
-          break;
-      }
+      const changedQty = nextQuantity - currentInventory.quantity;
 
       const updatedInventory = await tx.inventory.update({
-        where: {
-          inventoryId,
-        },
-        data: {
-          quantity: nextQuantity,
-        },
+        where: { inventoryId },
+        data: { quantity: nextQuantity },
         select: {
           quantity: true,
           updatedAt: true,
@@ -376,17 +319,23 @@ export class InventoryRepository {
         },
       });
 
-      await tx.inventoryAdjustment.create({
+      await tx.auditLog.create({
         data: {
-          inventoryId,
-          previousQuantity: currentInventory.quantity,
-          currentQuantity: updatedInventory.quantity,
-          changedQuantity:
-            updatedInventory.quantity - currentInventory.quantity,
-          type: type,
-          reason: reason ?? null,
-          note: note ?? null,
-          createdBy: userId,
+          actionType: 'update',
+          entityType: 'Inventory',
+          userId: userId,
+          storeId: storeId,
+          oldValue: {
+            quantity: currentInventory.quantity,
+          },
+          newValue: {
+            quantity: updatedInventory.quantity,
+            changedQuantity: changedQty,
+            adjustmentType: type,
+            reason: reason ?? null,
+            note: note ?? null,
+            productPackageId: currentInventory.productPackageId,
+          },
         },
       });
 
@@ -394,7 +343,7 @@ export class InventoryRepository {
         productPackageId: updatedInventory.productPackageId,
         previousQuantity: currentInventory.quantity,
         currentQuantity: updatedInventory.quantity,
-        changedQuantity: updatedInventory.quantity - currentInventory.quantity,
+        changedQuantity: changedQty,
         adjustmentType: type,
         reason: reason ?? null,
         note: note ?? null,
@@ -403,12 +352,47 @@ export class InventoryRepository {
     });
   }
 
+  async checkProductPackageBelongsToStore(
+    storeId: string,
+    productPackageId: string,
+  ): Promise<boolean> {
+    const count = await prisma.productPackage.count({
+      where: { productPackageId, product: { storeId } },
+    });
+
+    return count > 0;
+  }
+
+  async getInventoryStatusByProductPackageId(productPackageId: string) {
+    return await prisma.inventory.findUnique({
+      where: { productPackageId },
+      select: { inventoryId: true, activeStatus: true },
+    });
+  }
+
+  async restoreInventory(
+    inventoryId: string,
+    data: CreateInventoryDto,
+  ): Promise<InventoryDetailResponseDto> {
+    const inventory = await prisma.inventory.update({
+      where: { inventoryId },
+      data: {
+        quantity: data.quantity,
+        reorderThreshold: data.reorderThreshold ?? null,
+        lastCount: data.lastCount ?? null,
+        activeStatus: 'active',
+      },
+      select: inventorySelect,
+    });
+
+    return this.toInventoryListItem(inventory);
+  }
+
   async create(data: CreateInventoryDto): Promise<InventoryDetailResponseDto> {
     const inventory = await prisma.inventory.create({
       data: {
         productPackageId: data.productPackageId,
         quantity: data.quantity,
-        // Dùng ?? null để biến undefined thành null cho Prisma hiểu
         reorderThreshold: data.reorderThreshold ?? null,
         lastCount: data.lastCount ?? null,
       },
@@ -421,9 +405,7 @@ export class InventoryRepository {
   async delete(inventoryId: string): Promise<void> {
     await prisma.inventory.update({
       where: { inventoryId },
-      data: {
-        activeStatus: 'inactive',
-      },
+      data: { activeStatus: 'inactive' },
     });
   }
 }
