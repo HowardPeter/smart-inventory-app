@@ -4,6 +4,7 @@ import { errorHandler } from './common/middlewares/index.js';
 import { sendResponse } from './common/utils/index.js';
 import { categoryRouter } from './modules/categories/index.js';
 import { inventoryRouter } from './modules/inventories/inventory.route.js';
+import { inventoryAdjustmentRouter } from './modules/inventory-adjustments/inventory-adjustment.route.js';
 import {
   productPackageRouter,
   productPackageProductRouter,
@@ -30,6 +31,7 @@ app.use('/api/categories', categoryRouter);
 app.use('/api/auth', userProfileRouter);
 app.use('/api/product-packages', productPackageRouter);
 app.use('/api/inventories', inventoryRouter);
+app.use('/api/inventory-adjustments', inventoryAdjustmentRouter);
 
 app.use(errorHandler);
 
