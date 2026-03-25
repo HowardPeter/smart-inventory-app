@@ -1,5 +1,7 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
+import 'package:frontend/core/infrastructure/constants/app_constants.dart';
 import 'package:frontend/core/infrastructure/localization/app_translations.dart';
 import 'package:frontend/core/state/bindings/initial_binding.dart';
 import 'package:frontend/core/state/services/auth_service.dart'
@@ -17,10 +19,13 @@ import 'core/ui/theme/app_theme.dart';
 void main() async {
   // Đảm bảo Flutter core đã được khởi tạo trước khi chạy các setup khác
   WidgetsFlutterBinding.ensureInitialized();
-
+  try {
+    await dotenv.load(fileName: ".env");
+  } catch (e) {
+    debugPrint("⚠️ .env not found, using default values");
+  }
   // ---------------------------------------------------------
   // KHỞI TẠO CÁC DỊCH VỤ TOÀN CẦU (GLOBAL SERVICES) Ở ĐÂY
-  // Ví dụ: Get.put(ApiClient());
 
   // 1. Khởi tạo GetStorage
   await GetStorage.init();
@@ -32,10 +37,8 @@ void main() async {
   // ---------------------------------------------------------
   // 3. Khởi tạo supabase để kích hoạt các tính năng authen
   await Supabase.initialize(
-    url: 'http://10.0.2.2:54321',
-    // Sử dụng cho tạo máy thật
-    //  url: 'http://192.168.1.26:54321',
-    anonKey: 'YOUR_SUPABASE_ANON_KEY',
+    url: AppConstants.supabaseUrl,
+    anonKey: AppConstants.supabaseAnonKey,
   );
 
   runApp(
@@ -59,7 +62,21 @@ class App extends StatelessWidget {
       debugShowCheckedModeBanner: false,
 
       // 1. Cấu hình Device Preview kết hợp với GetX
-      builder: DevicePreview.appBuilder,
+      builder: (context, child) {
+        // 1. Cấu hình của DevicePreview
+        final devicePreviewChild = DevicePreview.appBuilder(context, child);
+
+        // 2. Bọc toàn bộ App bằng GestureDetector
+        return GestureDetector(
+          onTap: () {
+            // Lệnh này sẽ tự động tìm TextField đang mở và bỏ focus (tắt bàn phím)
+            FocusManager.instance.primaryFocus?.unfocus();
+          },
+          // Phải có behavior này để nó nhận diện click trên khoảng trống
+          behavior: HitTestBehavior.opaque,
+          child: devicePreviewChild,
+        );
+      },
 
       // 2. Cấu hình Theme (Chỉ dùng Light Theme nguyên bản)
       theme: AppTheme.lightTheme,

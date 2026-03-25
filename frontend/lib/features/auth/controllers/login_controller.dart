@@ -1,6 +1,5 @@
 import 'dart:async';
 import 'dart:io';
-
 import 'package:flutter/material.dart';
 import 'package:frontend/core/infrastructure/utils/full_screen_loader_utils.dart';
 import 'package:frontend/core/state/services/auth_service.dart';
@@ -13,6 +12,9 @@ import 'package:frontend/core/infrastructure/constants/text_strings.dart';
 import 'package:frontend/routes/app_routes.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import '../models/login_request_model.dart';
+
+// QUAN TRỌNG: Import thêm StoreService
+import 'package:frontend/core/state/services/store_service.dart';
 
 class LoginController extends GetxController {
   final AuthProvider authProvider;
@@ -94,7 +96,7 @@ class LoginController extends GetxController {
         rememberMe.value,
       );
 
-      // 2. TẮT LOADING KHI THÀNH CÔNG
+      // TẮT LOADING KHI THÀNH CÔNG
       FullScreenLoaderUtils.stopLoading();
 
       TSnackbarsWidget.success(
@@ -104,12 +106,17 @@ class LoginController extends GetxController {
         }),
       );
 
-      Get.offAllNamed(AppRoutes.main);
+      final storeService = Get.find<StoreService>();
+      if (storeService.currentStoreId.value.isNotEmpty) {
+        // Đã có Workspace được lưu -> Vào thẳng Home
+        Get.offAllNamed(AppRoutes.main);
+      } else {
+        // Chưa có Workspace -> Bắt buộc vào trang Chọn Workspace
+        Get.offAllNamed(AppRoutes.storeSelection);
+      }
     } on AuthException catch (e) {
-      // BẮT LỖI SUPABASE (Sai pass, user không tồn tại...)
       FullScreenLoaderUtils.stopLoading();
 
-      // Kiểm tra code lỗi hoặc message từ Supabase
       if (e.message.contains('Invalid login credentials') ||
           e.code == 'invalid_credentials') {
         TSnackbarsWidget.error(
@@ -119,25 +126,22 @@ class LoginController extends GetxController {
       } else {
         TSnackbarsWidget.error(
           title: TTexts.loginFailedTitle.tr,
-          message: e.message, // Lỗi khác của Supabase
+          message: e.message,
         );
       }
     } on TimeoutException catch (_) {
-      // BẮT LỖI QUÁ HẠN THỜI GIAN
       FullScreenLoaderUtils.stopLoading();
       TSnackbarsWidget.error(
         title: TTexts.errorTimeoutTitle.tr,
         message: TTexts.errorTimeoutMessage.tr,
       );
     } on SocketException catch (_) {
-      // BẮT LỖI MẤT MẠNG LÚC ĐANG GỌI API
       FullScreenLoaderUtils.stopLoading();
       TSnackbarsWidget.error(
         title: TTexts.netErrorTitle.tr,
         message: TTexts.netErrorDescription.tr,
       );
     } catch (e) {
-      // BẮT CÁC LỖI CÒN LẠI
       FullScreenLoaderUtils.stopLoading();
       TSnackbarsWidget.error(
         title: TTexts.errorTitle.tr,
@@ -152,7 +156,6 @@ class LoginController extends GetxController {
     try {
       FullScreenLoaderUtils.openLoadingDialog(TTexts.loggingIn.tr);
 
-      // 1. Nhận về AuthResponse từ Supabase
       final response = await authProvider.signInWithGoogle();
 
       if (response == null || response.user == null) {
@@ -162,13 +165,10 @@ class LoginController extends GetxController {
 
       final user = response.user!;
 
-      // Thông tin Full Name từ Google sẽ được lưu trong userMetadata
       final String displayName = user.userMetadata?['full_name'] ??
           user.email?.split('@')[0] ??
           'User';
 
-      // 2. Tùy chọn: Gọi tạo UserProfile giống như login thường
-      // Điều này đảm bảo user dùng Google lần đầu vẫn có dữ liệu profile
       await UserProfileProvider().createUserProfile(fullName: displayName);
 
       debugPrint("=== THÔNG TIN SUPABASE TRẢ VỀ TỪ GOOGLE ===");
@@ -176,7 +176,6 @@ class LoginController extends GetxController {
       debugPrint("Name: $displayName");
       debugPrint("=========================================");
 
-      // 3. LƯU VÀO KÉT SẮT (REMEMBER ME) ĐỂ APP GHI NHỚ
       await Get.find<AuthService>().saveUserLogin(
         user.email ?? "",
         "google_dummy_password",
@@ -185,7 +184,6 @@ class LoginController extends GetxController {
 
       FullScreenLoaderUtils.stopLoading();
 
-      // 4. HIỆN THÔNG BÁO THÀNH CÔNG
       TSnackbarsWidget.success(
         title: TTexts.loginSuccessTitle.tr,
         message: TTexts.loginSuccessMessage.trParams({
@@ -193,12 +191,20 @@ class LoginController extends GetxController {
         }),
       );
 
-      Get.offAllNamed(AppRoutes.main);
+      // ==========================================
+      // KIỂM TRA ĐIỀU HƯỚNG TRANG DỰA VÀO WORKSPACE
+      // (Áp dụng luôn cho cả Google Sign In)
+      // ==========================================
+      final storeService = Get.find<StoreService>();
+      if (storeService.currentStoreId.value.isNotEmpty) {
+        Get.offAllNamed(AppRoutes.main);
+      } else {
+        Get.offAllNamed(AppRoutes.storeSelection);
+      }
     } catch (e) {
       FullScreenLoaderUtils.stopLoading();
       debugPrint('❌ Google Auth Error: $e');
 
-      // 5. BÁO LỖI
       TSnackbarsWidget.error(
         title: TTexts.loginFailedTitle.tr,
         message: e.toString().replaceAll('Exception: ', ''),

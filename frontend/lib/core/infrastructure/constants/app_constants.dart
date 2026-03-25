@@ -1,10 +1,21 @@
 class AppConstants {
-  // Cấu hình API Backend
-  static const String baseUrl = 'http://10.0.2.2:3000';
-  // Cấu hình chạy máy thật
-  //static const String baseUrl = 'http://192.168.1.26:3000';
+  // Dùng String.fromEnvironment thay cho dotenv
+  static const String baseUrl = String.fromEnvironment(
+    'API_BASE_URL',
+    defaultValue: 'http://10.0.2.2:3000',
+  );
+
+  static const String supabaseUrl = String.fromEnvironment(
+    'SUPABASE_URL',
+    defaultValue: 'http://10.0.2.2:54321',
+  );
+
+  static const String supabaseAnonKey = String.fromEnvironment(
+    'SUPABASE_ANON_KEY',
+    defaultValue: 'YOUR_SUPABASE_ANON_KEY',
+  );
 
   // Thời gian chờ API (Timeout)
-  static const int connectionTimeout = 15000; // 15 giây
+  static const int connectionTimeout = 15000;
   static const int receiveTimeout = 15000;
 }
