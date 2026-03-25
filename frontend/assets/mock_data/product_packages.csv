@@ -1,0 +1,22 @@
+product_package_id,barcode_value,display_name,import_price,selling_price,created_at,updated_at,unit_id,product_id,active_status,barcode_type
+pkg_101_box,893101001,Wireless Mouse - Box,15.00,25.00,2026-03-24 10:00:00,2026-03-24 10:00:00,unit_box,prod_101,active,upc
+pkg_102_box,893102001,Mechanical Keyboard - Box,45.00,75.00,2026-03-24 10:00:00,2026-03-24 10:00:00,unit_box,prod_102,active,ean
+pkg_103_box,893103001,Gaming Headset - Box,30.00,55.00,2026-03-24 10:00:00,2026-03-24 10:00:00,unit_box,prod_103,active,code128
+pkg_104_box,893104001,USB-C Hub - Box,12.00,20.00,2026-03-24 10:00:00,2026-03-24 10:00:00,unit_box,prod_104,active,qr
+pkg_201_pcs,893201001,Cotton T-Shirt - Piece,5.00,12.00,2026-03-24 10:00:00,2026-03-24 10:00:00,unit_piece,prod_201,active,upc
+pkg_202_pcs,893202001,Denim Jeans - Piece,12.00,30.00,2026-03-24 10:00:00,2026-03-24 10:00:00,unit_piece,prod_202,active,ean
+pkg_203_pcs,893203001,Winter Jacket - Piece,25.00,60.00,2026-03-24 10:00:00,2026-03-24 10:00:00,unit_piece,prod_203,active,code128
+pkg_204_pcs,893204001,Sneakers - Pair,20.00,50.00,2026-03-24 10:00:00,2026-03-24 10:00:00,unit_piece,prod_204,active,upc
+pkg_301_can,893301001,Coca Cola - 330ml Can,0.30,0.60,2026-03-24 10:00:00,2026-03-24 10:00:00,unit_can,prod_301,active,ean
+pkg_301_crt,893301024,Coca Cola - Carton 24 Cans,6.50,12.00,2026-03-24 10:00:00,2026-03-24 10:00:00,unit_carton,prod_301,active,ean
+pkg_302_can,893302001,Mineral Water - 500ml,0.20,0.50,2026-03-24 10:00:00,2026-03-24 10:00:00,unit_can,prod_302,active,upc
+pkg_302_crt,893302024,Mineral Water - Carton 24,4.50,10.00,2026-03-24 10:00:00,2026-03-24 10:00:00,unit_carton,prod_302,active,upc
+pkg_303_pkt,893303001,Indomie Noodles - Packet,0.25,0.50,2026-03-24 10:00:00,2026-03-24 10:00:00,unit_packet,prod_303,active,code128
+pkg_303_crt,893303040,Indomie Noodles - Carton 40,8.00,18.00,2026-03-24 10:00:00,2026-03-24 10:00:00,unit_carton,prod_303,active,ean
+pkg_304_pkt,893304001,Snack Lays - 150g Packet,1.00,2.50,2026-03-24 10:00:00,2026-03-24 10:00:00,unit_packet,prod_304,active,qr
+pkg_401_box,893401001,A4 Copy Paper - Ream,2.50,5.00,2026-03-24 10:00:00,2026-03-24 10:00:00,unit_box,prod_401,active,upc
+pkg_401_crt,893401005,A4 Copy Paper - Carton 5 Reams,11.00,22.00,2026-03-24 10:00:00,2026-03-24 10:00:00,unit_carton,prod_401,active,upc
+pkg_402_pcs,893402001,Ballpoint Pen Blue - Piece,0.10,0.50,2026-03-24 10:00:00,2026-03-24 10:00:00,unit_piece,prod_402,active,ean
+pkg_402_box,893402050,Ballpoint Pen Blue - Box 50,4.00,20.00,2026-03-24 10:00:00,2026-03-24 10:00:00,unit_box,prod_402,active,ean
+pkg_403_pcs,893403001,Notebook A5 - Piece,0.80,2.00,2026-03-24 10:00:00,2026-03-24 10:00:00,unit_piece,prod_403,active,qr
+pkg_404_pcs,893404001,Stapler Mini - Piece,1.50,4.00,2026-03-24 10:00:00,2026-03-24 10:00:00,unit_piece,prod_404,active,code128

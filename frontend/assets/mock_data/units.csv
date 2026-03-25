@@ -1,0 +1,6 @@
+unit_id,code,name
+unit_box,BOX,Box
+unit_piece,PCS,Piece
+unit_can,CAN,Can
+unit_carton,CRT,Carton
+unit_packet,PKT,Packet

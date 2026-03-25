@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:frontend/core/infrastructure/constants/image_strings.dart';
 import 'package:frontend/core/ui/theme/app_colors.dart';
 import 'package:frontend/core/ui/theme/app_sizes.dart';
+import 'package:frontend/features/inventory/views/inventory_view.dart';
 import 'package:frontend/features/profile/views/profile_view.dart';
 import 'package:get/get.dart';
 import 'package:iconsax_flutter/iconsax_flutter.dart';
@@ -14,20 +15,46 @@ class NavigationMobileView extends GetView<NavigationController> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      resizeToAvoidBottomInset: false,
       backgroundColor: AppColors.background,
       body: Stack(
         children: [
           // 1. CHỨA CÁC MÀN HÌNH BÊN TRONG
-          Obx(() => IndexedStack(
-                index: controller.selectedIndex.value,
-                children: const [
-                  HomeView(), // Tab 0: Home
-                  Center(child: Text('Inventory Screen')), // Tab 1
-                  Center(child: Text('Transaction / Scan')), // Tab 2
-                  Center(child: Text('Reports')), // Tab 3
-                  ProfileView()
-                ],
-              )),
+          // 1. CHỨA CÁC MÀN HÌNH BÊN TRONG (Đã loại bỏ IndexedStack)
+          Obx(() {
+            final index = controller.selectedIndex.value;
+            Widget currentScreen;
+
+            switch (index) {
+              case 0:
+                currentScreen = const HomeView();
+                break;
+              case 1:
+                currentScreen = const InventoryView();
+                break;
+              case 2:
+                currentScreen = const Center(child: Text('Transaction / Scan'));
+                break;
+              case 3:
+                currentScreen = const Center(child: Text('Reports'));
+                break;
+              case 4:
+                currentScreen = const ProfileView();
+                break;
+              default:
+                currentScreen = const SizedBox.shrink();
+            }
+
+            
+            return AnimatedSwitcher(
+              duration: const Duration(milliseconds: 300),
+              child: KeyedSubtree(
+                key: ValueKey<int>(
+                    index), // Bắt buộc có Key để Flutter biết đã đổi màn hình
+                child: currentScreen,
+              ),
+            );
+          }),
 
           // 2. THANH ĐIỀU HƯỚNG OVERLAY
           Positioned(

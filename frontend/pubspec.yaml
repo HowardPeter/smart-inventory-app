@@ -48,6 +48,7 @@ dependencies:
   latlong2: ^0.9.1
   mobile_scanner: ^7.2.0
   open_mail_app_plus: ^0.0.2
+  percent_indicator: ^4.2.5
 
   # ----------------------------------------------------
   # Supabase

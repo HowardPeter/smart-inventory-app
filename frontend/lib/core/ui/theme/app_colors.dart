@@ -56,4 +56,7 @@ class AppColors {
   // Error (E88B76 -> CA5048)
   static const Color toastErrorGradientStart = Color(0xFFE88B76);
   static const Color toastErrorGradientEnd = Color(0xFFCA5048);
+
+  static const Color alertBg = Color(0xFFFEF2F2); // Nền đỏ siêu nhạt
+  static const Color alertText = Color(0xFFE02424); // Đỏ gắt mạnh mẽ
 }

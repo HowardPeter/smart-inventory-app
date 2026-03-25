@@ -7,6 +7,7 @@ import 'package:frontend/features/auth/views/login_view.dart';
 import 'package:frontend/features/auth/views/register_view.dart';
 import 'package:frontend/features/auth/views/verify_email_view.dart';
 import 'package:frontend/features/home/views/home_view.dart';
+import 'package:frontend/features/inventory/views/inventory_view.dart';
 import 'package:frontend/features/navigation/bindings/navigation_binding.dart';
 import 'package:frontend/features/navigation/views/navigation_view.dart';
 import 'package:frontend/features/onboarding/bindings/onboarding_binding.dart';
@@ -111,6 +112,7 @@ class AppPages {
       binding: JoinStoreBinding(),
       transition: Transition.rightToLeft,
     ),
+
     // -- Add member
     GetPage(
       name: AppRoutes.addMembers,
@@ -130,6 +132,11 @@ class AppPages {
     GetPage(
       name: AppRoutes.home,
       page: () => const HomeView(),
+    ),
+
+    GetPage(
+      name: AppRoutes.inventory,
+      page: () => const InventoryView(),
     ),
 
     // -- Profile

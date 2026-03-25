@@ -65,4 +65,15 @@ class ApiClient {
   Future<Response> delete(String path, {dynamic data}) async {
     return await dio.delete(path, data: data);
   }
+
+  Future<List<dynamic>> getList(String path,
+      {Map<String, dynamic>? queryParameters}) async {
+    final response = await get(path, queryParameters: queryParameters);
+    final dataField = response.data['data'];
+
+    if (dataField == null) return [];
+    if (dataField is List) return dataField;
+    if (dataField is Map) return dataField['items'] ?? dataField['data'] ?? [];
+    return [];
+  }
 }
