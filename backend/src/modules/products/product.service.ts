@@ -6,7 +6,9 @@ import {
   normalizePagination,
   buildPaginatedResponse,
 } from '../../common/utils/index.js';
+import { prisma } from '../../db/prismaClient.js'; // gọi prisma để dùng cơ chế $transaction
 import { CategoryRepository } from '../categories/index.js';
+import { ProductPackageRepository } from '../product-packages/index.js';
 
 import type {
   CreateProductData,
@@ -70,9 +72,7 @@ export class ProductService {
     return product;
   }
 
-  async createProduct(
-    data: CreateProductData,
-  ): Promise<ProductResponseDto> {
+  async createProduct(data: CreateProductData): Promise<ProductResponseDto> {
     const category = await this.categoryRepository.findById(data.categoryId);
 
     if (!category) {
@@ -109,6 +109,13 @@ export class ProductService {
   async softDeleteProduct(storeId: string, productId: string): Promise<void> {
     await this.checkProductExisted(storeId, productId);
 
-    return await this.productRepository.softDeleteOne(productId);
+    await prisma.$transaction(async (tx) => {
+      const productRepositoryTx = new ProductRepository(tx);
+      const productPackageRepositoryTx = new ProductPackageRepository(tx);
+
+      await productRepositoryTx.softDeleteOne(productId);
+
+      await productPackageRepositoryTx.softDeleteMany(productId);
+    });
   }
 }
