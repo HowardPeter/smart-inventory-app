@@ -1,6 +1,7 @@
 export class CustomError extends Error {
   public readonly status: number;
   public readonly code?: string;
+  public readonly details?: unknown;
   public readonly isOperational: boolean;
 
   constructor(options: {
@@ -18,6 +19,10 @@ export class CustomError extends Error {
 
     if (options?.code !== undefined) {
       this.code = options.code;
+    }
+
+    if(options?.details !== undefined) {
+      this.details = options.details;
     }
 
     Error.captureStackTrace(this, this.constructor);
