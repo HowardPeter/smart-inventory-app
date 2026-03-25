@@ -10,6 +10,10 @@ import type {
   ListAuditLogsQueryDto,
 } from '../dto/audit-log.dto.js';
 
+/* Lớp Repository chịu trách nhiệm tương tác trực tiếp với
+cơ sở dữ liệu (Prisma) cho module Audit Log.
+Cung cấp các phương thức truy xuất lịch sử hệ thống
+với khả năng lọc (filter) động linh hoạt. */
 export class AuditLogRepository {
   async findManyByStoreId(
     storeId: string,
@@ -26,7 +30,8 @@ export class AuditLogRepository {
       endDate,
     } = query;
 
-    // Build query động
+    // Xây dựng điều kiện truy vấn động (dynamic query)
+    // dựa trên các tham số filter mà client gửi lên
     const where: Prisma.AuditLogWhereInput = {
       storeId,
       ...(entityType && { entityType }),
@@ -40,6 +45,8 @@ export class AuditLogRepository {
       }),
     };
 
+    // NOTE: Chạy song song 2 truy vấn (lấy danh sách data và đếm tổng số)
+    // trong cùng 1 transaction để tối ưu hiệu suất phân trang
     const [items, totalItems] = await prisma.$transaction([
       prisma.auditLog.findMany({
         where,
