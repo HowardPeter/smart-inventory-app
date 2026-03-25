@@ -2,8 +2,9 @@ import { CategoryController } from './category.controller.js';
 import { CategoriesService } from './category.service.js';
 import { CategoryRepository } from './repositories/category.repository.js';
 import { HiddenDefaultRepository } from './repositories/hidden-default.repository.js';
+import { prisma } from '../../db/prismaClient.js';
 
-const categoryRepository = new CategoryRepository();
+const categoryRepository = new CategoryRepository(prisma);
 const hiddenDefaultRepository = new HiddenDefaultRepository();
 const categoryService = new CategoriesService(
   categoryRepository,
@@ -11,4 +12,4 @@ const categoryService = new CategoriesService(
 );
 const categoryController = new CategoryController(categoryService);
 
-export { categoryController };
+export { categoryController, categoryRepository };
