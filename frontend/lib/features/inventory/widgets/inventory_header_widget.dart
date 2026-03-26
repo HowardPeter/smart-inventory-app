@@ -2,6 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:iconsax_flutter/iconsax_flutter.dart';
 import 'package:frontend/core/ui/theme/app_colors.dart';
 import 'package:frontend/core/ui/theme/app_sizes.dart';
+// THÊM 2 DÒNG NÀY ĐỂ DÙNG ĐA NGÔN NGỮ
+import 'package:get/get.dart';
+import 'package:frontend/core/infrastructure/constants/text_strings.dart';
 
 class InventoryHeaderWidget extends StatelessWidget {
   const InventoryHeaderWidget({super.key});
@@ -14,22 +17,22 @@ class InventoryHeaderWidget extends StatelessWidget {
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          const Expanded(
+          Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  'Inventory Hub',
-                  style: TextStyle(
+                  TTexts.inventoryHub.tr,
+                  style: const TextStyle(
                       fontFamily: 'Poppins',
-                      fontSize: 22, // ĐÃ ĐỔI VỀ 22 THẬT GỌN GÀNG
+                      fontSize: 22,
                       fontWeight: FontWeight.bold,
                       color: AppColors.primaryText),
                 ),
-                SizedBox(height: 2),
+                const SizedBox(height: 2),
                 Text(
-                  'Manage products & stock levels',
-                  style: TextStyle(
+                  TTexts.manageProductsStock.tr,
+                  style: const TextStyle(
                       fontFamily: 'Poppins',
                       fontSize: 13,
                       color: AppColors.subText),

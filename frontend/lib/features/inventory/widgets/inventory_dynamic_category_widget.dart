@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
-import 'package:frontend/core/ui/widgets/t_custom_fade_overlay_widget.dart';
 import 'package:get/get.dart';
 import 'package:frontend/core/ui/theme/app_colors.dart';
 import 'package:frontend/features/inventory/controllers/inventory_controller.dart';
+// THÊM IMPORT NÀY
+import 'package:frontend/core/infrastructure/constants/text_strings.dart';
 
 class InventoryDynamicCategoryWidget extends StatelessWidget {
   const InventoryDynamicCategoryWidget({super.key});
@@ -23,21 +24,19 @@ class InventoryDynamicCategoryWidget extends StatelessWidget {
     return Obx(() {
       final dynamicCategories = controller.categoryStats;
 
-      // Cố định hiển thị tối đa 6 danh mục
       const int maxDisplay = 6;
       final bool hasMore = dynamicCategories.length > maxDisplay;
       final int itemCount = hasMore ? maxDisplay : dynamicCategories.length;
 
       if (dynamicCategories.isEmpty) {
-        return const Center(
+        return Center(
             child: Padding(
-          padding: EdgeInsets.all(20.0),
-          child: Text("No categories found",
-              style: TextStyle(color: AppColors.softGrey)),
+          padding: const EdgeInsets.all(20.0),
+          child: Text(TTexts.noCategoriesFound.tr,
+              style: const TextStyle(color: AppColors.softGrey)),
         ));
       }
 
-      // Xây dựng GridView
       Widget gridView = GridView.builder(
         shrinkWrap: true,
         physics: const NeverScrollableScrollPhysics(),
@@ -91,7 +90,7 @@ class InventoryDynamicCategoryWidget extends StatelessWidget {
                           style: const TextStyle(
                               fontWeight: FontWeight.bold, fontSize: 13)),
                       const SizedBox(height: 2),
-                      Text("$count items",
+                      Text("$count ${TTexts.items.tr}",
                           style: const TextStyle(
                               color: AppColors.softGrey, fontSize: 11)),
                     ],
@@ -103,24 +102,71 @@ class InventoryDynamicCategoryWidget extends StatelessWidget {
         },
       );
 
-      // Nếu có trên 6 cái, bọc vào Stack và phủ hiệu ứng Fade lên trên
       if (hasMore) {
+        final int hiddenCount = dynamicCategories.length - maxDisplay;
         return Stack(
           children: [
             gridView,
-            TCustomFadeOverlayWidget(
-              text: "See All Categories",
-              height: 70.0, // Bạn có thể chỉnh chiều cao lớp mờ ở đây
-              onTap: () {
-                // TODO: Chuyển sang màn hình danh sách tất cả Category
-              },
-            ),
+            _buildMoreOverlay(hiddenCount),
           ],
         );
       }
 
-      // Nếu <= 6 cái, chỉ trả về GridView bình thường
       return gridView;
     });
+  }
+
+  Widget _buildMoreOverlay(int hiddenCount) {
+    return Positioned(
+      bottom: 0,
+      left: 0,
+      right: 0,
+      child: GestureDetector(
+        onTap: () {
+          // TODO: Mở trang danh sách danh mục
+        },
+        child: Container(
+          height: 70,
+          decoration: BoxDecoration(
+            borderRadius: const BorderRadius.only(
+              bottomLeft: Radius.circular(16),
+              bottomRight: Radius.circular(16),
+            ),
+            gradient: LinearGradient(
+              begin: Alignment.topCenter,
+              end: Alignment.bottomCenter,
+              colors: [
+                AppColors.background.withOpacity(0.0),
+                AppColors.background.withOpacity(0.9),
+                AppColors.background,
+              ],
+              stops: const [0.0, 0.6, 1.0],
+            ),
+          ),
+          child: Align(
+            alignment: Alignment.bottomCenter,
+            child: Padding(
+              padding: const EdgeInsets.only(bottom: 8.0),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  const Icon(Icons.keyboard_arrow_down,
+                      color: AppColors.primary, size: 20),
+                  const SizedBox(width: 4),
+                  Text(
+                    "+$hiddenCount ${TTexts.more.tr}",
+                    style: const TextStyle(
+                      color: AppColors.primary,
+                      fontSize: 13,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
+        ),
+      ),
+    );
   }
 }

@@ -26,6 +26,7 @@ class TTexts {
   static const String clearAll = "clear_all";
   static const String noResultsTitle = "no_results_title";
   static const String noResultsMessage = "no_results_message";
+  static const String searchItemsPackages = "search_items_packages";
 
   // -- Network Error Dialog
   static const String netErrorTitle = "net_error_title";
@@ -277,6 +278,30 @@ class TTexts {
   static const String homeInboundShipment = "home_inbound_shipment";
   static const String homeOutboundDelivery = "home_outbound_delivery";
   static const String homeStockAdjustment = "home_stock_adjustment";
+
+  // -- Inventory
+  static const String inventoryHub = "inventory_hub";
+  static const String manageProductsStock = "manage_products_stock";
+  static const String details = "details";
+static const String inboundOutbound7Days = "inbound_outbound_7_days";
+  static const String inventoryTitle = "inventory_title";
+  static const String inventoryInsights = "inventory_insights";
+  static const String manageData = "manage_data";
+  static const String productCatalog = "product_catalog";
+  static const String totalItems = "total_items";
+  static const String stockValue = "stock_value";
+  static const String stockHealth = "stock_health";
+  static const String statusHealthy = "status_healthy";
+  static const String statusLow = "status_low";
+  static const String statusOut = "status_out";
+  static const String topCategoriesByVolume = "top_categories_by_volume";
+  static const String stockFlow = "stock_flow";
+  static const String flowIn = "flow_in";
+  static const String flowOut = "flow_out";
+  static const String items = "items";
+  static const String more = "more";
+  static const String noDataAvailable = "no_data_available";
+  static const String noCategoriesFound = "no_categories_found";
 
   // Empty State
   static const String emptyTransactionTitle = "empty_transaction_title";

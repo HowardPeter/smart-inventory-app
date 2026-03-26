@@ -5,6 +5,10 @@ import 'package:frontend/core/ui/theme/app_sizes.dart';
 import 'inventory_health_widget.dart';
 import 'inventory_distribution_widget.dart';
 
+// THÊM 2 DÒNG NÀY ĐỂ DÙNG ĐA NGÔN NGỮ
+import 'package:get/get.dart';
+import 'package:frontend/core/infrastructure/constants/text_strings.dart';
+
 class InventoryInsightsWidget extends StatelessWidget {
   const InventoryInsightsWidget({super.key});
 
@@ -21,25 +25,24 @@ class InventoryInsightsWidget extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // HEADER ĐỒNG BỘ "Details >"
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              const Text("Stock Health",
-                  style: TextStyle(
+              Text(TTexts.inventoryInsights.tr,
+                  style: const TextStyle(
                       fontFamily: 'Poppins',
                       fontWeight: FontWeight.bold,
                       fontSize: 16)),
               InkWell(
                 onTap: () {},
-                child: const Row(
+                child: Row(
                   children: [
-                    Text("Details",
-                        style: TextStyle(
+                    Text(TTexts.details.tr,
+                        style: const TextStyle(
                             color: AppColors.primary,
                             fontSize: 13,
                             fontWeight: FontWeight.w600)),
-                    Icon(Icons.chevron_right_rounded,
+                    const Icon(Icons.chevron_right_rounded,
                         color: AppColors.primary, size: 18),
                   ],
                 ),

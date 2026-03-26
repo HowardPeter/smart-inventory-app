@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:frontend/core/ui/theme/app_colors.dart';
 import 'package:frontend/features/inventory/controllers/inventory_controller.dart';
+import 'package:frontend/core/infrastructure/constants/text_strings.dart';
 
 class InventoryDistributionWidget extends GetView<InventoryController> {
   const InventoryDistributionWidget({super.key});
@@ -9,28 +10,28 @@ class InventoryDistributionWidget extends GetView<InventoryController> {
   @override
   Widget build(BuildContext context) {
     return Obx(() {
-      final distributionData = controller.topDistribution; // DÙNG DATA TỪ API
+      final distributionData = controller.topDistribution;
 
       if (distributionData.isEmpty) {
-        return const Center(
+        return Center(
             child: Padding(
-                padding: EdgeInsets.all(20),
-                child: Text("No data available",
-                    style: TextStyle(color: AppColors.softGrey))));
+                padding: const EdgeInsets.all(20),
+                // SỬA Ở ĐÂY
+                child: Text(TTexts.noDataAvailable.tr,
+                    style: const TextStyle(color: AppColors.softGrey))));
       }
 
       return Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const Text("Top Categories by Volume",
-              style: TextStyle(
+          Text(TTexts.topCategoriesByVolume.tr,
+              style: const TextStyle(
                   fontSize: 13,
                   color: AppColors.subText,
                   fontWeight: FontWeight.w600)),
           const SizedBox(height: 16),
           ...distributionData.map((item) {
-            final double percentage =
-                item.value / item.max; // DÙNG MODEL VỪA TẠO
+            final double percentage = item.max > 0 ? item.value / item.max : 0;
             final bool isTop = item == distributionData.first;
 
             return Padding(

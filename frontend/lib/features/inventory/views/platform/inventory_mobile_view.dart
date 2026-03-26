@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:frontend/core/infrastructure/constants/text_strings.dart';
 import 'package:frontend/core/ui/layouts/t_barcode_scanner_layout.dart';
 import 'package:frontend/core/ui/widgets/t_bottom_nav_spacer_widget.dart';
 import 'package:frontend/core/ui/widgets/t_search_bar_widget.dart';
@@ -36,11 +37,11 @@ class InventoryMobileView extends GetView<InventoryController> {
                   children: [
                     const SizedBox(height: AppSizes.p8),
                     TSearchBarWidget(
-                      hintText: "Search items, packages, SKU...",
+                      hintText: TTexts.searchItemsPackages.tr,
                       onTap: () {
                         Get.toNamed(AppRoutes.search, arguments: {
                           'target': SearchTarget.inventory,
-                          'hint': 'Search items, packages,...',
+                          'hint': TTexts.searchItemsPackages.tr,
                         });
                       },
                       onScanTap: () =>

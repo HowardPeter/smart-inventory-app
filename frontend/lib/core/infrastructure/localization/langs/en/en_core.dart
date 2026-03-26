@@ -27,10 +27,12 @@ final Map<String, String> enCore = {
 
   // -- Search
   TTexts.searchHint: 'Search by name,...',
+  TTexts.searchItemsPackages: "Search items, packages,...",
   TTexts.recentSearches: 'Recent Searches',
   TTexts.clearAll: 'Clear All',
   TTexts.noResultsTitle: 'No Results Found',
-  TTexts.noResultsMessage: 'We could not find anything matching your search. Please try another keyword.',
+  TTexts.noResultsMessage:
+      'We could not find anything matching your search. Please try another keyword.',
 
   // -- Password Strength
   TTexts.weak: 'Weak',

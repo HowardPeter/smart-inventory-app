@@ -4,6 +4,8 @@ import 'package:get/get.dart';
 import 'package:frontend/core/ui/theme/app_colors.dart';
 import 'package:frontend/core/ui/theme/app_sizes.dart';
 import 'package:frontend/features/inventory/controllers/inventory_controller.dart';
+// THÊM IMPORT ĐA NGÔN NGỮ
+import 'package:frontend/core/infrastructure/constants/text_strings.dart';
 
 class InventoryFlowChartWidget extends GetView<InventoryController> {
   InventoryFlowChartWidget({super.key}) {
@@ -30,21 +32,24 @@ class InventoryFlowChartWidget extends GetView<InventoryController> {
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              const Text("Inventory Flow",
-                  style: TextStyle(
+              // SỬA: Inventory Flow -> TTexts.stockFlow.tr
+              Text(TTexts.stockFlow.tr,
+                  style: const TextStyle(
                       fontFamily: 'Poppins',
                       fontWeight: FontWeight.bold,
                       fontSize: 16)),
               InkWell(
                 onTap: () {},
-                child: const Row(
+                // SỬA: Bỏ const ở Row, thêm const vào TextStyle và Icon
+                child: Row(
                   children: [
-                    Text("Details",
-                        style: TextStyle(
+                    // SỬA: Details -> TTexts.details.tr
+                    Text(TTexts.details.tr,
+                        style: const TextStyle(
                             color: AppColors.primary,
                             fontSize: 13,
                             fontWeight: FontWeight.w600)),
-                    Icon(Icons.chevron_right_rounded,
+                    const Icon(Icons.chevron_right_rounded,
                         color: AppColors.primary, size: 18),
                   ],
                 ),
@@ -52,8 +57,9 @@ class InventoryFlowChartWidget extends GetView<InventoryController> {
             ],
           ),
           const SizedBox(height: 4),
-          const Text("Inbound vs Outbound (7 Days)",
-              style: TextStyle(color: AppColors.subText, fontSize: 12)),
+          // SỬA: Inbound vs Outbound... -> TTexts.inboundOutbound7Days.tr
+          Text(TTexts.inboundOutbound7Days.tr,
+              style: const TextStyle(color: AppColors.subText, fontSize: 12)),
           const SizedBox(height: AppSizes.p24),
           SizedBox(
             height: 180,
@@ -67,14 +73,17 @@ class InventoryFlowChartWidget extends GetView<InventoryController> {
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
+              // SỬA: Total Items -> TTexts.totalItems.tr
               Obx(() => _buildBottomStat(
-                  "Total Items",
+                  TTexts.totalItems.tr,
                   "${controller.totalActiveProducts.value}",
                   AppColors.primaryText)),
               // ĐÃ THAY BẰNG DỮ LIỆU TỪ CONTROLLER
-              Obx(() => _buildBottomStat("Inbound",
+              // SỬA: Inbound -> TTexts.flowIn.tr
+              Obx(() => _buildBottomStat(TTexts.flowIn.tr,
                   "+${controller.weeklyInbound.value}", AppColors.stockIn)),
-              Obx(() => _buildBottomStat("Outbound",
+              // SỬA: Outbound -> TTexts.flowOut.tr
+              Obx(() => _buildBottomStat(TTexts.flowOut.tr,
                   "-${controller.weeklyOutbound.value}", AppColors.stockOut)),
             ],
           )
@@ -114,8 +123,7 @@ class InventoryFlowChartWidget extends GetView<InventoryController> {
       return BarChart(
         BarChartData(
           alignment: BarChartAlignment.spaceBetween,
-          maxY:
-              60, // Tạm fix cứng maxY là 60, sau này bạn có thể tính max tự động trong Controller
+          maxY: 60,
           barTouchData: const BarTouchData(enabled: false),
           titlesData: FlTitlesData(
             show: true,
