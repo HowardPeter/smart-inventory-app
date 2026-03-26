@@ -1,13 +1,16 @@
 import 'package:flutter/material.dart';
+import 'package:frontend/core/ui/layouts/t_barcode_scanner_layout.dart';
 import 'package:frontend/core/ui/widgets/t_bottom_nav_spacer_widget.dart';
+import 'package:frontend/core/ui/widgets/t_search_bar_widget.dart';
 import 'package:frontend/features/inventory/widgets/inventory_insights_widget.dart';
+import 'package:frontend/features/search/controllers/search_controller.dart';
+import 'package:frontend/routes/app_routes.dart';
 import 'package:get/get.dart';
 import 'package:frontend/core/ui/theme/app_colors.dart';
 import 'package:frontend/core/ui/theme/app_sizes.dart';
 
 import 'package:frontend/features/inventory/controllers/inventory_controller.dart';
 import 'package:frontend/features/inventory/widgets/inventory_header_widget.dart';
-import 'package:frontend/features/inventory/widgets/inventory_search_bar_widget.dart';
 import 'package:frontend/features/inventory/widgets/inventory_flow_chart_widget.dart';
 import 'package:frontend/features/inventory/widgets/inventory_dynamic_category_widget.dart';
 
@@ -32,7 +35,17 @@ class InventoryMobileView extends GetView<InventoryController> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     const SizedBox(height: AppSizes.p8),
-                    const InventorySearchBarWidget(),
+                    TSearchBarWidget(
+                      hintText: "Search items, packages, SKU...",
+                      onTap: () {
+                        Get.toNamed(AppRoutes.search, arguments: {
+                          'target': SearchTarget.inventory,
+                          'hint': 'Search items, packages,...',
+                        });
+                      },
+                      onScanTap: () =>
+                          Get.to(() => const TBarcodeScannerLayout()),
+                    ),
                     const SizedBox(height: AppSizes.p24),
 
                     // 1. INVENTORY FLOW

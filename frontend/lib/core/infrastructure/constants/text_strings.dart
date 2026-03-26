@@ -20,6 +20,13 @@ class TTexts {
   static const String errorUnknownTitle = "error_unknown_title";
   static const String errorUnknownMessage = "error_unknown_message";
 
+  // -- Search
+  static const String searchHint = "search_hint";
+  static const String recentSearches = "recent_searches";
+  static const String clearAll = "clear_all";
+  static const String noResultsTitle = "no_results_title";
+  static const String noResultsMessage = "no_results_message";
+
   // -- Network Error Dialog
   static const String netErrorTitle = "net_error_title";
   static const String netErrorDescription = "net_error_description";

@@ -25,6 +25,13 @@ final Map<String, String> enCore = {
   TTexts.errorUnknownTitle: 'Unknown Error',
   TTexts.errorUnknownMessage: 'An unexpected error occurred. Please try again.',
 
+  // -- Search
+  TTexts.searchHint: 'Search by name,...',
+  TTexts.recentSearches: 'Recent Searches',
+  TTexts.clearAll: 'Clear All',
+  TTexts.noResultsTitle: 'No Results Found',
+  TTexts.noResultsMessage: 'We could not find anything matching your search. Please try another keyword.',
+
   // -- Password Strength
   TTexts.weak: 'Weak',
   TTexts.fair: 'Fair',

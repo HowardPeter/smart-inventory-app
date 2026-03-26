@@ -12,6 +12,8 @@ import 'package:frontend/features/navigation/bindings/navigation_binding.dart';
 import 'package:frontend/features/navigation/views/navigation_view.dart';
 import 'package:frontend/features/onboarding/bindings/onboarding_binding.dart';
 import 'package:frontend/features/profile/views/profile_view.dart';
+import 'package:frontend/features/search/bindings/search_binding.dart';
+import 'package:frontend/features/search/views/search_view.dart';
 import 'package:frontend/features/workspace/bindings/add_members_binding.dart';
 import 'package:frontend/features/workspace/bindings/create_store_binding.dart';
 import 'package:frontend/features/workspace/bindings/join_store_binding.dart';
@@ -126,6 +128,13 @@ class AppPages {
       name: AppRoutes.main,
       page: () => const NavigationView(),
       binding: NavigationBinding(),
+    ),
+
+    GetPage(
+      name: AppRoutes.search,
+      page: () => const SearchView(),
+      binding: SearchBinding(),
+      transition: Transition.fadeIn, 
     ),
 
     // -- Home

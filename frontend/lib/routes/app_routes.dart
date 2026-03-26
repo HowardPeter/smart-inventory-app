@@ -15,6 +15,7 @@ class AppRoutes {
   static const addMembers = '/add_members';
 
   static const main = '/main';
+  static const search = '/search';
   static const home = '/home';
   static const inventory = '/inventory';
   static const profile = '/profile';
