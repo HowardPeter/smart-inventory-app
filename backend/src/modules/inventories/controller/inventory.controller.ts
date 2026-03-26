@@ -78,6 +78,7 @@ export class InventoryController {
     res: Response<ApiResponse<InventoryDetailResponseDto>>,
   ): Promise<void> => {
     const storeId = requireReqStoreContext(req).storeId;
+    const userId = requireReqUser(req).userId;
     const { productPackageId } = req.params;
 
     // Chỉ cập nhật thông số cấu hình kho
@@ -86,6 +87,7 @@ export class InventoryController {
       storeId,
       productPackageId as string,
       req.body as UpdateInventoryDto,
+      userId,
     );
 
     sendResponse.success(res, inventory, { status: StatusCodes.OK });
@@ -119,10 +121,12 @@ export class InventoryController {
     res: Response<ApiResponse<InventoryDetailResponseDto>>,
   ): Promise<void> => {
     const storeId = requireReqStoreContext(req).storeId;
+    const userId = requireReqUser(req).userId;
 
     const inventory = await this.inventoryService.createInventory(
       storeId,
       req.body as CreateInventoryDto,
+      userId,
     );
 
     sendResponse.success(res, inventory, { status: StatusCodes.CREATED });
@@ -133,6 +137,7 @@ export class InventoryController {
     res: Response<ApiResponse<null>>,
   ): Promise<void> => {
     const storeId = requireReqStoreContext(req).storeId;
+    const userId = requireReqUser(req).userId;
     const { productPackageId } = req.params;
 
     // NOTE: Theo quy định hệ thống, đây là thao tác xóa mềm
@@ -140,6 +145,7 @@ export class InventoryController {
     await this.inventoryService.deleteInventory(
       storeId,
       productPackageId as string,
+      userId,
     );
 
     sendResponse.success(res, null, {
