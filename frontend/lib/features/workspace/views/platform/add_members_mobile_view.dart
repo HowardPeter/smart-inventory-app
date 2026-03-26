@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:frontend/core/ui/widgets/t_app_bar_widget.dart';
+import 'package:frontend/core/ui/widgets/t_blur_app_bar_widget.dart';
 import 'package:frontend/features/workspace/controllers/add_members_controller.dart';
 import 'package:get/get.dart';
 import 'package:frontend/core/ui/theme/app_colors.dart';
@@ -20,7 +20,7 @@ class AddMembersMobileView extends GetView<AddMembersController> {
 
     return Scaffold(
       backgroundColor: AppColors.background,
-      appBar: const TAppBarWidget(),
+      appBar: const TBlurAppBarWidget(),
       body: SafeArea(
         child: SingleChildScrollView(
           physics: const BouncingScrollPhysics(),

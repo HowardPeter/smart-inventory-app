@@ -3,7 +3,7 @@ import 'package:frontend/core/infrastructure/constants/text_strings.dart';
 import 'package:frontend/core/ui/layouts/t_barcode_scanner_layout.dart';
 import 'package:frontend/core/ui/widgets/t_bottom_nav_spacer_widget.dart';
 import 'package:frontend/core/ui/widgets/t_search_bar_widget.dart';
-import 'package:frontend/features/inventory/widgets/inventory_insights_widget.dart';
+import 'package:frontend/features/inventory/widgets/inventory/inventory_insights_widget.dart';
 import 'package:frontend/features/search/controllers/search_controller.dart';
 import 'package:frontend/routes/app_routes.dart';
 import 'package:get/get.dart';
@@ -11,9 +11,9 @@ import 'package:frontend/core/ui/theme/app_colors.dart';
 import 'package:frontend/core/ui/theme/app_sizes.dart';
 
 import 'package:frontend/features/inventory/controllers/inventory_controller.dart';
-import 'package:frontend/features/inventory/widgets/inventory_header_widget.dart';
-import 'package:frontend/features/inventory/widgets/inventory_flow_chart_widget.dart';
-import 'package:frontend/features/inventory/widgets/inventory_dynamic_category_widget.dart';
+import 'package:frontend/features/inventory/widgets/inventory/inventory_header_widget.dart';
+import 'package:frontend/features/inventory/widgets/inventory/inventory_flow_chart_widget.dart';
+import 'package:frontend/features/inventory/widgets/inventory/inventory_dynamic_category_widget.dart';
 
 class InventoryMobileView extends GetView<InventoryController> {
   const InventoryMobileView({super.key});

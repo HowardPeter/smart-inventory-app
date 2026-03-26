@@ -283,7 +283,7 @@ class TTexts {
   static const String inventoryHub = "inventory_hub";
   static const String manageProductsStock = "manage_products_stock";
   static const String details = "details";
-static const String inboundOutbound7Days = "inbound_outbound_7_days";
+  static const String inboundOutbound7Days = "inbound_outbound_7_days";
   static const String inventoryTitle = "inventory_title";
   static const String inventoryInsights = "inventory_insights";
   static const String manageData = "manage_data";
@@ -302,6 +302,22 @@ static const String inboundOutbound7Days = "inbound_outbound_7_days";
   static const String more = "more";
   static const String noDataAvailable = "no_data_available";
   static const String noCategoriesFound = "no_categories_found";
+  static const String totalInventory = "total_inventory";
+  static const String clearFilters = "clear_filters";
+  static const String emptyFilterMessage = "empty_filter_message";
+
+  // -- Inventory Insight
+  static const String inventoryList = "inventory_list";
+  static const String tabAll = "tab_all";
+  static const String tabHealthy = "tab_healthy";
+  static const String allItems = "all_items";
+  static const String tabLowStock = "tab_low_stock";
+  static const String tabOutStock = "tab_out_stock";
+  static const String sku = "sku";
+  static const String inStock = "in_stock";
+  static const String insightsOverview = "insights_overview";
+  static const String actionRequired = "action_required";
+  static const String goodCondition = "good_condition";
 
   // Empty State
   static const String emptyTransactionTitle = "empty_transaction_title";

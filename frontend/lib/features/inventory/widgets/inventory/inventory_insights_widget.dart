@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:frontend/core/ui/theme/app_colors.dart';
 import 'package:frontend/core/ui/theme/app_sizes.dart';
+import 'package:frontend/routes/app_routes.dart';
 
 import 'inventory_health_widget.dart';
 import 'inventory_distribution_widget.dart';
@@ -34,7 +35,7 @@ class InventoryInsightsWidget extends StatelessWidget {
                       fontWeight: FontWeight.bold,
                       fontSize: 16)),
               InkWell(
-                onTap: () {},
+                onTap: () => Get.toNamed(AppRoutes.inventorySight),
                 child: Row(
                   children: [
                     Text(TTexts.details.tr,

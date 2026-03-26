@@ -29,6 +29,23 @@ final Map<String, String> enInventory = {
   TTexts.items: 'items',
   TTexts.more: 'More',
 
+  // -- Inventory Insight
+  TTexts.insightsOverview: 'Insights Overview',
+  TTexts.actionRequired: 'Action Required',
+  TTexts.goodCondition: 'Good Condition',
+  TTexts.inventoryList: 'Inventory',
+  TTexts.tabAll: 'All',
+  TTexts.allItems: 'All Items',
+  TTexts.tabHealthy: 'Healthy',
+  TTexts.tabLowStock: 'Low Stock',
+  TTexts.tabOutStock: 'Out of Stock',
+  TTexts.sku: 'SKU',
+  TTexts.inStock: 'In Stock',
+  TTexts.totalInventory: 'Total Inventory',
+  TTexts.clearFilters: 'Clear Filters',
+  TTexts.emptyFilterMessage:
+      "Try adjusting the filters or categories to find what you're looking for.",
+
   // -- Empty States
   TTexts.noDataAvailable: 'No data available',
   TTexts.noCategoriesFound: 'No categories found',
