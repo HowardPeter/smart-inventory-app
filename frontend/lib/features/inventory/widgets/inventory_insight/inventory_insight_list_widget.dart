@@ -49,7 +49,8 @@ class InventoryInsightListWidget extends GetView<InventoryInsightController> {
             return const InventoryInsightShimmerWidget();
           }
 
-          final list = controller.filteredInventories;
+          // ĐÃ SỬA: Dùng displayList thay vì filteredInventories
+          final list = controller.displayList;
 
           // 2. NẾU RỖNG -> HIỂN THỊ EMPTY STATE
           if (list.isEmpty) {
@@ -67,7 +68,8 @@ class InventoryInsightListWidget extends GetView<InventoryInsightController> {
             physics: const NeverScrollableScrollPhysics(),
             itemCount: list.length,
             itemBuilder: (context, index) {
-              return InventoryInsightItemWidget(inventory: list[index]);
+              // ĐÃ SỬA: Truyền displayItem thay vì inventory
+              return InventoryInsightItemWidget(displayItem: list[index]);
             },
           );
         }),

@@ -13,6 +13,8 @@ class TTexts {
   static const String strong = "strong";
   static const String create = "create";
   static const String cancel = "cancel";
+  static const String unknownProduct = "unknown_product";
+  static const String na = "n_a";
   static const String errorServerTitle = "error_server_title";
   static const String errorServerMessage = "error_server_message";
   static const String errorNotFoundTitle = "error_not_found_title";

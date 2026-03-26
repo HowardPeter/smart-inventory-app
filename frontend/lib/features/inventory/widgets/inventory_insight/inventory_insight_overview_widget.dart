@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:frontend/core/ui/theme/app_sizes.dart'; // ĐÃ IMPORT APPSIZES
 import 'package:frontend/features/inventory/controllers/inventory_insight_controller.dart';
 import 'package:get/get.dart';
 import 'package:iconsax_flutter/iconsax_flutter.dart';
@@ -12,7 +13,8 @@ class InventoryInsightOverviewWidget
   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
+      padding: const EdgeInsets.symmetric(
+          horizontal: AppSizes.p20, vertical: AppSizes.p12),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -21,7 +23,7 @@ class InventoryInsightOverviewWidget
                   fontSize: 14,
                   fontWeight: FontWeight.bold,
                   color: AppColors.subText)),
-          const SizedBox(height: 12),
+          const SizedBox(height: AppSizes.p12),
           Row(
             children: [
               Expanded(
@@ -35,7 +37,7 @@ class InventoryInsightOverviewWidget
                       onTap: () => controller.toggleFilter(TTexts.tabOutStock),
                     )),
               ),
-              const SizedBox(width: 12),
+              const SizedBox(width: AppSizes.p12),
               Expanded(
                 child: Obx(() => _buildToggleCard(
                       title: TTexts.tabLowStock.tr,
@@ -47,7 +49,7 @@ class InventoryInsightOverviewWidget
                       onTap: () => controller.toggleFilter(TTexts.tabLowStock),
                     )),
               ),
-              const SizedBox(width: 12),
+              const SizedBox(width: AppSizes.p12),
               Expanded(
                 child: Obx(() => _buildToggleCard(
                       title: TTexts.tabHealthy.tr,
@@ -78,10 +80,11 @@ class InventoryInsightOverviewWidget
       onTap: onTap,
       child: AnimatedContainer(
         duration: const Duration(milliseconds: 200),
-        padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 8),
+        padding: const EdgeInsets.symmetric(
+            vertical: AppSizes.p12, horizontal: AppSizes.p8),
         decoration: BoxDecoration(
           color: isSelected ? color : color.withOpacity(0.05),
-          borderRadius: BorderRadius.circular(16),
+          borderRadius: BorderRadius.circular(AppSizes.radius16),
           border: Border.all(
               color: isSelected ? color : color.withOpacity(0.2), width: 1.5),
           boxShadow: isSelected
@@ -97,7 +100,7 @@ class InventoryInsightOverviewWidget
           crossAxisAlignment: CrossAxisAlignment.center,
           children: [
             Icon(icon, color: isSelected ? Colors.white : color, size: 22),
-            const SizedBox(height: 8),
+            const SizedBox(height: AppSizes.p8),
             Text(
               "$count",
               style: TextStyle(

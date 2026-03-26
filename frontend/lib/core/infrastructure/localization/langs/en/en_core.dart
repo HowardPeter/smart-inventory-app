@@ -65,4 +65,7 @@ final Map<String, String> enCore = {
 
   TTexts.create: "Create",
   TTexts.cancel: "Cancel",
+
+  TTexts.unknownProduct: 'Unknown Product',
+  TTexts.na: 'N/A',
 };

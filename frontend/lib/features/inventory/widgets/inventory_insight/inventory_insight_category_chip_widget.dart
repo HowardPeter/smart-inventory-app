@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:frontend/core/ui/theme/app_sizes.dart'; // ĐÃ IMPORT APPSIZES
 import 'package:frontend/features/inventory/controllers/inventory_insight_controller.dart';
 import 'package:get/get.dart';
 import 'package:frontend/core/ui/theme/app_colors.dart';
@@ -13,33 +14,31 @@ class InventoryInsightCategoryChipWidget
     return SizedBox(
       height: 42,
       child: Obx(() {
-        // Chỉ bọc Obx ở đây để lắng nghe thay đổi độ dài danh sách Categories (nếu có)
         final List<String> chipItems = [TTexts.allItems];
         chipItems.addAll(controller.categories.map((c) => c.name));
 
         return ListView.builder(
           scrollDirection: Axis.horizontal,
           physics: const BouncingScrollPhysics(),
-          padding: const EdgeInsets.symmetric(horizontal: 20),
+          padding: const EdgeInsets.symmetric(horizontal: AppSizes.p20),
           itemCount: chipItems.length,
           itemBuilder: (context, index) {
             final item = chipItems[index];
 
             return GestureDetector(
               onTap: () => controller.setCategory(item),
-              // QUAN TRỌNG: Bọc Obx ngay tại đây để từng Chip tự lắng nghe sự kiện đổi màu
               child: Obx(() {
                 final isSelected = controller.activeCategory.value == item;
                 return AnimatedContainer(
                   duration: const Duration(milliseconds: 200),
                   curve: Curves.easeInOut,
-                  margin: const EdgeInsets.only(right: 12),
+                  margin: const EdgeInsets.only(right: AppSizes.p12),
                   padding:
                       const EdgeInsets.symmetric(horizontal: 18, vertical: 0),
                   decoration: BoxDecoration(
                     color:
                         isSelected ? AppColors.primaryText : AppColors.surface,
-                    borderRadius: BorderRadius.circular(24),
+                    borderRadius: BorderRadius.circular(AppSizes.radius24),
                     border: Border.all(
                       color: isSelected
                           ? AppColors.primaryText
