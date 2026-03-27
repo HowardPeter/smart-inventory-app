@@ -10,6 +10,7 @@ import {
   productPackageProductRouter,
 } from './modules/product-packages/index.js';
 import { productRouter } from './modules/products/index.js';
+import { searchRouter } from './modules/search/index.js';
 import { storeRouter } from './modules/stores/index.js';
 import { userProfileRouter } from './modules/user-profile/index.js';
 
@@ -34,6 +35,7 @@ app.use('/api/auth', userProfileRouter);
 app.use('/api/product-packages', productPackageRouter);
 app.use('/api/inventories', inventoryRouter);
 app.use('/api/audit-logs', auditLogRouter);
+app.use('/api/search', searchRouter);
 
 app.use(errorHandler);
 
