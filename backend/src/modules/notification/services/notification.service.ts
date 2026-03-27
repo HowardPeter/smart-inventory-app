@@ -19,14 +19,16 @@ export class NotificationService {
   // --- LUỒNG CHÍNH: LƯU DB VÀ BẮN PUSH ---
   public async createAndSendNotification(
     userId: string,
+    storeId: string, // 👉 Bổ sung tham số storeId
     title: string,
     body: string,
     type: string,
     referenceId?: string,
   ): Promise<void> {
-    // 1. Lưu vào Database (Để làm màn hình danh sách thông báo)
+    // 1. Lưu vào Database
     const newNoti = await this.notificationRepository.createNotification(
       userId,
+      storeId, // 👉 Truyền storeId xuống Repo
       title,
       body,
       type,
@@ -73,8 +75,12 @@ export class NotificationService {
   }
 
   // Cung cấp dữ liệu cho API Frontend
-  public async getUserNotifications(userId: string) {
-    return await this.notificationRepository.getUserNotifications(userId);
+  public async getUserNotifications(userId: string, storeId: string) {
+    // 👉 Thêm tham số storeId
+    return await this.notificationRepository.getUserNotifications(
+      userId,
+      storeId,
+    ); // 👉 Đồng bộ với Repo
   }
 
   public async markAsRead(userId: string, notificationId: string) {

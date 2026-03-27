@@ -2,7 +2,6 @@ import 'package:dio/dio.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
-import 'package:get/get.dart';
 import 'package:frontend/core/infrastructure/network/app_client.dart';
 
 class NotificationService {
@@ -123,29 +122,29 @@ class NotificationService {
       }();
     }
 
-    // Điều hướng GetX dựa theo Use Case
+    // TODO: Điều hướng GetX dựa theo Use Case
     switch (type) {
       case 'LOW_STOCK': // Cảnh báo sắp hết hàng
       case 'REORDER_SUGGESTION': // Gợi ý nhập hàng
         if (referenceId.isNotEmpty) {
           // Bạn nhớ đổi tên route này cho khớp với app của bạn nhé
-          Get.toNamed('/product-detail', arguments: referenceId);
+         // Get.toNamed('/product-detail', arguments: referenceId);
         } else {
-          Get.toNamed('/notification-center');
+         // Get.toNamed('/notification-center');
         }
         break;
 
       case 'ABNORMAL_DISCREPANCY': // Cảnh báo biến động tồn kho bất thường
         if (referenceId.isNotEmpty) {
-          Get.toNamed('/inventory-adjustment-history', arguments: referenceId);
+          //Get.toNamed('/inventory-adjustment-history', arguments: referenceId);
         } else {
-          Get.toNamed('/notification-center');
+         // Get.toNamed('/notification-center');
         }
         break;
 
       default:
         // Các thông báo chung (Ví dụ tin tức, update hệ thống...)
-        Get.toNamed('/notification-center');
+      //  Get.toNamed('/notification-center');
         break;
     }
   }

@@ -87,6 +87,7 @@ model Store {
   auditLogs     AuditLog[]
   storeMembers  StoreMember[]
   hidedDefaults HidedDefault[]
+  notifications Notification[]
 }
 
 model StoreMember {
@@ -248,11 +249,14 @@ model Notification {
   isRead         Boolean  @default(false) @map("is_read")
   
   activeStatus   ActiveStatus @default(active) @map("active_status")
+
+  storeId        String?  @map("store_id")
   
   createdAt      DateTime @default(now()) @map("created_at")
   userId         String   @map("user_id")
 
   user UserProfile @relation(fields: [userId], references: [userId], onDelete: Cascade)
+  store Store?      @relation(fields: [storeId], references: [storeId], onDelete: Cascade)
 
   @@map("notification")
 }

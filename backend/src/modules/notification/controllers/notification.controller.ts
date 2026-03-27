@@ -28,11 +28,22 @@ export class NotificationController {
   };
 
   // API Lấy danh sách thông báo
-
   getNotifications = async (req: Request, res: Response): Promise<void> => {
     const user = requireReqUser(req);
+    const storeId = req.headers['x-store-id'] as string;
+
+    if (!storeId) {
+      res.status(StatusCodes.BAD_REQUEST).json({
+        success: false,
+        message: 'Thiếu x-store-id trong Header',
+      });
+
+      return;
+    }
+
     const notifications = await this.notificationService.getUserNotifications(
       user.userId,
+      storeId,
     );
 
     sendResponse.success(res, notifications, { status: StatusCodes.OK });
@@ -41,7 +52,6 @@ export class NotificationController {
   // API Đánh dấu đã đọc
   markAsRead = async (req: Request, res: Response): Promise<void> => {
     const user = requireReqUser(req);
-    // Thay đổi cách lấy params và ép kiểu thành string
     const notificationId = req.params.notificationId as string;
 
     await this.notificationService.markAsRead(user.userId, notificationId);
@@ -54,7 +64,6 @@ export class NotificationController {
   // API Xóa mềm
   deleteNotification = async (req: Request, res: Response): Promise<void> => {
     const user = requireReqUser(req);
-    // Thay đổi cách lấy params và ép kiểu thành string
     const notificationId = req.params.notificationId as string;
 
     await this.notificationService.softDeleteNotification(
@@ -70,10 +79,22 @@ export class NotificationController {
   // API Test gửi thông báo từ Postman
   testSend = async (req: Request, res: Response): Promise<void> => {
     const user = requireReqUser(req);
+    const storeId = req.headers['x-store-id'] as string; // 👉 Bắt storeId từ Header
+
+    if (!storeId) {
+      res.status(StatusCodes.BAD_REQUEST).json({
+        success: false,
+        message: 'Thiếu x-store-id trong Header',
+      });
+
+      return;
+    }
+
     const { title, body, type, referenceId } = req.body;
 
     await this.notificationService.createAndSendNotification(
       user.userId,
+      storeId, // 👉 Truyền storeId xuống Service
       title,
       body,
       type,

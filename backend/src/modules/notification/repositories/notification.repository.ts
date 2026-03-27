@@ -21,19 +21,31 @@ export class NotificationRepository {
   // --- XỬ LÝ IN-APP NOTIFICATION ---
   async createNotification(
     userId: string,
+    storeId: string, // 👉 Thêm storeId
     title: string,
     body: string,
     type: string,
     referenceId?: string,
   ) {
     return await prisma.notification.create({
-      data: { userId, title, body, type, referenceId: referenceId ?? null },
+      data: {
+        userId,
+        storeId,
+        title,
+        body,
+        type,
+        referenceId: referenceId ?? null,
+      },
     });
   }
 
-  async getUserNotifications(userId: string) {
+  async getUserNotifications(userId: string, storeId: string) {
     return await prisma.notification.findMany({
-      where: { userId, activeStatus: 'active' }, // Lấy danh sách chưa bị xóa mềm
+      where: {
+        userId: userId,
+        storeId: storeId, // Đã có lọc theo storeId
+        activeStatus: 'active',
+      },
       orderBy: { createdAt: 'desc' },
     });
   }
