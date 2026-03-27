@@ -3,7 +3,7 @@ import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:get/get.dart';
-import 'package:frontend/core/infrastructure/network/app_client.dart'; // Import đúng ApiClient của bạn
+import 'package:frontend/core/infrastructure/network/app_client.dart';
 
 class NotificationService {
   static final FirebaseMessaging _messaging = FirebaseMessaging.instance;
@@ -35,9 +35,10 @@ class NotificationService {
     await _localNotificationsPlugin.initialize(
       settings: initSettings,
       onDidReceiveNotificationResponse: (NotificationResponse response) {
-        // Xử lý khi user click vào thông báo lúc app ĐANG MỞ
+        // (Tùy chọn nâng cao) Xử lý khi user click vào popup Local Notification lúc app ĐANG MỞ
       },
     );
+
     const AndroidNotificationChannel channel = AndroidNotificationChannel(
       'high_importance_channel', // Khớp 100% với BE Node.js
       'High Importance Notifications',
@@ -57,17 +58,17 @@ class NotificationService {
 
       if (notification != null && android != null) {
         _localNotificationsPlugin.show(
-          id: notification.hashCode, // <-- Thêm id:
-          title: notification.title, // <-- Thêm title:
-          body: notification.body, // <-- Thêm body:
+          id: notification.hashCode,
+          title: notification.title,
+          body: notification.body,
           notificationDetails: NotificationDetails(
-            // <-- Thêm notificationDetails:
             android: AndroidNotificationDetails(
               channel.id,
               channel.name,
               channelDescription: channel.description,
               icon: '@drawable/ic_notification',
-              color: const Color(0x00fe7a03),
+              color: const Color(
+                  0x00ff7a03),
               largeIcon:
                   const DrawableResourceAndroidBitmap('@mipmap/ic_launcher'),
               importance: Importance.max,
@@ -94,21 +95,58 @@ class NotificationService {
 
     // 6. LẮNG NGHE ĐỔI TOKEN (Firebase tự đổi định kỳ)
     _messaging.onTokenRefresh.listen((newToken) {
-      // Gọi API cập nhật nếu cần, thường ApiClient tự có session token rồi
       registerTokenWithBackend();
     });
   }
 
-  // --- HÀM XỬ LÝ CHUYỂN TRANG BẰNG GETX ---
+  // --- BỘ ĐỊNH TUYẾN THÔNG MINH ---
   static void _handleNotificationTap(RemoteMessage message) {
-    // Đọc payload "data" gửi từ Node.js (biến dataPayload trong sendNotification)
     final data = message.data;
 
-    // Ví dụ cấu trúc data từ BE: { "type": "lesson", "lessonId": "123" }
-    if (data['type'] == 'lesson') {
-      Get.toNamed('/lesson-detail', arguments: data['lessonId']);
-    } else if (data['type'] == 'profile') {
-      Get.toNamed('/profile');
+    // Trích xuất data payload chuẩn
+    final String type = data['type'] ?? 'UNKNOWN';
+    final String referenceId = data['referenceId'] ?? '';
+    final String notificationId = data['notificationId'] ?? '';
+
+    debugPrint(
+        "🔔 [FCM] User click thông báo: type=$type, refId=$referenceId, notiId=$notificationId");
+
+    // Gọi API báo đã đọc chạy ngầm (Dùng PATCH)
+    if (notificationId.isNotEmpty) {
+      // Dùng async/await lồng trong một Future không chặn (fire-and-forget)
+      () async {
+        try {
+          await _apiClient.patch('api/notification/$notificationId/read');
+        } catch (e) {
+          debugPrint("⚠️ [FCM] Lỗi update trạng thái read: $e");
+        }
+      }();
+    }
+
+    // Điều hướng GetX dựa theo Use Case
+    switch (type) {
+      case 'LOW_STOCK': // Cảnh báo sắp hết hàng
+      case 'REORDER_SUGGESTION': // Gợi ý nhập hàng
+        if (referenceId.isNotEmpty) {
+          // Bạn nhớ đổi tên route này cho khớp với app của bạn nhé
+          Get.toNamed('/product-detail', arguments: referenceId);
+        } else {
+          Get.toNamed('/notification-center');
+        }
+        break;
+
+      case 'ABNORMAL_DISCREPANCY': // Cảnh báo biến động tồn kho bất thường
+        if (referenceId.isNotEmpty) {
+          Get.toNamed('/inventory-adjustment-history', arguments: referenceId);
+        } else {
+          Get.toNamed('/notification-center');
+        }
+        break;
+
+      default:
+        // Các thông báo chung (Ví dụ tin tức, update hệ thống...)
+        Get.toNamed('/notification-center');
+        break;
     }
   }
 
@@ -122,15 +160,19 @@ class NotificationService {
         return;
       }
 
+      // Đã sửa lại đường dẫn, bỏ /api
       await _apiClient.post(
         '/api/notification/register-token',
         data: {'token': fcmToken},
       );
       debugPrint("✅ [FCM] Đăng ký token lên server thành công");
     } on DioException catch (e) {
-      // Bắt chính xác lỗi từ API trả về (Cực kỳ hữu ích để debug)
-      debugPrint(
-          "❌ [FCM] Lỗi gọi API Dio: HTTP ${e.response?.statusCode} - ${e.response?.data}");
+      // Bắt lỗi chi tiết để trị lỗi null-null
+      debugPrint("❌ [FCM] Lỗi gọi API Dio đăng ký token:");
+      debugPrint("   - Type: ${e.type}");
+      debugPrint("   - Message: ${e.message}");
+      debugPrint("   - Status: ${e.response?.statusCode}");
+      debugPrint("   - Data: ${e.response?.data}");
     } catch (e) {
       debugPrint("❌ [FCM] Lỗi hệ thống chưa xác định: $e");
     }
@@ -141,6 +183,7 @@ class NotificationService {
       String? fcmToken = await _messaging.getToken();
       if (fcmToken == null) return;
 
+      // Đã sửa lại đường dẫn, bỏ /api
       await _apiClient.post(
         '/api/notification/remove-token',
         data: {'token': fcmToken},
@@ -149,8 +192,12 @@ class NotificationService {
       await _messaging.deleteToken();
       debugPrint("✅ [FCM] Đã xóa token thành công");
     } on DioException catch (e) {
-      debugPrint(
-          "❌ [FCM] Lỗi gọi API Dio khi xóa: HTTP ${e.response?.statusCode} - ${e.response?.data}");
+      // Bắt lỗi chi tiết để trị lỗi null-null
+      debugPrint("❌ [FCM] Lỗi gọi API Dio xóa token:");
+      debugPrint("   - Type: ${e.type}");
+      debugPrint("   - Message: ${e.message}");
+      debugPrint("   - Status: ${e.response?.statusCode}");
+      debugPrint("   - Data: ${e.response?.data}");
     } catch (e) {
       debugPrint("❌ [FCM] Lỗi xóa token: $e");
     }

@@ -1,37 +1,58 @@
-// src/modules/notification/routes/notification.route.ts
 import { Router } from 'express';
 
-import { asyncWrapper } from '../../common/middlewares/index.js';
-//import { validate } from '../../common/validators/index.js';
+import { NotificationController } from './controllers/notification.controller.js';
+import { NotificationRepository } from './repositories/notification.repository.js';
+import { NotificationService } from './services/notification.service.js';
+import { asyncWrapper } from '../../common/middlewares/async-wrapper.middleware.js';
 import { authenticate } from '../auth/index.js';
-import { notificationController } from '../notification/notification.module.js';
-import { validate } from './validators/validate.middleware.js';
 import {
   registerTokenSchema,
   removeTokenSchema,
-} from '../notification/validators/notification.validator.js';
+} from './validators/notification.validator.js';
+import { validate } from '../notification/validators/validate.middleware.js';
 
 const notificationRouter = Router();
+const repository = new NotificationRepository();
+const service = new NotificationService(repository);
+const controller = new NotificationController(service);
 
-// Endpoint đăng ký token yêu cầu user phải đăng nhập
 notificationRouter.post(
   '/register-token',
   authenticate,
   validate(registerTokenSchema),
-  asyncWrapper(notificationController.registerToken),
+  asyncWrapper(controller.registerToken),
 );
 
-// Endpoint xóa token (khi logout)
 notificationRouter.post(
   '/remove-token',
+  authenticate,
   validate(removeTokenSchema),
-  asyncWrapper(notificationController.removeToken),
+  asyncWrapper(controller.removeToken),
 );
 
 notificationRouter.post(
   '/test-send',
-  authenticate, // Lấy userId từ token
-  asyncWrapper(notificationController.testSend),
+  authenticate,
+  asyncWrapper(controller.testSend),
 );
 
-export { notificationRouter };
+// Các route cho App
+notificationRouter.get(
+  '/',
+  authenticate,
+  asyncWrapper(controller.getNotifications),
+);
+
+notificationRouter.patch(
+  '/:notificationId/read',
+  authenticate,
+  asyncWrapper(controller.markAsRead),
+);
+
+notificationRouter.delete(
+  '/:notificationId',
+  authenticate,
+  asyncWrapper(controller.deleteNotification),
+);
+
+export default notificationRouter;

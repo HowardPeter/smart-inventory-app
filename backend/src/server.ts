@@ -6,7 +6,7 @@ import { initFirebaseAdmin } from './config/firebase.config.js';
 import { auditLogRouter } from './modules/audit-log/audit-log.route.js';
 import { categoryRouter } from './modules/categories/index.js';
 import { inventoryRouter } from './modules/inventories/inventory.route.js';
-import { notificationRouter } from './modules/notification/notification.route.js';
+import notificationRouter from './modules/notification/notification.route.js';
 import {
   productPackageRouter,
   productPackageProductRouter,

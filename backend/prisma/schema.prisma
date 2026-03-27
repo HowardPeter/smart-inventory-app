@@ -68,6 +68,7 @@ model UserProfile {
   auditLogs    AuditLog[]
   storeMembers StoreMember[]
   fcmTokens    FcmToken[]
+  notifications Notification[]
 }
 
 model Store {
@@ -236,4 +237,22 @@ model FcmToken {
   user      UserProfile @relation(fields: [userId], references: [userId], onDelete: Cascade)
 
   @@map("fcm_token")
+}
+
+model Notification {
+  notificationId String   @id @default(uuid()) @map("notification_id")
+  title          String
+  body           String
+  type           String
+  referenceId    String?  @map("reference_id") 
+  isRead         Boolean  @default(false) @map("is_read")
+  
+  activeStatus   ActiveStatus @default(active) @map("active_status")
+  
+  createdAt      DateTime @default(now()) @map("created_at")
+  userId         String   @map("user_id")
+
+  user UserProfile @relation(fields: [userId], references: [userId], onDelete: Cascade)
+
+  @@map("notification")
 }

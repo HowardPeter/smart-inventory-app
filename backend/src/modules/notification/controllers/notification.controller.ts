@@ -1,68 +1,84 @@
-// src/modules/notification/controllers/notification.controller.ts
 import { StatusCodes } from 'http-status-codes';
 
 import { requireReqUser, sendResponse } from '../../../common/utils/index.js';
 import { NotificationService } from '../services/notification.service.js';
 
-import type { ApiResponse } from '../../../common/types/index.js';
-import type {
-  RegisterTokenDto,
-  RemoveTokenDto,
-  FcmTokenResponseDto,
-} from '../dto/notification.dto.js';
 import type { Request, Response } from 'express';
 
 export class NotificationController {
   constructor(private readonly notificationService: NotificationService) {}
 
-  registerToken = async (
-    req: Request,
-    res: Response<ApiResponse<FcmTokenResponseDto>>,
-  ): Promise<void> => {
+  // Quản lý Token
+  registerToken = async (req: Request, res: Response): Promise<void> => {
     const user = requireReqUser(req);
-    const payload = req.body as RegisterTokenDto;
-
-    const registeredToken = await this.notificationService.registerToken(
+    const { token } = req.body;
+    const data = await this.notificationService.registerToken(
       user.userId,
-      payload,
+      token,
     );
 
-    sendResponse.success(res, registeredToken, { status: StatusCodes.OK });
+    sendResponse.success(res, data, { status: StatusCodes.OK });
   };
 
-  removeToken = async (
-    req: Request,
-    res: Response<ApiResponse<null>>,
-  ): Promise<void> => {
-    // Không bắt buộc phải login khi remove token
-    // (đề phòng token bị treo khi phiên đã hết hạn)
-    // Nếu route của bạn bắt buộc authenticate
+  removeToken = async (req: Request, res: Response): Promise<void> => {
+    const { token } = req.body;
 
-    // thì có thể dùng requireReqUser ở đây.
-    const payload = req.body as RemoveTokenDto;
-
-    await this.notificationService.removeToken(payload);
-
+    await this.notificationService.removeToken(token);
     sendResponse.success(res, null, { status: StatusCodes.OK });
   };
 
-  // Hàm test notification
-  // Thêm hàm này vào NotificationController
-  testSend = async (
-    req: Request,
-    res: Response<ApiResponse<null>>,
-  ): Promise<void> => {
-    const user = requireReqUser(req);
-    const { title, body, dataPayload } = req.body;
+  // API Lấy danh sách thông báo
 
-    // Đã xóa chữ 'ToUser'
-    await this.notificationService.sendNotification(
+  getNotifications = async (req: Request, res: Response): Promise<void> => {
+    const user = requireReqUser(req);
+    const notifications = await this.notificationService.getUserNotifications(
+      user.userId,
+    );
+
+    sendResponse.success(res, notifications, { status: StatusCodes.OK });
+  };
+
+  // API Đánh dấu đã đọc
+  markAsRead = async (req: Request, res: Response): Promise<void> => {
+    const user = requireReqUser(req);
+    // Thay đổi cách lấy params và ép kiểu thành string
+    const notificationId = req.params.notificationId as string;
+
+    await this.notificationService.markAsRead(user.userId, notificationId);
+    sendResponse.success(res, null, {
+      status: StatusCodes.OK,
+      message: 'Đã đánh dấu đọc',
+    });
+  };
+
+  // API Xóa mềm
+  deleteNotification = async (req: Request, res: Response): Promise<void> => {
+    const user = requireReqUser(req);
+    // Thay đổi cách lấy params và ép kiểu thành string
+    const notificationId = req.params.notificationId as string;
+
+    await this.notificationService.softDeleteNotification(
+      user.userId,
+      notificationId,
+    );
+    sendResponse.success(res, null, {
+      status: StatusCodes.OK,
+      message: 'Đã xóa thông báo',
+    });
+  };
+
+  // API Test gửi thông báo từ Postman
+  testSend = async (req: Request, res: Response): Promise<void> => {
+    const user = requireReqUser(req);
+    const { title, body, type, referenceId } = req.body;
+
+    await this.notificationService.createAndSendNotification(
       user.userId,
       title,
       body,
-      dataPayload,
+      type,
+      referenceId,
     );
-
     sendResponse.success(res, null, { status: StatusCodes.OK });
   };
 }
