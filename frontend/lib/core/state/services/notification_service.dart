@@ -3,6 +3,8 @@ import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:frontend/core/infrastructure/network/app_client.dart';
+import 'package:frontend/features/notification/controller/notification_controller.dart';
+import 'package:get/get.dart';
 
 class NotificationService {
   static final FirebaseMessaging _messaging = FirebaseMessaging.instance;
@@ -75,6 +77,12 @@ class NotificationService {
             ),
           ),
         );
+
+        // 👉 THÊM MỚI TẠI ĐÂY: TRIGGER REAL-TIME UI UPDATE
+        // Cập nhật lại danh sách thông báo nếu user đang mở màn hình Notification
+        if (Get.isRegistered<NotificationController>()) {
+          Get.find<NotificationController>().fetchNotifications();
+        }
       }
     });
 

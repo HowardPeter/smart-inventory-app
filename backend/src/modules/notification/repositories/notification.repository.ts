@@ -63,4 +63,13 @@ export class NotificationRepository {
       data: { activeStatus: 'inactive' }, // Xóa mềm
     });
   }
+
+  // Thêm hàm này để xóa một lúc nhiều token rác
+  async deleteMultipleTokens(tokens: string[]) {
+    await prisma.fcmToken.deleteMany({
+      where: {
+        token: { in: tokens },
+      },
+    });
+  }
 }

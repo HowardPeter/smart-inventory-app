@@ -62,15 +62,46 @@ export class NotificationService {
       apns: { payload: { aps: { sound: 'default' } } },
     };
 
-    // 4. Bắn qua Firebase
+    // 4. Bắn qua Firebase và Dọn dẹp Token rác
     try {
       const response = await getMessaging().sendEachForMulticast(message);
 
       console.info(
         `[FCM] Gửi thành công: ${response.successCount}, Lỗi: ${response.failureCount}`,
       );
+
+      // Nếu có lỗi xảy ra trong quá trình gửi
+      if (response.failureCount > 0) {
+        const failedTokens: string[] = [];
+
+        // Duyệt qua từng kết quả trả về
+        response.responses.forEach((resp, idx) => {
+          if (!resp.success && resp.error) {
+            const errorCode = resp.error.code;
+
+            // Nếu lỗi là do token đã chết hoặc bị gỡ cài đặt
+            if (
+              errorCode === 'messaging/invalid-registration-token' ||
+              errorCode === 'messaging/registration-token-not-registered'
+            ) {
+              // Thêm if check để làm hài lòng TypeScript Strict Mode
+              if (tokens[idx] && tokens[idx].token) {
+                failedTokens.push(tokens[idx].token);
+              }
+            }
+          }
+        });
+
+        // Xóa các token rác khỏi Database để nhẹ DB và tăng tốc độ cho lần sau
+        if (failedTokens.length > 0) {
+          console.info(
+            `[FCM] Đang dọn dẹp ${failedTokens.length} token rác khỏi Database...`,
+          );
+          await this.notificationRepository.deleteMultipleTokens(failedTokens);
+        }
+      }
     } catch (error) {
-      console.error('Lỗi gửi push notification:', error);
+      console.error('Lỗi hệ thống khi gửi push notification:', error);
     }
   }
 
