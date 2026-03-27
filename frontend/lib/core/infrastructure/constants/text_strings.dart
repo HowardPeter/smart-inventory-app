@@ -321,6 +321,28 @@ class TTexts {
   static const String actionRequired = "action_required";
   static const String goodCondition = "good_condition";
 
+  // -- Inventory Detail
+  static const String inventoryDetails = "inventory_details";
+  static const String quantityInStock = "quantity_in_stock";
+  static const String reorderThreshold = "reorder_threshold";
+  static const String importPrice = "import_price";
+  static const String adjustStock = "adjust_stock";
+  static const String totalInStock = "total_in_stock";
+  static const String lowStockAlert = "low_stock_alert";
+  static const String noThreshold = "no_threshold";
+
+  // Detail Row Titles
+  static const String productSku = "product_sku";
+  static const String productPrice = "product_price";
+  static const String totalValue = "total_value";
+  static const String editItem = "edit_item";
+  static const String deleteItem = "delete_item";
+  static const String addToTransaction = "add_to_transaction";
+  static const String deleteConfirmation = "delete_confirmation";
+  static const String confirmDeleteText =
+      "are_you_sure_you_want_to_delete_this_item";
+  static const String delete = "delete";
+
   // Empty State
   static const String emptyTransactionTitle = "empty_transaction_title";
   static const String emptyTransactionSubtitle = "empty_transaction_subtitle";

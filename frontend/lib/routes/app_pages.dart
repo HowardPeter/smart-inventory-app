@@ -7,7 +7,9 @@ import 'package:frontend/features/auth/views/login_view.dart';
 import 'package:frontend/features/auth/views/register_view.dart';
 import 'package:frontend/features/auth/views/verify_email_view.dart';
 import 'package:frontend/features/home/views/home_view.dart';
+import 'package:frontend/features/inventory/bindings/inventory_detail_binding.dart';
 import 'package:frontend/features/inventory/bindings/inventory_insight_binding.dart';
+import 'package:frontend/features/inventory/views/inventory_detail_view.dart';
 import 'package:frontend/features/inventory/views/inventory_insight_view.dart';
 import 'package:frontend/features/inventory/views/inventory_view.dart';
 import 'package:frontend/features/navigation/bindings/navigation_binding.dart';
@@ -157,6 +159,13 @@ class AppPages {
       page: () => const InventoryInsightView(),
       binding: InventoryListBinding(),
       transition: Transition.fadeIn,
+    ),
+
+    GetPage(
+      name: AppRoutes.inventoryDetail,
+      page: () => const InventoryDetailView(),
+      binding: InventoryDetailBinding(),
+      transition: Transition.cupertino,
     ),
 
     // -- Profile

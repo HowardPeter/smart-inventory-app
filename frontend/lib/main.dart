@@ -1,3 +1,4 @@
+import 'dart:io';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
@@ -19,6 +20,9 @@ import 'core/ui/theme/app_theme.dart';
 void main() async {
   // Đảm bảo Flutter core đã được khởi tạo trước khi chạy các setup khác
   WidgetsFlutterBinding.ensureInitialized();
+
+  HttpOverrides.global = MyHttpOverrides();
+
   try {
     await dotenv.load(fileName: ".env");
   } catch (e) {
@@ -50,6 +54,15 @@ void main() async {
       builder: (context) => const App(),
     ),
   );
+}
+
+class MyHttpOverrides extends HttpOverrides {
+  @override
+  HttpClient createHttpClient(SecurityContext? context) {
+    return super.createHttpClient(context)
+      ..badCertificateCallback =
+          (X509Certificate cert, String host, int port) => true;
+  }
 }
 
 class App extends StatelessWidget {

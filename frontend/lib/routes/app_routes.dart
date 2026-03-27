@@ -19,5 +19,6 @@ class AppRoutes {
   static const home = '/home';
   static const inventory = '/inventory';
   static const inventorySight = '/inventory_insight';
+  static const inventoryDetail = '/inventory-detail';
   static const profile = '/profile';
 }

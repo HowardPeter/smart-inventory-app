@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:frontend/core/ui/theme/app_sizes.dart'; // ĐÃ IMPORT APPSIZES
+import 'package:frontend/core/ui/widgets/t_no_image_widget.dart';
 import 'package:frontend/features/inventory/models/inventory_insight_display_model.dart';
+import 'package:frontend/routes/app_routes.dart';
 import 'package:get/get.dart';
 import 'package:frontend/core/ui/theme/app_colors.dart';
 import 'package:frontend/core/infrastructure/constants/text_strings.dart';
@@ -16,7 +18,6 @@ class InventoryInsightItemWidget extends StatelessWidget {
     final product = displayItem.product;
     final pkg = inventory.productPackage;
 
-    // ĐÃ THAY CHỮ CỨNG BẰNG TTEXTS
     final name = pkg?.displayName ?? TTexts.unknownProduct.tr;
     final sku = pkg?.barcodeValue ?? TTexts.na.tr;
 
@@ -39,7 +40,7 @@ class InventoryInsightItemWidget extends StatelessWidget {
 
     return GestureDetector(
       onTap: () {
-        // Get.to(() => InventoryItemDetailView(inventory: inventory));
+        Get.toNamed(AppRoutes.inventoryDetail, arguments: displayItem);
       },
       child: Container(
         margin: const EdgeInsets.only(bottom: AppSizes.p16),
@@ -62,11 +63,11 @@ class InventoryInsightItemWidget extends StatelessWidget {
               width: 56,
               height: 56,
               decoration: BoxDecoration(
-                color: AppColors.softGrey.withOpacity(0.1),
-                borderRadius: BorderRadius.circular(AppSizes.radius12),
+                // Đã bỏ màu nền ở đây vì TNoImageWidget tự có màu nền
+                borderRadius: BorderRadius.circular(12),
               ),
               child: ClipRRect(
-                borderRadius: BorderRadius.circular(AppSizes.radius12),
+                borderRadius: BorderRadius.circular(12),
                 child: imageUrl != null && imageUrl.isNotEmpty
                     ? Image.network(
                         imageUrl,
@@ -77,12 +78,11 @@ class InventoryInsightItemWidget extends StatelessWidget {
                               child: CircularProgressIndicator(strokeWidth: 2));
                         },
                         errorBuilder: (context, error, stackTrace) {
-                          return Icon(Icons.inventory_2_outlined,
-                              color: statusColor, size: AppSizes.iconMd);
+                          return const TNoImageWidget(
+                              iconSize: 24, borderRadius: 12);
                         },
                       )
-                    : Icon(Icons.inventory_2_outlined,
-                        color: statusColor, size: AppSizes.iconMd),
+                    : const TNoImageWidget(iconSize: 24, borderRadius: 12),
               ),
             ),
             const SizedBox(width: AppSizes.p16),
