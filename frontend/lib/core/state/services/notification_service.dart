@@ -1,6 +1,6 @@
 import 'package:dio/dio.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
-import 'package:flutter/foundation.dart';
+import 'package:flutter/material.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:get/get.dart';
 import 'package:frontend/core/infrastructure/network/app_client.dart'; // Import đúng ApiClient của bạn
@@ -23,7 +23,7 @@ class NotificationService {
 
     // 2. SETUP LOCAL NOTIFICATION (Dành cho Foreground)
     const AndroidInitializationSettings androidSettings =
-        AndroidInitializationSettings('@mipmap/ic_launcher');
+        AndroidInitializationSettings('@drawable/ic_notification');
     const DarwinInitializationSettings iosSettings =
         DarwinInitializationSettings();
 
@@ -66,7 +66,10 @@ class NotificationService {
               channel.id,
               channel.name,
               channelDescription: channel.description,
-              icon: '@mipmap/ic_launcher',
+              icon: '@drawable/ic_notification',
+              color: const Color(0x00fe7a03),
+              largeIcon:
+                  const DrawableResourceAndroidBitmap('@mipmap/ic_launcher'),
               importance: Importance.max,
               priority: Priority.high,
             ),

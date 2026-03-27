@@ -1,11 +1,12 @@
+import 'package:frontend/core/infrastructure/network/app_client.dart';
 import 'package:frontend/core/infrastructure/utils/full_screen_loader_utils.dart';
 import 'package:frontend/core/state/services/auth_service.dart';
 import 'package:frontend/core/state/services/store_service.dart';
 import 'package:frontend/core/ui/widgets/t_snackbars_widget.dart';
+import 'package:frontend/features/auth/providers/auth_provider.dart';
 import 'package:get/get.dart';
 import 'package:frontend/routes/app_routes.dart';
 import 'package:frontend/core/state/services/user_service.dart';
-import 'package:google_sign_in/google_sign_in.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 // import 'package:frontend/features/auth/providers/auth_provider.dart';
 
@@ -13,6 +14,7 @@ class ProfileController extends GetxController {
   // Lấy thẳng UserService đã nạp trên RAM từ lúc Splash khởi động
   final userService = Get.find<UserService>();
   final supabase = Supabase.instance.client;
+  final apiClient = ApiClient();
 
   Future<void> executeLogout() async {
     try {
@@ -20,9 +22,7 @@ class ProfileController extends GetxController {
       FullScreenLoaderUtils.openLoadingDialog('Đang đăng xuất...');
 
       // 2. Gọi hàm logout thực sự của Supabase (Hủy phiên làm việc trên server)
-      await supabase.auth.signOut();
-      // Đăng xuất Google để lần sau hiện lại popup chọn tài khoản
-      await GoogleSignIn.instance.signOut();
+      await AuthProvider(apiClient: apiClient).logout();
 
       // 3. Dọn ổ cứng (Xóa token, email, trạng thái login)
       await Get.find<AuthService>().clearAuthData();
