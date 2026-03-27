@@ -71,7 +71,6 @@ class InventoryInsightController extends GetxController with TErrorHandler {
     return mappedList;
   }
 
-  // Giữ lại logic đếm số lượng cũ
   int getCount(String tabKey) {
     if (tabKey == TTexts.tabHealthy) return _parentCtrl.healthyCount.value;
     if (tabKey == TTexts.tabLowStock) return _parentCtrl.lowCount.value;

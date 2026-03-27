@@ -7,22 +7,35 @@ import 'package:frontend/features/inventory/models/inventory_history_model.dart'
 import 'package:get/get.dart';
 import 'package:frontend/core/ui/theme/app_colors.dart';
 import 'package:frontend/core/infrastructure/constants/text_strings.dart';
-import 'package:frontend/features/inventory/controllers/inventory_controller.dart';
+// Provider & Model thật
+import 'package:frontend/features/inventory/providers/inventory_provider.dart';
+import 'package:frontend/core/infrastructure/models/product_model.dart';
+import 'package:frontend/core/infrastructure/models/product_package_model.dart';
+import 'package:frontend/core/infrastructure/models/inventory_model.dart';
 
 class InventoryDetailController extends GetxController with TErrorHandler {
-  late InventoryInsightDisplayModel displayItem;
+  // Biến lưu trữ Item đang hiển thị (Có thể null trong lúc đợi tải data)
+  Rx<InventoryInsightDisplayModel?> currentDisplayItem =
+      Rx<InventoryInsightDisplayModel?>(null);
+
+  // Trạng thái loading toàn trang
+  final RxBool isLoading = true.obs;
+
   late final bool canManageInventory;
   final RxBool isChartMode = false.obs;
 
   final List<InventoryInsightDisplayModel> historyStack = [];
-
   String cachedCategoryName = 'Uncategorized';
   List<InventoryInsightDisplayModel> cachedRelatedPackages = [];
+
+  final InventoryProvider _provider = InventoryProvider();
+  String? targetBarcodeToFocus;
 
   @override
   void onInit() {
     super.onInit();
-    displayItem = Get.arguments as InventoryInsightDisplayModel;
+
+    // Check Quyền
     try {
       final storeService = Get.find<StoreService>();
       final role = storeService.currentRole.value.toLowerCase();
@@ -30,65 +43,122 @@ class InventoryDetailController extends GetxController with TErrorHandler {
           (role == 'manager' || role == 'owner' || role == 'admin');
     } catch (e) {
       canManageInventory = false;
-      // Ở đây có thể bỏ qua handleError nếu chỉ đơn giản là fallback quyền hạn,
-      // nhưng nếu lỗi nghiêm trọng do mất session thì có thể gọi handleError(e);
     }
-    _loadHeavyData();
+
+    // Nhận ID và Barcode mục tiêu
+    final productId = Get.arguments as String?;
+    targetBarcodeToFocus = Get.parameters['barcode'];
+
+    if (productId != null) {
+      _fetchDetailData(productId);
+    } else {
+      isLoading.value = false;
+      handleError("Product ID is missing");
+    }
   }
 
-  void pushRelatedItem(InventoryInsightDisplayModel item) {
-    final targetBarcode = item.inventory.productPackage?.barcodeValue;
-    final existingIndex = historyStack.indexWhere((element) =>
-        element.inventory.productPackage?.barcodeValue == targetBarcode);
+  // ==========================================
+  // GỌI API LẤY TOÀN BỘ DATA
+  // ==========================================
+  Future<void> _fetchDetailData(String productId) async {
+    try {
+      isLoading.value = true;
+      update(); // Báo View hiển thị Spinner
 
-    if (existingIndex != -1) {
-      historyStack.removeRange(existingIndex, historyStack.length);
-    } else {
-      historyStack.add(displayItem);
+      // 1. Gọi API (Đảm bảo getProductDetail đã có trong InventoryProvider)
+      final rawData = await _provider.getProductDetail(productId);
+
+      // 2. Parse Dữ liệu
+      cachedCategoryName = rawData['category']?['name'] ?? 'Uncategorized';
+      final parentProduct = ProductModel.fromJson(rawData);
+      final packagesList = rawData['productPackages'] as List<dynamic>? ?? [];
+
+      List<InventoryInsightDisplayModel> related = [];
+      InventoryInsightDisplayModel? initialItem;
+
+      for (var pkgJson in packagesList) {
+        final pkgModel = ProductPackageModel.fromJson(pkgJson);
+        // 1. Tạo một bản sao JSON của inventory có thể chỉnh sửa
+        final invJsonMap =
+            Map<String, dynamic>.from(pkgJson['inventory'] ?? {});
+
+        // 2. Nhét thẳng gói pkgJson vào trong inventory json
+        // (Lưu ý: key 'productPackage' này phải đúng với key mà hàm InventoryModel.fromJson của bạn đang đọc)
+        invJsonMap['productPackage'] = pkgJson;
+
+        // 3. Parse Model từ cục JSON đã được nhét đủ data
+        final invModel = InventoryModel.fromJson(invJsonMap);
+
+        // XÓA dòng này đi vì data đã được parse ở trên:
+        // invModel.productPackage = pkgModel;
+
+        final mappedItem = InventoryInsightDisplayModel(
+          product: parentProduct,
+          inventory: invModel,
+        );
+
+        related.add(mappedItem);
+
+        // Tìm item đúng barcode
+        if (targetBarcodeToFocus != null &&
+            pkgModel.barcodeValue == targetBarcodeToFocus) {
+          initialItem = mappedItem;
+        }
+      }
+
+      // 3. Phân chia Item Chính và Các gói Related
+      if (initialItem != null) {
+        related.removeWhere((item) =>
+            item.inventory.productPackage?.barcodeValue ==
+            targetBarcodeToFocus);
+      } else if (related.isNotEmpty) {
+        initialItem = related.first;
+        related.removeAt(0);
+      }
+
+      cachedRelatedPackages = related;
+      currentDisplayItem.value = initialItem;
+    } catch (e) {
+      handleError(e);
+    } finally {
+      isLoading.value = false;
+      update(); // Vẽ lại giao diện
     }
-    displayItem = item;
-    _loadHeavyData();
-    update();
+  }
+
+  // ==========================================
+  // XỬ LÝ CHUYỂN TRANG (RELATED PACKAGES)
+  // ==========================================
+  void pushRelatedItem(InventoryInsightDisplayModel newItem) {
+    if (currentDisplayItem.value != null) {
+      historyStack.add(currentDisplayItem.value!);
+      currentDisplayItem.value = newItem;
+
+      final allPackages = [...cachedRelatedPackages, historyStack.last];
+      allPackages.removeWhere((pkg) =>
+          pkg.inventory.productPackage?.barcodeValue ==
+          newItem.inventory.productPackage?.barcodeValue);
+      cachedRelatedPackages = allPackages;
+
+      // Có thể gọi _fetchDetailData(newItem.product!.productId) nếu muốn data luôn cực fresh
+      update();
+    }
   }
 
   void goBack() {
     if (historyStack.isNotEmpty) {
-      displayItem = historyStack.removeLast();
-      _loadHeavyData();
+      final oldItem = historyStack.removeLast();
+
+      final allPackages = [...cachedRelatedPackages, currentDisplayItem.value!];
+      allPackages.removeWhere((pkg) =>
+          pkg.inventory.productPackage?.barcodeValue ==
+          oldItem.inventory.productPackage?.barcodeValue);
+      cachedRelatedPackages = allPackages;
+
+      currentDisplayItem.value = oldItem;
       update();
     } else {
       Get.back();
-    }
-  }
-
-  Future<void> _loadHeavyData() async {
-    try {
-      // TODO: Khi ráp API, thay đoạn logic local này bằng await repository.getDetail(...)
-      final inventoryParent = Get.find<InventoryController>();
-
-      final catId = displayItem.product?.categoryId;
-      final cat = inventoryParent.categories
-          .firstWhereOrNull((c) => c.categoryId == catId);
-      cachedCategoryName = cat?.name ?? 'Uncategorized';
-
-      final currentProductId = displayItem.product?.productId;
-      final currentBarcode = displayItem.inventory.productPackage?.barcodeValue;
-
-      if (currentProductId != null) {
-        final related = inventoryParent.inventories.where((inv) {
-          final pkg = inv.productPackage;
-          return pkg?.productId == currentProductId &&
-              pkg?.barcodeValue != currentBarcode;
-        }).toList();
-
-        cachedRelatedPackages = related
-            .map((inv) => InventoryInsightDisplayModel(
-                inventory: inv, product: displayItem.product))
-            .toList();
-      }
-    } catch (e) {
-      // FIX: Dùng Error Handler để bắt lỗi và show UI thay vì print()
-      handleError(e);
     }
   }
 
@@ -96,20 +166,23 @@ class InventoryDetailController extends GetxController with TErrorHandler {
     isChartMode.value = isChart;
   }
 
-  // Các Getter lấy thông tin (Giữ nguyên)
-  String get name =>
-      displayItem.inventory.productPackage?.displayName ??
-      TTexts.unknownProduct.tr;
-  String get barcode =>
-      displayItem.inventory.productPackage?.barcodeValue ?? TTexts.na.tr;
-  String? get imageUrl => displayItem.product?.imageUrl;
+  // ==========================================
+  // GETTERS LẤY DỮ LIỆU BẢO VỆ NULL
+  // ==========================================
+  InventoryInsightDisplayModel? get _item => currentDisplayItem.value;
 
-  String get brand => displayItem.product?.brand ?? '';
+  String get name =>
+      _item?.inventory.productPackage?.displayName ?? TTexts.unknownProduct.tr;
+  String get barcode =>
+      _item?.inventory.productPackage?.barcodeValue ?? TTexts.na.tr;
+  String? get imageUrl => _item?.product?.imageUrl;
+
+  String get brand => _item?.product?.brand ?? '';
   String get barcodeType =>
-      displayItem.inventory.productPackage?.barcodeType ?? 'EAN';
-  int get lastCount => displayItem.inventory.lastCount;
+      _item?.inventory.productPackage?.barcodeType ?? 'EAN';
+  int get lastCount => _item?.inventory.lastCount ?? 0;
   String get activeStatus =>
-      displayItem.inventory.productPackage?.activeStatus ?? 'active';
+      _item?.inventory.productPackage?.activeStatus ?? 'active';
 
   String get categoryName => cachedCategoryName;
   List<InventoryInsightDisplayModel> get relatedPackages =>
@@ -117,26 +190,21 @@ class InventoryDetailController extends GetxController with TErrorHandler {
 
   List<String> get tags {
     List<String> result = [categoryName, statusText];
-    if (brand.isNotEmpty && brand != 'N/A') {
-      result.add(brand);
-    }
-    if (activeStatus.toLowerCase() != 'active') {
-      result.add('Inactive');
-    }
+    if (brand.isNotEmpty && brand != 'N/A') result.add(brand);
+    if (activeStatus.toLowerCase() != 'active') result.add('Inactive');
     return result;
   }
 
-  double get price => displayItem.inventory.productPackage?.sellingPrice ?? 0.0;
-  double get importPrice =>
-      displayItem.inventory.productPackage?.importPrice ?? 0.0;
+  double get price => _item?.inventory.productPackage?.sellingPrice ?? 0.0;
+  double get importPrice => _item?.inventory.productPackage?.importPrice ?? 0.0;
 
   double get profitMargin {
     if (importPrice == 0) return 0.0;
     return ((price - importPrice) / importPrice) * 100;
   }
 
-  int get quantity => displayItem.inventory.quantity;
-  int get threshold => displayItem.inventory.reorderThreshold;
+  int get quantity => _item?.inventory.quantity ?? 0;
+  int get threshold => _item?.inventory.reorderThreshold ?? 0;
 
   int get totalStockIn => quantity + 35;
   int get totalStockOut => 35;
@@ -161,41 +229,21 @@ class InventoryDetailController extends GetxController with TErrorHandler {
 
   List<InventoryHistoryModel> get inventoryHistory => [
         InventoryHistoryModel(
-          date: 'Just now',
-          type: InventoryActionType.adjust,
-          qty: lastCount,
-          note: TTexts.latestInventoryCount.tr,
-        ),
-        InventoryHistoryModel(
-          date: '2026-03-25 14:30',
-          type: InventoryActionType.iN,
-          qty: 50,
-          note: TTexts.restockFromSupplier.tr,
-        ),
-        InventoryHistoryModel(
-          date: '2026-03-20 09:15',
-          type: InventoryActionType.out,
-          qty: -5,
-          note: TTexts.salesOrder.tr,
-        ),
+            date: 'Just now',
+            type: InventoryActionType.adjust,
+            qty: lastCount,
+            note: TTexts.latestInventoryCount.tr),
       ];
 
   List<Map<String, dynamic>> get stockMovementData => [
         {'day': 'Mon', 'in': 120, 'out': 45},
-        {'day': 'Tue', 'in': 0, 'out': 30},
-        {'day': 'Wed', 'in': 50, 'out': 80},
-        {'day': 'Thu', 'in': 10, 'out': 15},
-        {'day': 'Fri', 'in': 200, 'out': 120},
-        {'day': 'Sat', 'in': 0, 'out': 90},
-        {'day': 'Sun', 'in': 20, 'out': 10},
       ];
 
+  // ==========================================
+  // ACTIONS MENU
+  // ==========================================
   void handleMenuAction(String value) {
-    if (value == TTexts.adjustStock) {
-      TSnackbarsWidget.info(
-          title: TTexts.info.tr, message: TTexts.featureComingSoon.tr);
-    }
-    if (value == TTexts.editItem) {
+    if (value == TTexts.adjustStock || value == TTexts.editItem) {
       TSnackbarsWidget.info(
           title: TTexts.info.tr, message: TTexts.featureComingSoon.tr);
     }
@@ -214,9 +262,8 @@ class InventoryDetailController extends GetxController with TErrorHandler {
               child: Text(TTexts.cancel.tr,
                   style: const TextStyle(color: AppColors.softGrey))),
           TextButton(
-              // FIX: Chuyển callback thành async để call API và catch lỗi
               onPressed: () async {
-                Get.back(); // Đóng Dialog trước
+                Get.back();
                 await _performDeleteItem();
               },
               child: Text(TTexts.delete.tr,
@@ -226,20 +273,14 @@ class InventoryDetailController extends GetxController with TErrorHandler {
     );
   }
 
-  // FIX: Tách logic xóa ra hàm async riêng biệt để dùng try-catch với TErrorHandler
   Future<void> _performDeleteItem() async {
     try {
-      // TODO: Call API xóa dữ liệu thật ở đây:
-      // await inventoryRepository.deleteItem(displayItem.inventory.id);
-
+      // Gọi API xóa ở đây
       Get.back();
-
       TSnackbarsWidget.success(
-        title: TTexts.itemDeletedSuccess.tr,
-        message: TTexts.itemDeletedMessage.tr,
-      );
+          title: TTexts.itemDeletedSuccess.tr,
+          message: TTexts.itemDeletedMessage.tr);
     } catch (e) {
-      // Nếu API xóa thất bại (rớt mạng, lỗi DB, hết hạn token...), lỗi sẽ tự popup qua Snackbar
       handleError(e);
     }
   }

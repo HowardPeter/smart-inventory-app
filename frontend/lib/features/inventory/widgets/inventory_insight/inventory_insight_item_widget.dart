@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:frontend/core/ui/theme/app_sizes.dart'; // ĐÃ IMPORT APPSIZES
+import 'package:frontend/core/ui/theme/app_sizes.dart';
 import 'package:frontend/core/ui/widgets/t_no_image_widget.dart';
 import 'package:frontend/features/inventory/models/inventory_insight_display_model.dart';
 import 'package:frontend/routes/app_routes.dart';
@@ -19,7 +19,7 @@ class InventoryInsightItemWidget extends StatelessWidget {
     final pkg = inventory.productPackage;
 
     final name = pkg?.displayName ?? TTexts.unknownProduct.tr;
-    final sku = pkg?.barcodeValue ?? TTexts.na.tr;
+    final barcode = pkg?.barcodeValue ?? TTexts.na.tr;
 
     final price = pkg?.sellingPrice ?? 0.0;
     final imageUrl = product?.imageUrl;
@@ -40,7 +40,14 @@ class InventoryInsightItemWidget extends StatelessWidget {
 
     return GestureDetector(
       onTap: () {
-        Get.toNamed(AppRoutes.inventoryDetail, arguments: displayItem);
+        final productId = displayItem.product?.productId;
+        final barcode = displayItem.inventory.productPackage?.barcodeValue;
+
+        if (productId != null) {
+          Get.toNamed(AppRoutes.inventoryDetail,
+              arguments: productId,
+              parameters: barcode != null ? {'barcode': barcode} : null);
+        }
       },
       child: Container(
         margin: const EdgeInsets.only(bottom: AppSizes.p16),
@@ -63,7 +70,6 @@ class InventoryInsightItemWidget extends StatelessWidget {
               width: 56,
               height: 56,
               decoration: BoxDecoration(
-                // Đã bỏ màu nền ở đây vì TNoImageWidget tự có màu nền
                 borderRadius: BorderRadius.circular(12),
               ),
               child: ClipRRect(
@@ -103,7 +109,7 @@ class InventoryInsightItemWidget extends StatelessWidget {
                   ),
                   const SizedBox(height: AppSizes.p4),
                   Text(
-                    "${TTexts.sku.tr}: $sku", // ĐÃ SỬA CHỮ "SKU: " THÀNH TTEXTS
+                    "${TTexts.barcodeLabel.tr}: $barcode",
                     style:
                         const TextStyle(color: AppColors.subText, fontSize: 12),
                   ),

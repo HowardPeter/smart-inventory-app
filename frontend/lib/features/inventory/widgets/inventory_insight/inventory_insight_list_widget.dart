@@ -33,7 +33,7 @@ class InventoryInsightListWidget extends GetView<InventoryInsightController> {
                       decoration: BoxDecoration(
                           color: AppColors.primary.withOpacity(0.1),
                           borderRadius: BorderRadius.circular(12)),
-                      child: Text(TTexts.clearFilters.tr, // ĐÃ DÙNG TTEXTS
+                      child: Text(TTexts.clearFilters.tr,
                           style: const TextStyle(
                               color: AppColors.primary,
                               fontSize: 12,
@@ -68,7 +68,6 @@ class InventoryInsightListWidget extends GetView<InventoryInsightController> {
             physics: const NeverScrollableScrollPhysics(),
             itemCount: list.length,
             itemBuilder: (context, index) {
-              // ĐÃ SỬA: Truyền displayItem thay vì inventory
               return InventoryInsightItemWidget(displayItem: list[index]);
             },
           );

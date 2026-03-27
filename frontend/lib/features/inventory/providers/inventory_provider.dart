@@ -46,4 +46,15 @@ class InventoryProvider {
       rethrow;
     }
   }
+
+  Future<Map<String, dynamic>> getProductDetail(String productId) async {
+    final response = await _apiClient.get('/api/products/$productId');
+
+    // Bóc lớp "data" theo chuẩn API của bạn
+    if (response.data != null && response.data['data'] != null) {
+      return response.data['data'] as Map<String, dynamic>;
+    }
+
+    throw Exception('No data found');
+  }
 }

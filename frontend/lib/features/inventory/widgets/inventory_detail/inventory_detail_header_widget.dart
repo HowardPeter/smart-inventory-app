@@ -45,7 +45,7 @@ class InventoryDetailHeaderWidget extends GetView<InventoryDetailController> {
                   bottom: AppSizes.p24),
               child: Hero(
                 tag:
-                    'hero_image_${controller.barcode}_${controller.displayItem.product?.productId ?? ""}',
+                    'hero_image_${controller.barcode}_${controller.currentDisplayItem.value?.product?.productId ?? ""}',
                 child: controller.imageUrl != null &&
                         controller.imageUrl!.isNotEmpty
                     // ĐÃ RÁP CACHED NETWORK IMAGE
