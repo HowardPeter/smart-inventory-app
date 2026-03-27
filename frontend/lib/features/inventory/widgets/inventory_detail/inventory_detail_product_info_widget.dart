@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:frontend/core/ui/theme/app_sizes.dart';
 import 'package:frontend/features/inventory/controllers/inventory_detail_controller.dart';
 import 'package:get/get.dart';
+import 'package:frontend/core/infrastructure/constants/text_strings.dart'; // THÊM IMPORT NÀY
 import 'package:frontend/core/ui/theme/app_colors.dart';
 
 class InventoryDetailProductInfoWidget
@@ -23,7 +24,7 @@ class InventoryDetailProductInfoWidget
                     color: AppColors.primaryText,
                     height: 1.3)),
             const SizedBox(height: AppSizes.p8),
-            Text("Bar code: ${controller.barcode}",
+            Text("${TTexts.barcodeLabel.tr}: ${controller.barcode}",
                 style: const TextStyle(
                     fontSize: 14,
                     color: AppColors.subText,

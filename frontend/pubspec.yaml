@@ -26,9 +26,11 @@ dependencies:
   # ----------------------------------------------------
   # UI & Design
   # ----------------------------------------------------
+  cached_network_image: ^3.4.1
   cupertino_icons: ^1.0.8
   fl_chart: ^1.2.0
   iconsax_flutter: ^1.0.1
+  percent_indicator: ^4.2.5
   shimmer: ^3.0.0
 
   # ----------------------------------------------------
@@ -48,7 +50,6 @@ dependencies:
   latlong2: ^0.9.1
   mobile_scanner: ^7.2.0
   open_mail_app_plus: ^0.0.2
-  percent_indicator: ^4.2.5
 
   # ----------------------------------------------------
   # Supabase

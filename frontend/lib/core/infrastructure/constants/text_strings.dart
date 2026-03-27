@@ -330,8 +330,6 @@ class TTexts {
   static const String totalInStock = "total_in_stock";
   static const String lowStockAlert = "low_stock_alert";
   static const String noThreshold = "no_threshold";
-
-  // Detail Row Titles
   static const String productSku = "product_sku";
   static const String productPrice = "product_price";
   static const String totalValue = "total_value";
@@ -342,6 +340,34 @@ class TTexts {
   static const String confirmDeleteText =
       "are_you_sure_you_want_to_delete_this_item";
   static const String delete = "delete";
+  static const String barcodeType = "barcode_type";
+  static const String noLimit = "no_limit";
+  static const String thresholdTitle = "threshold_title";
+  static const String totalStockTitle = "total_stock_title";
+  static const String featureComingSoon = "feature_coming_soon";
+  static const String itemDeletedSuccess = "item_deleted_success";
+  static const String itemDeletedMessage = "item_deleted_message";
+  static const String info = "info";
+  static const String totalStockInTitle = "total_stock_in_title";
+  static const String totalStockOutTitle = "total_stock_out_title";
+  static const String importCost = "import_cost";
+  static const String salePrice = "sale_price";
+  static const String profitMargin = "profit_margin";
+  static const String barcodeLabel = "barcode_label";
+  static const String noRelatedPackages = "no_related_packages";
+  static const String unknownPackage = "unknown_package";
+  static const String left = "left";
+  static const String stockMovement = "stock_movement";
+  static const String data = "data";
+  static const String chart = "chart";
+  static const String stockIn = "stock_in";
+  static const String stockOut = "stock_out";
+  static const String inventoryStatus = "inventory_status";
+  static const String relatedPackages = "related_packages";
+  static const String inventoryHistory = "inventory_history";
+  static const String latestInventoryCount = "latest_inventory_count";
+  static const String restockFromSupplier = "restock_from_supplier";
+  static const String salesOrder = "sales_order";
 
   // Empty State
   static const String emptyTransactionTitle = "empty_transaction_title";

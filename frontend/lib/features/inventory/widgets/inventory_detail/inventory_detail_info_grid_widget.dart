@@ -17,28 +17,29 @@ class InventoryDetailInfoGridWidget extends GetView<InventoryDetailController> {
         Row(
           children: [
             Expanded(
-                child: _buildGridItem("Total Stock",
+                child: _buildGridItem(TTexts.totalStockTitle.tr,
                     "${controller.quantity} ${TTexts.items.tr}")),
             const SizedBox(width: AppSizes.p12),
             Expanded(
                 child: _buildGridItem(
-                    "Threshold",
+                    TTexts.thresholdTitle.tr,
                     controller.threshold > 0
                         ? "${controller.threshold} ${TTexts.items.tr}"
-                        : "No limit")),
+                        : TTexts.noLimit.tr)), 
           ],
         ),
         const SizedBox(height: AppSizes.p12),
         // Dòng 2: Giao diện Stand Out với Vibe Nhập/Xuất rõ ràng
         Row(
           children: [
+            // TODO: Kết nối API để lấy chính xác tổng số lượng đã nhập/xuất
             Expanded(
-                child: _buildHighlightGridItem("Total Stock In",
+                child: _buildHighlightGridItem(TTexts.totalStockInTitle.tr,
                     "${controller.totalStockIn} ${TTexts.items.tr}",
                     isStockIn: true)),
             const SizedBox(width: AppSizes.p12),
             Expanded(
-                child: _buildHighlightGridItem("Total Stock Out",
+                child: _buildHighlightGridItem(TTexts.totalStockOutTitle.tr,
                     "${controller.totalStockOut} ${TTexts.items.tr}",
                     isStockIn: false)),
           ],
@@ -93,9 +94,9 @@ class InventoryDetailInfoGridWidget extends GetView<InventoryDetailController> {
     return Container(
       padding: const EdgeInsets.all(AppSizes.p12),
       decoration: BoxDecoration(
-        color: bgColor, // Nền Pastel đậm chất Vibe
+        color: bgColor,
         borderRadius: BorderRadius.circular(AppSizes.radius12),
-        border: Border.all(color: color.withOpacity(0.2)), // Viền tiệp màu
+        border: Border.all(color: color.withOpacity(0.2)),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,

@@ -3,6 +3,7 @@ import 'package:frontend/core/ui/theme/app_sizes.dart';
 import 'package:frontend/features/inventory/controllers/inventory_detail_controller.dart';
 import 'package:get/get.dart';
 import 'package:frontend/core/ui/theme/app_colors.dart';
+import 'package:frontend/core/infrastructure/constants/text_strings.dart';
 import 'package:iconsax_flutter/iconsax_flutter.dart';
 
 class InventoryDetailBarcodeWidget extends GetView<InventoryDetailController> {
@@ -24,7 +25,6 @@ class InventoryDetailBarcodeWidget extends GetView<InventoryDetailController> {
         ),
         child: Row(
           children: [
-            // CỘT 1: HÌNH ẢNH BARCODE MÔ PHỎNG
             Container(
               padding: const EdgeInsets.all(8),
               decoration: BoxDecoration(
@@ -36,8 +36,6 @@ class InventoryDetailBarcodeWidget extends GetView<InventoryDetailController> {
                   : _buildMockLinearBarcode(controller.barcode),
             ),
             const SizedBox(width: AppSizes.p16),
-
-            // CỘT 2: THÔNG TIN MÃ VẠCH
             Expanded(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -51,7 +49,7 @@ class InventoryDetailBarcodeWidget extends GetView<InventoryDetailController> {
                           size: 14,
                           color: AppColors.subText),
                       const SizedBox(width: 4),
-                      Text("Type: $type",
+                      Text("${TTexts.barcodeType.tr}: $type",
                           style: const TextStyle(
                               fontSize: 12,
                               color: AppColors.subText,

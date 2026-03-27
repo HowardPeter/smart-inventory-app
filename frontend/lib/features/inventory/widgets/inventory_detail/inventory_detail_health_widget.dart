@@ -15,7 +15,6 @@ class InventoryDetailHealthWidget extends GetView<InventoryDetailController> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.center,
       children: [
-        // Thu nhỏ vòng tròn xuống 90
         SizedBox(
           width: 90,
           height: 90,

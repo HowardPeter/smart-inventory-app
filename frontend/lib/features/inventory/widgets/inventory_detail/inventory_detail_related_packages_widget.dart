@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:frontend/core/ui/theme/app_sizes.dart';
 import 'package:frontend/features/inventory/controllers/inventory_detail_controller.dart';
 import 'package:get/get.dart';
+import 'package:frontend/core/infrastructure/constants/text_strings.dart'; // THÊM IMPORT NÀY
 import 'package:frontend/core/ui/theme/app_colors.dart';
 import 'package:iconsax_flutter/iconsax_flutter.dart';
 
@@ -14,10 +15,10 @@ class InventoryDetailRelatedPackagesWidget
     final related = controller.relatedPackages;
 
     if (related.isEmpty) {
-      return const Padding(
-        padding: EdgeInsets.symmetric(horizontal: AppSizes.p20),
-        child: Text("No other packages available for this product.",
-            style: TextStyle(
+      return Padding(
+        padding: const EdgeInsets.symmetric(horizontal: AppSizes.p20),
+        child: Text(TTexts.noRelatedPackages.tr,
+            style: const TextStyle(
                 color: AppColors.subText,
                 fontSize: 13,
                 fontStyle: FontStyle.italic)),
@@ -34,9 +35,9 @@ class InventoryDetailRelatedPackagesWidget
       itemBuilder: (context, index) {
         final item = related[index];
         final pkg = item.inventory.productPackage;
-        final name = pkg?.displayName ?? 'Unknown Package';
-        final barcode =
-            pkg?.barcodeValue ?? 'N/A'; // Hiển thị Barcode đúng ý bạn
+        // FIX: Đa ngôn ngữ
+        final name = pkg?.displayName ?? TTexts.unknownPackage.tr;
+        final barcode = pkg?.barcodeValue ?? TTexts.na.tr;
         final stock = item.inventory.quantity;
 
         return Container(
@@ -46,17 +47,11 @@ class InventoryDetailRelatedPackagesWidget
             border: Border.all(color: AppColors.divider.withOpacity(0.5)),
           ),
           child: ListTile(
-            // ==========================================
-            // THÊM SỰ KIỆN CLICK ĐỂ CHUYỂN TRANG
-            // ==========================================
             onTap: () => controller.pushRelatedItem(item),
-
-            // Khai báo shape để khi bấm vào, hiệu ứng sóng (ripple) bo góc chuẩn 16px
             shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(AppSizes.radius16)),
             contentPadding: const EdgeInsets.symmetric(
                 horizontal: AppSizes.p16, vertical: 4),
-
             leading: Container(
               padding: const EdgeInsets.all(10),
               decoration: BoxDecoration(
@@ -72,9 +67,9 @@ class InventoryDetailRelatedPackagesWidget
             title: Text(name,
                 style:
                     const TextStyle(fontSize: 14, fontWeight: FontWeight.w600)),
-            subtitle: Text("Barcode: $barcode",
+            subtitle: Text("${TTexts.barcodeLabel.tr}: $barcode",
                 style: const TextStyle(fontSize: 12, color: AppColors.subText)),
-            trailing: Text("$stock left",
+            trailing: Text("$stock ${TTexts.left.tr}",
                 style:
                     const TextStyle(fontSize: 14, fontWeight: FontWeight.bold)),
           ),

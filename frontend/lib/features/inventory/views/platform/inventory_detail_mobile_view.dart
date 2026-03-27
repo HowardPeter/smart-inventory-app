@@ -1,10 +1,10 @@
 // ignore_for_file: prefer_const_constructors
-
 import 'package:flutter/material.dart';
 import 'package:frontend/core/ui/theme/app_sizes.dart';
 import 'package:frontend/features/inventory/controllers/inventory_detail_controller.dart';
 import 'package:get/get.dart';
 import 'package:frontend/core/ui/theme/app_colors.dart';
+import 'package:frontend/core/infrastructure/constants/text_strings.dart'; // THÊM IMPORT NÀY
 import 'package:frontend/features/inventory/widgets/inventory_detail/inventory_detail_header_widget.dart';
 import 'package:frontend/features/inventory/widgets/inventory_detail/inventory_detail_health_widget.dart';
 import 'package:frontend/features/inventory/widgets/inventory_detail/inventory_detail_product_info_widget.dart';
@@ -34,7 +34,6 @@ class InventoryDetailMobileView extends GetView<InventoryDetailController> {
               duration: const Duration(milliseconds: 300),
               switchInCurve: Curves.easeOut,
               switchOutCurve: Curves.easeIn,
-
               transitionBuilder: (child, animation) {
                 final slide = Tween<Offset>(
                   begin: const Offset(1, 0),
@@ -54,8 +53,6 @@ class InventoryDetailMobileView extends GetView<InventoryDetailController> {
                   ),
                 );
               },
-
-              /// 🔥 KEY = trigger animation
               child: _DetailContent(
                 key: ValueKey(ctrl.barcode),
               ),
@@ -68,11 +65,6 @@ class InventoryDetailMobileView extends GetView<InventoryDetailController> {
   }
 }
 
-//
-// =============
-// CONTENT 
-// =============
-//
 class _DetailContent extends StatelessWidget {
   const _DetailContent({super.key});
 
@@ -97,11 +89,11 @@ class _DetailContent extends StatelessWidget {
                 const _Divider(),
                 InventoryDetailPricingWidget(),
                 const _Divider(),
-                const Padding(
-                  padding: EdgeInsets.symmetric(horizontal: AppSizes.p20),
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: AppSizes.p20),
                   child: Text(
-                    "Inventory Status",
-                    style: TextStyle(
+                    TTexts.inventoryStatus.tr,
+                    style: const TextStyle(
                       fontSize: 16,
                       fontWeight: FontWeight.bold,
                       color: AppColors.primaryText,
@@ -113,13 +105,12 @@ class _DetailContent extends StatelessWidget {
                   padding: const EdgeInsets.symmetric(horizontal: AppSizes.p20),
                   child: Row(
                     crossAxisAlignment: CrossAxisAlignment.center,
-                    // ignore: prefer_const_literals_to_create_immutables
-                    children: [
+                    children: const [
                       Expanded(
                         flex: 4,
                         child: InventoryDetailHealthWidget(),
                       ),
-                      const SizedBox(width: AppSizes.p20),
+                      SizedBox(width: AppSizes.p20),
                       Expanded(
                         flex: 5,
                         child: InventoryDetailBasicInfoWidget(),
@@ -133,10 +124,10 @@ class _DetailContent extends StatelessWidget {
                   child: InventoryDetailStockStatsWidget(),
                 ),
                 const _Divider(),
-                _buildSectionTitle("Related Packages"),
+                _buildSectionTitle(TTexts.relatedPackages.tr),
                 InventoryDetailRelatedPackagesWidget(),
                 const _Divider(),
-                _buildSectionTitle("Inventory History"),
+                _buildSectionTitle(TTexts.inventoryHistory.tr),
                 InventoryDetailHistoryWidget(),
                 const SizedBox(height: AppSizes.bottomNavSpacer),
               ],

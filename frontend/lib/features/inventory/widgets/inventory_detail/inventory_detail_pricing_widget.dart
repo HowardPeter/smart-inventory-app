@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:frontend/core/ui/theme/app_sizes.dart';
 import 'package:frontend/features/inventory/controllers/inventory_detail_controller.dart';
 import 'package:get/get.dart';
+import 'package:frontend/core/infrastructure/constants/text_strings.dart'; // THÊM IMPORT NÀY
 import 'package:frontend/core/ui/theme/app_colors.dart';
 
 class InventoryDetailPricingWidget extends GetView<InventoryDetailController> {
@@ -14,12 +15,12 @@ class InventoryDetailPricingWidget extends GetView<InventoryDetailController> {
       child: Row(
         children: [
           Expanded(
-              child: _buildPricingCol("Import Cost", controller.importPrice,
-                  AppColors.primaryText)),
+              child: _buildPricingCol(TTexts.importCost.tr,
+                  controller.importPrice, AppColors.primaryText)),
           Container(width: 1, height: 40, color: AppColors.divider),
           Expanded(
               child: _buildPricingCol(
-                  "Sale Price", controller.price, AppColors.primary)),
+                  TTexts.salePrice.tr, controller.price, AppColors.primary)),
           Container(width: 1, height: 40, color: AppColors.divider),
           Expanded(child: _buildMarginCol(controller.profitMargin)),
         ],
@@ -49,8 +50,8 @@ class InventoryDetailPricingWidget extends GetView<InventoryDetailController> {
         : (margin < 0 ? AppColors.alertText : AppColors.subText);
     return Column(
       children: [
-        const Text("Profit Margin",
-            style: TextStyle(fontSize: 12, color: AppColors.subText)),
+        Text(TTexts.profitMargin.tr,
+            style: const TextStyle(fontSize: 12, color: AppColors.subText)),
         const SizedBox(height: 4),
         Text(
             margin > 0

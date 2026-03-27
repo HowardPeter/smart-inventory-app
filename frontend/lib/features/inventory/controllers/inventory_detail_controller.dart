@@ -1,20 +1,19 @@
 import 'package:flutter/material.dart';
+import 'package:frontend/core/infrastructure/utils/error_handler_utils.dart';
 import 'package:frontend/core/state/services/store_service.dart';
 import 'package:frontend/core/ui/widgets/t_snackbars_widget.dart';
 import 'package:frontend/features/inventory/models/inventory_insight_display_model.dart';
+import 'package:frontend/features/inventory/models/inventory_history_model.dart';
 import 'package:get/get.dart';
 import 'package:frontend/core/ui/theme/app_colors.dart';
 import 'package:frontend/core/infrastructure/constants/text_strings.dart';
 import 'package:frontend/features/inventory/controllers/inventory_controller.dart';
 
-class InventoryDetailController extends GetxController {
+class InventoryDetailController extends GetxController with TErrorHandler {
   late InventoryInsightDisplayModel displayItem;
   late final bool canManageInventory;
   final RxBool isChartMode = false.obs;
 
-  // ==========================================
-  // CÁC BIẾN QUẢN LÝ LỊCH SỬ & CHỐNG LAG
-  // ==========================================
   final List<InventoryInsightDisplayModel> historyStack = [];
 
   String cachedCategoryName = 'Uncategorized';
@@ -31,81 +30,53 @@ class InventoryDetailController extends GetxController {
           (role == 'manager' || role == 'owner' || role == 'admin');
     } catch (e) {
       canManageInventory = false;
+      // Ở đây có thể bỏ qua handleError nếu chỉ đơn giản là fallback quyền hạn,
+      // nhưng nếu lỗi nghiêm trọng do mất session thì có thể gọi handleError(e);
     }
-
-    // Load data nặng 1 lần duy nhất để chống lag
     _loadHeavyData();
   }
 
-  // ==========================================
-  // 3. CÁC HÀM XỬ LÝ CHUYỂN TRANG NỘI BỘ (Fix lỗi bạn đang gặp)
-  // ==========================================
-
-// Thay thế hàm pushRelatedItem cũ bằng hàm này:
-
   void pushRelatedItem(InventoryInsightDisplayModel item) {
     final targetBarcode = item.inventory.productPackage?.barcodeValue;
-
-    // 1. Tìm xem cái item sắp mở này đã có trong lịch sử (historyStack) chưa
     final existingIndex = historyStack.indexWhere((element) =>
         element.inventory.productPackage?.barcodeValue == targetBarcode);
 
     if (existingIndex != -1) {
-      // TRƯỜNG HỢP 1: NẾU ĐÃ CÓ TRONG LỊCH SỬ (Ví dụ: vòng lại trang cũ)
-      // Cắt bỏ toàn bộ các trang nằm sau vị trí đó để dọn rác, không lưu thêm.
       historyStack.removeRange(existingIndex, historyStack.length);
     } else {
-      // TRƯỜNG HỢP 2: NẾU LÀ TRANG MỚI HOÀN TOÀN
-      // Lưu item hiện tại vào lịch sử bình thường
       historyStack.add(displayItem);
     }
-
-    // 2. Cập nhật item mới
     displayItem = item;
-
-    // 3. Tính toán lại dữ liệu
     _loadHeavyData();
-
-    // 4. Báo UI cập nhật (nhờ có key trong AnimatedSwitcher nên vẫn sẽ có animation mượt mà)
     update();
   }
 
   void goBack() {
     if (historyStack.isNotEmpty) {
-      // 1. Lấy lại item trước đó
       displayItem = historyStack.removeLast();
-
-      // 2. Reload lại data
       _loadHeavyData();
-
-      // 3. Update UI
       update();
     } else {
       Get.back();
     }
   }
 
-  // ==========================================
-  // 4. HÀM TỐI ƯU HIỆU NĂNG CHỐNG LAG (Chỉ tính toán 1 lần)
-  // ==========================================
-  void _loadHeavyData() {
+  Future<void> _loadHeavyData() async {
     try {
+      // TODO: Khi ráp API, thay đoạn logic local này bằng await repository.getDetail(...)
       final inventoryParent = Get.find<InventoryController>();
 
-      // Tìm Category Name
       final catId = displayItem.product?.categoryId;
       final cat = inventoryParent.categories
           .firstWhereOrNull((c) => c.categoryId == catId);
       cachedCategoryName = cat?.name ?? 'Uncategorized';
 
-      // Tìm Related Packages (những gói khác của cùng 1 sản phẩm)
       final currentProductId = displayItem.product?.productId;
       final currentBarcode = displayItem.inventory.productPackage?.barcodeValue;
 
       if (currentProductId != null) {
         final related = inventoryParent.inventories.where((inv) {
           final pkg = inv.productPackage;
-          // Lọc: cùng Product ID nhưng khác Barcode (để không hiện chính nó trong mục Related)
           return pkg?.productId == currentProductId &&
               pkg?.barcodeValue != currentBarcode;
         }).toList();
@@ -116,7 +87,8 @@ class InventoryDetailController extends GetxController {
             .toList();
       }
     } catch (e) {
-      // print("Error loading data: $e");
+      // FIX: Dùng Error Handler để bắt lỗi và show UI thay vì print()
+      handleError(e);
     }
   }
 
@@ -124,9 +96,7 @@ class InventoryDetailController extends GetxController {
     isChartMode.value = isChart;
   }
 
-  // ==========================================
-  // 5. CÁC GETTER LẤY THÔNG TIN
-  // ==========================================
+  // Các Getter lấy thông tin (Giữ nguyên)
   String get name =>
       displayItem.inventory.productPackage?.displayName ??
       TTexts.unknownProduct.tr;
@@ -141,7 +111,6 @@ class InventoryDetailController extends GetxController {
   String get activeStatus =>
       displayItem.inventory.productPackage?.activeStatus ?? 'active';
 
-  // Trỏ thẳng vào biến Cache để không bị lag
   String get categoryName => cachedCategoryName;
   List<InventoryInsightDisplayModel> get relatedPackages =>
       cachedRelatedPackages;
@@ -190,25 +159,25 @@ class InventoryDetailController extends GetxController {
     return TTexts.tabHealthy.tr;
   }
 
-  List<Map<String, dynamic>> get inventoryHistory => [
-        {
-          'date': 'Just now',
-          'type': 'ADJUST',
-          'qty': lastCount,
-          'note': 'Latest Inventory Count'
-        },
-        {
-          'date': '2026-03-25 14:30',
-          'type': 'IN',
-          'qty': 50,
-          'note': 'Restock from Supplier'
-        },
-        {
-          'date': '2026-03-20 09:15',
-          'type': 'OUT',
-          'qty': -5,
-          'note': 'Sales Order #1023'
-        },
+  List<InventoryHistoryModel> get inventoryHistory => [
+        InventoryHistoryModel(
+          date: 'Just now',
+          type: InventoryActionType.adjust,
+          qty: lastCount,
+          note: TTexts.latestInventoryCount.tr,
+        ),
+        InventoryHistoryModel(
+          date: '2026-03-25 14:30',
+          type: InventoryActionType.iN,
+          qty: 50,
+          note: TTexts.restockFromSupplier.tr,
+        ),
+        InventoryHistoryModel(
+          date: '2026-03-20 09:15',
+          type: InventoryActionType.out,
+          qty: -5,
+          note: TTexts.salesOrder.tr,
+        ),
       ];
 
   List<Map<String, dynamic>> get stockMovementData => [
@@ -224,16 +193,16 @@ class InventoryDetailController extends GetxController {
   void handleMenuAction(String value) {
     if (value == TTexts.adjustStock) {
       TSnackbarsWidget.info(
-          title: "Info", message: "Adjust stock feature coming soon");
+          title: TTexts.info.tr, message: TTexts.featureComingSoon.tr);
     }
     if (value == TTexts.editItem) {
       TSnackbarsWidget.info(
-          title: "Info", message: "Edit item feature coming soon");
+          title: TTexts.info.tr, message: TTexts.featureComingSoon.tr);
     }
-    if (value == TTexts.deleteItem) _onDeleteItem();
+    if (value == TTexts.deleteItem) _showDeleteConfirmDialog();
   }
 
-  void _onDeleteItem() {
+  void _showDeleteConfirmDialog() {
     Get.dialog(
       AlertDialog(
         backgroundColor: AppColors.background,
@@ -245,15 +214,33 @@ class InventoryDetailController extends GetxController {
               child: Text(TTexts.cancel.tr,
                   style: const TextStyle(color: AppColors.softGrey))),
           TextButton(
-              onPressed: () {
-                Get.back();
-                Get.back();
-                Get.snackbar("Deleted", "Item deleted!");
+              // FIX: Chuyển callback thành async để call API và catch lỗi
+              onPressed: () async {
+                Get.back(); // Đóng Dialog trước
+                await _performDeleteItem();
               },
               child: Text(TTexts.delete.tr,
                   style: const TextStyle(color: AppColors.alertText))),
         ],
       ),
     );
+  }
+
+  // FIX: Tách logic xóa ra hàm async riêng biệt để dùng try-catch với TErrorHandler
+  Future<void> _performDeleteItem() async {
+    try {
+      // TODO: Call API xóa dữ liệu thật ở đây:
+      // await inventoryRepository.deleteItem(displayItem.inventory.id);
+
+      Get.back();
+
+      TSnackbarsWidget.success(
+        title: TTexts.itemDeletedSuccess.tr,
+        message: TTexts.itemDeletedMessage.tr,
+      );
+    } catch (e) {
+      // Nếu API xóa thất bại (rớt mạng, lỗi DB, hết hạn token...), lỗi sẽ tự popup qua Snackbar
+      handleError(e);
+    }
   }
 }

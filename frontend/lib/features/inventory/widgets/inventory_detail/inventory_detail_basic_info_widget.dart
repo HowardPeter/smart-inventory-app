@@ -14,23 +14,23 @@ class InventoryDetailBasicInfoWidget
   Widget build(BuildContext context) {
     final thresholdStr = controller.threshold > 0
         ? "${controller.threshold} ${TTexts.items.tr}"
-        : "No limit";
+        : TTexts.noLimit.tr;
     final qtyStr = "${controller.quantity} ${TTexts.items.tr}";
 
     return Column(
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
-        // THẺ 1: THRESHOLD (NGƯỠNG ĐẶT HÀNG)
+        // THẺ 1: THRESHOLD
         _buildInfoCard(
-          title: "Threshold",
+          title: TTexts.thresholdTitle.tr,
           value: thresholdStr,
           icon: Iconsax.warning_2_copy,
           color: AppColors.secondPrimary,
         ),
         const SizedBox(height: AppSizes.p12),
-        // THẺ 2: TOTAL STOCK (TỔNG TỒN HIỆN TẠI)
+        // THẺ 2: TOTAL STOCK
         _buildInfoCard(
-          title: "Total Stock",
+          title: TTexts.totalStockTitle.tr,
           value: qtyStr,
           icon: Iconsax.box_copy,
           color: AppColors.primary,

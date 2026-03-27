@@ -5,6 +5,7 @@ import 'package:get/get.dart';
 import 'package:frontend/core/ui/theme/app_colors.dart';
 import 'package:frontend/core/infrastructure/constants/text_strings.dart';
 import 'package:iconsax_flutter/iconsax_flutter.dart';
+import 'package:frontend/core/ui/widgets/t_snackbars_widget.dart';
 
 class InventoryDetailBottomActionWidget
     extends GetView<InventoryDetailController> {
@@ -24,7 +25,13 @@ class InventoryDetailBottomActionWidget
             offset: const Offset(0, -5))
       ]),
       child: ElevatedButton(
-        onPressed: () => Get.snackbar("Info", "Add to Transaction coming soon"),
+        onPressed: () {
+          // TODO: Thêm Route chuyển sang màn hình Add to Transaction
+          TSnackbarsWidget.info(
+            title: TTexts.info.tr,
+            message: TTexts.featureComingSoon.tr,
+          );
+        },
         style: ElevatedButton.styleFrom(
             backgroundColor: AppColors.primary,
             padding: const EdgeInsets.symmetric(vertical: AppSizes.p16),

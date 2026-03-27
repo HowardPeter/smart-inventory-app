@@ -38,7 +38,6 @@ class _GlassmorphismDropdownMenuState extends State<_GlassmorphismDropdownMenu>
 
   @override
   void initState() {
-    // DÙNG initState() CHO STATEFUL WIDGET
     super.initState();
     _animationController = AnimationController(
       vsync: this,
@@ -48,7 +47,6 @@ class _GlassmorphismDropdownMenuState extends State<_GlassmorphismDropdownMenu>
 
     _animation = CurvedAnimation(
       parent: _animationController,
-      // ĐÃ FIX: Dùng easeOutBack để tạo hiệu ứng nảy (bouncy) chuẩn Flutter
       curve: Curves.easeOutBack,
       reverseCurve: Curves.easeInCubic,
     );

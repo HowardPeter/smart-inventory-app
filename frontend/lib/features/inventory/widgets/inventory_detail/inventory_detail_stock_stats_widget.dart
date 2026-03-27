@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:frontend/core/ui/theme/app_sizes.dart';
 import 'package:frontend/features/inventory/controllers/inventory_detail_controller.dart';
 import 'package:get/get.dart';
+import 'package:frontend/core/infrastructure/constants/text_strings.dart'; // THÊM IMPORT NÀY
 import 'package:frontend/core/ui/theme/app_colors.dart';
 import 'package:iconsax_flutter/iconsax_flutter.dart';
 
@@ -19,8 +20,8 @@ class InventoryDetailStockStatsWidget
         Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
-            const Text("Stock Movement",
-                style: TextStyle(
+            Text(TTexts.stockMovement.tr, // FIX: Đa ngôn ngữ
+                style: const TextStyle(
                     fontSize: 16,
                     fontWeight: FontWeight.bold,
                     color: AppColors.primaryText)),
@@ -32,12 +33,12 @@ class InventoryDetailStockStatsWidget
               child: Obx(() => Row(
                     children: [
                       _buildToggleBtn(
-                          "Data",
+                          TTexts.data.tr, // FIX: Đa ngôn ngữ
                           Iconsax.data_copy,
                           !controller.isChartMode.value,
                           () => controller.toggleStatsMode(false)),
                       _buildToggleBtn(
-                          "Chart",
+                          TTexts.chart.tr, // FIX: Đa ngôn ngữ
                           Iconsax.chart_2_copy,
                           controller.isChartMode.value,
                           () => controller.toggleStatsMode(true)),
@@ -63,6 +64,7 @@ class InventoryDetailStockStatsWidget
   // --- NÚT BẤM TOGGLE ---
   Widget _buildToggleBtn(
       String label, IconData icon, bool isActive, VoidCallback onTap) {
+    // ... Giữ nguyên code _buildToggleBtn
     return GestureDetector(
       onTap: onTap,
       child: AnimatedContainer(
@@ -93,18 +95,20 @@ class InventoryDetailStockStatsWidget
   Widget _buildDataView() {
     return Row(
       children: [
+        // TODO: Kết nối API lấy tổng lượng nhập/xuất trong khoảng thời gian nhất định (vd: 7 ngày qua)
         Expanded(
-            child: _buildDataCard(
-                "Total Stock In", "${controller.totalStockIn}", true)),
+            child: _buildDataCard(TTexts.totalStockInTitle.tr,
+                "${controller.totalStockIn}", true)),
         const SizedBox(width: AppSizes.p12),
         Expanded(
-            child: _buildDataCard(
-                "Total Stock Out", "${controller.totalStockOut}", false)),
+            child: _buildDataCard(TTexts.totalStockOutTitle.tr,
+                "${controller.totalStockOut}", false)),
       ],
     );
   }
 
   Widget _buildDataCard(String title, String value, bool isStockIn) {
+    // ... Giữ nguyên code _buildDataCard
     final color = isStockIn ? AppColors.stockIn : AppColors.alertText;
     final bgColor = isStockIn ? AppColors.toastSuccessBg : AppColors.alertBg;
     final icon = isStockIn ? Iconsax.arrow_down_copy : Iconsax.arrow_up_3_copy;
@@ -149,7 +153,7 @@ class InventoryDetailStockStatsWidget
   // ==========================================
   Widget _buildChartView() {
     return Container(
-      height: 220, // Cố định chiều cao cho biểu đồ
+      height: 220,
       padding: const EdgeInsets.all(AppSizes.p16),
       decoration: BoxDecoration(
           color: AppColors.surface,
@@ -161,25 +165,26 @@ class InventoryDetailStockStatsWidget
           Row(
             mainAxisAlignment: MainAxisAlignment.end,
             children: [
-              _buildLegendItem("Stock In", AppColors.stockIn),
+              _buildLegendItem(
+                  TTexts.stockIn.tr, AppColors.stockIn), // FIX: Đa ngôn ngữ
               const SizedBox(width: 16),
-              _buildLegendItem("Stock Out", AppColors.alertText),
+              _buildLegendItem(
+                  TTexts.stockOut.tr, AppColors.alertText), // FIX: Đa ngôn ngữ
             ],
           ),
           const SizedBox(height: 16),
 
-          // Khu vực vẽ biểu đồ có Animation (Vẽ từ từ 0 -> 1)
           Expanded(
             child: TweenAnimationBuilder<double>(
               tween: Tween<double>(begin: 0.0, end: 1.0),
-              duration:
-                  const Duration(milliseconds: 1000), // Mất 1 giây để vẽ xong
+              duration: const Duration(milliseconds: 1000),
               curve: Curves.easeOutQuart,
               builder: (context, value, child) {
                 return CustomPaint(
                   size: Size.infinite,
                   painter: _LineChartPainter(
-                    data: controller.stockMovementData,
+                    data: controller
+                        .stockMovementData, // TODO: Cung cấp API model chuẩn cho CustomPainter
                     colorIn: AppColors.stockIn,
                     colorOut: AppColors.alertText,
                     animationValue: value,
@@ -194,6 +199,7 @@ class InventoryDetailStockStatsWidget
           // Trục X (Các ngày trong tuần)
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            // TODO: Dịch các thứ trong tuần (Mon, Tue...) hoặc map label từ API trả về
             children: controller.stockMovementData.map((d) {
               return Text(d['day'],
                   style: const TextStyle(
@@ -208,6 +214,7 @@ class InventoryDetailStockStatsWidget
   }
 
   Widget _buildLegendItem(String label, Color color) {
+    // ... Giữ nguyên code _buildLegendItem
     return Row(
       children: [
         Container(
@@ -225,10 +232,9 @@ class InventoryDetailStockStatsWidget
   }
 }
 
-// ==========================================
-// CÔNG CỤ VẼ BIỂU ĐỒ ĐƯỜNG UỐN LƯỢN (CUSTOM PAINTER)
-// ==========================================
+// Lớp _LineChartPainter giữ nguyên, không cần sửa đổi text vì đây là vẽ canvas
 class _LineChartPainter extends CustomPainter {
+  // ... (Giữ nguyên toàn bộ logic vẽ Line Chart siêu xịn của bạn) ...
   final List<Map<String, dynamic>> data;
   final Color colorIn;
   final Color colorOut;
@@ -245,12 +251,10 @@ class _LineChartPainter extends CustomPainter {
   void paint(Canvas canvas, Size size) {
     if (data.isEmpty) return;
 
-    // Tìm giá trị lớn nhất để Scale chiều cao
     int maxVal = data.fold<int>(
         0, (m, e) => math.max(m, math.max(e['in'] as int, e['out'] as int)));
-    if (maxVal == 0) maxVal = 1; // Tránh lỗi chia cho 0
+    if (maxVal == 0) maxVal = 1;
 
-    // VẼ LƯỚI NỀN (Grid lines)
     final gridPaint = Paint()
       ..color = AppColors.divider.withOpacity(0.4)
       ..strokeWidth = 1;
@@ -261,14 +265,12 @@ class _LineChartPainter extends CustomPainter {
 
     final stepX = size.width / (data.length - 1);
 
-    // Bút vẽ cho Stock In
     final paintIn = Paint()
       ..color = colorIn
       ..strokeWidth = 2.5
       ..style = PaintingStyle.stroke
       ..strokeCap = StrokeCap.round;
 
-    // Bút vẽ cho Stock Out
     final paintOut = Paint()
       ..color = colorOut
       ..strokeWidth = 2.5
@@ -278,10 +280,8 @@ class _LineChartPainter extends CustomPainter {
     final pathIn = Path();
     final pathOut = Path();
 
-    // VẼ ĐƯỜNG CONG BEZIER
     for (int i = 0; i < data.length; i++) {
       final x = i * stepX;
-      // Y được nhân với animationValue để tạo hiệu ứng "mọc" lên từ dưới
       final yIn =
           size.height - (data[i]['in'] / maxVal * size.height * animationValue);
       final yOut = size.height -
@@ -297,7 +297,6 @@ class _LineChartPainter extends CustomPainter {
         final prevYOut = size.height -
             (data[i - 1]['out'] / maxVal * size.height * animationValue);
 
-        // Tính toán các điểm kiểm soát để bẻ cong đường thẳng thành hình chữ S mềm mại (Cubic)
         final controlX = prevX + (x - prevX) / 2;
 
         pathIn.cubicTo(controlX, prevYIn, controlX, yIn, x, yIn);
@@ -308,7 +307,6 @@ class _LineChartPainter extends CustomPainter {
     canvas.drawPath(pathIn, paintIn);
     canvas.drawPath(pathOut, paintOut);
 
-    // VẼ CÁC CHẤM TRÒN TẠI MỖI NGÀY
     final dotPaintIn = Paint()
       ..color = colorIn
       ..style = PaintingStyle.fill;
@@ -326,11 +324,9 @@ class _LineChartPainter extends CustomPainter {
       final yOut = size.height -
           (data[i]['out'] / maxVal * size.height * animationValue);
 
-      // Chấm của Stock In
-      canvas.drawCircle(Offset(x, yIn), 5, whitePaint); // Viền trắng
-      canvas.drawCircle(Offset(x, yIn), 3, dotPaintIn); // Lõi màu
+      canvas.drawCircle(Offset(x, yIn), 5, whitePaint);
+      canvas.drawCircle(Offset(x, yIn), 3, dotPaintIn);
 
-      // Chấm của Stock Out
       canvas.drawCircle(Offset(x, yOut), 5, whitePaint);
       canvas.drawCircle(Offset(x, yOut), 3, dotPaintOut);
     }

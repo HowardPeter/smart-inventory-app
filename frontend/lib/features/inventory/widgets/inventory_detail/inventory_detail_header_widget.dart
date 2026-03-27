@@ -1,4 +1,5 @@
-import 'dart:ui'; // Bắt buộc import thư viện này cho ImageFilter
+import 'dart:ui';
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:frontend/core/ui/theme/app_sizes.dart';
 import 'package:frontend/features/inventory/controllers/inventory_detail_controller.dart';
@@ -43,13 +44,25 @@ class InventoryDetailHeaderWidget extends GetView<InventoryDetailController> {
                   top: MediaQuery.of(context).padding.top + kToolbarHeight,
                   bottom: AppSizes.p24),
               child: Hero(
-                tag: controller.barcode,
+                tag:
+                    'hero_image_${controller.barcode}_${controller.displayItem.product?.productId ?? ""}',
                 child: controller.imageUrl != null &&
                         controller.imageUrl!.isNotEmpty
-                    ? Image.network(
-                        controller.imageUrl!,
+                    // ĐÃ RÁP CACHED NETWORK IMAGE
+                    ? CachedNetworkImage(
+                        imageUrl: controller.imageUrl!,
                         fit: BoxFit.contain,
-                        errorBuilder: (context, error, stackTrace) {
+                        // Hiển thị vòng xoay loading nhỏ xíu trong lúc đợi tải ảnh
+                        placeholder: (context, url) => const Center(
+                          child: SizedBox(
+                            width: 24,
+                            height: 24,
+                            child: CircularProgressIndicator(
+                                strokeWidth: 2, color: AppColors.primary),
+                          ),
+                        ),
+                        // Nếu link ảnh tèo (lỗi 404, lỗi mạng) thì ném ra cái hình No Image
+                        errorWidget: (context, url, error) {
                           return const TNoImageWidget(
                               iconSize: 64, borderRadius: 0);
                         },
