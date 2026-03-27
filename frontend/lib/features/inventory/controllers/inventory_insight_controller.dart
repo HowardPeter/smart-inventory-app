@@ -1,3 +1,4 @@
+import 'package:flutter/material.dart';
 import 'package:frontend/features/inventory/models/inventory_insight_display_model.dart';
 import 'package:get/get.dart';
 import 'package:frontend/features/inventory/controllers/inventory_controller.dart';
@@ -12,24 +13,67 @@ class InventoryInsightController extends GetxController with TErrorHandler {
   final RxString activeFilter = TTexts.tabAll.obs;
   final RxString activeCategory = TTexts.allItems.obs;
 
-  RxBool get isLoading => _parentCtrl.isLoading;
+  // --- LOGIC PHÂN TRANG (INFINITE SCROLLING) ---
+  final ScrollController scrollController = ScrollController();
 
+  // Danh sách gốc sau khi đã áp dụng Filter/Category (Chưa cắt trang)
+  List<InventoryInsightDisplayModel> _allFilteredList = [];
+
+  // Danh sách thực tế hiển thị lên UI (Đã cắt trang)
+  final RxList<InventoryInsightDisplayModel> displayList =
+      <InventoryInsightDisplayModel>[].obs;
+
+  int _currentPage = 1;
+  final int _itemsPerPage = 15;
+  final RxBool isLoadingMore = false.obs;
+  final RxBool hasMore = true.obs;
+
+  RxBool get isLoading => _parentCtrl.isLoading;
   List<CategoryModel> get categories => _parentCtrl.categories;
+
+  @override
+  void onInit() {
+    super.onInit();
+    // Lắng nghe sự kiện cuộn để load thêm data
+    scrollController.addListener(_onScroll);
+
+    // Lắng nghe khi data từ parent thay đổi thì tính toán lại
+    ever(_parentCtrl.inventories,
+        (_) => _applyFiltersAndPaginate(isRefresh: true));
+
+    // Chạy tính toán lần đầu
+    _applyFiltersAndPaginate(isRefresh: true);
+  }
+
+  void _onScroll() {
+    // Nếu cuộn gần tới đáy (cách 200px) thì nạp thêm item
+    if (scrollController.position.pixels >=
+        scrollController.position.maxScrollExtent - 200) {
+      loadMore();
+    }
+  }
 
   Future<void> refreshData() async {
     try {
       await _parentCtrl.fetchDashboardData();
+      // Không cần gọi lại _applyFiltersAndPaginate vì hàm ever() ở trên sẽ tự bắt sự kiện
     } catch (e) {
       handleError(e);
     }
   }
 
-  // --- 2. CẬP NHẬT LẠI HÀM LẤY DANH SÁCH (TRẢ VỀ MODEL HIỂN THỊ) ---
-  List<InventoryInsightDisplayModel> get displayList {
+  // Chạy 1 LẦN DUY NHẤT khi đổi bộ lọc để giảm tải CPU
+  void _applyFiltersAndPaginate({bool isRefresh = false}) {
+    if (isRefresh) {
+      _currentPage = 1;
+      hasMore.value = true;
+      displayList.clear();
+    }
+
     final inventories = List<InventoryModel>.from(_parentCtrl.inventories);
     final products = _parentCtrl.products;
 
-    // --- BƯỚC A: LỌC TRẠNG THÁI (Giữ nguyên logic cũ) ---
+    // 1. Lọc trạng thái
     List<InventoryModel> filteredInventories = inventories;
     if (activeFilter.value == TTexts.tabHealthy) {
       filteredInventories =
@@ -42,17 +86,15 @@ class InventoryInsightController extends GetxController with TErrorHandler {
       filteredInventories = inventories.where((i) => i.quantity == 0).toList();
     }
 
-    // --- BƯỚC B: ÁNH XẠ ẢNH VÀ TẠO LIST MỚI ---
+    // 2. Map dữ liệu
     List<InventoryInsightDisplayModel> mappedList =
         filteredInventories.map((inv) {
-      // Tra cứu Product dựa trên productId nằm trong productPackage
       final product = products.firstWhereOrNull(
           (p) => p.productId == inv.productPackage?.productId);
-
       return InventoryInsightDisplayModel(inventory: inv, product: product);
     }).toList();
 
-    // --- BƯỚC C: LỌC THEO DANH MỤC (Dựa trên list đã có Product) ---
+    // 3. Lọc danh mục
     if (activeCategory.value != TTexts.allItems) {
       mappedList = mappedList.where((item) {
         final category = categories
@@ -61,14 +103,50 @@ class InventoryInsightController extends GetxController with TErrorHandler {
       }).toList();
     }
 
-    // --- BƯỚC D: SẮP XẾP ---
+    // 4. Sắp xếp
     mappedList.sort((a, b) {
       if (a.inventory.quantity == 0 && b.inventory.quantity > 0) return -1;
       if (b.inventory.quantity == 0 && a.inventory.quantity > 0) return 1;
       return a.inventory.quantity.compareTo(b.inventory.quantity);
     });
 
-    return mappedList;
+    // Lưu vào bộ nhớ đệm
+    _allFilteredList = mappedList;
+
+    // Nạp trang đầu tiên lên UI
+    _loadNextPage();
+  }
+
+  void _loadNextPage() {
+    final startIndex = (_currentPage - 1) * _itemsPerPage;
+    final endIndex = startIndex + _itemsPerPage;
+
+    if (startIndex >= _allFilteredList.length) {
+      hasMore.value = false;
+      return;
+    }
+
+    final nextItems = _allFilteredList.sublist(
+      startIndex,
+      endIndex > _allFilteredList.length ? _allFilteredList.length : endIndex,
+    );
+
+    displayList.addAll(nextItems);
+
+    if (displayList.length >= _allFilteredList.length) {
+      hasMore.value = false;
+    }
+  }
+
+  Future<void> loadMore() async {
+    if (isLoadingMore.value || !hasMore.value) return;
+
+    isLoadingMore.value = true;
+    await Future.delayed(const Duration(
+        milliseconds: 300)); // Tạo độ trễ mượt mà cho UI xoay vòng
+    _currentPage++;
+    _loadNextPage();
+    isLoadingMore.value = false;
   }
 
   int getCount(String tabKey) {
@@ -84,9 +162,11 @@ class InventoryInsightController extends GetxController with TErrorHandler {
     } else {
       activeFilter.value = filterKey;
     }
+    _applyFiltersAndPaginate(isRefresh: true);
   }
 
   void setCategory(String categoryName) {
     activeCategory.value = categoryName;
+    _applyFiltersAndPaginate(isRefresh: true);
   }
 }

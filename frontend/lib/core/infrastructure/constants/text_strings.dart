@@ -368,6 +368,7 @@ class TTexts {
   static const String latestInventoryCount = "latest_inventory_count";
   static const String restockFromSupplier = "restock_from_supplier";
   static const String salesOrder = "sales_order";
+  static const String loadingProduct = "loading_product";
 
   // Empty State
   static const String emptyTransactionTitle = "empty_transaction_title";

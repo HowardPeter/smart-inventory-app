@@ -1,7 +1,41 @@
 category_id,name,description,store_id,is_default
-77777777-7777-4777-a777-777777777701,Electronics,Smartphones laptops and accessories,store_1,TRUE
+77777777-7777-4777-a777-777777777701,Electronics,Smartphones laptops and accessories,store_1,FALSE
 77777777-7777-4777-a777-777777777702,Apparel,Clothing and fashion items,store_1,FALSE
 77777777-7777-4777-a777-777777777703,Food & Beverage,Consumable goods and drinks,store_1,FALSE
 77777777-7777-4777-a777-777777777704,Office Supplies,Stationery and office equipment,store_1,FALSE
 77777777-7777-4777-a777-777777777705,Furniture,Home and office furniture,store_1,FALSE
 77777777-7777-4777-a777-777777777706,Accessories,Phone and tech accessories,store_1,FALSE
+77777777-7777-4777-a777-777777777707,Home Appliances,Household electrical appliances,store_1,FALSE
+77777777-7777-4777-a777-777777777708,Beauty & Personal Care,Cosmetics skincare and hygiene products,store_1,FALSE
+77777777-7777-4777-a777-777777777709,Sports & Outdoors,Sports equipment and outdoor gear,store_1,FALSE
+77777777-7777-4777-a777-777777777710,Toys & Games,Toys board games and entertainment items,store_1,FALSE
+77777777-7777-4777-a777-777777777711,Automotive,Car accessories and vehicle supplies,store_1,FALSE
+77777777-7777-4777-a777-777777777712,Pet Supplies,Food and accessories for pets,store_1,FALSE
+77777777-7777-4777-a777-777777777713,Books & Stationery,Books notebooks and school supplies,store_1,FALSE
+77777777-7777-4777-a777-777777777714,Health & Wellness,Healthcare and wellness products,store_1,FALSE
+77777777-7777-4777-a777-777777777715,Baby Products,Items for infants and toddlers,store_1,FALSE
+77777777-7777-4777-a777-777777777716,Jewelry & Watches,Fashion jewelry and watches,store_1,FALSE
+77777777-7777-4777-a777-777777777717,Grocery,Daily grocery and supermarket items,store_1,FALSE
+77777777-7777-4777-a777-777777777718,Hardware & Tools,Construction tools and hardware supplies,store_1,FALSE
+77777777-7777-4777-a777-777777777719,Music Instruments,Musical instruments and accessories,store_1,FALSE
+77777777-7777-4777-a777-777777777720,Gaming,Video games consoles and accessories,store_1,FALSE
+77777777-7777-4777-a777-777777777721,Photography,Cameras lenses and accessories,store_1,FALSE
+77777777-7777-4777-a777-777777777722,Travel & Luggage,Bags suitcases and travel gear,store_1,FALSE
+77777777-7777-4777-a777-777777777723,Footwear,Shoes sandals and slippers,store_1,FALSE
+77777777-7777-4777-a777-777777777724,Smart Home,IoT devices and smart home systems,store_1,FALSE
+77777777-7777-4777-a777-777777777725,Kitchenware,Cooking tools and kitchen equipment,store_1,FALSE
+77777777-7777-4777-a777-777777777726,Garden & Outdoor,Gardening tools and outdoor decor,store_1,FALSE
+77777777-7777-4777-a777-777777777727,Lighting,Indoor and outdoor lighting solutions,store_1,FALSE
+77777777-7777-4777-a777-777777777728,Security Systems,Home and office security equipment,store_1,FALSE
+77777777-7777-4777-a777-777777777729,Industrial Supplies,Industrial equipment and materials,store_1,FALSE
+77777777-7777-4777-a777-777777777730,Medical Supplies,Medical devices and consumables,store_1,FALSE
+77777777-7777-4777-a777-777777777731,Digital Goods,Software licenses and digital assets,store_1,FALSE
+77777777-7777-4777-a777-777777777732,Office Furniture,Desks chairs and office setups,store_1,FALSE
+77777777-7777-4777-a777-777777777733,Camping Gear,Tents sleeping bags and camping items,store_1,FALSE
+77777777-7777-4777-a777-777777777734,Fitness Equipment,Gym and workout equipment,store_1,FALSE
+77777777-7777-4777-a777-777777777735,DIY & Crafts,Handmade craft materials and tools,store_1,FALSE
+77777777-7777-4777-a777-777777777736,Seasonal Items,Holiday and seasonal decorations,store_1,FALSE
+77777777-7777-4777-a777-777777777737,Subscription Products,Recurring subscription items,store_1,FALSE
+77777777-7777-4777-a777-777777777738,Second-hand Goods,Used and refurbished items,store_1,FALSE
+77777777-7777-4777-a777-777777777739,Luxury Goods,High-end premium products,store_1,FALSE
+77777777-7777-4777-a777-777777777740,Wholesale,Bulk and wholesale items,store_1,FALSE

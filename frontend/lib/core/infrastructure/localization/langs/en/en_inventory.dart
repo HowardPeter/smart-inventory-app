@@ -92,6 +92,7 @@ final Map<String, String> enInventory = {
   TTexts.latestInventoryCount: 'Latest Inventory Count',
   TTexts.restockFromSupplier: 'Restock from Supplier',
   TTexts.salesOrder: 'Sales Order #1023',
+  TTexts.loadingProduct: 'Loading product details...',
 
   // -- Empty States
   TTexts.noDataAvailable: 'No data available',

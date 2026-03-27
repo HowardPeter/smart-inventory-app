@@ -19,6 +19,7 @@ class InventoryInsightMobileView extends GetView<InventoryInsightController> {
   Widget build(BuildContext context) {
     final double topOffset =
         MediaQuery.of(context).padding.top + kToolbarHeight;
+
     return Scaffold(
       backgroundColor: AppColors.background,
       extendBodyBehindAppBar: true,
@@ -27,52 +28,68 @@ class InventoryInsightMobileView extends GetView<InventoryInsightController> {
         showSearchIcon: true,
       ),
       floatingActionButton: TExpandableFabWidget(
-        //TODO: Them add san pham
         onManualAdd: () {},
         onScanAdd: () => Get.to(() => const TBarcodeScannerLayout()),
       ),
       body: TRefreshIndicatorWidget(
         onRefresh: controller.refreshData,
         edgeOffset: topOffset,
-        child: SingleChildScrollView(
+        child: CustomScrollView(
+          controller: controller.scrollController,
           physics: const AlwaysScrollableScrollPhysics(
-              parent: BouncingScrollPhysics()),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              SizedBox(
-                  height:
-                      MediaQuery.of(context).padding.top + kToolbarHeight + 16),
-              Padding(
+            parent: BouncingScrollPhysics(),
+          ),
+          slivers: [
+            SliverToBoxAdapter(
+              child: SizedBox(height: topOffset + 16),
+            ),
+            SliverToBoxAdapter(
+              child: Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 20),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text(TTexts.totalInventory.tr, // DÙNG TTEXTS
-                        style: const TextStyle(
-                            fontSize: 14,
-                            fontWeight: FontWeight.bold,
-                            color: AppColors.subText)),
+                    Text(
+                      TTexts.totalInventory.tr,
+                      style: const TextStyle(
+                        fontSize: 14,
+                        fontWeight: FontWeight.bold,
+                        color: AppColors.subText,
+                      ),
+                    ),
                     const SizedBox(height: 4),
                     Obx(() => Text(
-                          "${controller.getCount(TTexts.tabAll)} ${TTexts.items.tr}", // DÙNG TTEXTS
+                          "${controller.getCount(TTexts.tabAll)} ${TTexts.items.tr}",
                           style: const TextStyle(
-                              fontSize: 32,
-                              fontWeight: FontWeight.bold,
-                              fontFamily: 'Poppins',
-                              color: AppColors.primaryText),
+                            fontSize: 32,
+                            fontWeight: FontWeight.bold,
+                            fontFamily: 'Poppins',
+                            color: AppColors.primaryText,
+                          ),
                         )),
                   ],
                 ),
               ),
-              const SizedBox(height: AppSizes.p16),
-              const InventoryInsightOverviewWidget(),
-              const SizedBox(height: AppSizes.p16),
-              const InventoryInsightCategoryChipWidget(),
-              const SizedBox(height: AppSizes.p8),
-              const InventoryInsightListWidget(),
-            ],
-          ),
+            ),
+            const SliverToBoxAdapter(
+              child: SizedBox(height: AppSizes.p16),
+            ),
+            const SliverToBoxAdapter(
+              child: InventoryInsightOverviewWidget(),
+            ),
+            const SliverToBoxAdapter(
+              child: SizedBox(height: AppSizes.p16),
+            ),
+            const SliverToBoxAdapter(
+              child: InventoryInsightCategoryChipWidget(),
+            ),
+            const SliverToBoxAdapter(
+              child: SizedBox(height: AppSizes.p8),
+            ),
+            const SliverToBoxAdapter(
+              child: InventoryInsightListWidget(),
+            ),
+          ],
         ),
       ),
     );
