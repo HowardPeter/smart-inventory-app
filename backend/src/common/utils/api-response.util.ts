@@ -27,16 +27,29 @@ export const sendResponse = {
     return res.status(options?.status ?? 200).json(response);
   },
 
-  error: (
+  error: <T = unknown>(
     res: Response,
     status: number,
     message: string,
+    options?: {
+      code?: string;
+      errors?: Record<string, unknown>;
+      data?: T
+    },
   ) => {
     const response: ApiErrorResponse = {
       success: false,
       status,
       message,
     };
+
+    if (options?.code !== undefined) {
+      response.code = options.code;
+    }
+
+    if (options?.errors !== undefined) {
+      response.errors = options.errors;
+    }
 
     return res.status(status).json(response);
   },

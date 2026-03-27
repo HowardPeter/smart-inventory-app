@@ -3,6 +3,8 @@ import { StatusCodes } from 'http-status-codes';
 import { ProductPackageRepository } from './repositories/product-package.repository.js';
 import { UnitRepository } from './repositories/unit.repository.js';
 import { CustomError } from '../../common/errors/index.js';
+import { prisma } from '../../db/prismaClient.js'; // gọi prisma để dùng cơ chế $transaction
+import { InventoryRepository } from '../inventories/index.js';
 import { productService } from '../products/index.js';
 
 import type {
@@ -173,6 +175,14 @@ export class ProductPackageService {
   ): Promise<void> {
     await this.checkProductPackageExisted(storeId, productPackageId);
 
-    await this.productPackageRepository.softDeleteOne(productPackageId);
+    // xóa inventory tương ứng khi xóa product package
+    await prisma.$transaction(async (tx) => {
+      const productPackageRepositoryTx = new ProductPackageRepository(tx);
+      const inventoryRepositoryTx = new InventoryRepository(tx);
+
+      await productPackageRepositoryTx.softDeleteOne(productPackageId);
+
+      await inventoryRepositoryTx.softDeleteOneByPackageId(productPackageId);
+    });
   }
 }

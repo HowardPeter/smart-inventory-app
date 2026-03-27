@@ -1,5 +1,4 @@
-import { prisma } from '../../../db/prismaClient.js';
-
+import type { DbClient } from '../../../common/types/index.js';
 import type { Prisma } from '../../../generated/prisma/client.js';
 import type {
   CreateProductPackageData,
@@ -38,6 +37,8 @@ type ProductPackageRecord = Prisma.ProductPackageGetPayload<{
 }>;
 
 export class ProductPackageRepository {
+  constructor(private readonly db: DbClient) {}
+
   // convert importPrice, sellingPrice từ Prisma Decimal sang number | null.
   private toResponseDto(
     productPackage: ProductPackageRecord,
@@ -53,7 +54,7 @@ export class ProductPackageRepository {
     storeId: string,
     productId: string,
   ): Promise<ProductPackageResponseDto[]> {
-    const productPackages = await prisma.productPackage.findMany({
+    const productPackages = await this.db.productPackage.findMany({
       where: {
         productId,
         activeStatus: 'active',
@@ -77,7 +78,7 @@ export class ProductPackageRepository {
     storeId: string,
     productPackageId: string,
   ): Promise<ProductPackageResponseDto | null> {
-    const productPackage = await prisma.productPackage.findFirst({
+    const productPackage = await this.db.productPackage.findFirst({
       where: {
         productPackageId,
         activeStatus: 'active',
@@ -96,7 +97,7 @@ export class ProductPackageRepository {
     productId: string,
     unitId: string,
   ): Promise<{ productPackageId: string } | null> {
-    return prisma.productPackage.findFirst({
+    return this.db.productPackage.findFirst({
       where: {
         productId,
         unitId,
@@ -112,7 +113,7 @@ export class ProductPackageRepository {
     storeId: string,
     barcodeValue: string,
   ): Promise<{ productPackageId: string } | null> {
-    return prisma.productPackage.findFirst({
+    return this.db.productPackage.findFirst({
       where: {
         barcodeValue,
         activeStatus: 'active',
@@ -130,7 +131,7 @@ export class ProductPackageRepository {
   async createOne(
     data: CreateProductPackageData,
   ): Promise<ProductPackageResponseDto> {
-    const productPackage = await prisma.productPackage.create({
+    const productPackage = await this.db.productPackage.create({
       data,
       select: productPackageResponseSelect,
     });
@@ -142,7 +143,7 @@ export class ProductPackageRepository {
     productPackageId: string,
     data: UpdateProductPackageDto,
   ): Promise<ProductPackageResponseDto> {
-    const productPackage = await prisma.productPackage.update({
+    const productPackage = await this.db.productPackage.update({
       where: { productPackageId },
       data: {
         ...(data.displayName !== undefined && {
@@ -168,8 +169,17 @@ export class ProductPackageRepository {
   }
 
   async softDeleteOne(productPackageId: string): Promise<void> {
-    await prisma.productPackage.update({
+    await this.db.productPackage.update({
       where: { productPackageId },
+      data: {
+        activeStatus: 'inactive',
+      },
+    });
+  }
+
+  async softDeleteMany(productId: string): Promise<void> {
+    await this.db.productPackage.updateMany({
+      where: { productId },
       data: {
         activeStatus: 'inactive',
       },

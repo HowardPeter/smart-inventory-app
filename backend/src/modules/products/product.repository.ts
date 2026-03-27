@@ -2,7 +2,6 @@ import {
   normalizePagination,
   getPaginationSkip,
 } from '../../common/utils/index.js';
-import { prisma } from '../../db/prismaClient.js';
 
 import type {
   CreateProductData,
@@ -11,10 +10,14 @@ import type {
   DetailProductResponseDto,
   ListProductsQueryDto,
   ProductListItemDto,
+  ProductsByCategoryDto,
 } from './product.dto.js';
 import type { Prisma } from '../../../src/generated/prisma/client.js';
+import type { DbClient } from '../../common/types/index.js';
 
 export class ProductRepository {
+  constructor(private readonly db: DbClient) {}
+
   async findManyByStoreId(
     storeId: string,
     query: ListProductsQueryDto,
@@ -37,8 +40,8 @@ export class ProductRepository {
     };
 
     // INFO: $transaction - chạy nhiều query trong 1 transaction
-    const [items, totalItems] = await prisma.$transaction([
-      prisma.product.findMany({
+    const [items, totalItems] = await this.db.$transaction([
+      this.db.product.findMany({
         where,
         orderBy: {
           [sortBy]: sortOrder,
@@ -62,7 +65,7 @@ export class ProductRepository {
           },
         },
       }),
-      prisma.product.count({
+      this.db.product.count({
         where,
       }),
     ]);
@@ -77,7 +80,7 @@ export class ProductRepository {
     storeId: string,
     productId: string,
   ): Promise<DetailProductResponseDto | null> {
-    const detailProduct = await prisma.product.findFirst({
+    const detailProduct = await this.db.product.findFirst({
       where: {
         productId,
         storeId,
@@ -144,7 +147,7 @@ export class ProductRepository {
   }
 
   async createOne(data: CreateProductData): Promise<ProductResponseDto> {
-    return await prisma.product.create({
+    return await this.db.product.create({
       data,
       select: {
         productId: true,
@@ -169,7 +172,7 @@ export class ProductRepository {
     productId: string,
     data: UpdateProductDto,
   ): Promise<ProductResponseDto> {
-    return await prisma.product.update({
+    return await this.db.product.update({
       where: { productId },
       data,
       select: {
@@ -191,8 +194,47 @@ export class ProductRepository {
     });
   }
 
+  async findProductsByCategoryId(
+    categoryId: string,
+  ): Promise<ProductsByCategoryDto> {
+    const products = await this.db.product.findMany({
+      where: { categoryId },
+      select: {
+        productId: true,
+        name: true,
+        imageUrl: true,
+        brand: true,
+        storeId: true,
+        categoryId: true,
+      },
+    });
+
+    return {
+      count: products.length,
+      products,
+    };
+  }
+
+  async uncategorizeMany(
+    storeId: string,
+    oldCategoryId: string,
+    uncategorizedId: string,
+  ): Promise<number> {
+    const uncategorized = await this.db.product.updateMany({
+      where: {
+        categoryId: oldCategoryId,
+        storeId,
+      },
+      data: {
+        categoryId: uncategorizedId,
+      },
+    });
+
+    return uncategorized.count;
+  }
+
   async softDeleteOne(productId: string): Promise<void> {
-    await prisma.product.update({
+    await this.db.product.update({
       where: {
         productId,
       },

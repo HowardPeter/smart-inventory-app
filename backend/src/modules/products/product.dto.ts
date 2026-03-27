@@ -6,6 +6,13 @@ import type {
 import type { Category } from '../categories/index.js';
 import type { ProductPackage, Unit } from '../product-packages/index.js';
 
+type ProductSimpleResponseDto = Omit<Product, 'activeStatus' | 'createdAt' | 'updatedAt'>;
+
+export type ProductsByCategoryDto = {
+  count: number;
+  products: ProductSimpleResponseDto[];
+};
+
 export type ProductResponseDto = Omit<Product, 'categoryId'> & {
   category: Omit<Category, 'description' | 'storeId' | 'isDefault'>;
 };

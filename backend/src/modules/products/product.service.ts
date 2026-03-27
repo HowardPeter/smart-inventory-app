@@ -6,7 +6,9 @@ import {
   normalizePagination,
   buildPaginatedResponse,
 } from '../../common/utils/index.js';
-import { CategoryRepository } from '../categories/index.js';
+import { prisma } from '../../db/prismaClient.js'; // gọi prisma để dùng cơ chế $transaction
+import { categoryRepository } from '../categories/index.js';
+import { ProductPackageRepository } from '../product-packages/index.js';
 
 import type {
   CreateProductData,
@@ -14,13 +16,11 @@ import type {
   UpdateProductDto,
   ListProductsQueryDto,
   ListProductsResponseDto,
+  ProductsByCategoryDto,
 } from './product.dto.js';
 
 export class ProductService {
-  constructor(
-    private readonly productRepository: ProductRepository,
-    private readonly categoryRepository: CategoryRepository,
-  ) {}
+  constructor(private readonly productRepository: ProductRepository) {}
 
   private async checkProductExisted(
     storeId: string,
@@ -34,6 +34,17 @@ export class ProductService {
     if (!existingProduct) {
       throw new CustomError({
         message: 'Product not found',
+        status: StatusCodes.NOT_FOUND,
+      });
+    }
+  }
+
+  private async checkCategoryExisted(categoryId: string): Promise<void> {
+    const category = await categoryRepository.findById(categoryId);
+
+    if (!category) {
+      throw new CustomError({
+        message: 'Category not found',
         status: StatusCodes.NOT_FOUND,
       });
     }
@@ -70,17 +81,16 @@ export class ProductService {
     return product;
   }
 
-  async createProduct(
-    data: CreateProductData,
-  ): Promise<ProductResponseDto> {
-    const category = await this.categoryRepository.findById(data.categoryId);
+  async getProductsByCategory(
+    categoryId: string,
+  ): Promise<ProductsByCategoryDto> {
+    await this.checkCategoryExisted(categoryId);
 
-    if (!category) {
-      throw new CustomError({
-        message: 'Category not found',
-        status: StatusCodes.NOT_FOUND,
-      });
-    }
+    return await this.productRepository.findProductsByCategoryId(categoryId);
+  }
+
+  async createProduct(data: CreateProductData): Promise<ProductResponseDto> {
+    await this.checkCategoryExisted(data.categoryId);
 
     return await this.productRepository.createOne(data);
   }
@@ -93,14 +103,7 @@ export class ProductService {
     await this.checkProductExisted(storeId, productId);
 
     if (data.categoryId) {
-      const category = await this.categoryRepository.findById(data.categoryId);
-
-      if (!category) {
-        throw new CustomError({
-          message: 'Category not found',
-          status: StatusCodes.NOT_FOUND,
-        });
-      }
+      await this.checkCategoryExisted(data.categoryId);
     }
 
     return await this.productRepository.updateOne(productId, data);
@@ -109,6 +112,13 @@ export class ProductService {
   async softDeleteProduct(storeId: string, productId: string): Promise<void> {
     await this.checkProductExisted(storeId, productId);
 
-    return await this.productRepository.softDeleteOne(productId);
+    await prisma.$transaction(async (tx) => {
+      const productRepositoryTx = new ProductRepository(tx);
+      const productPackageRepositoryTx = new ProductPackageRepository(tx);
+
+      await productRepositoryTx.softDeleteOne(productId);
+
+      await productPackageRepositoryTx.softDeleteMany(productId);
+    });
   }
 }
