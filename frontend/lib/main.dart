@@ -1,3 +1,5 @@
+import 'package:firebase_core/firebase_core.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
@@ -6,8 +8,10 @@ import 'package:frontend/core/infrastructure/localization/app_translations.dart'
 import 'package:frontend/core/state/bindings/initial_binding.dart';
 import 'package:frontend/core/state/services/auth_service.dart'
     show AuthService;
+import 'package:frontend/core/state/services/notification_service.dart';
 import 'package:frontend/core/state/services/store_service.dart';
 import 'package:frontend/core/state/services/user_service.dart';
+import 'package:frontend/firebase_options.dart';
 import 'package:frontend/routes/app_pages.dart';
 import 'package:get/get.dart';
 import 'package:device_preview/device_preview.dart';
@@ -15,6 +19,14 @@ import 'package:get_storage/get_storage.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'core/ui/theme/app_theme.dart';
 // import 'core/network/api_client.dart'; // Sau này mở ra để inject ApiClient
+
+// Hàm bắt buộc nằm ngoài class (top-level) để xử lý thông báo khi app chạy ngầm/tắt
+// Notification (Firebase)
+@pragma('vm:entry-point')
+Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
+  await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
+  // print("Background message: ${message.messageId}");
+}
 
 void main() async {
   // Đảm bảo Flutter core đã được khởi tạo trước khi chạy các setup khác
@@ -40,6 +52,14 @@ void main() async {
     url: AppConstants.supabaseUrl,
     anonKey: AppConstants.supabaseAnonKey,
   );
+  // ---------------------------------------------------------
+  // 4. Khởi tạo Firebase cho chức năng notification
+  await Firebase.initializeApp(
+    options: DefaultFirebaseOptions.currentPlatform,
+  );
+  FirebaseMessaging.onBackgroundMessage(_firebaseMessagingBackgroundHandler);
+  await NotificationService.initialize();
+   // ---------------------------------------------------------
 
   runApp(
     // Bọc toàn bộ app trong DevicePreview

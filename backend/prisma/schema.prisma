@@ -67,6 +67,7 @@ model UserProfile {
   transactions Transaction[]
   auditLogs    AuditLog[]
   storeMembers StoreMember[]
+  fcmTokens    FcmToken[]
 }
 
 model Store {
@@ -223,4 +224,16 @@ model HidedDefault {
   category Category @relation(fields: [categoryId], references: [categoryId])
 
   @@id([storeId, categoryId])
+}
+
+model FcmToken {
+  tokenId   String   @id @default(uuid()) @map("token_id")
+  token     String   @unique
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+  
+  userId    String   @map("user_id")
+  user      UserProfile @relation(fields: [userId], references: [userId], onDelete: Cascade)
+
+  @@map("fcm_token")
 }

@@ -3,6 +3,7 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:frontend/core/infrastructure/utils/full_screen_loader_utils.dart';
 import 'package:frontend/core/state/services/auth_service.dart';
+import 'package:frontend/core/state/services/notification_service.dart';
 import 'package:frontend/core/state/services/user_service.dart';
 import 'package:frontend/features/auth/providers/auth_provider.dart';
 import 'package:frontend/core/state/provider/user_profile_provider.dart';
@@ -78,6 +79,9 @@ class LoginController extends GetxController {
 
       // TẠO PROFILE (Nếu đây là lần đầu)
       await UserProfileProvider().createUserProfile();
+
+      // LOGIN THÀNH CÔNG -> ĐĂNG KÝ FCM TOKEN
+      await NotificationService.registerTokenWithBackend();
 
       debugPrint(
           "Token: ${Supabase.instance.client.auth.currentSession!.accessToken}");
@@ -181,6 +185,9 @@ class LoginController extends GetxController {
         "google_dummy_password",
         true,
       );
+
+      //  ĐĂNG NHẬP GOOGLE THÀNH CÔNG -> ĐĂNG KÝ FCM TOKEN
+      await NotificationService.registerTokenWithBackend();
 
       FullScreenLoaderUtils.stopLoading();
 
