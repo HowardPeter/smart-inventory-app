@@ -17,12 +17,12 @@ const listAuditLogsQuerySchema = z.object({
   sortOrder: z.enum(['asc', 'desc']).optional().default('desc'),
   entityType: z.string().trim().optional(),
   actionType: z.enum(['create', 'update', 'delete']).optional(),
-  userId: z.string().uuid().optional(),
+  userId: z.string().optional(),
 
   // NOTE: Bắt buộc định dạng thời gian truyền lên phải tuân thủ
   // nghiêm ngặt chuẩn ISO 8601 để parse đúng múi giờ
-  startDate: z.string().datetime().optional(),
-  endDate: z.string().datetime().optional(),
+  startDate: z.string().optional(),
+  endDate: z.string().optional(),
 });
 
 // Middleware lưu trữ kết quả query đã validate an toàn
