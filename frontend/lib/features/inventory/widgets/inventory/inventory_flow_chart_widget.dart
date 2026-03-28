@@ -32,7 +32,6 @@ class InventoryFlowChartWidget extends GetView<InventoryController> {
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              // SỬA: Inventory Flow -> TTexts.stockFlow.tr
               Text(TTexts.stockFlow.tr,
                   style: const TextStyle(
                       fontFamily: 'Poppins',
@@ -40,10 +39,8 @@ class InventoryFlowChartWidget extends GetView<InventoryController> {
                       fontSize: 16)),
               InkWell(
                 onTap: () {},
-                // SỬA: Bỏ const ở Row, thêm const vào TextStyle và Icon
                 child: Row(
                   children: [
-                    // SỬA: Details -> TTexts.details.tr
                     Text(TTexts.details.tr,
                         style: const TextStyle(
                             color: AppColors.primary,
@@ -57,7 +54,6 @@ class InventoryFlowChartWidget extends GetView<InventoryController> {
             ],
           ),
           const SizedBox(height: 4),
-          // SỬA: Inbound vs Outbound... -> TTexts.inboundOutbound7Days.tr
           Text(TTexts.inboundOutbound7Days.tr,
               style: const TextStyle(color: AppColors.subText, fontSize: 12)),
           const SizedBox(height: AppSizes.p24),
@@ -73,16 +69,12 @@ class InventoryFlowChartWidget extends GetView<InventoryController> {
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              // SỬA: Total Items -> TTexts.totalItems.tr
               Obx(() => _buildBottomStat(
                   TTexts.totalItems.tr,
                   "${controller.totalActiveProducts.value}",
                   AppColors.primaryText)),
-              // ĐÃ THAY BẰNG DỮ LIỆU TỪ CONTROLLER
-              // SỬA: Inbound -> TTexts.flowIn.tr
               Obx(() => _buildBottomStat(TTexts.flowIn.tr,
                   "+${controller.weeklyInbound.value}", AppColors.stockIn)),
-              // SỬA: Outbound -> TTexts.flowOut.tr
               Obx(() => _buildBottomStat(TTexts.flowOut.tr,
                   "-${controller.weeklyOutbound.value}", AppColors.stockOut)),
             ],
@@ -114,7 +106,6 @@ class InventoryFlowChartWidget extends GetView<InventoryController> {
 
   Widget _buildBarChart() {
     return Obx(() {
-      // ĐÃ LẤY DỮ LIỆU TỪ CONTROLLER
       final currentInbound =
           _isAnimated.value ? controller.inboundFlow : _zeros;
       final currentOutbound =

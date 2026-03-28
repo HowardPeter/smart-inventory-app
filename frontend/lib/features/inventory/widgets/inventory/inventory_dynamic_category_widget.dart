@@ -1,9 +1,12 @@
 import 'package:flutter/material.dart';
+import 'package:frontend/routes/app_routes.dart';
 import 'package:get/get.dart';
 import 'package:frontend/core/ui/theme/app_colors.dart';
 import 'package:frontend/features/inventory/controllers/inventory_controller.dart';
-// THÊM IMPORT NÀY
 import 'package:frontend/core/infrastructure/constants/text_strings.dart';
+
+// ĐÃ IMPORT WIDGET OVERLAY CỦA BẠN
+import 'package:frontend/core/ui/widgets/t_custom_fade_overlay_widget.dart';
 
 class InventoryDynamicCategoryWidget extends StatelessWidget {
   const InventoryDynamicCategoryWidget({super.key});
@@ -107,66 +110,15 @@ class InventoryDynamicCategoryWidget extends StatelessWidget {
         return Stack(
           children: [
             gridView,
-            _buildMoreOverlay(hiddenCount),
+            TCustomFadeOverlayWidget(
+              text: "+$hiddenCount ${TTexts.more.tr}",
+              onTap: () => Get.toNamed(AppRoutes.productCatalog),
+            ),
           ],
         );
       }
 
       return gridView;
     });
-  }
-
-  Widget _buildMoreOverlay(int hiddenCount) {
-    return Positioned(
-      bottom: 0,
-      left: 0,
-      right: 0,
-      child: GestureDetector(
-        onTap: () {
-          // TODO: Mở trang danh sách danh mục
-        },
-        child: Container(
-          height: 70,
-          decoration: BoxDecoration(
-            borderRadius: const BorderRadius.only(
-              bottomLeft: Radius.circular(16),
-              bottomRight: Radius.circular(16),
-            ),
-            gradient: LinearGradient(
-              begin: Alignment.topCenter,
-              end: Alignment.bottomCenter,
-              colors: [
-                AppColors.background.withOpacity(0.0),
-                AppColors.background.withOpacity(0.9),
-                AppColors.background,
-              ],
-              stops: const [0.0, 0.6, 1.0],
-            ),
-          ),
-          child: Align(
-            alignment: Alignment.bottomCenter,
-            child: Padding(
-              padding: const EdgeInsets.only(bottom: 8.0),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  const Icon(Icons.keyboard_arrow_down,
-                      color: AppColors.primary, size: 20),
-                  const SizedBox(width: 4),
-                  Text(
-                    "+$hiddenCount ${TTexts.more.tr}",
-                    style: const TextStyle(
-                      color: AppColors.primary,
-                      fontSize: 13,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                ],
-              ),
-            ),
-          ),
-        ),
-      ),
-    );
   }
 }

@@ -20,8 +20,7 @@ class InventoryInsightsWidget extends StatelessWidget {
       decoration: BoxDecoration(
         color: AppColors.surface,
         borderRadius: BorderRadius.circular(AppSizes.radius24),
-        border: Border.all(
-            color: AppColors.stockIn.withOpacity(0.3)), // Viền nhận diện
+        border: Border.all(color: AppColors.stockIn.withOpacity(0.3)),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,

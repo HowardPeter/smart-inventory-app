@@ -9,9 +9,11 @@ import 'package:frontend/features/auth/views/verify_email_view.dart';
 import 'package:frontend/features/home/views/home_view.dart';
 import 'package:frontend/features/inventory/bindings/inventory_detail_binding.dart';
 import 'package:frontend/features/inventory/bindings/inventory_insight_binding.dart';
+import 'package:frontend/features/inventory/bindings/product_catalog_bindings.dart';
 import 'package:frontend/features/inventory/views/inventory_detail_view.dart';
 import 'package:frontend/features/inventory/views/inventory_insight_view.dart';
 import 'package:frontend/features/inventory/views/inventory_view.dart';
+import 'package:frontend/features/inventory/views/product_catalog_view.dart';
 import 'package:frontend/features/navigation/bindings/navigation_binding.dart';
 import 'package:frontend/features/navigation/views/navigation_view.dart';
 import 'package:frontend/features/onboarding/bindings/onboarding_binding.dart';
@@ -161,10 +163,19 @@ class AppPages {
       transition: Transition.fadeIn,
     ),
 
+    // -- Inventory Detail
     GetPage(
       name: AppRoutes.inventoryDetail,
       page: () => const InventoryDetailView(),
       binding: InventoryDetailBinding(),
+      transition: Transition.cupertino,
+    ),
+
+    // -- Product Catalog
+    GetPage(
+      name: AppRoutes.productCatalog,
+      page: () => const ProductCatalogView(),
+      binding: ProductCatalogBinding(),
       transition: Transition.cupertino,
     ),
 

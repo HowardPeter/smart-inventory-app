@@ -370,6 +370,17 @@ class TTexts {
   static const String salesOrder = "sales_order";
   static const String loadingProduct = "loading_product";
 
+  // --- Product Catalog & Categories ---
+  static const String categoryCatalog = 'categoryCatalog';
+  static const String searchCategories = 'searchCategories';
+  static const String totalCategories = 'totalCategories';
+  static const String categoriesUnit = 'categoriesUnit';
+  static const String addNewCategory = 'addNewCategory';
+  static const String addNewCategorySub = 'addNewCategorySub';
+  static const String categoryDescription = 'categoryDescription';
+  static const String noCategoryDescription = 'noDescription';
+  static const String emptyCategoryMessage = 'emptyCategoryMessage';
+
   // Empty State
   static const String emptyTransactionTitle = "empty_transaction_title";
   static const String emptyTransactionSubtitle = "empty_transaction_subtitle";

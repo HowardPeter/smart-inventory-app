@@ -94,6 +94,19 @@ final Map<String, String> enInventory = {
   TTexts.salesOrder: 'Sales Order #1023',
   TTexts.loadingProduct: 'Loading product details...',
 
+// --- Product Catalog & Categories ---
+  TTexts.categoryCatalog: 'Product Catalog',
+  TTexts.searchCategories: 'Search categories...',
+  TTexts.totalCategories: 'Total',
+  TTexts.categoriesUnit: 'categories',
+  TTexts.addNewCategory: 'Add New Category',
+  TTexts.addNewCategorySub:
+      'Create a new classification group for your inventory items.',
+  TTexts.categoryDescription: 'Category Description',
+  TTexts.noCategoryDescription: 'This category does not have description',
+  TTexts.emptyCategoryMessage:
+      'We couldn\'t find any categories matching your search. Try a different keyword or add a new category.',
+
   // -- Empty States
   TTexts.noDataAvailable: 'No data available',
   TTexts.noCategoriesFound: 'No categories found',

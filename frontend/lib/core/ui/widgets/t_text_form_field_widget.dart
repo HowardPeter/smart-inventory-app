@@ -48,6 +48,7 @@ class TTextFormFieldWidget extends StatelessWidget {
           onChanged: onChanged,
           validator: validator,
           maxLines: isObscure ? 1 : maxLines,
+          cursorColor: AppColors.primary,
           style: const TextStyle(
             fontFamily: 'Poppins',
             fontSize: 14,
