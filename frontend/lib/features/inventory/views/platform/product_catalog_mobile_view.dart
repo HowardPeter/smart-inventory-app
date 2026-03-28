@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:frontend/core/ui/widgets/t_empty_state_widget.dart';
 import 'package:frontend/core/ui/widgets/t_form_skeleton_widget.dart';
+import 'package:frontend/core/ui/widgets/t_refresh_indicator_widget.dart';
 import 'package:frontend/features/inventory/widgets/product_catalog/product_catalog_category_list_item_widget.dart';
 import 'package:frontend/features/inventory/widgets/product_catalog/product_catalog_search_bar_widget.dart';
 import 'package:frontend/features/inventory/widgets/product_catalog/product_catalog_add_category_widget.dart';
@@ -28,9 +29,7 @@ class ProductCatalogMobileView extends GetView<ProductCatalogController> {
         title: TTexts.categoryCatalog.tr,
         showBackArrow: true,
       ),
-      body: RefreshIndicator(
-        color: AppColors.primary,
-        backgroundColor: AppColors.white,
+      body: TRefreshIndicatorWidget(
         edgeOffset: topOffset,
         onRefresh: () => controller.refreshCategories(),
         child: CustomScrollView(

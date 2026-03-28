@@ -385,6 +385,18 @@ class TTexts {
   static const String addNewProduct = 'add_new_product';
   static const String addNewProductSub = 'add_new_product_sub';
 
+  // --- Product Catalog Deatail
+  static const String brand = 'brand';
+  static const String packagesOrVariants = 'packagesOrVariants';
+  static const String add = 'add';
+  static const String addPackageSubtitle = 'addPackageSubtitle';
+  static const String noBarcode = 'noBarcode';
+  static const String editProduct = 'editProduct';
+  static const String deleteProduct = 'deleteProduct';
+  static const String addNewPackage = 'addNewPackage';
+  static const String editPackage = 'editPackage';
+  static const String noPackagesFound = 'noPackagesFound';
+
   // Empty State
   static const String emptyTransactionTitle = "empty_transaction_title";
   static const String emptyTransactionSubtitle = "empty_transaction_subtitle";

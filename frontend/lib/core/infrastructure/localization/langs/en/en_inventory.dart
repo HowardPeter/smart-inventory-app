@@ -111,6 +111,19 @@ final Map<String, String> enInventory = {
   TTexts.addNewProduct: 'Add New Product',
   TTexts.addNewProductSub: 'Add a new product item to this category.',
 
+  // -- Product Catalog Detail
+  TTexts.brand: 'Brand',
+  TTexts.packagesOrVariants: 'Packages / Variants',
+  TTexts.add: 'Add',
+  TTexts.noPackagesFound: 'No Packages Found',
+  TTexts.addPackageSubtitle:
+      'Add a package (variant, unit, barcode) for this product to manage stock.',
+  TTexts.noBarcode: 'No Barcode',
+  TTexts.editProduct: 'Edit Product',
+  TTexts.deleteProduct: 'Delete Product',
+  TTexts.addNewPackage: 'Add New Package',
+  TTexts.editPackage: 'Edit Package',
+
   // -- Empty States
   TTexts.noDataAvailable: 'No data available',
   TTexts.noCategoriesFound: 'No categories found',

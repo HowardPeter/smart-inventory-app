@@ -1,3 +1,4 @@
+import 'package:frontend/routes/app_routes.dart';
 import 'package:get/get.dart';
 import 'package:frontend/core/infrastructure/utils/error_handler_utils.dart';
 import 'package:frontend/core/infrastructure/models/category_model.dart';
@@ -43,14 +44,16 @@ class CategoryDetailController extends GetxController with TErrorHandler {
 
   Future<void> fetchProducts({bool isRefresh = false}) async {
     try {
-      if (!isRefresh) isLoading.value = true;
+      isLoading.value = true;
+
       final fetchedData =
           await _provider.getProductsByCategory(category.categoryId);
       products.assignAll(fetchedData);
     } catch (e) {
       handleError(e);
     } finally {
-      if (!isRefresh) isLoading.value = false;
+      // LUÔN LUÔN tắt loading khi tải xong
+      isLoading.value = false;
     }
   }
 
@@ -66,6 +69,13 @@ class CategoryDetailController extends GetxController with TErrorHandler {
   }
 
   void goToProductDetail(ProductModel product) {
-    // Get.toNamed(AppRoutes.productDetail, arguments: product);
+    try {
+      Get.toNamed(
+        AppRoutes.productCatalogDetail,
+        arguments: product,
+      );
+    } catch (e) {
+      handleError(e);
+    }
   }
 }

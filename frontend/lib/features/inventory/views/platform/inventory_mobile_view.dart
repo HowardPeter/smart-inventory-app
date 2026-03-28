@@ -19,8 +19,6 @@ class InventoryMobileView extends GetView<InventoryController> {
 
   @override
   Widget build(BuildContext context) {
-    // Đã bỏ Get.put() vì Controller được khởi tạo ở Navigation
-
     return Scaffold(
       backgroundColor: AppColors.background,
       body: SafeArea(

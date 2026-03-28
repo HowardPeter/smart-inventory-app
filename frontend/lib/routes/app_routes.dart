@@ -22,6 +22,7 @@ class AppRoutes {
   static const inventoryDetail = '/inventory-detail';
   static const productCatalog = '/product-catalog';
   static const categoryDetail = '/category-detail';
+  static const productCatalogDetail = '/product-catalog-detail';
 
   static const profile = '/profile';
 }

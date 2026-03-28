@@ -1,3 +1,4 @@
+import 'package:frontend/core/infrastructure/models/product_package_model.dart';
 import 'package:frontend/core/infrastructure/network/app_client.dart';
 import 'package:frontend/core/infrastructure/models/category_model.dart';
 import 'package:frontend/core/infrastructure/models/product_model.dart';
@@ -59,11 +60,16 @@ class InventoryProvider {
   }
 
   Future<List<ProductModel>> getProductsByCategory(String categoryId) async {
-    final listData =
-        await _apiClient.getList('/api/products', queryParameters: {
-      'categoryId': categoryId,
-      'limit': 100
-    });
+    final listData = await _apiClient.getList('/api/products',
+        queryParameters: {'categoryId': categoryId, 'limit': 100});
     return listData.map((json) => ProductModel.fromJson(json)).toList();
+  }
+
+  Future<List<ProductPackageModel>> getPackagesByProduct(
+      String productId) async {
+    final listData = await _apiClient.getList(
+        '/api/products/$productId/packages',
+        queryParameters: {'limit': 100});
+    return listData.map((json) => ProductPackageModel.fromJson(json)).toList();
   }
 }

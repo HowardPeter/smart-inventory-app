@@ -11,10 +11,12 @@ import 'package:frontend/features/inventory/bindings/category_detail_binding.dar
 import 'package:frontend/features/inventory/bindings/inventory_detail_binding.dart';
 import 'package:frontend/features/inventory/bindings/inventory_insight_binding.dart';
 import 'package:frontend/features/inventory/bindings/product_catalog_bindings.dart';
+import 'package:frontend/features/inventory/bindings/product_catalog_detail_binding.dart';
 import 'package:frontend/features/inventory/views/category_detail_view.dart';
 import 'package:frontend/features/inventory/views/inventory_detail_view.dart';
 import 'package:frontend/features/inventory/views/inventory_insight_view.dart';
 import 'package:frontend/features/inventory/views/inventory_view.dart';
+import 'package:frontend/features/inventory/views/product_catalog_detail_view.dart';
 import 'package:frontend/features/inventory/views/product_catalog_view.dart';
 import 'package:frontend/features/navigation/bindings/navigation_binding.dart';
 import 'package:frontend/features/navigation/views/navigation_view.dart';
@@ -162,7 +164,7 @@ class AppPages {
       name: AppRoutes.inventorySight,
       page: () => const InventoryInsightView(),
       binding: InventoryListBinding(),
-      transition: Transition.fadeIn,
+      transition: Transition.cupertino,
     ),
 
     // -- Inventory Detail
@@ -186,6 +188,14 @@ class AppPages {
       name: AppRoutes.categoryDetail,
       page: () => const CategoryDetaiView(),
       binding: CategoryDetailBinding(),
+      transition: Transition.cupertino,
+    ),
+
+    // -- Product Catalog Detail
+    GetPage(
+      name: AppRoutes.productCatalogDetail,
+      page: () => const ProductCatalogDetailView(),
+      binding: ProductCatalogDetailBinding(),
       transition: Transition.cupertino,
     ),
 
