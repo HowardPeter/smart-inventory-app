@@ -14,12 +14,11 @@ class ProductCatalogCategoryListItemWidget extends StatelessWidget {
   });
 
   final CategoryModel category;
-  final int index; // Dùng để tính màu
+  final int index;
   final VoidCallback onTap;
 
   @override
   Widget build(BuildContext context) {
-    // Bảng màu y chang màn hình Home
     final List<Color> avatarColors = [
       Colors.blue,
       Colors.orange,
@@ -33,92 +32,91 @@ class ProductCatalogCategoryListItemWidget extends StatelessWidget {
     final String firstLetter = name.isNotEmpty ? name[0].toUpperCase() : "?";
     final Color bgColor = avatarColors[index % avatarColors.length];
 
-    return InkWell(
-      onTap: onTap,
-      borderRadius: BorderRadius.circular(AppSizes.radius12),
-      child: Container(
-        margin: const EdgeInsets.only(bottom: AppSizes.p12),
-        padding: const EdgeInsets.all(AppSizes.p16),
-        decoration: BoxDecoration(
-          color: AppColors.white,
-          borderRadius: BorderRadius.circular(AppSizes.radius12),
-          border: Border.all(color: AppColors.softGrey.withOpacity(0.05)),
-          boxShadow: [
-            BoxShadow(
-              color: Colors.black.withOpacity(0.02),
-              blurRadius: 8,
-              offset: const Offset(0, 2),
-            ),
-          ],
-        ),
-        child: Row(
-          crossAxisAlignment:
-              CrossAxisAlignment.center, // Căn giữa theo chiều dọc
-          children: [
-            // Avatar cục vuông màu mè
-            Container(
-              width: 50,
-              height: 50,
-              decoration: BoxDecoration(
-                color: bgColor.withOpacity(0.15),
-                borderRadius: BorderRadius.circular(12),
-              ),
-              alignment: Alignment.center,
-              child: Text(
-                firstLetter,
-                style: TextStyle(
-                  color: bgColor,
-                  fontSize: 22,
-                  fontWeight: FontWeight.bold,
-                  fontFamily: 'Poppins',
+    // 1. Container ngoài cùng chỉ giữ Shadow và Margin
+    return Container(
+      margin: const EdgeInsets.only(bottom: AppSizes.p12),
+      decoration: BoxDecoration(
+        color: AppColors.white,
+        borderRadius: BorderRadius.circular(AppSizes.radius12),
+        border: Border.all(color: AppColors.softGrey.withOpacity(0.05)),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.02),
+            blurRadius: 8,
+            offset: const Offset(0, 2),
+          ),
+        ],
+      ),
+      // 2. Material bọc trong để giới hạn hiệu ứng InkWell không bị tràn góc
+      child: Material(
+        color: Colors.transparent,
+        borderRadius: BorderRadius.circular(AppSizes.radius12),
+        clipBehavior: Clip.antiAlias,
+        child: InkWell(
+          onTap: onTap,
+          splashColor: AppColors.primary.withOpacity(0.1),
+          highlightColor: AppColors.primary.withOpacity(0.05),
+          // 3. Padding chuyển vào trong cùng
+          child: Padding(
+            padding: const EdgeInsets.all(AppSizes.p16),
+            child: Row(
+              crossAxisAlignment: CrossAxisAlignment.center,
+              children: [
+                Container(
+                  width: 50,
+                  height: 50,
+                  decoration: BoxDecoration(
+                    color: bgColor.withOpacity(0.15),
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  alignment: Alignment.center,
+                  child: Text(
+                    firstLetter,
+                    style: TextStyle(
+                        color: bgColor,
+                        fontSize: 22,
+                        fontWeight: FontWeight.bold,
+                        fontFamily: 'Poppins'),
+                  ),
                 ),
-              ),
-            ),
-            const SizedBox(width: AppSizes.p16),
-
-            // Text Thông tin
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    name,
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
-                    style: const TextStyle(
-                      fontFamily: 'Poppins',
-                      fontSize: 15,
-                      fontWeight: FontWeight.bold,
-                      color: AppColors.primaryText,
-                    ),
+                const SizedBox(width: AppSizes.p16),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        name,
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                        style: const TextStyle(
+                            fontFamily: 'Poppins',
+                            fontSize: 15,
+                            fontWeight: FontWeight.bold,
+                            color: AppColors.primaryText),
+                      ),
+                      const SizedBox(height: 4),
+                      Text(
+                        (category.description != null &&
+                                category.description!.isNotEmpty)
+                            ? category.description!
+                            : TTexts.noCategoryDescription.tr,
+                        maxLines: 2,
+                        overflow: TextOverflow.ellipsis,
+                        style: const TextStyle(
+                            fontFamily: 'Poppins',
+                            fontSize: 12,
+                            height: 1.3,
+                            color: AppColors.subText),
+                      ),
+                    ],
                   ),
-                  const SizedBox(height: 4),
-                  Text(
-                    (category.description != null &&
-                            category.description!.isNotEmpty)
-                        ? category.description!
-                        : TTexts.noCategoryDescription.tr,
-                    maxLines: 2,
-                    overflow: TextOverflow.ellipsis,
-                    style: const TextStyle(
-                      fontFamily: 'Poppins',
-                      fontSize: 12,
-                      height: 1.3,
-                      color: AppColors.subText,
-                    ),
-                  ),
-                ],
-              ),
+                ),
+                const SizedBox(width: AppSizes.p8),
+                const Icon(Icons.chevron_right_rounded,
+                    color: AppColors.softGrey, size: 24),
+              ],
             ),
-            const SizedBox(width: AppSizes.p8),
-
-            // Icon mui tên bên phải
-            const Icon(
-              Icons.chevron_right_rounded,
-              color: AppColors.softGrey,
-              size: 24,
-            ),
-          ],
+          ),
         ),
       ),
     );

@@ -7,9 +7,11 @@ import 'package:frontend/features/auth/views/login_view.dart';
 import 'package:frontend/features/auth/views/register_view.dart';
 import 'package:frontend/features/auth/views/verify_email_view.dart';
 import 'package:frontend/features/home/views/home_view.dart';
+import 'package:frontend/features/inventory/bindings/category_detail_binding.dart';
 import 'package:frontend/features/inventory/bindings/inventory_detail_binding.dart';
 import 'package:frontend/features/inventory/bindings/inventory_insight_binding.dart';
 import 'package:frontend/features/inventory/bindings/product_catalog_bindings.dart';
+import 'package:frontend/features/inventory/views/category_detail_view.dart';
 import 'package:frontend/features/inventory/views/inventory_detail_view.dart';
 import 'package:frontend/features/inventory/views/inventory_insight_view.dart';
 import 'package:frontend/features/inventory/views/inventory_view.dart';
@@ -176,6 +178,14 @@ class AppPages {
       name: AppRoutes.productCatalog,
       page: () => const ProductCatalogView(),
       binding: ProductCatalogBinding(),
+      transition: Transition.cupertino,
+    ),
+
+    // -- Category Detail
+    GetPage(
+      name: AppRoutes.categoryDetail,
+      page: () => const CategoryDetaiView(),
+      binding: CategoryDetailBinding(),
       transition: Transition.cupertino,
     ),
 

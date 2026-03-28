@@ -6,7 +6,6 @@ import 'package:frontend/features/inventory/widgets/product_catalog/product_cata
 import 'package:frontend/features/inventory/widgets/product_catalog/product_catalog_add_category_widget.dart';
 import 'package:get/get.dart';
 import 'package:iconsax_flutter/iconsax_flutter.dart';
-
 import 'package:frontend/core/infrastructure/constants/text_strings.dart';
 import 'package:frontend/core/ui/theme/app_colors.dart';
 import 'package:frontend/core/ui/theme/app_sizes.dart';

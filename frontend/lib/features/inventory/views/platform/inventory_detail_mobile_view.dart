@@ -9,7 +9,6 @@ import 'package:get/get.dart';
 import 'package:frontend/core/ui/theme/app_colors.dart';
 import 'package:frontend/core/infrastructure/constants/text_strings.dart';
 import 'package:iconsax_flutter/iconsax_flutter.dart';
-
 import 'package:frontend/features/inventory/widgets/inventory_detail/inventory_detail_header_widget.dart';
 import 'package:frontend/features/inventory/widgets/inventory_detail/inventory_detail_health_widget.dart';
 import 'package:frontend/features/inventory/widgets/inventory_detail/inventory_detail_product_info_widget.dart';

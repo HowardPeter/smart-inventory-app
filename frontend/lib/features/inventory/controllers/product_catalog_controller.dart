@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:frontend/routes/app_routes.dart';
 import 'package:get/get.dart';
 
 import 'package:frontend/core/infrastructure/constants/text_strings.dart';
@@ -135,7 +136,10 @@ class ProductCatalogController extends GetxController with TErrorHandler {
 
   void goToCategoryDetail(CategoryModel category) {
     try {
-      // TODO: Chuyển trang chi tiết
+      Get.toNamed(
+        AppRoutes.categoryDetail,
+        arguments: category,
+      );
     } catch (e) {
       handleError(e);
     }

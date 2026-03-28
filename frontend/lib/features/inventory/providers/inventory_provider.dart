@@ -57,4 +57,13 @@ class InventoryProvider {
 
     throw Exception('No data found');
   }
+
+  Future<List<ProductModel>> getProductsByCategory(String categoryId) async {
+    final listData =
+        await _apiClient.getList('/api/products', queryParameters: {
+      'categoryId': categoryId,
+      'limit': 100
+    });
+    return listData.map((json) => ProductModel.fromJson(json)).toList();
+  }
 }

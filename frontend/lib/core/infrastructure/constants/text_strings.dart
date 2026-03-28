@@ -371,15 +371,19 @@ class TTexts {
   static const String loadingProduct = "loading_product";
 
   // --- Product Catalog & Categories ---
-  static const String categoryCatalog = 'categoryCatalog';
-  static const String searchCategories = 'searchCategories';
-  static const String totalCategories = 'totalCategories';
-  static const String categoriesUnit = 'categoriesUnit';
-  static const String addNewCategory = 'addNewCategory';
-  static const String addNewCategorySub = 'addNewCategorySub';
-  static const String categoryDescription = 'categoryDescription';
-  static const String noCategoryDescription = 'noDescription';
-  static const String emptyCategoryMessage = 'emptyCategoryMessage';
+  static const String categoryCatalog = 'category_catalog';
+  static const String searchCategories = 'search_categories';
+  static const String totalCategories = 'total_categories';
+  static const String categoriesUnit = 'categories_unit';
+  static const String addNewCategory = 'add_new_category';
+  static const String addNewCategorySub = 'add_new_category_sub';
+  static const String categoryDescription = 'category_description';
+  static const String noCategoryDescription = 'no_description';
+  static const String emptyCategoryMessage = 'empty_category_message';
+
+  // -- Category Detail ---
+  static const String addNewProduct = 'add_new_product';
+  static const String addNewProductSub = 'add_new_product_sub';
 
   // Empty State
   static const String emptyTransactionTitle = "empty_transaction_title";

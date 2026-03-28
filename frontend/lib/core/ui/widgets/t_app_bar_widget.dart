@@ -5,20 +5,18 @@ import 'package:iconsax_flutter/iconsax_flutter.dart';
 import 'package:frontend/core/ui/theme/app_colors.dart';
 import 'package:frontend/core/ui/theme/app_sizes.dart';
 import 'package:frontend/features/search/controllers/search_controller.dart';
-import 'package:frontend/routes/app_routes.dart'; // Tuỳ chỉnh lại đường dẫn AppRoutes nếu cần
+import 'package:frontend/routes/app_routes.dart';
 
 class TAppBarWidget extends StatelessWidget implements PreferredSizeWidget {
-  final String? title; // Trữ Text tiêu đề
-  final Widget?
-      titleWidget; // Cho phép truyền cả Widget vào Title (vd: Hình ảnh, Dropdown)
-  final bool showBackArrow; // Bật/Tắt nút Go Back mặc định
-  final Widget?
-      leadingWidget; // Cho phép thay thế hoàn toàn nút Go Back bằng nút khác
-  final List<Widget>?
-      actions; // Cho phép truyền vào 1 nùi nút bấm bên phải (vd: Filter, Menu, User Avatar)
-  final bool showSearchIcon; // Bật/Tắt nhanh nút Search tích hợp sẵn
-  final VoidCallback? onSearchPressed; // Ghi đè sự kiện khi bấm nút Search
-  final PreferredSizeWidget? bottom; // Hỗ trợ thêm TabBar ở dưới AppBar
+  final String? title;
+  final Widget? titleWidget;
+  final bool showBackArrow;
+  final Widget? leadingWidget;
+  final List<Widget>? actions;
+  final bool showSearchIcon;
+  final VoidCallback? onSearchPressed;
+  final PreferredSizeWidget? bottom;
+  final bool centerTitle;
 
   const TAppBarWidget({
     super.key,
@@ -30,6 +28,7 @@ class TAppBarWidget extends StatelessWidget implements PreferredSizeWidget {
     this.showSearchIcon = false,
     this.onSearchPressed,
     this.bottom,
+    this.centerTitle = true,
   });
 
   @override
@@ -38,15 +37,14 @@ class TAppBarWidget extends StatelessWidget implements PreferredSizeWidget {
       child: BackdropFilter(
         filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
         child: AppBar(
-          backgroundColor:
-              AppColors.background.withOpacity(0.7), // Trong suốt 70%
+          backgroundColor: AppColors.background.withOpacity(0.7),
           elevation: 0,
           scrolledUnderElevation: 0,
-          centerTitle: true,
-          // Nếu dùng nút Back dạng Text "Go Back" thì cần độ rộng 120, nếu không thì để mặc định
-          leadingWidth: showBackArrow && leadingWidget == null ? 120 : 56,
+          centerTitle: centerTitle, // Sử dụng biến cấu hình
 
-          // ĐƯỜNG KẺ CHỈ Ở DƯỚI (Hoặc TabBar tuỳ biến)
+          // FIX LỖI 120px: Đưa về chuẩn 56px vì bây giờ chỉ có icon mũi tên
+          leadingWidth: showBackArrow && leadingWidget == null ? 56 : 56,
+
           bottom: bottom ??
               PreferredSize(
                 preferredSize: const Size.fromHeight(1.0),
@@ -54,24 +52,21 @@ class TAppBarWidget extends StatelessWidget implements PreferredSizeWidget {
                     Container(color: Colors.grey.withOpacity(0.2), height: 1.0),
               ),
 
-          // NÚT BÊN TRÁI (LEADING)
+          // NÚT BÊN TRÁI
           leading: leadingWidget ??
               (showBackArrow
                   ? InkWell(
                       onTap: () => Get.back(),
                       borderRadius: BorderRadius.circular(AppSizes.radius8),
-                      child: const Row(
-                        children: [
-                          SizedBox(width: AppSizes.p16),
-                          Icon(Iconsax.arrow_left_2_copy,
-                              color: AppColors.primaryText, size: 20),
-                          SizedBox(width: 4),
-                        ],
+                      // Đã bỏ SizedBox 16px vô lý để mũi tên sát ra viền cho cân đối
+                      child: const Center(
+                        child: Icon(Iconsax.arrow_left_2_copy,
+                            color: AppColors.primaryText, size: 20),
                       ),
                     )
                   : null),
 
-          // TIÊU ĐỀ (TITLE)
+          // TIÊU ĐỀ
           title: titleWidget ??
               (title != null
                   ? Text(title!,
@@ -82,9 +77,8 @@ class TAppBarWidget extends StatelessWidget implements PreferredSizeWidget {
                           fontFamily: 'Poppins'))
                   : null),
 
-          // CÁC NÚT BÊN PHẢI (ACTIONS)
+          // NÚT BÊN PHẢI
           actions: [
-            // 1. Nút Search mặc định (Nếu bật)
             if (showSearchIcon)
               IconButton(
                 icon: const Icon(Iconsax.search_normal_copy,
@@ -93,10 +87,7 @@ class TAppBarWidget extends StatelessWidget implements PreferredSizeWidget {
                     () => Get.toNamed(AppRoutes.search,
                         arguments: {'target': SearchTarget.inventory}),
               ),
-
-            // 2. Chèn thêm các nút Custom mà bạn truyền vào
             ...?actions,
-
             const SizedBox(width: AppSizes.p8),
           ],
         ),

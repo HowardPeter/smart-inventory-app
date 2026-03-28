@@ -94,7 +94,7 @@ final Map<String, String> enInventory = {
   TTexts.salesOrder: 'Sales Order #1023',
   TTexts.loadingProduct: 'Loading product details...',
 
-// --- Product Catalog & Categories ---
+  // -- Product Catalog & Categories ---
   TTexts.categoryCatalog: 'Product Catalog',
   TTexts.searchCategories: 'Search categories...',
   TTexts.totalCategories: 'Total',
@@ -106,6 +106,10 @@ final Map<String, String> enInventory = {
   TTexts.noCategoryDescription: 'This category does not have description',
   TTexts.emptyCategoryMessage:
       'We couldn\'t find any categories matching your search. Try a different keyword or add a new category.',
+
+  // -- Category Detail
+  TTexts.addNewProduct: 'Add New Product',
+  TTexts.addNewProductSub: 'Add a new product item to this category.',
 
   // -- Empty States
   TTexts.noDataAvailable: 'No data available',

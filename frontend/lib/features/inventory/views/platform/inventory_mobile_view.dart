@@ -9,7 +9,6 @@ import 'package:frontend/routes/app_routes.dart';
 import 'package:get/get.dart';
 import 'package:frontend/core/ui/theme/app_colors.dart';
 import 'package:frontend/core/ui/theme/app_sizes.dart';
-
 import 'package:frontend/features/inventory/controllers/inventory_controller.dart';
 import 'package:frontend/features/inventory/widgets/inventory/inventory_header_widget.dart';
 import 'package:frontend/features/inventory/widgets/inventory/inventory_flow_chart_widget.dart';
