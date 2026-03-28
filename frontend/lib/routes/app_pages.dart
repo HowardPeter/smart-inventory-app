@@ -7,11 +7,13 @@ import 'package:frontend/features/auth/views/login_view.dart';
 import 'package:frontend/features/auth/views/register_view.dart';
 import 'package:frontend/features/auth/views/verify_email_view.dart';
 import 'package:frontend/features/home/views/home_view.dart';
+import 'package:frontend/features/inventory/bindings/add_category_binding.dart';
 import 'package:frontend/features/inventory/bindings/category_detail_binding.dart';
 import 'package:frontend/features/inventory/bindings/inventory_detail_binding.dart';
 import 'package:frontend/features/inventory/bindings/inventory_insight_binding.dart';
 import 'package:frontend/features/inventory/bindings/product_catalog_bindings.dart';
 import 'package:frontend/features/inventory/bindings/product_catalog_detail_binding.dart';
+import 'package:frontend/features/inventory/views/add_category_view.dart';
 import 'package:frontend/features/inventory/views/category_detail_view.dart';
 import 'package:frontend/features/inventory/views/inventory_detail_view.dart';
 import 'package:frontend/features/inventory/views/inventory_insight_view.dart';
@@ -196,6 +198,14 @@ class AppPages {
       name: AppRoutes.productCatalogDetail,
       page: () => const ProductCatalogDetailView(),
       binding: ProductCatalogDetailBinding(),
+      transition: Transition.cupertino,
+    ),
+
+    // -- Add Category
+    GetPage(
+      name: AppRoutes.addCategory,
+      page: () => const AddCategoryView(),
+      binding: AddCategoryBinding(),
       transition: Transition.cupertino,
     ),
 

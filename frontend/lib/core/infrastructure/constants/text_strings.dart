@@ -385,7 +385,7 @@ class TTexts {
   static const String addNewProduct = 'add_new_product';
   static const String addNewProductSub = 'add_new_product_sub';
 
-  // --- Product Catalog Deatail
+  // -- Product Catalog Deatail
   static const String brand = 'brand';
   static const String packagesOrVariants = 'packagesOrVariants';
   static const String add = 'add';
@@ -396,6 +396,21 @@ class TTexts {
   static const String addNewPackage = 'addNewPackage';
   static const String editPackage = 'editPackage';
   static const String noPackagesFound = 'noPackagesFound';
+
+  // -- Add Category
+  static const String categoryNameLabel = 'categoryNameLabel';
+  static const String categoryNameHint = 'categoryNameHint';
+  static const String categoryDescLabel = 'categoryDescLabel';
+  static const String categoryDescHint = 'categoryDescHint';
+  static const String saveCategory = 'saveCategory';
+  static const String categoryNameRequired = 'categoryNameRequired';
+  static const String categoryCreatedSuccessTitle =
+      'categoryCreatedSuccessTitle';
+  static const String categoryCreatedSuccessMessage =
+      'categoryCreatedSuccessMessage';
+  static const String categoryNameExists = 'categoryNameExists';
+  static const String saving = 'saving';
+  static const String savingCategory = 'savingCategory';
 
   // Empty State
   static const String emptyTransactionTitle = "empty_transaction_title";

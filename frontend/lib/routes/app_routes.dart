@@ -19,10 +19,11 @@ class AppRoutes {
   static const home = '/home';
   static const inventory = '/inventory';
   static const inventorySight = '/inventory_insight';
-  static const inventoryDetail = '/inventory-detail';
-  static const productCatalog = '/product-catalog';
-  static const categoryDetail = '/category-detail';
-  static const productCatalogDetail = '/product-catalog-detail';
+  static const inventoryDetail = '/inventory_detail';
+  static const productCatalog = '/product_catalog';
+  static const categoryDetail = '/category_detail';
+  static const productCatalogDetail = '/product_catalog_detail';
+  static const addCategory = '/add_category';
 
   static const profile = '/profile';
 }

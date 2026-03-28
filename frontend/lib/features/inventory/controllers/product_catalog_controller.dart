@@ -1,9 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:frontend/routes/app_routes.dart';
 import 'package:get/get.dart';
-
-import 'package:frontend/core/infrastructure/constants/text_strings.dart';
-import 'package:frontend/core/ui/widgets/t_snackbars_widget.dart';
 import 'package:frontend/core/infrastructure/models/category_model.dart';
 import 'package:frontend/core/infrastructure/utils/error_handler_utils.dart';
 import 'package:frontend/core/state/services/store_service.dart';
@@ -126,9 +123,7 @@ class ProductCatalogController extends GetxController with TErrorHandler {
   // ==========================================
   void addNewCategory() {
     try {
-      // TODO: Logic mở Form/BottomSheet thêm danh mục mới
-      TSnackbarsWidget.info(
-          title: TTexts.info.tr, message: TTexts.featureComingSoon.tr);
+      Get.toNamed(AppRoutes.addCategory);
     } catch (e) {
       handleError(e);
     }

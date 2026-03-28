@@ -72,4 +72,16 @@ class InventoryProvider {
         queryParameters: {'limit': 100});
     return listData.map((json) => ProductPackageModel.fromJson(json)).toList();
   }
+
+  Future<CategoryModel> createCategory(Map<String, dynamic> data) async {
+    final response = await _apiClient.post('/api/categories', data: data);
+
+    if (response.data != null && response.data['data'] != null) {
+      return CategoryModel.fromJson(response.data['data']);
+    } else if (response.data != null) {
+      return CategoryModel.fromJson(response.data);
+    }
+
+    throw Exception('Failed to create category');
+  }
 }

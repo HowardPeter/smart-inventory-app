@@ -124,6 +124,20 @@ final Map<String, String> enInventory = {
   TTexts.addNewPackage: 'Add New Package',
   TTexts.editPackage: 'Edit Package',
 
+  // -- Add Category
+  TTexts.categoryNameLabel: 'Category Name',
+  TTexts.categoryNameHint: 'e.g. Beauty & Personal Care',
+  TTexts.categoryDescLabel: 'Description (Optional)',
+  TTexts.categoryDescHint: 'Brief details about this category...',
+  TTexts.saveCategory: 'Save Category',
+  TTexts.categoryNameRequired: 'Category name is required.',
+  TTexts.categoryCreatedSuccessTitle: 'Success',
+  TTexts.categoryCreatedSuccessMessage:
+      'Category has been created successfully.',
+  TTexts.categoryNameExists: 'This category name already exists in your store.',
+  TTexts.saving: 'Saving...',
+  TTexts.savingCategory: 'Saving category...',
+
   // -- Empty States
   TTexts.noDataAvailable: 'No data available',
   TTexts.noCategoriesFound: 'No categories found',
