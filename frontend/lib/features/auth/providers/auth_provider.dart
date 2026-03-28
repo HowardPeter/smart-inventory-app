@@ -1,5 +1,6 @@
 import 'package:flutter/foundation.dart';
 import 'package:frontend/core/infrastructure/network/app_client.dart';
+import 'package:frontend/core/state/services/notification_service.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
@@ -89,6 +90,9 @@ class AuthProvider {
   }
 
   Future<void> logout() async {
+    // Gọi xóa token ở server TRƯỚC KHI Supabase sign out
+    await NotificationService.removeTokenFromBackend();
+
     await supabase.auth.signOut();
     // Đăng xuất Google để lần sau hiện lại popup chọn tài khoản
     await GoogleSignIn.instance.signOut();

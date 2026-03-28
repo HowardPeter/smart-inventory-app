@@ -53,6 +53,12 @@ dependencies:
   # Supabase
   # ----------------------------------------------------
   supabase_flutter: ^2.12.0
+  # ----------------------------------------------------
+  # Firebase && Notification
+  # ----------------------------------------------------
+  firebase_core: ^4.6.0
+  firebase_messaging: ^16.1.3
+  flutter_local_notifications: ^20.1.0
 
 dev_dependencies:
   flutter_test:
