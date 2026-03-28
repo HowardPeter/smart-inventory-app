@@ -26,6 +26,18 @@ export class CategoriesService {
     storeId: string,
     payload: CreateCategoryDto,
   ): Promise<CategoryResponseDto> {
+    const isDuplicate = await this.categoryRepository.checkDuplicateName(
+      storeId,
+      payload.name,
+    );
+
+    if (isDuplicate) {
+      throw new CustomError({
+        message: 'Category name already exists',
+        status: StatusCodes.CONFLICT,
+      });
+    }
+
     return await this.categoryRepository.createOne(storeId, payload);
   }
 

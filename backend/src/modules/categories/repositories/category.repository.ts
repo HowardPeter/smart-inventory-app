@@ -61,6 +61,32 @@ export class CategoryRepository {
     });
   }
 
+  async checkDuplicateName(storeId: string, name: string): Promise<boolean> {
+    const existingCategory = await this.db.category.findFirst({
+      where: {
+        name: {
+          equals: name,
+          mode: 'insensitive', // không phân biệt hoa thường
+        },
+        OR: [
+          {
+            storeId,
+            isDefault: false,
+          },
+          {
+            isDefault: true,
+            storeId: null,
+          },
+        ],
+      },
+      select: {
+        categoryId: true,
+      },
+    });
+
+    return !!existingCategory;
+  }
+
   async createOne(
     storeId: string,
     payload: CreateCategoryDto,
