@@ -68,8 +68,7 @@ class NotificationService {
               channel.name,
               channelDescription: channel.description,
               icon: '@drawable/ic_notification',
-              color: const Color(
-                  0x00ff7a03),
+              color: const Color(0x00ff7a03),
               largeIcon:
                   const DrawableResourceAndroidBitmap('@mipmap/ic_launcher'),
               importance: Importance.max,
@@ -136,9 +135,9 @@ class NotificationService {
       case 'REORDER_SUGGESTION': // Gợi ý nhập hàng
         if (referenceId.isNotEmpty) {
           // Bạn nhớ đổi tên route này cho khớp với app của bạn nhé
-         // Get.toNamed('/product-detail', arguments: referenceId);
+          // Get.toNamed('/product-detail', arguments: referenceId);
         } else {
-         // Get.toNamed('/notification-center');
+          // Get.toNamed('/notification-center');
         }
         break;
 
@@ -146,13 +145,13 @@ class NotificationService {
         if (referenceId.isNotEmpty) {
           //Get.toNamed('/inventory-adjustment-history', arguments: referenceId);
         } else {
-         // Get.toNamed('/notification-center');
+          // Get.toNamed('/notification-center');
         }
         break;
 
       default:
         // Các thông báo chung (Ví dụ tin tức, update hệ thống...)
-      //  Get.toNamed('/notification-center');
+        //  Get.toNamed('/notification-center');
         break;
     }
   }
