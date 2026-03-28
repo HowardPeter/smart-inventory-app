@@ -25,7 +25,7 @@ const listInventoriesQuerySchema = z.object({
     .default('updatedAt'),
   sortOrder: z.enum(['asc', 'desc']).optional().default('desc'),
   keyword: z.string().trim().min(1).max(255).optional(),
-  categoryId: z.string().uuid('Invalid categoryId').optional(),
+  categoryId: z.string().optional(),
   inventoryStatus: z.enum(['inStock', 'lowStock', 'outOfStock']).optional(),
 });
 
@@ -49,7 +49,7 @@ const adjustInventoryBodySchema = z.object({
 });
 
 const createInventoryBodySchema = z.object({
-  productPackageId: z.string().uuid('Invalid productPackageId'),
+  productPackageId: z.string(),
   quantity: z.number().int().min(0).default(0),
   reorderThreshold: z.number().int().min(0).nullable().optional(),
   lastCount: z.number().int().min(0).nullable().optional(),

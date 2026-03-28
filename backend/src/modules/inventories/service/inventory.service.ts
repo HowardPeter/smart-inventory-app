@@ -87,6 +87,7 @@ export class InventoryService {
     storeId: string,
     productPackageId: string,
     data: UpdateInventoryDto,
+    userId: string,
   ): Promise<InventoryDetailResponseDto> {
     const existingInventory = await this.getExistingInventory(
       storeId,
@@ -94,8 +95,10 @@ export class InventoryService {
     );
 
     return await this.inventoryRepository.updateOne(
+      storeId,
       existingInventory.inventoryId,
       data,
+      userId,
     );
   }
 
@@ -152,6 +155,7 @@ export class InventoryService {
   async createInventory(
     storeId: string,
     data: CreateInventoryDto,
+    userId: string,
   ): Promise<InventoryDetailResponseDto> {
     // Kiểm tra xem sản phẩm có thực sự thuộc quyền sở hữu
     // của cửa hàng hiện tại không
@@ -186,25 +190,32 @@ export class InventoryService {
         // Khôi phục lại kho đã bị xóa mềm (inactive)
         // thay vì tạo mới để tránh lỗi duplicate khóa unique
         return await this.inventoryRepository.restoreInventory(
+          storeId,
           existingInventory.inventoryId,
           data,
+          userId,
         );
       }
     }
 
     // Nếu dữ liệu chưa từng tồn tại, tiến hành tạo mới hoàn toàn
-    return await this.inventoryRepository.create(data);
+    return await this.inventoryRepository.create(storeId, data, userId);
   }
 
   async deleteInventory(
     storeId: string,
     productPackageId: string,
+    userId: string,
   ): Promise<void> {
     const existingInventory = await this.getExistingInventory(
       storeId,
       productPackageId,
     );
 
-    await this.inventoryRepository.delete(existingInventory.inventoryId);
+    await this.inventoryRepository.delete(
+      storeId,
+      existingInventory.inventoryId,
+      userId,
+    );
   }
 }
