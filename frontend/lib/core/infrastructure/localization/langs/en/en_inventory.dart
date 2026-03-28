@@ -110,6 +110,12 @@ final Map<String, String> enInventory = {
   // -- Category Detail
   TTexts.addNewProduct: 'Add New Product',
   TTexts.addNewProductSub: 'Add a new product item to this category.',
+  TTexts.editCategory: 'Edit Category',
+  TTexts.deleteCategory: 'Delete Category',
+  TTexts.noProductsFound: 'No Products Found',
+  TTexts.noProductsAssigned: 'There are currently no products assigned to this category.',
+  TTexts.deleteCategoryConfirm: 'Are you sure you want to delete this category?',
+  TTexts.deleting: 'Deleting...',
 
   // -- Product Catalog Detail
   TTexts.brand: 'Brand',
@@ -137,6 +143,14 @@ final Map<String, String> enInventory = {
   TTexts.categoryNameExists: 'This category name already exists in your store.',
   TTexts.saving: 'Saving...',
   TTexts.savingCategory: 'Saving category...',
+
+  // -- Edit Category
+  TTexts.editCategoryTitle: 'Edit Category',
+  TTexts.categoryUpdatedSuccessMessage:
+      'Category has been updated successfully.',
+  TTexts.deleteCategorySuccessMessage: 'Category has been deleted.',
+  TTexts.categoryNotEmptyError:
+      'Cannot delete. Please remove or clear inventory of all products inside this category first.',
 
   // -- Empty States
   TTexts.noDataAvailable: 'No data available',

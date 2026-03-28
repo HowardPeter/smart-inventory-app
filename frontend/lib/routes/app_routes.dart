@@ -23,7 +23,7 @@ class AppRoutes {
   static const productCatalog = '/product_catalog';
   static const categoryDetail = '/category_detail';
   static const productCatalogDetail = '/product_catalog_detail';
-  static const addCategory = '/add_category';
+  static const categoryForm = '/category_form';
 
   static const profile = '/profile';
 }

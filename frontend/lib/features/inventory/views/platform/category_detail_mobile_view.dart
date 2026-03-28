@@ -1,4 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:frontend/core/infrastructure/constants/text_strings.dart';
+import 'package:frontend/core/ui/widgets/t_refresh_indicator_widget.dart';
+import 'package:frontend/features/inventory/widgets/category_detail/category_detail_action_menu_widget.dart';
 import 'package:get/get.dart';
 import 'package:iconsax_flutter/iconsax_flutter.dart';
 import 'package:frontend/core/ui/theme/app_colors.dart';
@@ -22,12 +25,19 @@ class CategoryDetailMobileView extends GetView<CategoryDetailController> {
       backgroundColor: AppColors.background,
       extendBodyBehindAppBar: true,
       appBar: TAppBarWidget(
-        title: controller.category.name,
+        titleWidget: Obx(() => Text(
+              controller.rxCategory.value.name,
+              style: const TextStyle(
+                color: AppColors.primaryText,
+                fontSize: 18,
+                fontWeight: FontWeight.bold,
+                fontFamily: 'Poppins',
+              ),
+            )),
         showBackArrow: true,
+        actions: const [CategoryDetailActionMenuWidget()],
       ),
-      body: RefreshIndicator(
-        color: AppColors.primary,
-        backgroundColor: AppColors.white,
+      body: TRefreshIndicatorWidget(
         edgeOffset: topOffset,
         onRefresh: () => controller.fetchProducts(isRefresh: true),
         child: CustomScrollView(
@@ -41,35 +51,39 @@ class CategoryDetailMobileView extends GetView<CategoryDetailController> {
               padding: const EdgeInsets.symmetric(
                   horizontal: AppSizes.p20, vertical: AppSizes.p8),
               sliver: SliverToBoxAdapter(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      controller.category.name,
-                      style: const TextStyle(
-                          fontFamily: 'Poppins',
-                          fontSize: 24,
-                          fontWeight: FontWeight.bold,
-                          color: AppColors.primaryText),
-                    ),
-                    const SizedBox(height: 8),
-                    Text(
-                      controller.category.description ??
-                          'No description available.',
-                      style: const TextStyle(
-                          fontFamily: 'Poppins',
-                          fontSize: 14,
-                          height: 1.5,
-                          color: AppColors.subText),
-                    ),
-                    const SizedBox(height: 16),
-                    const Divider(color: AppColors.divider),
-                    const SizedBox(height: 8),
-                  ],
-                ),
+                child: Obx(() => Column(
+                      // <--- BỌC OBX Ở ĐÂY
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          controller.rxCategory.value.name,
+                          style: const TextStyle(
+                              fontFamily: 'Poppins',
+                              fontSize: 24,
+                              fontWeight: FontWeight.bold,
+                              color: AppColors.primaryText),
+                        ),
+                        const SizedBox(height: 8),
+                        Text(
+                          // Kiểm tra rỗng chuẩn xác
+                          (controller.rxCategory.value.description != null &&
+                                  controller
+                                      .rxCategory.value.description!.isNotEmpty)
+                              ? controller.rxCategory.value.description!
+                              : TTexts.noCategoryDescription.tr,
+                          style: const TextStyle(
+                              fontFamily: 'Poppins',
+                              fontSize: 14,
+                              height: 1.5,
+                              color: AppColors.subText),
+                        ),
+                        const SizedBox(height: 16),
+                        const Divider(color: AppColors.divider),
+                        const SizedBox(height: 8),
+                      ],
+                    )),
               ),
             ),
-
             // 2. MAIN CONTENT
             Obx(() {
               if (controller.isLoading.value) {
@@ -101,16 +115,14 @@ class CategoryDetailMobileView extends GetView<CategoryDetailController> {
 
                   // TRẠNG THÁI TRỐNG SẢN PHẨM
                   if (controller.products.isEmpty)
-                    const SliverFillRemaining(
+                    SliverFillRemaining(
                       hasScrollBody: false,
                       child: TEmptyStateWidget(
                         icon: Iconsax.box_remove_copy,
-                        title: 'No Products Found',
-                        subtitle:
-                            'There are currently no products assigned to this category.',
+                        title: TTexts.noProductsFound.tr,
+                        subtitle: TTexts.noProductsAssigned.tr,
                       ),
                     )
-
                   // DANH SÁCH SẢN PHẨM
                   else
                     SliverPadding(

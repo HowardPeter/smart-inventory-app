@@ -384,6 +384,12 @@ class TTexts {
   // -- Category Detail ---
   static const String addNewProduct = 'add_new_product';
   static const String addNewProductSub = 'add_new_product_sub';
+  static const String editCategory = 'editCategory';
+  static const String deleteCategory = 'deleteCategory';
+  static const String noProductsFound = 'noProductsFound';
+  static const String noProductsAssigned = 'noProductsAssigned';
+  static const String deleteCategoryConfirm = 'deleteCategoryConfirm';
+  static const String deleting = 'deleting';
 
   // -- Product Catalog Deatail
   static const String brand = 'brand';
@@ -411,6 +417,14 @@ class TTexts {
   static const String categoryNameExists = 'categoryNameExists';
   static const String saving = 'saving';
   static const String savingCategory = 'savingCategory';
+
+  // -- Edit Category
+  static const String editCategoryTitle = 'editCategoryTitle';
+  static const String categoryUpdatedSuccessMessage =
+      'categoryUpdatedSuccessMessage';
+  static const String deleteCategorySuccessMessage =
+      'deleteCategorySuccessMessage';
+  static const String categoryNotEmptyError = 'categoryNotEmptyError';
 
   // Empty State
   static const String emptyTransactionTitle = "empty_transaction_title";

@@ -3,7 +3,6 @@ import 'package:frontend/core/infrastructure/network/app_client.dart';
 import 'package:frontend/core/infrastructure/models/category_model.dart';
 import 'package:frontend/core/infrastructure/models/product_model.dart';
 import 'package:frontend/core/infrastructure/models/inventory_model.dart';
-import 'package:frontend/core/infrastructure/models/unit_model.dart';
 
 class InventoryProvider {
   final _apiClient = ApiClient();
@@ -27,25 +26,6 @@ class InventoryProvider {
     final listData = await _apiClient
         .getList('/api/inventories', queryParameters: {'limit': 100});
     return listData.map((json) => InventoryModel.fromJson(json)).toList();
-  }
-
-  // ==========================================================
-  // TODO: [MOCK DATA] - BỎ GIẢ LẬP KHI BACKEND CÓ API '/api/units'
-  // ==========================================================
-  Future<List<UnitModel>> getUnits() async {
-    try {
-      await Future.delayed(const Duration(milliseconds: 500));
-      final mockData = [
-        {'unit_id': 'unit_box', 'code': 'BOX', 'name': 'Box'},
-        {'unit_id': 'unit_piece', 'code': 'PCS', 'name': 'Piece'},
-        {'unit_id': 'unit_can', 'code': 'CAN', 'name': 'Can'},
-        {'unit_id': 'unit_carton', 'code': 'CRT', 'name': 'Carton'},
-        {'unit_id': 'unit_packet', 'code': 'PKT', 'name': 'Packet'},
-      ];
-      return mockData.map((json) => UnitModel.fromJson(json)).toList();
-    } catch (e) {
-      rethrow;
-    }
   }
 
   Future<Map<String, dynamic>> getProductDetail(String productId) async {
@@ -83,5 +63,16 @@ class InventoryProvider {
     }
 
     throw Exception('Failed to create category');
+  }
+
+  // Cập nhật danh mục
+  Future<void> updateCategory(
+      String categoryId, Map<String, dynamic> data) async {
+    await _apiClient.patch('/api/categories/$categoryId', data: data);
+  }
+
+  // Xóa danh mục
+  Future<void> deleteCategory(String categoryId) async {
+    await _apiClient.delete('/api/categories/$categoryId');
   }
 }

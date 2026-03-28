@@ -6,45 +6,38 @@ import 'package:frontend/core/ui/theme/app_sizes.dart';
 import 'package:frontend/core/ui/widgets/t_app_bar_widget.dart';
 import 'package:frontend/core/ui/widgets/t_text_form_field_widget.dart';
 import 'package:frontend/core/ui/widgets/t_primary_button_widget.dart';
-import 'package:frontend/features/inventory/controllers/add_category_controller.dart';
+import 'package:frontend/features/inventory/controllers/category_form_controller.dart';
 
-class AddCategoryMobileView extends GetView<AddCategoryController> {
-  const AddCategoryMobileView({super.key});
+class CategoryFormMobileView extends GetView<CategoryFormController> {
+  const CategoryFormMobileView({super.key});
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: AppColors.background,
-
-      // HEADER
       appBar: TAppBarWidget(
-        title: TTexts.addNewCategory.tr,
+        // Tiêu đề động
+        title: controller.isEditMode
+            ? TTexts.editCategoryTitle.tr
+            : TTexts.addNewCategory.tr,
         showBackArrow: true,
         centerTitle: true,
       ),
-
-      // NÚT LƯU Ở DƯỚI CÙNG (Gọn gàng vì không cần Obx nữa)
       bottomNavigationBar: SafeArea(
         child: Container(
           padding: const EdgeInsets.all(AppSizes.p20),
-          decoration: BoxDecoration(
-            color: AppColors.white,
-            boxShadow: [
-              BoxShadow(
+          decoration: BoxDecoration(color: AppColors.white, boxShadow: [
+            BoxShadow(
                 color: Colors.black.withOpacity(0.05),
                 blurRadius: 10,
-                offset: const Offset(0, -4),
-              )
-            ],
-          ),
+                offset: const Offset(0, -4))
+          ]),
           child: TPrimaryButtonWidget(
             text: TTexts.saveCategory.tr,
             onPressed: () => controller.saveCategory(),
           ),
         ),
       ),
-
-      // FORM NHẬP LIỆU
       body: SingleChildScrollView(
         child: Padding(
           padding: const EdgeInsets.all(AppSizes.p20),
@@ -54,23 +47,15 @@ class AddCategoryMobileView extends GetView<AddCategoryController> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 const SizedBox(height: AppSizes.p12),
-
-                // Trường Tên danh mục
                 TTextFormFieldWidget(
                   label: TTexts.categoryNameLabel.tr,
                   hintText: TTexts.categoryNameHint.tr,
                   controller: controller.nameController,
-                  validator: (value) {
-                    if (value == null || value.trim().isEmpty) {
-                      return TTexts.categoryNameRequired.tr;
-                    }
-                    return null;
-                  },
+                  validator: (value) => (value == null || value.trim().isEmpty)
+                      ? TTexts.categoryNameRequired.tr
+                      : null,
                 ),
-
                 const SizedBox(height: AppSizes.p24),
-
-                // Trường Mô tả
                 TTextFormFieldWidget(
                   label: TTexts.categoryDescLabel.tr,
                   hintText: TTexts.categoryDescHint.tr,

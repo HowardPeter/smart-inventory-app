@@ -1,3 +1,8 @@
+import 'package:dio/dio.dart';
+import 'package:flutter/material.dart';
+import 'package:frontend/core/infrastructure/utils/full_screen_loader_utils.dart';
+import 'package:frontend/core/ui/widgets/t_custom_dialog_widget.dart';
+import 'package:frontend/features/inventory/controllers/product_catalog_controller.dart';
 import 'package:frontend/routes/app_routes.dart';
 import 'package:get/get.dart';
 import 'package:frontend/core/infrastructure/utils/error_handler_utils.dart';
@@ -11,19 +16,17 @@ import 'package:frontend/core/infrastructure/constants/text_strings.dart';
 class CategoryDetailController extends GetxController with TErrorHandler {
   final InventoryProvider _provider = InventoryProvider();
 
-  late final CategoryModel category;
+  late Rx<CategoryModel> rxCategory;
 
   final RxBool isLoading = true.obs;
   final RxList<ProductModel> products = <ProductModel>[].obs;
 
-  // Biến kiểm tra quyền Manager
   bool canManageProduct = false;
 
   @override
   void onInit() {
     super.onInit();
 
-    // Kiểm tra quyền (Chỉ Manager/Owner mới được thêm sản phẩm)
     try {
       final storeService = Get.find<StoreService>();
       final role = storeService.currentRole.value.toLowerCase();
@@ -34,7 +37,7 @@ class CategoryDetailController extends GetxController with TErrorHandler {
     }
 
     if (Get.arguments is CategoryModel) {
-      category = Get.arguments as CategoryModel;
+      rxCategory = (Get.arguments as CategoryModel).obs;
       fetchProducts();
     } else {
       isLoading.value = false;
@@ -47,20 +50,18 @@ class CategoryDetailController extends GetxController with TErrorHandler {
       isLoading.value = true;
 
       final fetchedData =
-          await _provider.getProductsByCategory(category.categoryId);
+          await _provider.getProductsByCategory(rxCategory.value.categoryId);
       products.assignAll(fetchedData);
     } catch (e) {
       handleError(e);
     } finally {
-      // LUÔN LUÔN tắt loading khi tải xong
       isLoading.value = false;
     }
   }
 
-  // HÀM MỚI: Xử lý nút Add Product
+  // --- ACTIONS CHO SẢN PHẨM ---
   void addNewProduct() {
     try {
-      // TODO: Mở form thêm sản phẩm
       TSnackbarsWidget.info(
           title: TTexts.info.tr, message: TTexts.featureComingSoon.tr);
     } catch (e) {
@@ -77,5 +78,70 @@ class CategoryDetailController extends GetxController with TErrorHandler {
     } catch (e) {
       handleError(e);
     }
+  }
+
+  // ==========================================
+  // HÀM MỚI: ACTIONS CHO CATEGORY
+  // ==========================================
+  void editCategory() {
+    try {
+      // Chuyển sang form dùng chung và truyền category sang để bật Edit Mode
+      Get.toNamed(AppRoutes.categoryForm, arguments: rxCategory.value);
+    } catch (e) {
+      handleError(e);
+    }
+  }
+
+  Future<void> deleteCategory() async {
+    // SỬ DỤNG TCustomDialogWidget ĐỂ HIỆN XÁC NHẬN
+    Get.dialog(
+      TCustomDialogWidget(
+        title: TTexts.deleteCategory.tr,
+        description: TTexts.deleteCategoryConfirm.tr,
+        icon: const Text('🗑️', style: TextStyle(fontSize: 40)),
+        primaryButtonText: TTexts.delete.tr,
+        secondaryButtonText: TTexts.cancel.tr,
+        onSecondaryPressed: () => Get.back(),
+        onPrimaryPressed: () async {
+          Get.back();
+          try {
+            FullScreenLoaderUtils.openLoadingDialog('Deleting...');
+
+            await _provider.deleteCategory(rxCategory.value.categoryId);
+
+            FullScreenLoaderUtils.stopLoading();
+
+            // Refresh lại danh sách Catalog
+            if (Get.isRegistered<ProductCatalogController>()) {
+              Get.find<ProductCatalogController>().fetchCategories();
+            }
+
+            // Xóa xong thì đá văng người dùng về trang Product Catalog
+            Get.back();
+
+            TSnackbarsWidget.success(
+              title: TTexts.successTitle.tr,
+              message: TTexts.deleteCategorySuccessMessage.tr,
+            );
+          } on DioException catch (e) {
+            FullScreenLoaderUtils.stopLoading();
+            final statusCode = e.response?.statusCode;
+            // Bắt đúng lỗi 409 từ Backend (Category đang chứa Products)
+            if (statusCode == 409) {
+              TSnackbarsWidget.warning(
+                title: TTexts.errorTitle.tr,
+                message: TTexts.categoryNotEmptyError.tr,
+              );
+            } else {
+              handleError(e);
+            }
+          } catch (e) {
+            FullScreenLoaderUtils.stopLoading();
+            handleError(e);
+          }
+        },
+      ),
+      barrierDismissible: true, // Cho phép bấm ra ngoài để đóng
+    );
   }
 }

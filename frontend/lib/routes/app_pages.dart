@@ -7,7 +7,7 @@ import 'package:frontend/features/auth/views/login_view.dart';
 import 'package:frontend/features/auth/views/register_view.dart';
 import 'package:frontend/features/auth/views/verify_email_view.dart';
 import 'package:frontend/features/home/views/home_view.dart';
-import 'package:frontend/features/inventory/bindings/add_category_binding.dart';
+import 'package:frontend/features/inventory/bindings/category_form_binding.dart';
 import 'package:frontend/features/inventory/bindings/category_detail_binding.dart';
 import 'package:frontend/features/inventory/bindings/inventory_detail_binding.dart';
 import 'package:frontend/features/inventory/bindings/inventory_insight_binding.dart';
@@ -203,9 +203,9 @@ class AppPages {
 
     // -- Add Category
     GetPage(
-      name: AppRoutes.addCategory,
-      page: () => const AddCategoryView(),
-      binding: AddCategoryBinding(),
+      name: AppRoutes.categoryForm,
+      page: () => const CategoryFormView(),
+      binding: CategoryFormBinding(),
       transition: Transition.cupertino,
     ),
 

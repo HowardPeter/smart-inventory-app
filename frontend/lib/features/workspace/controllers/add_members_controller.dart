@@ -68,8 +68,7 @@ class AddMembersController extends GetxController {
       TCustomDialogWidget(
         title: TTexts.generateCodeDialogTitle.tr,
         description: TTexts.generateCodeDialogMessage.tr,
-        icon: const Text('📩',
-            style: TextStyle(fontSize: 40)), // Chuẩn Icon bạn yêu cầu
+        icon: const Text('📩', style: TextStyle(fontSize: 40)),
         primaryButtonText: TTexts.confirmGenerate.tr,
         secondaryButtonText: TTexts.cancel.tr,
         onPrimaryPressed: () {

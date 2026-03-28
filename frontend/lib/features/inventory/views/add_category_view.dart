@@ -1,14 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:frontend/core/ui/layouts/t_responsive_layout.dart';
-import 'package:frontend/features/inventory/views/platform/add_category_mobile_view.dart';
+import 'package:frontend/features/inventory/views/platform/category_form_mobile_view.dart';
 
-class AddCategoryView extends StatelessWidget {
-  const AddCategoryView({super.key});
+class CategoryFormView extends StatelessWidget {
+  const CategoryFormView({super.key});
 
   @override
   Widget build(BuildContext context) {
     return const Scaffold(
-      body: TResponsiveLayout(mobile: AddCategoryMobileView()),
+      body: TResponsiveLayout(mobile: CategoryFormMobileView()),
     );
   }
 }
