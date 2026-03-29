@@ -1,5 +1,8 @@
+import 'package:frontend/core/infrastructure/constants/text_strings.dart';
 import 'package:frontend/core/infrastructure/utils/error_handler_utils.dart';
+import 'package:frontend/core/ui/widgets/t_snackbars_widget.dart';
 import 'package:frontend/features/inventory/models/dashboard_stat_model.dart';
+import 'package:frontend/routes/app_routes.dart';
 import 'package:get/get.dart';
 import 'package:frontend/core/infrastructure/models/category_model.dart';
 import 'package:frontend/core/infrastructure/models/product_model.dart';
@@ -148,5 +151,21 @@ class InventoryController extends GetxController with TErrorHandler {
         inboundFlow.fold(0, (sum, item) => sum + item.toInt());
     weeklyOutbound.value =
         outboundFlow.fold(0, (sum, item) => sum + item.toInt());
+  }
+
+  void onCategorySelected(String categoryName) {
+    // Tìm data gốc xịn từ danh sách categories bằng tên
+    final match = categories.where((c) => c.name == categoryName);
+
+    if (match.isNotEmpty) {
+      // Có data gốc -> Truyền thẳng nguyên cục CategoryModel sang trang sau
+      Get.toNamed(AppRoutes.categoryDetail, arguments: match.first);
+    } else {
+      // Không có -> Báo lỗi, tuyệt đối không chuyển trang gây Crash
+      TSnackbarsWidget.error(
+          title: TTexts
+              .errorUnknownTitle.tr, // Nên dùng .tr cho đa ngôn ngữ nếu có
+          message: TTexts.errorUnknownMessage.tr);
+    }
   }
 }

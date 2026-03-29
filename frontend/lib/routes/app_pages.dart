@@ -13,13 +13,15 @@ import 'package:frontend/features/inventory/bindings/inventory_detail_binding.da
 import 'package:frontend/features/inventory/bindings/inventory_insight_binding.dart';
 import 'package:frontend/features/inventory/bindings/product_catalog_bindings.dart';
 import 'package:frontend/features/inventory/bindings/product_catalog_detail_binding.dart';
-import 'package:frontend/features/inventory/views/add_category_view.dart';
+import 'package:frontend/features/inventory/bindings/product_form_binding.dart';
+import 'package:frontend/features/inventory/views/category_form_view.dart';
 import 'package:frontend/features/inventory/views/category_detail_view.dart';
 import 'package:frontend/features/inventory/views/inventory_detail_view.dart';
 import 'package:frontend/features/inventory/views/inventory_insight_view.dart';
 import 'package:frontend/features/inventory/views/inventory_view.dart';
 import 'package:frontend/features/inventory/views/product_catalog_detail_view.dart';
 import 'package:frontend/features/inventory/views/product_catalog_view.dart';
+import 'package:frontend/features/inventory/views/product_form_view.dart';
 import 'package:frontend/features/navigation/bindings/navigation_binding.dart';
 import 'package:frontend/features/navigation/views/navigation_view.dart';
 import 'package:frontend/features/onboarding/bindings/onboarding_binding.dart';
@@ -201,11 +203,19 @@ class AppPages {
       transition: Transition.cupertino,
     ),
 
-    // -- Add Category
+    // -- Category Form
     GetPage(
       name: AppRoutes.categoryForm,
       page: () => const CategoryFormView(),
       binding: CategoryFormBinding(),
+      transition: Transition.cupertino,
+    ),
+
+    // -- Product Form
+    GetPage(
+      name: AppRoutes.productForm,
+      page: () => const ProductFormView(),
+      binding: ProductFormBinding(),
       transition: Transition.cupertino,
     ),
 

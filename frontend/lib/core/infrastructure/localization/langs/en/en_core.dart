@@ -7,6 +7,10 @@ final Map<String, String> enCore = {
   // -- Global Errors
   TTexts.errorTitle: 'Error',
   TTexts.successTitle: 'Success',
+  TTexts.warningTitle: 'Warning',
+  TTexts.one: '1',
+  TTexts.two: '2',
+  TTexts.three: '3',
   TTexts.errorAccessRestrictedTitle: 'Access Restricted',
   TTexts.errorAccessRestrictedSubtitle:
       'This application is exclusively optimized for Smartphones. Please access via a mobile device or a standard desktop web browser for the full experience.',

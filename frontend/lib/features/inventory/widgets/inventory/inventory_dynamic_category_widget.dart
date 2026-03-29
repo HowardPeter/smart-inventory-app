@@ -1,19 +1,20 @@
+// Mở file inventory_dynamic_category_widget.dart và dán đè toàn bộ code này:
+
 import 'package:flutter/material.dart';
 import 'package:frontend/routes/app_routes.dart';
 import 'package:get/get.dart';
 import 'package:frontend/core/ui/theme/app_colors.dart';
 import 'package:frontend/features/inventory/controllers/inventory_controller.dart';
 import 'package:frontend/core/infrastructure/constants/text_strings.dart';
-
-// ĐÃ IMPORT WIDGET OVERLAY CỦA BẠN
 import 'package:frontend/core/ui/widgets/t_custom_fade_overlay_widget.dart';
 
-class InventoryDynamicCategoryWidget extends StatelessWidget {
+// 1. ĐỔI SANG DÙNG GetView
+class InventoryDynamicCategoryWidget extends GetView<InventoryController> {
   const InventoryDynamicCategoryWidget({super.key});
 
   @override
   Widget build(BuildContext context) {
-    final controller = Get.find<InventoryController>();
+    // Đã bỏ dòng Get.find() vì GetView đã cung cấp sẵn biến `controller`
 
     final List<Color> avatarColors = [
       Colors.blue,
@@ -27,9 +28,13 @@ class InventoryDynamicCategoryWidget extends StatelessWidget {
     return Obx(() {
       final dynamicCategories = controller.categoryStats;
 
-      const int maxDisplay = 6;
-      final bool hasMore = dynamicCategories.length > maxDisplay;
-      final int itemCount = hasMore ? maxDisplay : dynamicCategories.length;
+      const int fullyVisibleCount = 4;
+      const int renderCount = 6;
+      final bool hasMore = dynamicCategories.length > fullyVisibleCount;
+
+      final int itemCount = dynamicCategories.length > renderCount
+          ? renderCount
+          : dynamicCategories.length;
 
       if (dynamicCategories.isEmpty) {
         return Center(
@@ -58,55 +63,64 @@ class InventoryDynamicCategoryWidget extends StatelessWidget {
               name.isNotEmpty ? name[0].toUpperCase() : "?";
           final Color bgColor = avatarColors[index % avatarColors.length];
 
-          return Container(
-            padding: const EdgeInsets.symmetric(horizontal: 12),
-            decoration: BoxDecoration(
-              color: AppColors.surface,
-              borderRadius: BorderRadius.circular(16),
-              border: Border.all(color: AppColors.softGrey.withOpacity(0.05)),
-            ),
-            child: Row(
-              children: [
-                Container(
-                  width: 40,
-                  height: 40,
-                  decoration: BoxDecoration(
-                      color: bgColor.withOpacity(0.15),
-                      borderRadius: BorderRadius.circular(10)),
-                  alignment: Alignment.center,
-                  child: Text(firstLetter,
-                      style: TextStyle(
-                          color: bgColor,
-                          fontSize: 18,
-                          fontWeight: FontWeight.bold,
-                          fontFamily: 'Poppins')),
-                ),
-                const SizedBox(width: 12),
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Text(name,
-                          maxLines: 1,
-                          overflow: TextOverflow.ellipsis,
-                          style: const TextStyle(
-                              fontWeight: FontWeight.bold, fontSize: 13)),
-                      const SizedBox(height: 2),
-                      Text("$count ${TTexts.items.tr}",
-                          style: const TextStyle(
-                              color: AppColors.softGrey, fontSize: 11)),
-                    ],
+          final bool isClickable = index < fullyVisibleCount;
+
+          return InkWell(
+            // 2. GỌI HÀM TỪ CONTROLLER THAY VÌ XỬ LÝ LOGIC TRỰC TIẾP TẠI ĐÂY
+            onTap: isClickable
+                ? () => controller.onCategorySelected(cat.name)
+                : null,
+            borderRadius: BorderRadius.circular(16),
+            child: Container(
+              padding: const EdgeInsets.symmetric(horizontal: 12),
+              decoration: BoxDecoration(
+                color: AppColors.surface,
+                borderRadius: BorderRadius.circular(16),
+                border: Border.all(color: AppColors.softGrey.withOpacity(0.05)),
+              ),
+              child: Row(
+                children: [
+                  Container(
+                    width: 40,
+                    height: 40,
+                    decoration: BoxDecoration(
+                        color: bgColor.withOpacity(0.15),
+                        borderRadius: BorderRadius.circular(10)),
+                    alignment: Alignment.center,
+                    child: Text(firstLetter,
+                        style: TextStyle(
+                            color: bgColor,
+                            fontSize: 18,
+                            fontWeight: FontWeight.bold,
+                            fontFamily: 'Poppins')),
                   ),
-                ),
-              ],
+                  const SizedBox(width: 12),
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Text(name,
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                            style: const TextStyle(
+                                fontWeight: FontWeight.bold, fontSize: 13)),
+                        const SizedBox(height: 2),
+                        Text("$count ${TTexts.items.tr}",
+                            style: const TextStyle(
+                                color: AppColors.softGrey, fontSize: 11)),
+                      ],
+                    ),
+                  ),
+                ],
+              ),
             ),
           );
         },
       );
 
       if (hasMore) {
-        final int hiddenCount = dynamicCategories.length - maxDisplay;
+        final int hiddenCount = dynamicCategories.length - fullyVisibleCount;
         return Stack(
           children: [
             gridView,

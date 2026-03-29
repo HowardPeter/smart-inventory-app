@@ -227,19 +227,22 @@ class InventoryDetailController extends GetxController with TErrorHandler {
   int get totalStockOut => 35;
 
   double get stockHealthRatio {
+    if (quantity <= 0) return 0.0;
+
     if (threshold <= 0) return 1.0;
     final ratio = quantity / (threshold * 2);
     return ratio > 1.0 ? 1.0 : ratio;
   }
 
   Color get stockHealthColor {
-    if (quantity == 0) return AppColors.alertText;
+    if (quantity <= 0) return AppColors.alertText;
     if (quantity <= threshold) return AppColors.primary;
     return AppColors.stockIn;
   }
 
   String get statusText {
-    if (quantity == 0) return TTexts.tabOutStock.tr;
+    // ĐÃ FIX: Bắt chặt điều kiện <= 0
+    if (quantity <= 0) return TTexts.tabOutStock.tr;
     if (quantity <= threshold) return TTexts.tabLowStock.tr;
     return TTexts.tabHealthy.tr;
   }

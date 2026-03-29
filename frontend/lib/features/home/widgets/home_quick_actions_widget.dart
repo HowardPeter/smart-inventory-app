@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:frontend/core/ui/layouts/t_barcode_scanner_layout.dart';
+import 'package:frontend/routes/app_routes.dart';
 import 'package:get/get.dart';
 import 'package:frontend/core/infrastructure/constants/text_strings.dart';
 import 'package:frontend/core/ui/theme/app_colors.dart';
@@ -141,7 +142,7 @@ class HomeQuickActionsWidget extends StatelessWidget {
                   color: AppColors.primary,
                   bgColor: AppColors.toastWarningBg,
                   onTap: () {
-                    // TODO: Chuyển sang màn hình thêm sản phẩm
+                    Get.toNamed(AppRoutes.productForm);
                   },
                 ),
                 const SizedBox(width: AppSizes.p12),

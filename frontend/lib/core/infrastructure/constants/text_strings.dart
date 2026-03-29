@@ -13,8 +13,12 @@ class TTexts {
   static const String strong = "strong";
   static const String create = "create";
   static const String cancel = "cancel";
+  static const String one = "one";
+  static const String two = "two";
+  static const String three = "three";
   static const String unknownProduct = "unknown_product";
   static const String na = "n_a";
+  static const String warningTitle = "warning_title";
   static const String errorServerTitle = "error_server_title";
   static const String errorServerMessage = "error_server_message";
   static const String errorNotFoundTitle = "error_not_found_title";
@@ -385,46 +389,101 @@ class TTexts {
   static const String addNewProduct = 'add_new_product';
   static const String addNewProductSub = 'add_new_product_sub';
   static const String editCategory = 'editCategory';
-  static const String deleteCategory = 'deleteCategory';
-  static const String noProductsFound = 'noProductsFound';
-  static const String noProductsAssigned = 'noProductsAssigned';
-  static const String deleteCategoryConfirm = 'deleteCategoryConfirm';
+  static const String deleteCategory = 'delete_category';
+  static const String noProductsFound = 'no_products_found';
+  static const String noProductsAssigned = 'no_products_assigned';
+  static const String deleteCategoryConfirm = 'delete_category_confirm';
   static const String deleting = 'deleting';
 
   // -- Product Catalog Deatail
   static const String brand = 'brand';
-  static const String packagesOrVariants = 'packagesOrVariants';
+  static const String packagesOrVariants = 'packages_or_variants';
   static const String add = 'add';
-  static const String addPackageSubtitle = 'addPackageSubtitle';
-  static const String noBarcode = 'noBarcode';
-  static const String editProduct = 'editProduct';
-  static const String deleteProduct = 'deleteProduct';
-  static const String addNewPackage = 'addNewPackage';
-  static const String editPackage = 'editPackage';
-  static const String noPackagesFound = 'noPackagesFound';
+  static const String addPackageSubtitle = 'add_package_subtitle';
+  static const String noBarcode = 'no_barcode';
+  static const String editProduct = 'edit_product';
+  static const String deleteProduct = 'delete_product';
+  static const String addNewPackage = 'add_new_package';
+  static const String editPackage = 'edit_package';
+  static const String noPackagesFound = 'no_packages_found';
 
   // -- Add Category
-  static const String categoryNameLabel = 'categoryNameLabel';
-  static const String categoryNameHint = 'categoryNameHint';
-  static const String categoryDescLabel = 'categoryDescLabel';
-  static const String categoryDescHint = 'categoryDescHint';
-  static const String saveCategory = 'saveCategory';
-  static const String categoryNameRequired = 'categoryNameRequired';
+  static const String categoryNameLabel = 'category_name_label';
+  static const String categoryNameHint = 'category_name_hint';
+  static const String categoryDescLabel = 'category_desc_label';
+  static const String categoryDescHint = 'category_desc_hint';
+  static const String saveCategory = 'save_category';
+  static const String categoryNameRequired = 'category_name_required';
   static const String categoryCreatedSuccessTitle =
-      'categoryCreatedSuccessTitle';
+      'category_created_success_title';
   static const String categoryCreatedSuccessMessage =
-      'categoryCreatedSuccessMessage';
-  static const String categoryNameExists = 'categoryNameExists';
+      'category_created_success_message';
+  static const String categoryNameExists = 'category_name_exists';
   static const String saving = 'saving';
-  static const String savingCategory = 'savingCategory';
+  static const String savingCategory = 'saving_category';
 
   // -- Edit Category
-  static const String editCategoryTitle = 'editCategoryTitle';
+  static const String editCategoryTitle = 'edit_category_title';
   static const String categoryUpdatedSuccessMessage =
-      'categoryUpdatedSuccessMessage';
+      'category_updated_success_message';
   static const String deleteCategorySuccessMessage =
-      'deleteCategorySuccessMessage';
-  static const String categoryNotEmptyError = 'categoryNotEmptyError';
+      'delete_category_success_message';
+  static const String categoryNotEmptyError = 'category_not_empty_error';
+
+  // -- Add Product
+  static const String addNewProductTitle = 'add_new_product_title';
+  static const String editProductTitle = 'edit_product_title';
+  static const String productNameLabel = 'product_name_label';
+  static const String productNameSubLabel = 'product_name_sub_label';
+  static const String brandSub = 'brand_Sub';
+  static const String selectCategory = 'select_category';
+  static const String initialPackageInfo = 'initial_package_info';
+  static const String unitLabel = 'unitLabel';
+  static const String productCreatedSuccess = 'product_created_success';
+  static const String productUpdatedSuccess = 'product_updated_success';
+  static const String step1 = 'step_1';
+  static const String step2 = 'step_2';
+  static const String baseInfo = 'base_info';
+  static const String packageInfo = 'package_info';
+  static const String nextStep = 'next_step';
+  static const String previousStep = 'previous_step';
+  static const String variantNameLabel = 'variant_name_label';
+  static const String variantNameHint = 'variant_name_hint';
+  static const String selectCategoryWarning = 'select_category_warning';
+  static const String tapToSelect = 'tap_to_select';
+  static const String step1Title = 'step_1_title';
+  static const String step1Sub = 'step_1_sub';
+  static const String step2Title = 'step_2_title';
+  static const String step2Sub = 'step_2_sub';
+  static const String productImage = 'product_image';
+  static const String uploadImage = 'upload_image';
+  static const String takePhoto = 'take_photo';
+  static const String chooseFromGallery = 'choose_from_gallery';
+  static const String stepProductBaseInfo = 'step_product_base_info';
+  static const String stepProductImage = 'step_product_image';
+  static const String stepProductPackage = 'step_product_package';
+  static const String productBaseTitle = 'product_base_title';
+  static const String productBaseSub = 'product_base_sub';
+  static const String productImageTitle = 'product_image_title';
+  static const String productImageSub = 'product_image_sub';
+  static const String productPackageTitle = 'product_package_title';
+  static const String productPackageSub = 'product_package_sub';
+  static const String requirePhoto = 'require_photo';
+  static const String cameraPermissionDenied = 'camera_permission_denied';
+  static const String scanOrTypeBarcode = 'scan_or_type';
+  static const String zeroPointZero = 'zero_point_zero';
+  static const String selectUnit = 'select_unit';
+  static const String discardChangesTitle = 'discard_changes_title';
+  static const String discardChangesMessage = 'discard_changes_message';
+  static const String discard = 'discard';
+  static const String keepEditing = 'keep_editing';
+  static const String confirmNoImageTitle = 'confirm_no_image_title';
+  static const String confirmNoImageMessage = 'confirm_no_image_message';
+  static const String yesContinue = 'yes_continue';
+  static const String addPhoto = 'add_photo';
+  static const String cropImage = 'crop_image';
+  static const String reorderThresholdLabel = 'reorder_threshold_label';
+  static const String reorderThresholdHint = 'reorder_threshold_hint';
 
   // Empty State
   static const String emptyTransactionTitle = "empty_transaction_title";

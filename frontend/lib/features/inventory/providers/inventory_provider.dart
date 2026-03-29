@@ -75,4 +75,29 @@ class InventoryProvider {
   Future<void> deleteCategory(String categoryId) async {
     await _apiClient.delete('/api/categories/$categoryId');
   }
+
+  // 1. Tạo Sản phẩm gốc
+  Future<ProductModel> createProduct(Map<String, dynamic> data) async {
+    final response = await _apiClient.post('/api/products', data: data);
+    return ProductModel.fromJson(response.data['data'] ?? response.data);
+  }
+
+  // 2. Cập nhật Sản phẩm gốc
+  Future<void> updateProduct(
+      String productId, Map<String, dynamic> data) async {
+    await _apiClient.patch('/api/products/$productId', data: data);
+  }
+
+  // 3. Tạo Package cho Sản phẩm
+  Future<Map<String, dynamic>> createProductPackage(
+      String productId, Map<String, dynamic> data) async {
+    final response =
+        await _apiClient.post('/api/products/$productId/packages', data: data);
+    return response.data['data'] ?? response.data;
+  }
+
+  // 4. Tạo Inventory 
+  Future<void> createInventory(Map<String, dynamic> data) async {
+    await _apiClient.post('/api/inventories', data: data);
+  }
 }

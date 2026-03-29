@@ -16,7 +16,12 @@ import 'package:frontend/core/infrastructure/constants/text_strings.dart';
 class CategoryDetailController extends GetxController with TErrorHandler {
   final InventoryProvider _provider = InventoryProvider();
 
-  late Rx<CategoryModel> rxCategory;
+  final Rx<CategoryModel> rxCategory = CategoryModel(
+    categoryId: '',
+    name: 'Loading...',
+    storeId: '',
+    isDefault: false,
+  ).obs;
 
   final RxBool isLoading = true.obs;
   final RxList<ProductModel> products = <ProductModel>[].obs;
@@ -36,12 +41,21 @@ class CategoryDetailController extends GetxController with TErrorHandler {
       canManageProduct = false;
     }
 
-    if (Get.arguments is CategoryModel) {
-      rxCategory = (Get.arguments as CategoryModel).obs;
-      fetchProducts();
+    // 2. NHẬN DATA CHUẨN
+    if (Get.arguments != null && Get.arguments is CategoryModel) {
+      // Gán data thật đè lên cái data mặc định ở trên
+      rxCategory.value = Get.arguments as CategoryModel;
+
+      // 3. DIỆT LỖI OVERLAY: Bắt buộc đợi giao diện vẽ xong mới gọi API (vì API có kèm Loading Dialog)
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        fetchProducts();
+      });
     } else {
-      isLoading.value = false;
-      handleError("Category data is missing");
+      // Nếu không có data truyền sang -> Đẩy người dùng về trang trước
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        Get.back();
+        handleError("Dữ liệu danh mục không hợp lệ!");
+      });
     }
   }
 
@@ -62,8 +76,10 @@ class CategoryDetailController extends GetxController with TErrorHandler {
   // --- ACTIONS CHO SẢN PHẨM ---
   void addNewProduct() {
     try {
-      TSnackbarsWidget.info(
-          title: TTexts.info.tr, message: TTexts.featureComingSoon.tr);
+      Get.toNamed(
+        AppRoutes.productForm,
+        arguments: rxCategory.value,
+      );
     } catch (e) {
       handleError(e);
     }

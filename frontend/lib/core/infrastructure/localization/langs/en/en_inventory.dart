@@ -113,8 +113,10 @@ final Map<String, String> enInventory = {
   TTexts.editCategory: 'Edit Category',
   TTexts.deleteCategory: 'Delete Category',
   TTexts.noProductsFound: 'No Products Found',
-  TTexts.noProductsAssigned: 'There are currently no products assigned to this category.',
-  TTexts.deleteCategoryConfirm: 'Are you sure you want to delete this category?',
+  TTexts.noProductsAssigned:
+      'There are currently no products assigned to this category.',
+  TTexts.deleteCategoryConfirm:
+      'Are you sure you want to delete this category?',
   TTexts.deleting: 'Deleting...',
 
   // -- Product Catalog Detail
@@ -151,6 +153,67 @@ final Map<String, String> enInventory = {
   TTexts.deleteCategorySuccessMessage: 'Category has been deleted.',
   TTexts.categoryNotEmptyError:
       'Cannot delete. Please remove or clear inventory of all products inside this category first.',
+
+  // -- Add Product
+  TTexts.addNewProductTitle: 'Add New Product',
+  TTexts.editProductTitle: 'Edit Product Info',
+  TTexts.productNameLabel: 'Product Name',
+  TTexts.productNameSubLabel: 'e.g. Product name...',
+  TTexts.selectCategory: 'Select Category',
+  TTexts.initialPackageInfo: 'Initial Package (Required)',
+  TTexts.unitLabel: 'Unit (Piece, Box...)',
+  TTexts.productCreatedSuccess:
+      'Product and initial package created successfully.',
+  TTexts.productUpdatedSuccess: 'Product updated successfully.',
+  TTexts.step1: 'Step 1',
+  TTexts.step2: 'Step 2',
+  TTexts.baseInfo: 'Base Info',
+  TTexts.packageInfo: 'Package Info',
+  TTexts.nextStep: 'Next Step',
+  TTexts.previousStep: 'Back',
+  TTexts.variantNameLabel: 'Variant Name',
+  TTexts.variantNameHint: 'e.g. 150ml Tube, Red Color',
+  TTexts.selectCategoryWarning: 'Please select a category first.',
+  TTexts.brandSub: 'e.g. Brand',
+  TTexts.tapToSelect: 'Tap to select...',
+  TTexts.step1Title: 'Base Information',
+  TTexts.step1Sub: 'Provide the basic details of your new product.',
+  TTexts.step2Title: 'Initial Package',
+  TTexts.step2Sub:
+      'Create the first unit variant and pricing for this product.',
+  TTexts.productImage: 'Product Image',
+  TTexts.uploadImage: 'Upload Image',
+  TTexts.takePhoto: 'Take Photo',
+  TTexts.chooseFromGallery: 'Choose from Gallery',
+  TTexts.stepProductBaseInfo: 'Base Info',
+  TTexts.stepProductImage: 'Photo',
+  TTexts.stepProductPackage: 'Pricing',
+  TTexts.productBaseTitle: 'Base Information',
+  TTexts.productBaseSub: 'Let\'s start with product name, brand, and category.',
+  TTexts.productImageTitle: 'Product Photo',
+  TTexts.productImageSub: 'Take or upload a photo of this product.',
+  TTexts.productPackageTitle: 'Initial Package & Pricing',
+  TTexts.productPackageSub:
+      'Define the first variant (e.g. 1 Box) and its prices.',
+  TTexts.requirePhoto: 'Please take or choose a product photo first.',
+  TTexts.cameraPermissionDenied:
+      'Camera permission is required to take photos. Please enable it in settings.',
+  TTexts.scanOrTypeBarcode: 'Scan or type...',
+  TTexts.zeroPointZero: "0.00",
+  TTexts.selectUnit: 'Select unit...',
+  TTexts.discardChangesTitle: 'Discard Changes?',
+  TTexts.discardChangesMessage:
+      'Are you sure you want to go back? All your entered data will be lost.',
+  TTexts.discard: 'Discard',
+  TTexts.keepEditing: 'Keep Editing',
+  TTexts.confirmNoImageTitle: 'No Photo Selected',
+  TTexts.confirmNoImageMessage:
+      'Are you sure you want to proceed without a product photo?',
+  TTexts.yesContinue: 'Yes, Proceed',
+  TTexts.addPhoto: 'Add Photo',
+  TTexts.cropImage: 'Edit Photo',
+  TTexts.reorderThresholdLabel: 'Low Stock Alert At',
+  TTexts.reorderThresholdHint: 'e.g. 5',
 
   // -- Empty States
   TTexts.noDataAvailable: 'No data available',

@@ -1,3 +1,5 @@
+// lib/core/ui/widgets/t_app_bar_widget.dart
+
 import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
@@ -17,6 +19,7 @@ class TAppBarWidget extends StatelessWidget implements PreferredSizeWidget {
   final VoidCallback? onSearchPressed;
   final PreferredSizeWidget? bottom;
   final bool centerTitle;
+  final VoidCallback? onBackPress;
 
   const TAppBarWidget({
     super.key,
@@ -29,6 +32,7 @@ class TAppBarWidget extends StatelessWidget implements PreferredSizeWidget {
     this.onSearchPressed,
     this.bottom,
     this.centerTitle = true,
+    this.onBackPress,
   });
 
   @override
@@ -37,36 +41,22 @@ class TAppBarWidget extends StatelessWidget implements PreferredSizeWidget {
       child: BackdropFilter(
         filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
         child: AppBar(
-          backgroundColor: AppColors.background.withOpacity(0.7),
+          backgroundColor: AppColors.background.withOpacity(0.8),
           elevation: 0,
-          scrolledUnderElevation: 0,
-          centerTitle: centerTitle, // Sử dụng biến cấu hình
-
-          // FIX LỖI 120px: Đưa về chuẩn 56px vì bây giờ chỉ có icon mũi tên
-          leadingWidth: showBackArrow && leadingWidget == null ? 56 : 56,
-
-          bottom: bottom ??
-              PreferredSize(
-                preferredSize: const Size.fromHeight(1.0),
-                child:
-                    Container(color: Colors.grey.withOpacity(0.2), height: 1.0),
-              ),
-
-          // NÚT BÊN TRÁI
+          centerTitle: centerTitle,
+          automaticallyImplyLeading: false,
+          bottom: bottom,
           leading: leadingWidget ??
               (showBackArrow
                   ? InkWell(
-                      onTap: () => Get.back(),
+                      onTap: onBackPress ?? () => Get.back(),
                       borderRadius: BorderRadius.circular(AppSizes.radius8),
-                      // Đã bỏ SizedBox 16px vô lý để mũi tên sát ra viền cho cân đối
                       child: const Center(
                         child: Icon(Iconsax.arrow_left_2_copy,
                             color: AppColors.primaryText, size: 20),
                       ),
                     )
                   : null),
-
-          // TIÊU ĐỀ
           title: titleWidget ??
               (title != null
                   ? Text(title!,
@@ -76,8 +66,6 @@ class TAppBarWidget extends StatelessWidget implements PreferredSizeWidget {
                           fontWeight: FontWeight.bold,
                           fontFamily: 'Poppins'))
                   : null),
-
-          // NÚT BÊN PHẢI
           actions: [
             if (showSearchIcon)
               IconButton(
