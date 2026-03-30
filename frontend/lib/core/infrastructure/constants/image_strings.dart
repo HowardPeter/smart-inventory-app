@@ -49,8 +49,7 @@ class CoreImages {
   final String deviceNotSupported =
       'assets/images/core/device-not-supported.png';
 
-  final String successAdding =
-      'assets/images/core/success-adding.png';
+  final String successAdding = 'assets/images/core/success-adding.png';
 
   final String defaultAvatar = 'assets/images/core/default-avatar.jpg';
 }

@@ -15,6 +15,7 @@ class TTextFormFieldWidget extends StatelessWidget {
     this.validator,
     this.maxLines = 1,
     this.prefixIcon,
+    this.keyboardType,
   });
 
   final String label;
@@ -26,6 +27,7 @@ class TTextFormFieldWidget extends StatelessWidget {
   final String? Function(String?)? validator;
   final int maxLines;
   final IconData? prefixIcon;
+  final TextInputType? keyboardType;
 
   @override
   Widget build(BuildContext context) {
@@ -45,9 +47,11 @@ class TTextFormFieldWidget extends StatelessWidget {
         TextFormField(
           controller: controller,
           obscureText: isObscure,
+          keyboardType: keyboardType,
           onChanged: onChanged,
           validator: validator,
           maxLines: isObscure ? 1 : maxLines,
+          cursorColor: AppColors.primary,
           style: const TextStyle(
             fontFamily: 'Poppins',
             fontSize: 14,

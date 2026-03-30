@@ -5,7 +5,7 @@ import 'package:frontend/core/ui/theme/app_sizes.dart';
 import 'package:frontend/core/infrastructure/constants/text_strings.dart';
 import 'package:frontend/core/ui/widgets/t_primary_button_widget.dart';
 import 'package:frontend/features/workspace/controllers/create_store_controller.dart';
-import 'package:frontend/core/ui/widgets/t_app_bar_widget.dart';
+import 'package:frontend/core/ui/widgets/t_blur_app_bar_widget.dart';
 import 'package:frontend/features/workspace/widgets/create_store/create_store_input_form_widget.dart';
 import 'package:frontend/features/workspace/widgets/create_store/create_store_map_preview_widget.dart';
 
@@ -17,7 +17,7 @@ class CreateStoreMobileView extends GetView<CreateStoreController> {
     return Scaffold(
       backgroundColor: AppColors.background,
       extendBodyBehindAppBar: true,
-      appBar: const TAppBarWidget(),
+      appBar: const TBlurAppBarWidget(),
       body: SingleChildScrollView(
         physics: const BouncingScrollPhysics(),
         child: Padding(

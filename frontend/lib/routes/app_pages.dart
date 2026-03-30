@@ -7,10 +7,29 @@ import 'package:frontend/features/auth/views/login_view.dart';
 import 'package:frontend/features/auth/views/register_view.dart';
 import 'package:frontend/features/auth/views/verify_email_view.dart';
 import 'package:frontend/features/home/views/home_view.dart';
+import 'package:frontend/features/inventory/bindings/category_form_binding.dart';
+import 'package:frontend/features/inventory/bindings/category_detail_binding.dart';
+import 'package:frontend/features/inventory/bindings/customize_catalog_binding.dart';
+import 'package:frontend/features/inventory/bindings/inventory_detail_binding.dart';
+import 'package:frontend/features/inventory/bindings/inventory_insight_binding.dart';
+import 'package:frontend/features/inventory/bindings/product_catalog_bindings.dart';
+import 'package:frontend/features/inventory/bindings/product_catalog_detail_binding.dart';
+import 'package:frontend/features/inventory/bindings/product_form_binding.dart';
+import 'package:frontend/features/inventory/views/category_form_view.dart';
+import 'package:frontend/features/inventory/views/category_detail_view.dart';
+import 'package:frontend/features/inventory/views/customize_catalog_view.dart';
+import 'package:frontend/features/inventory/views/inventory_detail_view.dart';
+import 'package:frontend/features/inventory/views/inventory_insight_view.dart';
+import 'package:frontend/features/inventory/views/inventory_view.dart';
+import 'package:frontend/features/inventory/views/product_catalog_detail_view.dart';
+import 'package:frontend/features/inventory/views/product_catalog_view.dart';
+import 'package:frontend/features/inventory/views/product_form_view.dart';
 import 'package:frontend/features/navigation/bindings/navigation_binding.dart';
 import 'package:frontend/features/navigation/views/navigation_view.dart';
 import 'package:frontend/features/onboarding/bindings/onboarding_binding.dart';
 import 'package:frontend/features/profile/views/profile_view.dart';
+import 'package:frontend/features/search/bindings/search_binding.dart';
+import 'package:frontend/features/search/views/search_view.dart';
 import 'package:frontend/features/workspace/bindings/add_members_binding.dart';
 import 'package:frontend/features/workspace/bindings/create_store_binding.dart';
 import 'package:frontend/features/workspace/bindings/join_store_binding.dart';
@@ -111,6 +130,7 @@ class AppPages {
       binding: JoinStoreBinding(),
       transition: Transition.rightToLeft,
     ),
+
     // -- Add member
     GetPage(
       name: AppRoutes.addMembers,
@@ -126,10 +146,87 @@ class AppPages {
       binding: NavigationBinding(),
     ),
 
+    GetPage(
+      name: AppRoutes.search,
+      page: () => const SearchView(),
+      binding: SearchBinding(),
+      transition: Transition.fadeIn,
+    ),
+
     // -- Home
     GetPage(
       name: AppRoutes.home,
       page: () => const HomeView(),
+    ),
+
+    // -- Inventory
+    GetPage(
+      name: AppRoutes.inventory,
+      page: () => const InventoryView(),
+    ),
+
+    // -- Inventory List
+    GetPage(
+      name: AppRoutes.inventorySight,
+      page: () => const InventoryInsightView(),
+      binding: InventoryListBinding(),
+      transition: Transition.cupertino,
+    ),
+
+    // -- Inventory Detail
+    GetPage(
+      name: AppRoutes.inventoryDetail,
+      page: () => const InventoryDetailView(),
+      binding: InventoryDetailBinding(),
+      transition: Transition.cupertino,
+    ),
+
+    // -- Product Catalog
+    GetPage(
+      name: AppRoutes.productCatalog,
+      page: () => const ProductCatalogView(),
+      binding: ProductCatalogBinding(),
+      transition: Transition.cupertino,
+    ),
+
+    // -- Category Detail
+    GetPage(
+      name: AppRoutes.categoryDetail,
+      page: () => const CategoryDetaiView(),
+      binding: CategoryDetailBinding(),
+      transition: Transition.cupertino,
+    ),
+
+    // -- Product Catalog Detail
+    GetPage(
+      name: AppRoutes.productCatalogDetail,
+      page: () => const ProductCatalogDetailView(),
+      binding: ProductCatalogDetailBinding(),
+      transition: Transition.cupertino,
+    ),
+
+    // -- Category Form
+    GetPage(
+      name: AppRoutes.categoryForm,
+      page: () => const CategoryFormView(),
+      binding: CategoryFormBinding(),
+      transition: Transition.cupertino,
+    ),
+
+    // -- Product Form
+    GetPage(
+      name: AppRoutes.productForm,
+      page: () => const ProductFormView(),
+      binding: ProductFormBinding(),
+      transition: Transition.cupertino,
+    ),
+
+    // -- Customize Catalog 
+    GetPage(
+      name: AppRoutes.customizeCatalog,
+      page: () => const CustomizeCatalogView(),
+      binding: CustomizeCatalogBinding(),
+      transition: Transition.cupertino,
     ),
 
     // -- Profile

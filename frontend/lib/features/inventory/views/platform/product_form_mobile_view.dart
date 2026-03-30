@@ -1,0 +1,159 @@
+import 'package:flutter/material.dart';
+import 'package:frontend/features/inventory/widgets/shared/product_form_action_buttons_widget.dart';
+import 'package:frontend/features/inventory/widgets/shared/product_form_base_info_widget.dart';
+import 'package:frontend/features/inventory/widgets/shared/product_form_image_widget.dart';
+import 'package:frontend/features/inventory/widgets/shared/product_package_form_fields_widget.dart';
+import 'package:get/get.dart';
+import 'package:frontend/core/infrastructure/constants/text_strings.dart';
+import 'package:frontend/core/ui/theme/app_colors.dart';
+import 'package:frontend/core/ui/theme/app_sizes.dart';
+import 'package:frontend/core/ui/widgets/t_app_bar_widget.dart';
+import 'package:frontend/features/inventory/controllers/product_form_controller.dart';
+import 'package:frontend/features/inventory/widgets/product_form/product_form_progress_bar_widget.dart';
+
+class ProductFormMobileView extends GetView<ProductFormController> {
+  const ProductFormMobileView({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return WillPopScope(
+      onWillPop: () async {
+        controller.confirmExit();
+        return false;
+      },
+      child: Scaffold(
+        backgroundColor: AppColors.background,
+        appBar: TAppBarWidget(
+          // APPBAR TITLE ĐỘNG
+          title: _getAppBarTitle(),
+          centerTitle: true,
+          showBackArrow: true,
+          onBackPress: () => controller.confirmExit(),
+        ),
+        body: SafeArea(
+          child: SingleChildScrollView(
+            physics: const BouncingScrollPhysics(),
+            child: Obx(() {
+              final mode = controller.formMode.value;
+              final step = controller.currentStep.value;
+
+              return Column(
+                children: [
+                  // 1. THANH TIẾN TRÌNH (Chỉ hiện khi tạo mới hoàn toàn)
+                  if (mode == 'create') const ProductFormProgressBarWidget(),
+
+                  // 2. KHU VỰC NHẬP LIỆU CHÍNH
+                  Padding(
+                    padding: EdgeInsets.symmetric(
+                        horizontal: AppSizes.p20,
+                        vertical:
+                            mode == 'create' ? AppSizes.p12 : AppSizes.p24),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        // TITLE & SUBTITLE ĐỘNG THEO MODE
+                        Text(
+                          _getHeaderTitle(mode, step),
+                          style: const TextStyle(
+                              fontFamily: 'Poppins',
+                              fontSize: 18,
+                              fontWeight: FontWeight.bold,
+                              color: AppColors.primaryText),
+                        ),
+                        const SizedBox(height: 6),
+                        Text(
+                          _getHeaderSubtitle(mode, step),
+                          style: const TextStyle(
+                              fontFamily: 'Poppins',
+                              fontSize: 13,
+                              color: AppColors.subText,
+                              height: 1.4),
+                        ),
+                        const SizedBox(height: 32),
+
+                        // RENDER ĐÚNG WIDGET DỰA VÀO MODE
+                        AnimatedSwitcher(
+                          duration: const Duration(milliseconds: 400),
+                          switchInCurve: Curves.easeOutBack,
+                          switchOutCurve: Curves.easeIn,
+                          child: _renderCurrentForm(mode, step),
+                        ),
+                      ],
+                    ),
+                  ),
+
+                  // 3. KHU VỰC NÚT BẤM (Cũng thay đổi theo Mode)
+                  const ProductFormActionButtonsWidget(),
+                ],
+              );
+            }),
+          ),
+        ),
+      ),
+    );
+  }
+
+  // --- CÁC HÀM XỬ LÝ GIAO DIỆN ĐỘNG ---
+
+  String _getAppBarTitle() {
+    final mode = controller.formMode.value;
+    switch (mode) {
+      case 'info':
+        return TTexts.editProductTitle.tr;
+      case 'image':
+        return TTexts.editProductImageTitle.tr;
+      case 'edit_package':
+        return TTexts.editPackageTitle.tr;
+      case 'add_package':
+        return TTexts.addPackageTitle.tr;
+      default:
+        return TTexts.addNewProductTitle.tr;
+    }
+  }
+
+  String _getHeaderTitle(String mode, int step) {
+    if (mode == 'info') return TTexts.productBaseTitle.tr;
+    if (mode == 'image') return TTexts.productImageTitle.tr;
+    if (mode == 'edit_package') return TTexts.editPackageTitle.tr;
+    if (mode == 'add_package') return TTexts.addPackageTitle.tr;
+    // Mode create
+    return step == 1
+        ? TTexts.productBaseTitle.tr
+        : (step == 2
+            ? TTexts.productImageTitle.tr
+            : TTexts.productPackageTitle.tr);
+  }
+
+  String _getHeaderSubtitle(String mode, int step) {
+    if (mode == 'info') return TTexts.step1Sub.tr;
+    if (mode == 'image') return TTexts.editProductImageSub.tr;
+    if (mode == 'edit_package') return TTexts.editPackageSub.tr;
+    if (mode == 'add_package') return TTexts.addPackageSub.tr;
+    // Mode create
+    return step == 1
+        ? TTexts.productBaseSub.tr
+        : (step == 2 ? TTexts.productImageSub.tr : TTexts.productPackageSub.tr);
+  }
+
+  Widget _renderCurrentForm(String mode, int step) {
+    // ÉP CỨNG GIAO DIỆN NẾU ĐANG Ở CHẾ ĐỘ SỬA LẺ TẺ
+    if (mode == 'info') {
+      return const ProductFormBaseInfoWidget(key: ValueKey('info'));
+    }
+    if (mode == 'image') {
+      return const ProductFormImageWidget(key: ValueKey('image'));
+    }
+    if (mode == 'edit_package' || mode == 'add_package') {
+      return const Form(
+          key: ValueKey('pkg'), child: ProductPackageFormFieldsWidget());
+    }
+
+    // NẾU LÀ TẠO MỚI (WIZARD) THÌ CHẠY THEO STEP
+    if (step == 1) {
+      return const ProductFormBaseInfoWidget(key: ValueKey('step1'));
+    }
+    if (step == 2) return const ProductFormImageWidget(key: ValueKey('step2'));
+    return const Form(
+        key: ValueKey('step3'), child: ProductPackageFormFieldsWidget());
+  }
+}

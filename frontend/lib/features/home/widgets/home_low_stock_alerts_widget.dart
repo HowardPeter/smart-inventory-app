@@ -69,7 +69,7 @@ class HomeLowStockAlertsWidget extends GetView<HomeController> {
                       padding: const EdgeInsets.only(bottom: AppSizes.p12),
                       child: _buildAlertItem(
                         // Gọi an toàn ?. để tránh lỗi null
-                        name: item.productPackage?.displayName ?? 'Unknown',
+                        name: item.productPackageId,
                         // Tạm gán Category (bạn có thể bổ sung category vào Model sau)
                         category: 'Product',
                         quantityLeft: item.quantity,
