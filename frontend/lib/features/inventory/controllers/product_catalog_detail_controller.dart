@@ -6,12 +6,17 @@ import 'package:get/get.dart';
 import 'package:frontend/core/infrastructure/utils/error_handler_utils.dart';
 import 'package:frontend/core/infrastructure/models/product_model.dart';
 import 'package:frontend/core/infrastructure/models/product_package_model.dart';
+import 'package:frontend/core/infrastructure/models/inventory_model.dart'; // THÊM MODEL INVENTORY
 import 'package:frontend/core/state/services/store_service.dart';
 import 'package:frontend/core/infrastructure/constants/text_strings.dart';
 import 'package:frontend/core/ui/widgets/t_snackbars_widget.dart';
 import 'package:frontend/features/inventory/providers/inventory_provider.dart';
 import 'package:frontend/routes/app_routes.dart';
 import 'package:frontend/core/ui/widgets/t_custom_dialog_widget.dart';
+
+// THÊM CONTROLLER ĐỂ REFRESH TỰ ĐỘNG
+import 'package:frontend/features/inventory/controllers/inventory_controller.dart';
+import 'package:frontend/features/inventory/controllers/inventory_insight_controller.dart';
 
 class ProductCatalogDetailController extends GetxController with TErrorHandler {
   final InventoryProvider _provider = InventoryProvider();
@@ -26,6 +31,7 @@ class ProductCatalogDetailController extends GetxController with TErrorHandler {
   final RxBool isLoadingPackages = true.obs;
   final RxList<ProductPackageModel> packages = <ProductPackageModel>[].obs;
 
+  bool _isDeleteDialogShowing = false;
   bool canManageProduct = false;
 
   @override
@@ -34,8 +40,7 @@ class ProductCatalogDetailController extends GetxController with TErrorHandler {
     try {
       final storeService = Get.find<StoreService>();
       final role = storeService.currentRole.value.toLowerCase();
-      canManageProduct =
-          (role == 'manager' || role == 'owner' || role == 'admin');
+      canManageProduct = (role == 'manager');
     } catch (e) {
       canManageProduct = false;
     }
@@ -47,7 +52,6 @@ class ProductCatalogDetailController extends GetxController with TErrorHandler {
       rxImageUrl.value = product.imageUrl ?? '';
       fetchPackages();
     } else {
-      // ĐÃ SỬA THÀNH TTexts
       handleError(TTexts.productDataMissing.tr);
       Get.back();
     }
@@ -55,13 +59,38 @@ class ProductCatalogDetailController extends GetxController with TErrorHandler {
 
   Future<void> fetchPackages({bool isRefresh = false}) async {
     try {
+      // 1. ÉP LUÔN LUÔN BẬT LOADING ĐỂ SHIMMER CHẠY CẢ KHI PULL-TO-REFRESH
       isLoadingPackages.value = true;
-      final fetchedData =
-          await _provider.getPackagesByProduct(product.productId);
 
-      // Chỉ hiển thị các package đang active
-      packages.assignAll(
-          fetchedData.where((p) => p.activeStatus == 'active').toList());
+      // Tạo độ trễ nhỏ để trải nghiệm mượt mà không bị chớp giật
+      if (isRefresh) {
+        await Future.delayed(const Duration(milliseconds: 300));
+      }
+
+      final results = await Future.wait([
+        _provider.getPackagesByProduct(product.productId),
+        _provider.getInventories(),
+      ]);
+
+      final fetchedPackages = results[0] as List<ProductPackageModel>;
+      final allInventories = results[1] as List<InventoryModel>;
+
+      // 2. DÙNG BLACKLIST: Lấy ra những ID CHẮC CHẮN ĐÃ BỊ INACTIVE TRONG KHO
+      final deadInventoryPackageIds = allInventories
+          .where((inv) => (inv.activeStatus).toLowerCase() == 'inactive')
+          .map((inv) => inv.productPackageId)
+          .toSet();
+
+      // 3. LỌC: Package phải 'active' VÀ không nằm trong sổ đen của kho
+      final validPackages = fetchedPackages.where((p) {
+        final isPackageActive = (p.activeStatus).toLowerCase() == 'active';
+        final isInventoryDead =
+            deadInventoryPackageIds.contains(p.productPackageId);
+
+        return isPackageActive && !isInventoryDead;
+      }).toList();
+
+      packages.assignAll(validPackages);
     } catch (e) {
       handleError(e);
     } finally {
@@ -102,7 +131,6 @@ class ProductCatalogDetailController extends GetxController with TErrorHandler {
 
   void deleteProduct() {
     if (packages.isNotEmpty) {
-      // ĐÃ SỬA THÀNH TTexts
       TSnackbarsWidget.error(
           title: TTexts.errorTitle.tr, message: TTexts.productNotEmptyError.tr);
       return;
@@ -111,7 +139,7 @@ class ProductCatalogDetailController extends GetxController with TErrorHandler {
     Get.dialog(
       TCustomDialogWidget(
         title: TTexts.deleteProduct.tr,
-        description: TTexts.confirmMoveProductToTrash.tr, // ĐÃ SỬA THÀNH TTexts
+        description: TTexts.confirmMoveProductToTrash.tr,
         icon: const Text('🗑️', style: TextStyle(fontSize: 40)),
         primaryButtonText: TTexts.delete.tr,
         secondaryButtonText: TTexts.cancel.tr,
@@ -128,6 +156,15 @@ class ProductCatalogDetailController extends GetxController with TErrorHandler {
             if (Get.isRegistered<CategoryDetailController>()) {
               Get.find<CategoryDetailController>()
                   .fetchProducts(isRefresh: true);
+            }
+
+            // Báo cho các màn hình Tổng update
+            if (Get.isRegistered<InventoryController>()) {
+              Get.find<InventoryController>()
+                  .fetchDashboardData(isRefresh: true);
+            }
+            if (Get.isRegistered<InventoryInsightController>()) {
+              Get.find<InventoryInsightController>().refreshData();
             }
 
             Get.back();
@@ -168,22 +205,28 @@ class ProductCatalogDetailController extends GetxController with TErrorHandler {
   }
 
   void deletePackage(ProductPackageModel package) async {
+    // 1. CHẶN NGAY NẾU ĐANG CÓ DIALOG MỞ
+    if (_isDeleteDialogShowing) return;
+
+    // 2. CHẶN SLIDABLE GỌI LẠI ITEM ĐÃ XÓA
+    if (!packages.any((p) => p.productPackageId == package.productPackageId)) {
+      return;
+    }
+
+    _isDeleteDialogShowing = true;
+
     try {
-      // 1. HIỆN LOADING KHI ĐANG CHECK KHO
       FullScreenLoaderUtils.openLoadingDialog(TTexts.saving.tr);
 
-      // 2. LẤY SỐ LƯỢNG TỒN KHO THỰC TẾ
       final int currentQuantity =
           await _provider.getPackageQuantity(package.productPackageId);
 
       FullScreenLoaderUtils.stopLoading();
 
-      // 3. NẾU CÒN HÀNG TRONG KHO (> 0) -> CHẶN XÓA
       if (currentQuantity > 0) {
-        Get.dialog(
+        await Get.dialog(
           TCustomDialogWidget(
             title: TTexts.inventoryNotEmptyTitle.tr,
-            // ĐÃ SỬA: Không còn text cứng, sử dụng trParams
             description:
                 '${TTexts.inventoryNotEmptyMessage.tr}\n\n(${TTexts.currentStockWithCount.trParams({
                   'count': currentQuantity.toString()
@@ -193,18 +236,18 @@ class ProductCatalogDetailController extends GetxController with TErrorHandler {
             secondaryButtonText: TTexts.cancel.tr,
             onSecondaryPressed: () => Get.back(),
             onPrimaryPressed: () {
-              Get.back();
               // TODO: Điều hướng sang trang tạo Transaction
+              Get.back();
               TSnackbarsWidget.info(
                   title: 'Info', message: 'Navigate to Transaction page');
             },
           ),
+          barrierDismissible: false,
         );
         return;
       }
 
-      // 4. NẾU KHO ĐÃ TRỐNG (= 0) -> HIỆN DIALOG XÁC NHẬN XÓA
-      Get.dialog(
+      final bool? shouldDelete = await Get.dialog<bool>(
         TCustomDialogWidget(
           title: TTexts.deletePackage.tr,
           description:
@@ -212,16 +255,21 @@ class ProductCatalogDetailController extends GetxController with TErrorHandler {
           icon: const Text('🗑️', style: TextStyle(fontSize: 40)),
           primaryButtonText: TTexts.delete.tr,
           secondaryButtonText: TTexts.cancel.tr,
-          onSecondaryPressed: () => Get.back(),
-          onPrimaryPressed: () async {
-            Get.back(); // Đóng dialog xác nhận
-            _performDeletePackage(package.productPackageId);
-          },
+          onSecondaryPressed: () => Get.back(result: false),
+          onPrimaryPressed: () => Get.back(result: true),
         ),
+        barrierDismissible: false,
       );
+
+      if (shouldDelete == true) {
+        await _performDeletePackage(package.productPackageId);
+      }
     } catch (e) {
       FullScreenLoaderUtils.stopLoading();
       handleError(e);
+    } finally {
+      await Future.delayed(const Duration(milliseconds: 300));
+      _isDeleteDialogShowing = false;
     }
   }
 
@@ -236,6 +284,14 @@ class ProductCatalogDetailController extends GetxController with TErrorHandler {
       TSnackbarsWidget.success(
           title: TTexts.successTitle.tr,
           message: TTexts.packageDeletedSuccess.tr);
+
+      // 🟢 BÁO CHO CÁC TRANG KIA TỰ ĐỘNG CẬP NHẬT KHI XÓA THÀNH CÔNG 🟢
+      if (Get.isRegistered<InventoryController>()) {
+        Get.find<InventoryController>().fetchDashboardData(isRefresh: true);
+      }
+      if (Get.isRegistered<InventoryInsightController>()) {
+        Get.find<InventoryInsightController>().refreshData();
+      }
     } on DioException catch (e) {
       FullScreenLoaderUtils.stopLoading();
       TSnackbarsWidget.error(

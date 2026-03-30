@@ -333,6 +333,7 @@ class ProductFormController extends GetxController with TErrorHandler {
         'importPrice': double.tryParse(importPriceController.text) ?? 0,
         'sellingPrice': double.tryParse(salePriceController.text) ?? 0,
         'barcodeValue': barcodeController.text.trim(),
+        'barcodeType': 'ean',
       };
       final newPackage = await _provider.createProductPackage(
           newProduct.productId, packagePayload);
@@ -438,6 +439,7 @@ class ProductFormController extends GetxController with TErrorHandler {
         'importPrice': double.tryParse(importPriceController.text) ?? 0,
         'sellingPrice': double.tryParse(salePriceController.text) ?? 0,
         'barcodeValue': barcodeController.text.trim(),
+        'barcodeType': 'ean',
       };
 
       final inventoryPayload = {
@@ -460,6 +462,7 @@ class ProductFormController extends GetxController with TErrorHandler {
           importPrice: double.tryParse(importPriceController.text) ?? 0,
           sellingPrice: double.tryParse(salePriceController.text) ?? 0,
           barcodeValue: barcodeController.text.trim(),
+          barcodeType: 'ean',
           unitId: selectedUnitId.value,
           productId: productToEdit!.productId,
           activeStatus: packageToEdit!.activeStatus,

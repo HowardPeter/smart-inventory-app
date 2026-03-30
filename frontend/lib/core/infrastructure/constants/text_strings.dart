@@ -318,6 +318,12 @@ class TTexts {
   static const String topCategories = 'top_categories';
   static const String inventoryFlow = 'inventory_flow';
 
+  // -- Customize Catalog
+  static const String customizeCatalog = "customize_catalog";
+  static const String pinnedOnHome = "pinned_on_home";
+  static const String tapAndHoldToDrag = "tap_and_hold_to_drag";
+  static const String save = "save";
+
   // -- Inventory Insight
   static const String inventoryList = "inventory_list";
   static const String tabAll = "tab_all";

@@ -1,6 +1,7 @@
 // Mở file inventory_dynamic_category_widget.dart và dán đè toàn bộ code này:
 
 import 'package:flutter/material.dart';
+import 'package:frontend/features/inventory/widgets/inventory/inventory_empty_category_widget.dart';
 import 'package:frontend/routes/app_routes.dart';
 import 'package:get/get.dart';
 import 'package:frontend/core/ui/theme/app_colors.dart';
@@ -37,12 +38,10 @@ class InventoryDynamicCategoryWidget extends GetView<InventoryController> {
           : dynamicCategories.length;
 
       if (dynamicCategories.isEmpty) {
-        return Center(
-            child: Padding(
-          padding: const EdgeInsets.all(20.0),
-          child: Text(TTexts.noCategoriesFound.tr,
-              style: const TextStyle(color: AppColors.softGrey)),
-        ));
+        return const Padding(
+          padding: EdgeInsets.symmetric(vertical: 8.0),
+          child: InventoryEmptyCategoryWidget(),
+        );
       }
 
       Widget gridView = GridView.builder(

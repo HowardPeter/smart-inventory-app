@@ -7,6 +7,7 @@ class InventoryModel {
   final int lastCount;
   final DateTime updatedAt;
   final String productPackageId;
+  final String activeStatus;
   final ProductPackageModel? productPackage;
 
   InventoryModel({
@@ -16,9 +17,9 @@ class InventoryModel {
     required this.lastCount,
     required this.updatedAt,
     required this.productPackageId,
+    required this.activeStatus,
     this.productPackage,
   });
-
   factory InventoryModel.fromJson(Map<String, dynamic> json) {
     return InventoryModel(
       inventoryId: json['inventoryId'] ?? '',
@@ -28,6 +29,7 @@ class InventoryModel {
       updatedAt: json['updatedAt'] != null
           ? DateTime.parse(json['updatedAt'])
           : DateTime.now(),
+      activeStatus: json['activeStatus'] ?? 'active',
       productPackageId: json['productPackageId'] ?? '',
       productPackage: json['productPackage'] != null
           ? ProductPackageModel.fromJson(json['productPackage'])

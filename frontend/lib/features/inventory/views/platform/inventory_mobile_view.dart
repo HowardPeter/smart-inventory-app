@@ -17,6 +17,7 @@ import 'package:frontend/features/inventory/widgets/inventory/inventory_insights
 import 'package:frontend/features/inventory/widgets/inventory/inventory_dynamic_category_widget.dart';
 // Import widget shimmer vừa tách
 import 'package:frontend/features/inventory/widgets/inventory/inventory_dashboard_shimmer_widget.dart';
+import 'package:iconsax_flutter/iconsax_flutter.dart';
 
 class InventoryMobileView extends GetView<InventoryController> {
   const InventoryMobileView({super.key});
@@ -73,13 +74,31 @@ class InventoryMobileView extends GetView<InventoryController> {
                         const SizedBox(height: AppSizes.p32),
 
                         // 3. PRODUCT CATALOG (DYNAMIC CATEGORIES)
-                        Text(
-                          TTexts.productCatalog.tr,
-                          style: const TextStyle(
-                              fontFamily: 'Poppins',
-                              fontSize: 18,
-                              fontWeight: FontWeight.bold,
-                              color: AppColors.primaryText),
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Text(
+                              TTexts.productCatalog.tr,
+                              style: const TextStyle(
+                                  fontFamily: 'Poppins',
+                                  fontSize: 18,
+                                  fontWeight: FontWeight.bold,
+                                  color: AppColors.primaryText),
+                            ),
+                            InkWell(
+                              onTap: () =>
+                                  Get.toNamed(AppRoutes.customizeCatalog),
+                              borderRadius: BorderRadius.circular(8),
+                              child: Container(
+                                padding: const EdgeInsets.all(6),
+                                decoration: BoxDecoration(
+                                    color: AppColors.primary.withOpacity(0.1),
+                                    borderRadius: BorderRadius.circular(8)),
+                                child: const Icon(Iconsax.setting_4_copy,
+                                    size: 18, color: AppColors.primary),
+                              ),
+                            )
+                          ],
                         ),
                         const SizedBox(height: 12),
                         const InventoryDynamicCategoryWidget(),

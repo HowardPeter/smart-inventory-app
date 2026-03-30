@@ -25,6 +25,7 @@ class AppRoutes {
   static const productCatalogDetail = '/product_catalog_detail';
   static const categoryForm = '/category_form';
   static const productForm = '/product_form';
+  static const customizeCatalog = '/customize-catalog';
 
   static const profile = '/profile';
 }

@@ -262,6 +262,12 @@ final Map<String, String> enInventory = {
   TTexts.inventoryThreshold: 'Threshold',
   TTexts.sellingPrice: 'Sale Price',
 
+  // -- Customize Catalog
+  TTexts.customizeCatalog: 'Customize Catalog',
+  TTexts.pinnedOnHome: 'Pinned on Home',
+  TTexts.tapAndHoldToDrag: 'Tap and hold to drag',
+  TTexts.save: 'Save',
+
   // -- Empty States
   TTexts.noDataAvailable: 'No data available',
   TTexts.noCategoriesFound: 'No categories found',
