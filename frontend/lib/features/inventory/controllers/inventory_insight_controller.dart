@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:frontend/core/state/services/store_service.dart';
 import 'package:frontend/features/inventory/models/inventory_insight_display_model.dart';
 import 'package:get/get.dart';
 import 'package:frontend/features/inventory/controllers/inventory_controller.dart';
@@ -28,12 +29,27 @@ class InventoryInsightController extends GetxController with TErrorHandler {
   final RxBool isLoadingMore = false.obs;
   final RxBool hasMore = true.obs;
 
+  bool canManageProduct = false;
+
   RxBool get isLoading => _parentCtrl.isLoading;
   List<CategoryModel> get categories => _parentCtrl.categories;
 
   @override
   void onInit() {
     super.onInit();
+    try {
+      final storeService = Get.find<StoreService>();
+      final role = storeService.currentRole.value.toLowerCase();
+      canManageProduct = (role == 'manager');
+    } catch (e) {
+      canManageProduct = false;
+    }
+
+    scrollController.addListener(_onScroll);
+    ever(_parentCtrl.inventories,
+        (_) => _applyFiltersAndPaginate(isRefresh: true));
+    _applyFiltersAndPaginate(isRefresh: true);
+
     // Lắng nghe sự kiện cuộn để load thêm data
     scrollController.addListener(_onScroll);
 

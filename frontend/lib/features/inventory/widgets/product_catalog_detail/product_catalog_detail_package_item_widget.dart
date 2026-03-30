@@ -1,14 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
+import 'package:frontend/features/inventory/controllers/product_catalog_detail_controller.dart';
 import 'package:get/get.dart';
 import 'package:iconsax_flutter/iconsax_flutter.dart';
-
 import 'package:frontend/core/infrastructure/constants/text_strings.dart';
 import 'package:frontend/core/infrastructure/models/product_package_model.dart';
 import 'package:frontend/core/ui/theme/app_colors.dart';
 import 'package:frontend/core/ui/theme/app_sizes.dart';
 
-class ProductCatalogDetailPackageItemWidget extends StatelessWidget {
+class ProductCatalogDetailPackageItemWidget
+    extends GetView<ProductCatalogDetailController> {
   final ProductPackageModel package;
   final VoidCallback onEdit;
   final VoidCallback onDelete;
@@ -25,6 +26,7 @@ class ProductCatalogDetailPackageItemWidget extends StatelessWidget {
     return Container(
       margin: const EdgeInsets.only(bottom: AppSizes.p12),
       child: Slidable(
+        enabled: controller.canManageProduct,
         key: ValueKey(package.productPackageId),
         endActionPane: ActionPane(
           motion: const BehindMotion(), // Animation lộ diện từ dưới card

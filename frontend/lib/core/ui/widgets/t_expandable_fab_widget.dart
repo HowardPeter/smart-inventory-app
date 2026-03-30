@@ -4,11 +4,13 @@ import 'package:iconsax_flutter/iconsax_flutter.dart';
 class TExpandableFabWidget extends StatefulWidget {
   final VoidCallback onManualAdd;
   final VoidCallback onScanAdd;
+  final bool isStaffMode; // 🟢 THÊM CỜ PHÂN QUYỀN VÀO ĐÂY
 
   const TExpandableFabWidget({
     super.key,
     required this.onManualAdd,
     required this.onScanAdd,
+    this.isStaffMode = false, // Mặc định là Quản lý
   });
 
   @override
@@ -43,28 +45,45 @@ class _TExpandableFabWidgetState extends State<TExpandableFabWidget>
 
   @override
   Widget build(BuildContext context) {
+    // ==============================================================
+    // 🟢 NẾU LÀ STAFF: HIỆN NÚT ĐƠN TRÔNG Y HỆT NÚT GỐC NHƯNG ĐỂ QUÉT
+    // ==============================================================
+    if (widget.isStaffMode) {
+      return SizedBox(
+        width: 56,
+        height: 56,
+        child: FloatingActionButton(
+          heroTag: "fab_scan_staff",
+          shape: const CircleBorder(),
+          backgroundColor: Colors.black, // Giữ màu đen đồng bộ
+          elevation: 6,
+          onPressed: widget.onScanAdd, // Bấm là gọi hàm Scan luôn
+          child: const Icon(Iconsax.scan_barcode_copy,
+              color: Colors.white, size: 28),
+        ),
+      );
+    }
+
+    // ==============================================================
+    // 🟢 NẾU LÀ MANAGER: HIỆN LOGIC BUNG NÚT NHƯ CŨ
+    // ==============================================================
     return SizedBox(
-      width: 56, // Giới hạn khung chiều rộng đúng bằng nút chính
-      height: 220, // Tăng chiều cao khung chứa để đủ chỗ cho các nút to hơn
+      width: 56,
+      height: 220,
       child: AnimatedBuilder(
         animation: _expandAnimation,
         builder: (context, child) {
           return Stack(
-            alignment:
-                Alignment.bottomCenter, // Đảm bảo mọi nút nằm ở giữa trục dọc
+            alignment: Alignment.bottomCenter,
             clipBehavior: Clip.none,
             children: [
-              // ================================
-              // NÚT CON 1: SCAN (NẰM TRÊN CÙNG)
-              // ================================
+              // --- Nút Scan ---
               Positioned(
-                // Đẩy lên cao hơn (140) để tránh đè vào nút dưới khi nút to ra
                 bottom: 140 * _expandAnimation.value,
                 child: Transform.scale(
                   scale: _expandAnimation.value,
                   child: FadeTransition(
                     opacity: _expandAnimation,
-                    // Tăng size từ 40x40 (small) lên 48x48
                     child: SizedBox(
                       width: 48,
                       height: 48,
@@ -78,25 +97,20 @@ class _TExpandableFabWidgetState extends State<TExpandableFabWidget>
                           widget.onScanAdd();
                         },
                         child: const Icon(Iconsax.scan_barcode_copy,
-                            color: Colors.white,
-                            size: 22), // Tăng icon size lên 22
+                            color: Colors.white, size: 22),
                       ),
                     ),
                   ),
                 ),
               ),
 
-              // ================================
-              // NÚT CON 2: MANUAL EDIT (NẰM GIỮA)
-              // ================================
+              // --- Nút Manual ---
               Positioned(
-                // Đẩy lên (75) để tạo khoảng cách đẹp với nút chính
                 bottom: 75 * _expandAnimation.value,
                 child: Transform.scale(
                   scale: _expandAnimation.value,
                   child: FadeTransition(
                     opacity: _expandAnimation,
-                    // Tăng size lên 48x48
                     child: SizedBox(
                       width: 48,
                       height: 48,
@@ -117,9 +131,7 @@ class _TExpandableFabWidgetState extends State<TExpandableFabWidget>
                 ),
               ),
 
-              // ================================
-              // NÚT CHÍNH: NẰM DƯỚI CÙNG
-              // ================================
+              // --- Nút Chính ---
               Positioned(
                 bottom: 0,
                 child: SizedBox(

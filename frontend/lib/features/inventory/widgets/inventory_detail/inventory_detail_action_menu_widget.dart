@@ -13,8 +13,6 @@ class InventoryDetailActionMenuWidget
 
   @override
   Widget build(BuildContext context) {
-    if (!controller.canManageInventory) return const SizedBox.shrink();
-
     return const _GlassmorphismDropdownMenu();
   }
 }

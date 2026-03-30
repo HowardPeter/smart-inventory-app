@@ -4,7 +4,6 @@ import 'package:frontend/features/inventory/controllers/inventory_insight_contro
 import 'package:frontend/features/inventory/widgets/inventory_insight/inventory_insight_category_chip_widget.dart';
 import 'package:frontend/features/inventory/widgets/inventory_insight/inventory_insight_list_widget.dart';
 import 'package:frontend/features/inventory/widgets/inventory_insight/inventory_insight_overview_widget.dart';
-// Import file shimmer vừa tạo
 import 'package:frontend/features/inventory/widgets/inventory_insight/inventory_insight_shimmer_widget.dart';
 import 'package:frontend/routes/app_routes.dart';
 import 'package:get/get.dart';
@@ -31,15 +30,18 @@ class InventoryInsightMobileView extends GetView<InventoryInsightController> {
         title: TTexts.inventoryList.tr,
         showSearchIcon: true,
       ),
-      floatingActionButton: TExpandableFabWidget(onManualAdd: () {
-        Get.toNamed(AppRoutes.productForm)?.then((_) {
-          controller.refreshData();
-        });
-      }, onScanAdd: () {
-        Get.to(() => const TBarcodeScannerLayout())?.then((_) {
-          controller.refreshData();
-        });
-      }),
+      floatingActionButton: TExpandableFabWidget(
+          isStaffMode: !controller.canManageProduct,
+          onManualAdd: () {
+            Get.toNamed(AppRoutes.productForm)?.then((_) {
+              controller.refreshData();
+            });
+          },
+          onScanAdd: () {
+            Get.to(() => const TBarcodeScannerLayout())?.then((_) {
+              controller.refreshData();
+            });
+          }),
       body: TRefreshIndicatorWidget(
         onRefresh: controller.refreshData,
         edgeOffset: topOffset, // Đẩy icon xoay xoay xuống dưới Appbar

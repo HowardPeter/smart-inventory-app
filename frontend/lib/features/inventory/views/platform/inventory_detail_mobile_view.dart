@@ -30,7 +30,6 @@ class InventoryDetailMobileView extends GetView<InventoryDetailController> {
             !ctrl.isLoading.value && ctrl.currentDisplayItem.value != null;
 
         return PopScope(
-            // canPop = true khi stack lịch sử rỗng (để thoát app/trang)
             canPop: ctrl.historyStack.isEmpty,
             onPopInvoked: (didPop) {
               if (!didPop) {
@@ -50,7 +49,6 @@ class InventoryDetailMobileView extends GetView<InventoryDetailController> {
                       leading: IconButton(
                         icon: const Icon(Iconsax.arrow_left_2_copy,
                             color: AppColors.primaryText),
-                        // FIX LỖI 1 ( điều hướng): Gọi ctrl.goBack() thay vì Get.back()
                         onPressed: () => ctrl.goBack(),
                       ),
                     ),
