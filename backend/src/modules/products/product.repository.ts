@@ -10,9 +10,13 @@ import type {
   DetailProductResponseDto,
   ListProductsQueryDto,
   ProductListItemDto,
+  ProductsByCategoryDto,
 } from './product.dto.js';
 import type { Prisma } from '../../../src/generated/prisma/client.js';
-import type { DbClient } from '../../common/types/index.js';
+import type {
+  DbClient,
+  ListPaginationResponseDto,
+} from '../../common/types/index.js';
 
 export class ProductRepository {
   constructor(private readonly db: DbClient) {}
@@ -20,7 +24,7 @@ export class ProductRepository {
   async findManyByStoreId(
     storeId: string,
     query: ListProductsQueryDto,
-  ): Promise<{ items: ProductListItemDto[]; totalItems: number }> {
+  ): Promise<ListPaginationResponseDto<ProductListItemDto>> {
     const { page, limit } = normalizePagination(query);
     const { sortBy = 'name', sortOrder = 'desc', categoryId, brand } = query;
 
@@ -191,6 +195,45 @@ export class ProductRepository {
         },
       },
     });
+  }
+
+  async findProductsByCategoryId(
+    categoryId: string,
+  ): Promise<ProductsByCategoryDto> {
+    const products = await this.db.product.findMany({
+      where: { categoryId },
+      select: {
+        productId: true,
+        name: true,
+        imageUrl: true,
+        brand: true,
+        storeId: true,
+        categoryId: true,
+      },
+    });
+
+    return {
+      count: products.length,
+      products,
+    };
+  }
+
+  async uncategorizeMany(
+    storeId: string,
+    oldCategoryId: string,
+    uncategorizedId: string,
+  ): Promise<number> {
+    const uncategorized = await this.db.product.updateMany({
+      where: {
+        categoryId: oldCategoryId,
+        storeId,
+      },
+      data: {
+        categoryId: uncategorizedId,
+      },
+    });
+
+    return uncategorized.count;
   }
 
   async softDeleteOne(productId: string): Promise<void> {

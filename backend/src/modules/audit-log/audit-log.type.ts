@@ -14,4 +14,5 @@ export type AuditLog = {
   performedAt: Date;
   userId: string;
   storeId: string;
+  note: string | null;
 };

@@ -3,6 +3,7 @@ import 'package:frontend/core/infrastructure/constants/text_strings.dart';
 import 'package:frontend/core/state/controllers/network_controller.dart';
 import 'package:frontend/core/infrastructure/utils/token_utils.dart';
 import 'package:frontend/core/state/services/auth_service.dart';
+import 'package:frontend/core/state/services/notification_service.dart';
 import 'package:frontend/core/state/services/user_service.dart';
 import 'package:get/get.dart';
 import 'package:get_storage/get_storage.dart';
@@ -107,9 +108,13 @@ class SplashController extends GetxController {
           // Ta tha cho nó, cho phép vào App bình thường!
           debugPrint(
               'Profile API failed, but Session is still active. Proceeding to Main...');
+          // Có mạng trở lại, token còn sống, tranh thủ cập nhật Notification Token
+          await NotificationService.registerTokenWithBackend();
         }
       } else {
         debugPrint('Xác thực và tải profile thành công!');
+        // Load profile thành công, mọi thứ hoàn hảo, cập nhật Notification Token
+        await NotificationService.registerTokenWithBackend();
       }
     } catch (e) {
       debugPrint('Phiên đăng nhập đã chết hoặc có lỗi nghiêm trọng: $e');

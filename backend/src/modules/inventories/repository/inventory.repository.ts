@@ -2,6 +2,7 @@ import {
   getPaginationSkip,
   normalizePagination,
 } from '../../../common/utils/index.js';
+import { prisma as globalPrisma } from '../../../db/prismaClient.js';
 import { Prisma } from '../../../generated/prisma/client.js';
 
 import type { DbClient } from '../../../common/types/index.js';
@@ -61,7 +62,9 @@ const inventorySelect = {
 với cơ sở dữ liệu (Prisma) cho module Inventory.
 Chỉ chứa logic truy xuất và lưu trữ dữ liệu, không chứa business logic. */
 export class InventoryRepository {
-  constructor(private readonly prisma: DbClient) {}
+  // NOTE: Cho phép nhận DbClient (hoặc tx) từ bên ngoài truyền vào.
+  // Nếu không truyền, mặc định sẽ dùng globalPrisma.
+  constructor(private readonly prisma: DbClient = globalPrisma) {}
 
   // Xác định trạng thái tồn kho dựa trên số lượng thực tế và ngưỡng cảnh báo
   private mapInventoryStatus(
@@ -284,16 +287,47 @@ export class InventoryRepository {
   }
 
   async updateOne(
+    storeId: string,
     inventoryId: string,
     data: UpdateInventoryDto,
+    userId: string,
   ): Promise<InventoryDetailResponseDto> {
-    const inventory = await this.prisma.inventory.update({
-      where: { inventoryId },
-      data,
-      select: inventorySelect,
-    });
+    return await this.prisma.$transaction(async (tx) => {
+      const oldInventory = await tx.inventory.findUnique({
+        where: { inventoryId },
+        select: {
+          reorderThreshold: true,
+          lastCount: true,
+          productPackageId: true,
+        },
+      });
 
-    return this.toInventoryListItem(inventory);
+      const inventory = await tx.inventory.update({
+        where: { inventoryId },
+        data,
+        select: inventorySelect,
+      });
+
+      await tx.auditLog.create({
+        data: {
+          actionType: 'update',
+          entityType: 'Inventory',
+          userId,
+          storeId,
+          oldValue: {
+            reorderThreshold: oldInventory?.reorderThreshold,
+            lastCount: oldInventory?.lastCount,
+          },
+          newValue: {
+            reorderThreshold: inventory.reorderThreshold,
+            lastCount: inventory.lastCount,
+            productPackageId: inventory.productPackage.productPackageId,
+          },
+        },
+      });
+
+      return this.toInventoryListItem(inventory);
+    });
   }
 
   async adjustQuantity(
@@ -305,8 +339,6 @@ export class InventoryRepository {
     reason?: string | null,
     note?: string | null,
   ): Promise<InventoryAdjustmentResponseDto | null> {
-    // NOTE: Sử dụng transaction để đảm bảo việc thay đổi số lượng kho
-    // và ghi AuditLog luôn thành công hoặc thất bại cùng lúc
     return await this.prisma.$transaction(async (tx) => {
       const currentInventory = await tx.inventory.findUnique({
         where: { inventoryId },
@@ -340,6 +372,7 @@ export class InventoryRepository {
           entityType: 'Inventory',
           userId: userId,
           storeId: storeId,
+          note: note ?? null,
           oldValue: {
             quantity: currentInventory.quantity,
           },
@@ -348,7 +381,6 @@ export class InventoryRepository {
             changedQuantity: changedQty,
             adjustmentType: type,
             reason: reason ?? null,
-            note: note ?? null,
             productPackageId: currentInventory.productPackageId,
           },
         },
@@ -386,39 +418,81 @@ export class InventoryRepository {
   }
 
   async restoreInventory(
+    storeId: string,
     inventoryId: string,
     data: CreateInventoryDto,
+    userId: string,
   ): Promise<InventoryDetailResponseDto> {
-    // NOTE: Khôi phục trạng thái kho thay vì tạo dòng mới để tránh vi phạm
-    // Unique Constraint của Database
-    const inventory = await this.prisma.inventory.update({
-      where: { inventoryId },
-      data: {
-        quantity: data.quantity,
-        reorderThreshold: data.reorderThreshold ?? null,
-        lastCount: data.lastCount ?? null,
-        activeStatus: 'active',
-      },
-      select: inventorySelect,
-    });
+    return await this.prisma.$transaction(async (tx) => {
+      const inventory = await tx.inventory.update({
+        where: { inventoryId },
+        data: {
+          quantity: data.quantity,
+          reorderThreshold: data.reorderThreshold ?? null,
+          lastCount: data.lastCount ?? null,
+          activeStatus: 'active',
+        },
+        select: inventorySelect,
+      });
 
-    return this.toInventoryListItem(inventory);
+      await tx.auditLog.create({
+        data: {
+          actionType: 'create',
+          entityType: 'Inventory',
+          userId,
+          storeId,
+          oldValue: { activeStatus: 'inactive' },
+          newValue: {
+            activeStatus: 'active',
+            quantity: inventory.quantity,
+            reorderThreshold: inventory.reorderThreshold,
+            lastCount: inventory.lastCount,
+            productPackageId: inventory.productPackage.productPackageId,
+          },
+        },
+      });
+
+      return this.toInventoryListItem(inventory);
+    });
   }
 
-  async create(data: CreateInventoryDto): Promise<InventoryDetailResponseDto> {
-    const inventory = await this.prisma.inventory.create({
-      data: {
-        productPackageId: data.productPackageId,
-        quantity: data.quantity,
-        reorderThreshold: data.reorderThreshold ?? null,
-        lastCount: data.lastCount ?? null,
-      },
-      select: inventorySelect,
-    });
+  async create(
+    storeId: string,
+    data: CreateInventoryDto,
+    userId: string,
+  ): Promise<InventoryDetailResponseDto> {
+    return await this.prisma.$transaction(async (tx) => {
+      const inventory = await tx.inventory.create({
+        data: {
+          productPackageId: data.productPackageId,
+          quantity: data.quantity,
+          reorderThreshold: data.reorderThreshold ?? null,
+          lastCount: data.lastCount ?? null,
+        },
+        select: inventorySelect,
+      });
 
-    return this.toInventoryListItem(inventory);
+      await tx.auditLog.create({
+        data: {
+          actionType: 'create',
+          entityType: 'Inventory',
+          userId,
+          storeId,
+          oldValue: Prisma.DbNull,
+          newValue: {
+            quantity: inventory.quantity,
+            reorderThreshold: inventory.reorderThreshold,
+            lastCount: inventory.lastCount,
+            productPackageId: inventory.productPackage.productPackageId,
+          },
+        },
+      });
+
+      return this.toInventoryListItem(inventory);
+    });
   }
 
+  // NOTE: Hàm này được gọi từ product-package.service.ts
   async softDeleteOneByPackageId(productPackageId: string): Promise<void> {
     await this.prisma.inventory.update({
       where: { productPackageId },
@@ -428,12 +502,30 @@ export class InventoryRepository {
     });
   }
 
-  async delete(inventoryId: string): Promise<void> {
-    // NOTE: Chỉ cập nhật trạng thái sang inactive
-    // để giữ lại toàn bộ lịch sử (soft-delete)
-    await this.prisma.inventory.update({
-      where: { inventoryId },
-      data: { activeStatus: 'inactive' },
+  async delete(
+    storeId: string,
+    inventoryId: string,
+    userId: string,
+  ): Promise<void> {
+    await this.prisma.$transaction(async (tx) => {
+      const inventory = await tx.inventory.update({
+        where: { inventoryId },
+        data: { activeStatus: 'inactive' },
+      });
+
+      await tx.auditLog.create({
+        data: {
+          actionType: 'delete',
+          entityType: 'Inventory',
+          userId,
+          storeId,
+          oldValue: { activeStatus: 'active' },
+          newValue: {
+            activeStatus: 'inactive',
+            productPackageId: inventory.productPackageId,
+          },
+        },
+      });
     });
   }
 }
