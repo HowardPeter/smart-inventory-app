@@ -285,6 +285,12 @@ class TTexts {
   static const String homeInboundShipment = "home_inbound_shipment";
   static const String homeOutboundDelivery = "home_outbound_delivery";
   static const String homeStockAdjustment = "home_stock_adjustment";
+  static const String homeScanBarcode = "home_scan_barcode";
+  static const String homeScanBarcodeSub = "home_scan_barcode_sub";
+  static const String homeAddProduct = "home_add_product";
+  static const String homeAddProductSub = "home_add_product_sub";
+  static const String homeViewReports = "home_view_reports";
+  static const String homeViewReportsSub = "home_view_reports_sub";
 
   // -- Inventory
   static const String inventoryHub = "inventory_hub";
@@ -539,9 +545,6 @@ class TTexts {
   static const String emptyTransactionTitle = "empty_transaction_title";
   static const String emptyTransactionSubtitle = "empty_transaction_subtitle";
   static const String homeQuickActions = "home_quick_actions";
-  static const String homeScanBarcode = "home_scan_barcode";
-  static const String homeAddProduct = "home_add_product";
-  static const String homeViewReports = "home_view_reports";
   static const String homeLowStockAlerts = "home_low_stock_alerts";
   static const String homeItems = "home_items";
   static const String homeOnlyLeft = "home_only_left";

@@ -1,12 +1,11 @@
 import 'package:flutter/material.dart';
-import 'package:get/get.dart';
 import 'package:frontend/core/infrastructure/constants/text_strings.dart';
+import 'package:get/get.dart';
+import 'package:iconsax_flutter/iconsax_flutter.dart'; // ĐẢM BẢO CÓ IMPORT NÀYtext_strings.dart';
 import 'package:frontend/core/ui/theme/app_colors.dart';
 import 'package:frontend/core/ui/theme/app_sizes.dart';
 import 'package:frontend/features/home/controllers/home_controller.dart';
-
-// THÊM IMPORT STORE SERVICE ĐỂ LẤY ROLE
-import 'package:frontend/core/state/services/store_service.dart';
+import 'package:frontend/core/ui/widgets/t_snackbars_widget.dart';
 
 class HomeHeaderWidget extends StatelessWidget {
   const HomeHeaderWidget({super.key});
@@ -54,54 +53,36 @@ class HomeHeaderWidget extends StatelessWidget {
           ),
           const SizedBox(width: AppSizes.p12),
 
-          // BADGE ROLE
-          Obx(() {
-            // Lấy role từ StoreService (RAM)
-            final storeService = Get.find<StoreService>();
-            final role = storeService.currentRole.value.toLowerCase();
-
-            // Phân quyền UI Manager/Staff
-            final isManager = role == 'manager';
-
-            // Lấy nội dung Tooltip từ TTexts
-            final String tooltipMessage = isManager
-                ? TTexts.homeRoleManagerTooltip.tr
-                : TTexts.homeRoleStaffTooltip.tr;
-                
-            final List<Color> gradientColors = isManager
-                ? [AppColors.primary, AppColors.secondPrimary]
-                : [const Color(0xFFFF9900), const Color(0xFFFFCC00)];
-
-            final IconData roleIcon = isManager
-                ? Icons.admin_panel_settings_rounded
-                : Icons.badge_rounded;
-
-            return Tooltip(
-              message: tooltipMessage,
-              triggerMode: TooltipTriggerMode.tap,
-              preferBelow: false,
-              child: Container(
-                width: 48,
-                height: 48,
-                decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(15),
-                  gradient: LinearGradient(
-                    begin: Alignment.topLeft,
-                    end: Alignment.bottomRight,
-                    colors: gradientColors,
+          // NÚT CHUÔNG THÔNG BÁO (THAY THẾ CHO ROLE BADGE)
+          InkWell(
+            onTap: () {
+              // TODO: Điều hướng sang Notification Center
+              TSnackbarsWidget.info(
+                  title: TTexts.info.tr, message: TTexts.featureComingSoon.tr);
+            },
+            borderRadius: BorderRadius.circular(16),
+            child: Container(
+              padding: const EdgeInsets.all(12),
+              decoration: BoxDecoration(
+                color: AppColors.surface,
+                borderRadius: BorderRadius.circular(16),
+                border: Border.all(color: AppColors.softGrey.withOpacity(0.15)),
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.black.withOpacity(0.02),
+                    blurRadius: 8,
+                    offset: const Offset(0, 4),
                   ),
-                  boxShadow: [
-                    BoxShadow(
-                      color: gradientColors[0].withOpacity(0.3),
-                      blurRadius: 10,
-                      offset: const Offset(0, 4),
-                    ),
-                  ],
-                ),
-                child: Icon(roleIcon, color: Colors.white, size: 26),
+                ],
               ),
-            );
-          }),
+              child: const Badge(
+                backgroundColor: AppColors.stockOut,
+                smallSize: 10,
+                child: Icon(Iconsax.notification_bing_copy,
+                    color: AppColors.primaryText, size: 24),
+              ),
+            ),
+          ),
         ],
       ),
     );

@@ -4,7 +4,7 @@ import 'package:frontend/core/ui/theme/app_colors.dart';
 import 'package:frontend/core/ui/theme/app_sizes.dart';
 
 class TSearchBarWidget extends StatelessWidget {
-  final String hintText; // Chuyển thành Dynamic
+  final String hintText;
   final VoidCallback onTap;
   final VoidCallback onScanTap;
 
@@ -25,7 +25,7 @@ class TSearchBarWidget extends StatelessWidget {
           borderRadius: BorderRadius.circular(AppSizes.radius12),
           boxShadow: [
             BoxShadow(
-              color: AppColors.softGrey.withOpacity(0.2),
+              color: AppColors.softGrey.withOpacity(0.15),
               blurRadius: 15,
               offset: const Offset(0, 4),
             )
@@ -33,17 +33,15 @@ class TSearchBarWidget extends StatelessWidget {
         ),
         child: Stack(
           children: [
-            // 1. LỚP NỀN: Nút Scan (Đã fix Gradient đậm đà)
+            // 1. LỚP NỀN: Nút Scan (Áp dụng Gradient Đen - Xám 0% -> 100%)
             Container(
               decoration: BoxDecoration(
-                // Đổi thành gradient đậm, không dùng secondPrimary nếu nó quá nhạt
-                gradient: LinearGradient(
-                  begin: Alignment.topLeft,
-                  end: Alignment.bottomRight,
+                gradient: const LinearGradient(
+                  begin: Alignment.topCenter,
+                  end: Alignment.bottomCenter,
                   colors: [
-                    AppColors.primary,
-                    AppColors.primary
-                        .withOpacity(0.8), // Đảm bảo màu cam đậm và rực
+                    AppColors.gradientBlackStart,
+                    AppColors.gradientBlackEnd,
                   ],
                 ),
                 borderRadius: BorderRadius.circular(AppSizes.radius12),
@@ -57,7 +55,7 @@ class TSearchBarWidget extends StatelessWidget {
                     onTap: onScanTap,
                     child: const Padding(
                       padding: EdgeInsets.symmetric(
-                          horizontal: 14.0, vertical: 15.0),
+                          horizontal: 18.0, vertical: 15.0),
                       child: Icon(Iconsax.scan_barcode_copy,
                           color: Colors.white, size: 24),
                     ),
@@ -71,7 +69,7 @@ class TSearchBarWidget extends StatelessWidget {
               left: 0,
               top: 0,
               bottom: 0,
-              right: 50,
+              right: 60, // Chừa khoảng trống rộng hơn chút cho nút Scan
               child: Container(
                 decoration: BoxDecoration(
                   color: AppColors.background,
@@ -85,7 +83,7 @@ class TSearchBarWidget extends StatelessWidget {
                     const SizedBox(width: 12),
                     Expanded(
                       child: Text(
-                        hintText, // DATA TRUYỀN VÀO ĐỘNG Ở ĐÂY
+                        hintText,
                         style: const TextStyle(
                             color: AppColors.softGrey, fontSize: 14),
                         overflow: TextOverflow.ellipsis,

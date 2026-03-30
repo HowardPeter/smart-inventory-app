@@ -44,19 +44,25 @@ class InventoryInsightShimmerWidget extends StatelessWidget {
           ),
           const SizedBox(height: AppSizes.p24),
 
-          // 3. Category Chips (Giả lập cuộn ngang)
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: AppSizes.p20),
-            child: Row(
-              children: [
-                _buildBlock(width: 80, height: 40, radius: 20),
-                const SizedBox(width: 8),
-                _buildBlock(width: 100, height: 40, radius: 20),
-                const SizedBox(width: 8),
-                _buildBlock(width: 120, height: 40, radius: 20),
-                const SizedBox(width: 8),
-                Expanded(child: _buildBlock(height: 40, radius: 20)),
-              ],
+          // 3. Category Chips (ĐÃ FIX LỖI TRÀN MÀN HÌNH 4 PIXELS)
+          SingleChildScrollView(
+            scrollDirection: Axis.horizontal,
+            physics:
+                const NeverScrollableScrollPhysics(), // Tắt cuộn vì là khung xương
+            child: Padding(
+              padding: const EdgeInsets.symmetric(horizontal: AppSizes.p20),
+              child: Row(
+                children: [
+                  _buildBlock(width: 80, height: 40, radius: 20),
+                  const SizedBox(width: 8),
+                  _buildBlock(width: 100, height: 40, radius: 20),
+                  const SizedBox(width: 8),
+                  _buildBlock(width: 120, height: 40, radius: 20),
+                  const SizedBox(width: 8),
+                  // Đổi Expanded thành fixed width vì đang nằm trong thanh cuộn ngang
+                  _buildBlock(width: 90, height: 40, radius: 20),
+                ],
+              ),
             ),
           ),
           const SizedBox(height: AppSizes.p24),
