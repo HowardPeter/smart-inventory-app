@@ -2,6 +2,8 @@ import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:frontend/core/infrastructure/utils/full_screen_loader_utils.dart';
 import 'package:frontend/core/ui/widgets/t_custom_dialog_widget.dart';
+import 'package:frontend/features/inventory/controllers/inventory_controller.dart';
+import 'package:frontend/features/inventory/controllers/inventory_insight_controller.dart';
 import 'package:frontend/features/inventory/controllers/product_catalog_controller.dart';
 import 'package:frontend/routes/app_routes.dart';
 import 'package:get/get.dart';
@@ -87,10 +89,16 @@ class CategoryDetailController extends GetxController with TErrorHandler {
 
   void goToProductDetail(ProductModel product) {
     try {
-      Get.toNamed(
-        AppRoutes.productCatalogDetail,
-        arguments: product,
-      );
+      Get.toNamed(AppRoutes.productCatalogDetail, arguments: product)
+          ?.then((_) {
+        // Hàm này sẽ tự động chạy ngầm NGAY KHI màn hình Catalog đóng lại, cap nhat data ngay lap tuc o 2 trang duoi
+        if (Get.isRegistered<InventoryController>()) {
+          Get.find<InventoryController>().fetchDashboardData(isRefresh: true);
+        }
+        if (Get.isRegistered<InventoryInsightController>()) {
+          Get.find<InventoryInsightController>().refreshData();
+        }
+      });
     } catch (e) {
       handleError(e);
     }

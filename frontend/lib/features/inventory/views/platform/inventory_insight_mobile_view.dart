@@ -4,6 +4,8 @@ import 'package:frontend/features/inventory/controllers/inventory_insight_contro
 import 'package:frontend/features/inventory/widgets/inventory_insight/inventory_insight_category_chip_widget.dart';
 import 'package:frontend/features/inventory/widgets/inventory_insight/inventory_insight_list_widget.dart';
 import 'package:frontend/features/inventory/widgets/inventory_insight/inventory_insight_overview_widget.dart';
+// Import file shimmer vừa tạo
+import 'package:frontend/features/inventory/widgets/inventory_insight/inventory_insight_shimmer_widget.dart';
 import 'package:frontend/routes/app_routes.dart';
 import 'package:get/get.dart';
 import 'package:frontend/core/ui/theme/app_colors.dart';
@@ -18,6 +20,7 @@ class InventoryInsightMobileView extends GetView<InventoryInsightController> {
 
   @override
   Widget build(BuildContext context) {
+    // Tính toán khoảng cách chừa ra cho Appbar trong suốt
     final double topOffset =
         MediaQuery.of(context).padding.top + kToolbarHeight;
 
@@ -28,72 +31,83 @@ class InventoryInsightMobileView extends GetView<InventoryInsightController> {
         title: TTexts.inventoryList.tr,
         showSearchIcon: true,
       ),
-      floatingActionButton: TExpandableFabWidget(
-        onManualAdd: () {
-          Get.toNamed(AppRoutes.productForm);
-        },
-        onScanAdd: () => Get.to(() => const TBarcodeScannerLayout()),
-      ),
+      floatingActionButton: TExpandableFabWidget(onManualAdd: () {
+        Get.toNamed(AppRoutes.productForm)?.then((_) {
+          controller.refreshData();
+        });
+      }, onScanAdd: () {
+        Get.to(() => const TBarcodeScannerLayout())?.then((_) {
+          controller.refreshData();
+        });
+      }),
       body: TRefreshIndicatorWidget(
         onRefresh: controller.refreshData,
-        edgeOffset: topOffset,
-        child: CustomScrollView(
-          controller: controller.scrollController,
-          physics: const AlwaysScrollableScrollPhysics(
-            parent: BouncingScrollPhysics(),
-          ),
-          slivers: [
-            SliverToBoxAdapter(
-              child: SizedBox(height: topOffset + 16),
+        edgeOffset: topOffset, // Đẩy icon xoay xoay xuống dưới Appbar
+        child: Obx(() {
+          // 1. NẾU ĐANG TẢI -> HIỆN KHUNG XƯƠNG SHIMMER
+          if (controller.isLoading.value) {
+            return InventoryInsightShimmerWidget(topOffset: topOffset);
+          }
+
+          // 2. NẾU CÓ DỮ LIỆU -> HIỆN VIEW GỐC
+          return CustomScrollView(
+            controller: controller.scrollController,
+            physics: const AlwaysScrollableScrollPhysics(
+              parent: BouncingScrollPhysics(),
             ),
-            SliverToBoxAdapter(
-              child: Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 20),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      TTexts.totalInventory.tr,
-                      style: const TextStyle(
-                        fontSize: 14,
-                        fontWeight: FontWeight.bold,
-                        color: AppColors.subText,
+            slivers: [
+              SliverToBoxAdapter(
+                child: SizedBox(height: topOffset + 16),
+              ),
+              SliverToBoxAdapter(
+                child: Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 20),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        TTexts.totalInventory.tr,
+                        style: const TextStyle(
+                          fontSize: 14,
+                          fontWeight: FontWeight.bold,
+                          color: AppColors.subText,
+                        ),
                       ),
-                    ),
-                    const SizedBox(height: 4),
-                    Obx(() => Text(
-                          "${controller.getCount(TTexts.tabAll)} ${TTexts.items.tr}",
-                          style: const TextStyle(
-                            fontSize: 32,
-                            fontWeight: FontWeight.bold,
-                            fontFamily: 'Poppins',
-                            color: AppColors.primaryText,
-                          ),
-                        )),
-                  ],
+                      const SizedBox(height: 4),
+                      Text(
+                        "${controller.getCount(TTexts.tabAll)} ${TTexts.items.tr}",
+                        style: const TextStyle(
+                          fontSize: 32,
+                          fontWeight: FontWeight.bold,
+                          fontFamily: 'Poppins',
+                          color: AppColors.primaryText,
+                        ),
+                      ),
+                    ],
+                  ),
                 ),
               ),
-            ),
-            const SliverToBoxAdapter(
-              child: SizedBox(height: AppSizes.p16),
-            ),
-            const SliverToBoxAdapter(
-              child: InventoryInsightOverviewWidget(),
-            ),
-            const SliverToBoxAdapter(
-              child: SizedBox(height: AppSizes.p16),
-            ),
-            const SliverToBoxAdapter(
-              child: InventoryInsightCategoryChipWidget(),
-            ),
-            const SliverToBoxAdapter(
-              child: SizedBox(height: AppSizes.p8),
-            ),
-            const SliverToBoxAdapter(
-              child: InventoryInsightListWidget(),
-            ),
-          ],
-        ),
+              const SliverToBoxAdapter(
+                child: SizedBox(height: AppSizes.p16),
+              ),
+              const SliverToBoxAdapter(
+                child: InventoryInsightOverviewWidget(),
+              ),
+              const SliverToBoxAdapter(
+                child: SizedBox(height: AppSizes.p16),
+              ),
+              const SliverToBoxAdapter(
+                child: InventoryInsightCategoryChipWidget(),
+              ),
+              const SliverToBoxAdapter(
+                child: SizedBox(height: AppSizes.p8),
+              ),
+              const SliverToBoxAdapter(
+                child: InventoryInsightListWidget(),
+              ),
+            ],
+          );
+        }),
       ),
     );
   }

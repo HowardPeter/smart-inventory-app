@@ -29,6 +29,12 @@ final Map<String, String> enInventory = {
   TTexts.items: 'items',
   TTexts.more: 'More',
 
+  TTexts.totalActiveProducts: 'Total Active Products',
+  TTexts.totalStockValue: 'Total Stock Value',
+  TTexts.inventoryHealth: 'Inventory Health',
+  TTexts.topCategories: 'Top Categories',
+  TTexts.inventoryFlow: 'Inventory Flow',
+
   // -- Inventory Insight
   TTexts.insightsOverview: 'Insights Overview',
   TTexts.actionRequired: 'Action Required',

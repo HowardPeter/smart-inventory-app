@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:frontend/core/infrastructure/utils/error_handler_utils.dart';
 import 'package:frontend/core/state/services/store_service.dart';
 import 'package:frontend/core/ui/widgets/t_snackbars_widget.dart';
+import 'package:frontend/features/inventory/controllers/inventory_controller.dart';
+import 'package:frontend/features/inventory/controllers/inventory_insight_controller.dart';
 import 'package:frontend/features/inventory/models/inventory_insight_display_model.dart';
 import 'package:frontend/features/inventory/models/inventory_history_model.dart';
 import 'package:frontend/routes/app_routes.dart';
@@ -263,10 +265,16 @@ class InventoryDetailController extends GetxController with TErrorHandler {
 
       if (product != null) {
         // Điều hướng sang trang Catalog Detail và truyền Model sản phẩm sang
-        Get.toNamed(
-          AppRoutes.productCatalogDetail,
-          arguments: product,
-        );
+        Get.toNamed(AppRoutes.productCatalogDetail, arguments: product)
+            ?.then((_) {
+          // Hàm này sẽ tự động chạy ngầm NGAY KHI màn hình Catalog đóng lại, cap nhat data ngay lap tuc o 2 trang duoi
+          if (Get.isRegistered<InventoryController>()) {
+            Get.find<InventoryController>().fetchDashboardData(isRefresh: true);
+          }
+          if (Get.isRegistered<InventoryInsightController>()) {
+            Get.find<InventoryInsightController>().refreshData();
+          }
+        });
       } else {
         // Báo lỗi nếu dữ liệu sản phẩm bị null
         TSnackbarsWidget.error(

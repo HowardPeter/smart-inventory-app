@@ -312,6 +312,11 @@ class TTexts {
   static const String totalInventory = "total_inventory";
   static const String clearFilters = "clear_filters";
   static const String emptyFilterMessage = "empty_filter_message";
+  static const String totalActiveProducts = 'total_active_products';
+  static const String totalStockValue = 'total_stock_value';
+  static const String inventoryHealth = 'inventory_health';
+  static const String topCategories = 'top_categories';
+  static const String inventoryFlow = 'inventory_flow';
 
   // -- Inventory Insight
   static const String inventoryList = "inventory_list";

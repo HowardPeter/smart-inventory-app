@@ -43,11 +43,15 @@ class InventoryController extends GetxController with TErrorHandler {
     fetchDashboardData();
   }
 
-  Future<void> fetchDashboardData() async {
+  Future<void> fetchDashboardData({bool isRefresh = false}) async {
     try {
       isLoading.value = true;
 
-      // Chạy song song 3 API để tối ưu thời gian tải
+      // Nếu là refresh, có thể delay nhẹ một chút (tùy chọn) để người dùng thấy hiệu ứng mượt hơn
+      if (isRefresh) {
+        await Future.delayed(const Duration(milliseconds: 200));
+      }
+
       final results = await Future.wait([
         _provider.getCategories(),
         _provider.getProducts(),
@@ -60,9 +64,9 @@ class InventoryController extends GetxController with TErrorHandler {
 
       _calculateDashboardInsights();
     } catch (e) {
-      // ĐÃ SỬA: SỬ DỤNG TErrorHandler ĐỂ BẬT SNACKBAR THÔNG BÁO LỖI THAY VÌ CHỈ PRINT
       handleError(e);
     } finally {
+      // Tắt loading để hiện data thật
       isLoading.value = false;
     }
   }

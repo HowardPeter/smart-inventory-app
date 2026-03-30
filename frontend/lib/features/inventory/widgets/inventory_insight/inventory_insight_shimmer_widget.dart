@@ -1,97 +1,99 @@
 import 'package:flutter/material.dart';
 import 'package:frontend/core/ui/theme/app_colors.dart';
+import 'package:frontend/core/ui/theme/app_sizes.dart';
 
-class InventoryInsightShimmerWidget extends StatefulWidget {
-  const InventoryInsightShimmerWidget({super.key});
+class InventoryInsightShimmerWidget extends StatelessWidget {
+  final double topOffset;
 
-  @override
-  State<InventoryInsightShimmerWidget> createState() =>
-      _InventoryInsightShimmerWidgetState();
-}
-
-class _InventoryInsightShimmerWidgetState
-    extends State<InventoryInsightShimmerWidget>
-    with SingleTickerProviderStateMixin {
-  late AnimationController _controller;
-
-  @override
-  void initState() {
-    super.initState();
-    _controller =
-        AnimationController(vsync: this, duration: const Duration(seconds: 1))
-          ..repeat(reverse: true);
-  }
+  const InventoryInsightShimmerWidget({super.key, required this.topOffset});
 
   @override
   Widget build(BuildContext context) {
-    return ListView.builder(
-      padding: const EdgeInsets.fromLTRB(20, 0, 20, 100),
-      shrinkWrap: true,
+    return SingleChildScrollView(
       physics: const NeverScrollableScrollPhysics(),
-      itemCount: 5, // Hiển thị 5 cục mờ mờ
-      itemBuilder: (context, index) {
-        return FadeTransition(
-          opacity: Tween<double>(begin: 0.4, end: 1.0).animate(_controller),
-          child: Container(
-            margin: const EdgeInsets.only(bottom: 16),
-            padding: const EdgeInsets.all(16),
-            decoration: BoxDecoration(
-              color: AppColors.surface,
-              borderRadius: BorderRadius.circular(20),
-              border: Border.all(color: AppColors.softGrey.withOpacity(0.1)),
-            ),
-            child: Row(
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          SizedBox(height: topOffset + 16),
+          // 1. Tổng số Item (Giả)
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: AppSizes.p20),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Container(
-                    width: 48,
-                    height: 48,
-                    decoration: BoxDecoration(
-                        color: AppColors.softGrey.withOpacity(0.2),
-                        borderRadius: BorderRadius.circular(12))),
-                const SizedBox(width: 16),
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Container(
-                          width: 150,
-                          height: 14,
-                          color: AppColors.softGrey.withOpacity(0.2)),
-                      const SizedBox(height: 8),
-                      Container(
-                          width: 100,
-                          height: 10,
-                          color: AppColors.softGrey.withOpacity(0.2)),
-                    ],
-                  ),
-                ),
-                Column(
-                  crossAxisAlignment: CrossAxisAlignment.end,
-                  children: [
-                    Container(
-                        width: 60,
-                        height: 14,
-                        color: AppColors.softGrey.withOpacity(0.2)),
-                    const SizedBox(height: 8),
-                    Container(
-                        width: 40,
-                        height: 20,
-                        decoration: BoxDecoration(
-                            color: AppColors.softGrey.withOpacity(0.2),
-                            borderRadius: BorderRadius.circular(8))),
-                  ],
-                )
+                _buildBlock(width: 120, height: 16, radius: 4),
+                const SizedBox(height: 8),
+                _buildBlock(width: 180, height: 36, radius: 8),
               ],
             ),
           ),
-        );
-      },
+          const SizedBox(height: AppSizes.p24),
+
+          // 2. Overview Cards (3 Thẻ ngang)
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: AppSizes.p20),
+            child: Row(
+              children: [
+                Expanded(child: _buildBlock(height: 110, radius: 16)),
+                const SizedBox(width: 12),
+                Expanded(child: _buildBlock(height: 110, radius: 16)),
+                const SizedBox(width: 12),
+                Expanded(child: _buildBlock(height: 110, radius: 16)),
+              ],
+            ),
+          ),
+          const SizedBox(height: AppSizes.p24),
+
+          // 3. Category Chips (Giả lập cuộn ngang)
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: AppSizes.p20),
+            child: Row(
+              children: [
+                _buildBlock(width: 80, height: 40, radius: 20),
+                const SizedBox(width: 8),
+                _buildBlock(width: 100, height: 40, radius: 20),
+                const SizedBox(width: 8),
+                _buildBlock(width: 120, height: 40, radius: 20),
+                const SizedBox(width: 8),
+                Expanded(child: _buildBlock(height: 40, radius: 20)),
+              ],
+            ),
+          ),
+          const SizedBox(height: AppSizes.p24),
+
+          // 4. Danh sách Items (Giả lập list dọc)
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: AppSizes.p20),
+            child: Column(
+              children: [
+                _buildBlock(width: double.infinity, height: 90, radius: 16),
+                const SizedBox(height: 12),
+                _buildBlock(width: double.infinity, height: 90, radius: 16),
+                const SizedBox(height: 12),
+                _buildBlock(width: double.infinity, height: 90, radius: 16),
+                const SizedBox(height: 12),
+                _buildBlock(width: double.infinity, height: 90, radius: 16),
+                const SizedBox(height: 12),
+                _buildBlock(width: double.infinity, height: 90, radius: 16),
+              ],
+            ),
+          )
+        ],
+      ),
     );
   }
 
-  @override
-  void dispose() {
-    _controller.dispose();
-    super.dispose();
+  Widget _buildBlock(
+      {double width = double.infinity,
+      required double height,
+      required double radius}) {
+    return Container(
+      width: width,
+      height: height,
+      decoration: BoxDecoration(
+        color: AppColors.divider.withOpacity(0.3), // Màu xám nhạt
+        borderRadius: BorderRadius.circular(radius),
+      ),
+    );
   }
 }
