@@ -95,7 +95,7 @@ class InventoryDetailStockStatsWidget
   Widget _buildDataView() {
     return Row(
       children: [
-        // TODO: Kết nối API lấy tổng lượng nhập/xuất trong khoảng thời gian nhất định (vd: 7 ngày qua)
+        // TODO: Kết nối API lấy tổng lượng nhập/xuất trong khoảng thời gian nhất định
         Expanded(
             child: _buildDataCard(TTexts.totalStockInTitle.tr,
                 "${controller.totalStockIn}", true)),
@@ -184,7 +184,7 @@ class InventoryDetailStockStatsWidget
                   size: Size.infinite,
                   painter: _LineChartPainter(
                     data: controller
-                        .stockMovementData, // TODO: Cung cấp API model chuẩn cho CustomPainter
+                        .stockMovementData, // TODO: Cung cấp API model chuẩn cho CustomPainter, tức là phải có Transaction để tính toán
                     colorIn: AppColors.stockIn,
                     colorOut: AppColors.alertText,
                     animationValue: value,
@@ -199,7 +199,7 @@ class InventoryDetailStockStatsWidget
           // Trục X (Các ngày trong tuần)
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            // TODO: Dịch các thứ trong tuần (Mon, Tue...) hoặc map label từ API trả về
+            // TODO: Dịch các thứ trong tuần theo trasaction
             children: controller.stockMovementData.map((d) {
               return Text(d['day'],
                   style: const TextStyle(

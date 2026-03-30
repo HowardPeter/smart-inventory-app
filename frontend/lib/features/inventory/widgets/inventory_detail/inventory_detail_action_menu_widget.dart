@@ -154,24 +154,11 @@ class _GlassmorphismDropdownMenuState extends State<_GlassmorphismDropdownMenu>
             mainAxisSize: MainAxisSize.min,
             children: [
               _buildMenuItem(
-                icon: Iconsax.edit_2_copy,
-                text: TTexts.editItem.tr,
+                icon: Iconsax.info_circle_copy,
+                text: TTexts.viewProductInfo.tr,
                 onTap: () {
                   _closeMenu();
-                  controller.handleMenuAction(TTexts.editItem);
-                },
-              ),
-              Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 12),
-                child: Divider(height: 1, color: Colors.white.withOpacity(0.2)),
-              ),
-              _buildMenuItem(
-                icon: Iconsax.trash_copy,
-                text: TTexts.deleteItem.tr,
-                color: AppColors.alertText,
-                onTap: () {
-                  _closeMenu();
-                  controller.handleMenuAction(TTexts.deleteItem);
+                  controller.handleMenuAction(TTexts.viewProductInfo);
                 },
               ),
             ],

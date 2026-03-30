@@ -151,12 +151,12 @@ class _GlassmorphismDropdownMenuState extends State<_GlassmorphismDropdownMenu>
             mainAxisSize: MainAxisSize.min,
             children: [
               // Nút sửa sản phẩm
-              _buildMenuItem(
+             _buildMenuItem(
                 icon: Iconsax.edit_2_copy,
-                text: TTexts.editProduct.tr, // ĐÃ SỬA
+                text: TTexts.editProduct.tr,
                 onTap: () {
                   _closeMenu();
-                  controller.editProduct();
+                  controller.editProductInfo(); // ĐÃ ĐỔI TÊN HÀM
                 },
               ),
               Padding(

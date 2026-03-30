@@ -4,6 +4,7 @@ import 'package:frontend/features/inventory/controllers/inventory_insight_contro
 import 'package:frontend/features/inventory/widgets/inventory_insight/inventory_insight_category_chip_widget.dart';
 import 'package:frontend/features/inventory/widgets/inventory_insight/inventory_insight_list_widget.dart';
 import 'package:frontend/features/inventory/widgets/inventory_insight/inventory_insight_overview_widget.dart';
+import 'package:frontend/routes/app_routes.dart';
 import 'package:get/get.dart';
 import 'package:frontend/core/ui/theme/app_colors.dart';
 import 'package:frontend/core/infrastructure/constants/text_strings.dart';
@@ -28,7 +29,9 @@ class InventoryInsightMobileView extends GetView<InventoryInsightController> {
         showSearchIcon: true,
       ),
       floatingActionButton: TExpandableFabWidget(
-        onManualAdd: () {},
+        onManualAdd: () {
+          Get.toNamed(AppRoutes.productForm);
+        },
         onScanAdd: () => Get.to(() => const TBarcodeScannerLayout()),
       ),
       body: TRefreshIndicatorWidget(

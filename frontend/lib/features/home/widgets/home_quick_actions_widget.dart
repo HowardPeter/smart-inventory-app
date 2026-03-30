@@ -115,7 +115,7 @@ class HomeQuickActionsWidget extends StatelessWidget {
                                         ),
                                         onPressed: () {
                                           Get.back();
-                                          // TODO: Chuyển sang màn hình Chi tiết sản phẩm
+                                          // TODO: Chuyển sang màn hình Chi tiết sản phẩm, tức là quét xong chuyển sang màn hình chi tiết sản phẩm
                                         },
                                         child: const Text(
                                           'Tìm kiếm sản phẩm',

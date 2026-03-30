@@ -15,8 +15,6 @@ class ProductCatalogDetailHeaderWidget
 
   @override
   Widget build(BuildContext context) {
-    final product = controller.product;
-
     return SliverAppBar(
       expandedHeight: 280.0,
       pinned: true,
@@ -30,12 +28,11 @@ class ProductCatalogDetailHeaderWidget
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             Icon(Iconsax.arrow_left_2_copy,
-                color: AppColors.primaryText, size: 20),
+                color: AppColors.primaryText, size: 20)
           ],
         ),
       ),
       actions: const [
-        // Gắn Action Menu Glassmorphism mới tạo vào đây
         ProductCatalogDetailActionMenuWidget(),
         SizedBox(width: AppSizes.p12),
       ],
@@ -47,27 +44,66 @@ class ProductCatalogDetailHeaderWidget
               padding: EdgeInsets.only(
                   top: MediaQuery.of(context).padding.top + kToolbarHeight,
                   bottom: AppSizes.p24),
-              child: Hero(
-                tag: 'hero_image_catalog_${product.productId}',
-                child: product.imageUrl != null && product.imageUrl!.isNotEmpty
-                    ? CachedNetworkImage(
-                        imageUrl: product.imageUrl!,
-                        fit: BoxFit.contain,
-                        placeholder: (context, url) => const Center(
-                          child: SizedBox(
-                            width: 24,
-                            height: 24,
-                            child: CircularProgressIndicator(
-                                strokeWidth: 2, color: AppColors.primary),
+              // ĐÃ BỌC BẰNG OBX ĐỂ ĐỔI ẢNH TỨC THÌ
+              child: Obx(() {
+                final imageUrl = controller.rxImageUrl.value;
+                return Stack(
+                  alignment: Alignment.center,
+                  children: [
+                    Hero(
+                      tag: 'hero_image_catalog_${controller.product.productId}',
+                      child: imageUrl.isNotEmpty
+                          ? CachedNetworkImage(
+                              imageUrl: imageUrl,
+                              fit: BoxFit.contain,
+                              placeholder: (context, url) => const Center(
+                                child: SizedBox(
+                                  width: 24,
+                                  height: 24,
+                                  child: CircularProgressIndicator(
+                                      strokeWidth: 2, color: AppColors.primary),
+                                ),
+                              ),
+                              errorWidget: (context, url, error) =>
+                                  const TNoImageWidget(
+                                      iconSize: 64, borderRadius: 0),
+                            )
+                          : const TNoImageWidget(iconSize: 64, borderRadius: 0),
+                    ),
+                    if (controller.canManageProduct)
+                      Positioned(
+                        bottom: 0,
+                        right: 24,
+                        child: GestureDetector(
+                          onTap: () => controller.editProductImage(),
+                          child: Container(
+                            padding: const EdgeInsets.all(10),
+                            decoration: BoxDecoration(
+                              shape: BoxShape.circle,
+                              gradient: const LinearGradient(
+                                colors: [
+                                  AppColors.primary,
+                                  AppColors.secondPrimary
+                                ],
+                                begin: Alignment.topLeft,
+                                end: Alignment.bottomRight,
+                              ),
+                              border: Border.all(color: Colors.white, width: 3),
+                              boxShadow: [
+                                BoxShadow(
+                                    color: AppColors.primary.withOpacity(0.4),
+                                    blurRadius: 10,
+                                    offset: const Offset(0, 4))
+                              ],
+                            ),
+                            child: const Icon(Iconsax.camera_copy,
+                                color: Colors.white, size: 20),
                           ),
                         ),
-                        errorWidget: (context, url, error) {
-                          return const TNoImageWidget(
-                              iconSize: 64, borderRadius: 0);
-                        },
-                      )
-                    : const TNoImageWidget(iconSize: 64, borderRadius: 0),
-              ),
+                      ),
+                  ],
+                );
+              }),
             ),
           ),
         ),

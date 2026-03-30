@@ -4,6 +4,7 @@ import 'package:frontend/core/state/services/store_service.dart';
 import 'package:frontend/core/ui/widgets/t_snackbars_widget.dart';
 import 'package:frontend/features/inventory/models/inventory_insight_display_model.dart';
 import 'package:frontend/features/inventory/models/inventory_history_model.dart';
+import 'package:frontend/routes/app_routes.dart';
 import 'package:get/get.dart';
 import 'package:frontend/core/ui/theme/app_colors.dart';
 import 'package:frontend/core/infrastructure/constants/text_strings.dart';
@@ -255,15 +256,28 @@ class InventoryDetailController extends GetxController with TErrorHandler {
             note: TTexts.latestInventoryCount.tr),
       ];
 
-  void handleMenuAction(String value) {
-    if (value == TTexts.adjustStock || value == TTexts.editItem) {
-      TSnackbarsWidget.info(
-          title: TTexts.info.tr, message: TTexts.featureComingSoon.tr);
+  void handleMenuAction(String actionKey) {
+    if (actionKey == TTexts.viewProductInfo) {
+      // Lấy dữ liệu product từ item đang hiển thị trên màn hình
+      final product = currentDisplayItem.value?.product;
+
+      if (product != null) {
+        // Điều hướng sang trang Catalog Detail và truyền Model sản phẩm sang
+        Get.toNamed(
+          AppRoutes.productCatalogDetail,
+          arguments: product,
+        );
+      } else {
+        // Báo lỗi nếu dữ liệu sản phẩm bị null
+        TSnackbarsWidget.error(
+          title: TTexts.errorTitle.tr,
+          message: TTexts.productDataMissing.tr,
+        );
+      }
     }
-    if (value == TTexts.deleteItem) _showDeleteConfirmDialog();
   }
 
-  // TODO: Doi data that cho bieu do
+  // TODO: Doi data that cho bieu do, can Transaction
   List<Map<String, dynamic>> get stockMovementData => [
         {'day': 'Mon', 'in': 120, 'out': 45},
         {'day': 'Tue', 'in': 80, 'out': 60},
@@ -273,38 +287,4 @@ class InventoryDetailController extends GetxController with TErrorHandler {
         {'day': 'Sat', 'in': 60, 'out': 20},
         {'day': 'Sun', 'in': 40, 'out': 10},
       ];
-
-  void _showDeleteConfirmDialog() {
-    Get.dialog(
-      AlertDialog(
-        backgroundColor: AppColors.background,
-        title: Text(TTexts.deleteConfirmation.tr),
-        content: Text(TTexts.confirmDeleteText.tr),
-        actions: [
-          TextButton(
-              onPressed: () => Get.back(),
-              child: Text(TTexts.cancel.tr,
-                  style: const TextStyle(color: AppColors.softGrey))),
-          TextButton(
-              onPressed: () async {
-                Get.back();
-                await _performDeleteItem();
-              },
-              child: Text(TTexts.delete.tr,
-                  style: const TextStyle(color: AppColors.alertText))),
-        ],
-      ),
-    );
-  }
-
-  Future<void> _performDeleteItem() async {
-    try {
-      Get.back();
-      TSnackbarsWidget.success(
-          title: TTexts.itemDeletedSuccess.tr,
-          message: TTexts.itemDeletedMessage.tr);
-    } catch (e) {
-      handleError(e);
-    }
-  }
 }

@@ -1,7 +1,7 @@
 import 'dart:io';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_dotenv/flutter_dotenv.dart';
+// import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:frontend/core/infrastructure/constants/app_constants.dart';
 import 'package:frontend/core/infrastructure/localization/app_translations.dart';
 import 'package:frontend/core/state/bindings/initial_binding.dart';
@@ -23,11 +23,11 @@ void main() async {
 
   HttpOverrides.global = MyHttpOverrides();
 
-  try {
-    await dotenv.load(fileName: ".env");
-  } catch (e) {
-    debugPrint("⚠️ .env not found, using default values");
-  }
+  // try {
+  //   await dotenv.load(fileName: ".env");
+  // } catch (e) {
+  //   debugPrint("⚠️ .env not found, using default values");
+  // }
   // ---------------------------------------------------------
   // KHỞI TẠO CÁC DỊCH VỤ TOÀN CẦU (GLOBAL SERVICES) Ở ĐÂY
 

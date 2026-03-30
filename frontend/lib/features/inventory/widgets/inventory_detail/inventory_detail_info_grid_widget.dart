@@ -25,14 +25,14 @@ class InventoryDetailInfoGridWidget extends GetView<InventoryDetailController> {
                     TTexts.thresholdTitle.tr,
                     controller.threshold > 0
                         ? "${controller.threshold} ${TTexts.items.tr}"
-                        : TTexts.noLimit.tr)), 
+                        : TTexts.noLimit.tr)),
           ],
         ),
         const SizedBox(height: AppSizes.p12),
         // Dòng 2: Giao diện Stand Out với Vibe Nhập/Xuất rõ ràng
         Row(
           children: [
-            // TODO: Kết nối API để lấy chính xác tổng số lượng đã nhập/xuất
+            // TODO: Kết nối API để lấy chính xác tổng số lượng đã nhập/xuất, càna Transaction
             Expanded(
                 child: _buildHighlightGridItem(TTexts.totalStockInTitle.tr,
                     "${controller.totalStockIn} ${TTexts.items.tr}",

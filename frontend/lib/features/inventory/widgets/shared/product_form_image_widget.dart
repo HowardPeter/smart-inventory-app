@@ -1,4 +1,5 @@
 import 'dart:io';
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:image_picker/image_picker.dart';
@@ -20,7 +21,20 @@ class ProductFormImageWidget extends GetView<ProductFormController> {
         Center(
           child: Obx(() {
             final image = controller.selectedImage.value;
+            final existingUrl = controller.existingImageUrl.value;
             final isLoading = controller.isPickingImage.value;
+
+            // XÁC ĐỊNH NGUỒN ẢNH ĐỂ HIỂN THỊ
+            ImageProvider? imageProvider;
+            if (image != null) {
+              imageProvider =
+                  FileImage(File(image.path)); // Ưu tiên ảnh mới chụp
+            } else if (existingUrl.isNotEmpty) {
+              imageProvider = CachedNetworkImageProvider(
+                  existingUrl); // Không có ảnh mới thì load ảnh cũ
+            }
+
+            final bool hasImage = imageProvider != null;
 
             return Stack(
               children: [
@@ -36,13 +50,14 @@ class ProductFormImageWidget extends GetView<ProductFormController> {
                       border: Border.all(
                           color: AppColors.softGrey.withOpacity(0.3),
                           width: 1.5),
-                      image: image != null
+                      // HIỂN THỊ ẢNH NẾU CÓ
+                      image: hasImage
                           ? DecorationImage(
-                              image: FileImage(File(image.path)),
-                              fit: BoxFit.cover)
+                              image: imageProvider, fit: BoxFit.cover)
                           : null,
                     ),
-                    child: image == null
+                    // NẾU TRỐNG THÌ HIỆN CHỮ UPLOAD
+                    child: !hasImage
                         ? Column(
                             mainAxisAlignment: MainAxisAlignment.center,
                             children: [
@@ -66,18 +81,16 @@ class ProductFormImageWidget extends GetView<ProductFormController> {
                   ),
                 ),
 
-                // NÚT THÙNG RÁC HIỆN ĐẠI (GÓC DƯỚI BÊN PHẢI)
-                if (image != null && !isLoading)
+                // NÚT THÙNG RÁC
+                if (hasImage && !isLoading)
                   Positioned(
                     bottom: 12,
                     right: 12,
                     child: GestureDetector(
-                      onTap: () =>
-                          controller.selectedImage.value = null, // Xóa ảnh
+                      onTap: () => controller.removeSelectedImage(),
                       child: Container(
                         padding: const EdgeInsets.all(10),
                         decoration: BoxDecoration(
-                          // Nền đen mờ 60% tạo cảm giác sang trọng, nổi bật trên mọi nền ảnh
                           color: Colors.black.withOpacity(0.6),
                           shape: BoxShape.circle,
                           border: Border.all(

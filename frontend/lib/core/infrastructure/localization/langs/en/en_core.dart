@@ -21,6 +21,7 @@ final Map<String, String> enCore = {
   TTexts.errorTooManyRequestsMessage:
       'You have requested too many times. Please wait a moment before trying again.',
   TTexts.exit: 'Exit',
+  TTexts.done: 'Done',
   TTexts.errorServerTitle: 'Server Error',
   TTexts.errorServerMessage:
       'Our servers are currently facing an issue. Please try again later.',

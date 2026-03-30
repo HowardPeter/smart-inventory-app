@@ -93,6 +93,8 @@ final Map<String, String> enInventory = {
   TTexts.restockFromSupplier: 'Restock from Supplier',
   TTexts.salesOrder: 'Sales Order #1023',
   TTexts.loadingProduct: 'Loading product details...',
+  TTexts.viewProductInfo: 'View Product Info',
+  TTexts.productDataMissing: 'Product data is missing',
 
   // -- Product Catalog & Categories ---
   TTexts.categoryCatalog: 'Product Catalog',
@@ -214,6 +216,45 @@ final Map<String, String> enInventory = {
   TTexts.cropImage: 'Edit Photo',
   TTexts.reorderThresholdLabel: 'Low Stock Alert At',
   TTexts.reorderThresholdHint: 'e.g. 5',
+
+  // -- Edit Product
+  TTexts.editProductImageTitle: 'Edit Product Image',
+  TTexts.editProductImageSub: 'Update the main photo for this product.',
+  TTexts.editPackageTitle: 'Edit Package',
+  TTexts.editPackageSub:
+      'Update pricing, barcode, and threshold for this package.',
+  TTexts.addPackageTitle: 'Add New Package',
+  TTexts.addPackageSub: 'Create a new variant or unit for this product.',
+  TTexts.saveChanges: 'Save Changes',
+  TTexts.saveImage: 'Save Image',
+  TTexts.savePackage: 'Save Package',
+  TTexts.deletePackage: 'Delete Package',
+  TTexts.addPackageBtn: 'Add Package',
+  TTexts.imageUpdatedSuccess: 'Product image updated successfully.',
+  TTexts.packageUpdatedSuccess: 'Package updated successfully.',
+  TTexts.packageCreatedSuccess: 'New package created successfully.',
+  TTexts.deletingProduct: 'Deleting product...',
+  TTexts.productDeletedSuccess: 'Product has been moved to trash.',
+  TTexts.deletingPackage: 'Deleting package...',
+  TTexts.packageDeletedSuccess: 'Package has been moved to trash.',
+  TTexts.productNotEmptyError:
+      'Cannot delete product. Please delete or empty all packages first.',
+  TTexts.confirmMoveProductToTrash:
+      'Are you sure you want to move this product to trash?',
+  TTexts.confirmMovePackageToTrash:
+      'Are you sure you want to move this package to trash?',
+  TTexts.inventoryNotEmptyTitle: 'Inventory Not Empty',
+  TTexts.inventoryNotEmptyMessage:
+      'You cannot delete this package because there is still stock in the inventory. Please check out the remaining items first.',
+  TTexts.makeTransaction: 'Make Transaction',
+  TTexts.confirmDeletePackageMessage:
+      'Are you sure you want to delete this package? This will mark it as inactive in your system.',
+  TTexts.currentStockWithCount: 'Current stock: @count',
+  TTexts.importPriceLabel: 'Import Price',
+  TTexts.sellingPriceLabel: 'Selling Price',
+  TTexts.stockQuantityLabel: 'Stock',
+  TTexts.inventoryThreshold: 'Threshold',
+  TTexts.sellingPrice: 'Sale Price',
 
   // -- Empty States
   TTexts.noDataAvailable: 'No data available',
