@@ -22,6 +22,13 @@ searchRouter.get(
 );
 
 searchRouter.get(
+  '/product-packages',
+  requirePermission(PERMISSION.PRODUCT_READ),
+  validateGetProductsByKeyword,
+  asyncWrapper(searchController.getProductPackagesbyKeyword),
+);
+
+searchRouter.get(
   '/products/prefix',
   requirePermission(PERMISSION.PRODUCT_READ),
   validateGetProductsByPrefix,

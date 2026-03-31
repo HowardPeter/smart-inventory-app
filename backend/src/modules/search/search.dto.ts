@@ -18,7 +18,7 @@ export type SearchByPrefixQueryDto = {
   limit?: number;
 };
 
-export type SearchProductItemDto = {
+export type SearchProductPackageItemDto = {
   productId: string;
   productName: string;
   imageUrl: string | null;
@@ -45,8 +45,8 @@ export type SearchProductItemDto = {
 // đại diện cho kết quả trả về từ Prisma
 // nên importPrice, sellingPrice cần để Prisma.Decimal
 // vì $queryRaw trả về raw result, không tự map kiểu như findMany(),...
-export type SearchProductRow = Omit<
-  SearchProductItemDto,
+export type SearchProductPackageRow = Omit<
+  SearchProductPackageItemDto,
   'importPrice' | 'sellingPrice'
 > & {
   importPrice: Prisma.Decimal | null;
@@ -58,7 +58,29 @@ export type SearchCountRow = {
   total: bigint;
 };
 
-export type ListSearchByKeywordResponseDto =
+export type SearchProductItemDto = {
+  productId: string;
+  productName: string;
+  imageUrl: string | null;
+  brand: string | null;
+  categoryId: string;
+  categoryName: string;
+};
+
+export type SearchProductRow = {
+  productId: string;
+  productName: string;
+  imageUrl: string | null;
+  brand: string | null;
+  categoryId: string;
+  categoryName: string;
+  rank?: number;
+};
+
+export type ListProductPackageByKeywordResponseDto =
+  PaginationResponseDto<SearchProductPackageItemDto>;
+
+export type ListProductByKeywordResponseDto =
   PaginationResponseDto<SearchProductItemDto>;
 
 export type SearchProductPrefixResponseDto = Pick<

@@ -8,7 +8,8 @@ import {
 
 import type {
   SearchByKeywordQueryDto,
-  ListSearchByKeywordResponseDto,
+  ListProductByKeywordResponseDto,
+  ListProductPackageByKeywordResponseDto,
   SearchByPrefixQueryDto,
   SearchProductPrefixResponseDto,
 } from './search.dto.js';
@@ -18,16 +19,32 @@ import type { Request, Response } from 'express';
 export class SearchController {
   constructor(private readonly searchService: SearchService) {}
 
-  getProductsbyKeyword = async (
+  getProductPackagesbyKeyword = async (
     req: Request,
-    res: Response<ApiResponse<ListSearchByKeywordResponseDto>>,
+    res: Response<ApiResponse<ListProductPackageByKeywordResponseDto>>,
   ): Promise<void> => {
     const storeId = requireReqStoreContext(req).storeId;
 
-    const searchedProducts = await this.searchService.searchProductsByKeyword(
-      storeId,
-      res.locals.validatedQuery as unknown as SearchByKeywordQueryDto,
-    );
+    const searchedProducts =
+      await this.searchService.searchProductPackagesByKeyword(
+        storeId,
+        res.locals.validatedQuery as unknown as SearchByKeywordQueryDto,
+      );
+
+    sendResponse.success(res, searchedProducts, { status: StatusCodes.OK });
+  };
+
+  getProductsbyKeyword = async (
+    req: Request,
+    res: Response<ApiResponse<ListProductByKeywordResponseDto>>,
+  ): Promise<void> => {
+    const storeId = requireReqStoreContext(req).storeId;
+
+    const searchedProducts =
+      await this.searchService.searchProductsByKeyword(
+        storeId,
+        res.locals.validatedQuery as unknown as SearchByKeywordQueryDto,
+      );
 
     sendResponse.success(res, searchedProducts, { status: StatusCodes.OK });
   };
