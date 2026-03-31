@@ -1,199 +1,158 @@
 import 'package:flutter/material.dart';
 import 'package:frontend/core/ui/layouts/t_barcode_scanner_layout.dart';
+import 'package:frontend/routes/app_routes.dart';
 import 'package:get/get.dart';
+import 'package:iconsax_flutter/iconsax_flutter.dart';
 import 'package:frontend/core/infrastructure/constants/text_strings.dart';
 import 'package:frontend/core/ui/theme/app_colors.dart';
 import 'package:frontend/core/ui/theme/app_sizes.dart';
+import 'package:frontend/core/state/services/store_service.dart';
 
 class HomeQuickActionsWidget extends StatelessWidget {
   const HomeQuickActionsWidget({super.key});
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      padding: const EdgeInsets.all(AppSizes.p16),
-      decoration: BoxDecoration(
-        color: AppColors.background,
-        borderRadius: BorderRadius.circular(AppSizes.radius16),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withOpacity(0.03),
-            blurRadius: 10,
-            offset: const Offset(0, 4),
-          ),
-        ],
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          // Tiêu đề sử dụng TTexts
-          Text(
-            TTexts.homeQuickActions.tr,
-            style: const TextStyle(
-              fontFamily: 'Poppins',
-              fontSize: 18,
-              fontWeight: FontWeight.bold,
-              color: AppColors.primaryText,
-            ),
-          ),
-          const SizedBox(height: AppSizes.p12),
+    final storeService = Get.find<StoreService>();
+    final isManager = storeService.currentRole.value.toLowerCase() != 'staff';
 
-          // Danh sách cuộn ngang
-          SingleChildScrollView(
-            scrollDirection: Axis.horizontal,
-            physics: const BouncingScrollPhysics(),
-            child: Row(
-              children: [
-                _buildActionChip(
-                  icon: Icons.qr_code_scanner_rounded,
-                  label: TTexts.homeScanBarcode.tr,
-                  color: Colors.blue,
-                  bgColor: AppColors.toastInfoBg,
-                  onTap: () {
-                    // MỞ MÀN HÌNH QUÉT MÃ VẠCH KHI BẤM NÚT NÀY
-                    Get.to(() => TBarcodeScannerLayout(
-                          title: TTexts.homeScanBarcode.tr,
-                          onScanned: (code) {
-                            // Tạm thời tắt màn hình quét và hiển thị BottomSheet chứa mã
-                            Get.back(); // Đóng camera
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          TTexts.homeQuickActions.tr,
+          style: const TextStyle(
+            fontFamily: 'Poppins',
+            fontSize: 20,
+            fontWeight: FontWeight.bold,
+            color: AppColors.primaryText,
+          ),
+        ),
+        const SizedBox(height: AppSizes.p16),
+        SingleChildScrollView(
+          scrollDirection: Axis.horizontal,
+          physics: const BouncingScrollPhysics(),
+          clipBehavior: Clip.none,
+          child: Row(
+            children: [
+              // 1. THẺ SCAN
+              _buildPremiumCard(
+                icon: Iconsax.scan_barcode_copy,
+                title: TTexts
+                    .homeScanBarcode.tr, // 🟢 Đã đổi sang biến đa ngôn ngữ
+                subtitle: TTexts
+                    .homeScanBarcodeSub.tr, // 🟢 Đã đổi sang biến đa ngôn ngữ
+                gradient: const LinearGradient(
+                  begin: Alignment.topLeft,
+                  end: Alignment.bottomRight,
+                  colors: [Color(0xFF4A4A4A), Color(0xFF1E1E24)],
+                ),
+                onTap: () {
+                  Get.to(() => TBarcodeScannerLayout(
+                        title: TTexts.homeScanBarcode.tr,
+                        onScanned: (code) {
+                          Get.back();
+                        },
+                      ));
+                },
+              ),
 
-                            Get.bottomSheet(
-                              Container(
-                                padding: const EdgeInsets.all(24),
-                                decoration: const BoxDecoration(
-                                  color: Colors.white,
-                                  borderRadius: BorderRadius.vertical(
-                                    top: Radius.circular(AppSizes.radius24),
-                                  ),
-                                ),
-                                child: Column(
-                                  mainAxisSize: MainAxisSize.min,
-                                  children: [
-                                    Container(
-                                      width: 40,
-                                      height: 4,
-                                      decoration: BoxDecoration(
-                                        color: Colors.grey.shade300,
-                                        borderRadius: BorderRadius.circular(2),
-                                      ),
-                                    ),
-                                    const SizedBox(height: 20),
-                                    const Icon(Icons.qr_code_2_rounded,
-                                        size: 60, color: Colors.blue),
-                                    const SizedBox(height: 16),
-                                    const Text(
-                                      'Mã vạch quét được',
-                                      style: TextStyle(
-                                        fontFamily: 'Poppins',
-                                        fontSize: 14,
-                                        color: AppColors.subText,
-                                      ),
-                                    ),
-                                    const SizedBox(height: 4),
-                                    Text(
-                                      code,
-                                      style: const TextStyle(
-                                        fontFamily: 'Poppins',
-                                        fontSize: 20,
-                                        fontWeight: FontWeight.bold,
-                                        color: AppColors.primaryText,
-                                      ),
-                                    ),
-                                    const SizedBox(height: 24),
-                                    SizedBox(
-                                      width: double.infinity,
-                                      child: ElevatedButton(
-                                        style: ElevatedButton.styleFrom(
-                                          backgroundColor: Colors.blue,
-                                          padding: const EdgeInsets.symmetric(
-                                              vertical: 14),
-                                          shape: RoundedRectangleBorder(
-                                            borderRadius:
-                                                BorderRadius.circular(12),
-                                          ),
-                                        ),
-                                        onPressed: () {
-                                          Get.back();
-                                          // TODO: Chuyển sang màn hình Chi tiết sản phẩm
-                                        },
-                                        child: const Text(
-                                          'Tìm kiếm sản phẩm',
-                                          style: TextStyle(
-                                            fontFamily: 'Poppins',
-                                            fontWeight: FontWeight.bold,
-                                            color: Colors.white,
-                                          ),
-                                        ),
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                              ),
-                            );
-                          },
-                        ));
-                  },
-                ),
-                const SizedBox(width: AppSizes.p12),
-                _buildActionChip(
-                  icon: Icons.add_box_rounded,
-                  label: TTexts.homeAddProduct.tr,
-                  color: AppColors.primary,
-                  bgColor: AppColors.toastWarningBg,
-                  onTap: () {
-                    // TODO: Chuyển sang màn hình thêm sản phẩm
-                  },
-                ),
-                const SizedBox(width: AppSizes.p12),
-                _buildActionChip(
-                  icon: Icons.bar_chart_rounded,
-                  label: TTexts.homeViewReports.tr,
-                  color: Colors.purple,
-                  bgColor: const Color(0xFFF3E8FF),
-                  onTap: () {
-                    // TODO: Chuyển sang màn hình báo cáo
-                  },
+              // 2. THẺ ADD PRODUCT
+              if (isManager) ...[
+                const SizedBox(width: AppSizes.p16),
+                _buildPremiumCard(
+                  icon: Iconsax.box_1_copy,
+                  title: TTexts.homeAddProduct.tr, // 🟢
+                  subtitle: TTexts.homeAddProductSub.tr, // 🟢
+                  gradient: const LinearGradient(
+                    begin: Alignment.topLeft,
+                    end: Alignment.bottomRight,
+                    colors: [Color(0xFF222222), Color(0xFF000000)],
+                  ),
+                  onTap: () => Get.toNamed(AppRoutes.productForm),
                 ),
               ],
-            ),
+
+              // 3. THẺ VIEW REPORTS
+              const SizedBox(width: AppSizes.p16),
+              _buildPremiumCard(
+                icon: Iconsax.chart_square_copy,
+                title: TTexts.homeViewReports.tr, // 🟢
+                subtitle: TTexts.homeViewReportsSub.tr, // 🟢
+                gradient: const LinearGradient(
+                  begin: Alignment.topLeft,
+                  end: Alignment.bottomRight,
+                  colors: [Color(0xFF7B61FF), Color(0xFF5835E5)],
+                ),
+                onTap: () {
+                  // TODO: Chuyển sang màn hình báo cáo
+                },
+              ),
+
+              const SizedBox(width: AppSizes.p16),
+            ],
           ),
-        ],
-      ),
+        ),
+      ],
     );
   }
 
-  Widget _buildActionChip({
+  Widget _buildPremiumCard({
     required IconData icon,
-    required String label,
-    required Color color,
-    required Color bgColor,
+    required String title,
+    required String subtitle,
+    required Gradient gradient,
     required VoidCallback onTap,
   }) {
     return InkWell(
       onTap: onTap,
-      borderRadius: BorderRadius.circular(AppSizes.radius24),
+      borderRadius: BorderRadius.circular(24),
       child: Container(
-        padding: const EdgeInsets.symmetric(
-          horizontal: AppSizes.p16,
-          vertical: AppSizes.p12,
-        ),
+        width: 135,
+        height: 185,
+        padding: const EdgeInsets.all(18),
         decoration: BoxDecoration(
-          color: bgColor,
-          borderRadius: BorderRadius.circular(AppSizes.radius24),
-          border: Border.all(color: color, width: 1.5),
+          gradient: gradient,
+          borderRadius: BorderRadius.circular(24),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withOpacity(0.12),
+              blurRadius: 15,
+              offset: const Offset(0, 8),
+            ),
+          ],
         ),
-        child: Row(
-          mainAxisSize: MainAxisSize.min,
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Icon(icon, color: color, size: AppSizes.iconMd),
-            const SizedBox(width: AppSizes.p8),
+            Container(
+              padding: const EdgeInsets.all(10),
+              decoration: BoxDecoration(
+                color: Colors.white.withOpacity(0.12),
+                borderRadius: BorderRadius.circular(14),
+              ),
+              child: Icon(icon, color: Colors.white, size: 26),
+            ),
+            const Spacer(),
             Text(
-              label,
+              title,
+              style: const TextStyle(
+                fontFamily: 'Poppins',
+                color: Colors.white,
+                fontWeight: FontWeight.bold,
+                fontSize: 17,
+                height: 1.1,
+              ),
+            ),
+            const SizedBox(height: 6),
+            Text(
+              subtitle,
               style: TextStyle(
                 fontFamily: 'Poppins',
-                color: color,
-                fontWeight: FontWeight.w600,
-                fontSize: 14,
+                color: Colors.white.withOpacity(0.65),
+                fontSize: 11,
+                fontWeight: FontWeight.w400,
+                height: 1.3,
               ),
             ),
           ],

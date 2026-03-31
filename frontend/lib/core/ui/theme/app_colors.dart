@@ -20,10 +20,13 @@ class AppColors {
   static const Color whiteText = Color(0xFFFFFFFF);
 
   // ==========================================
-  // THÊM MỚI: Màu Trạng thái & Gradient Dự án
+  // Màu Trạng thái & Gradient Dự án
   // ==========================================
   static const Color gradientOrangeStart = Color(0xFFFF8A00); // 0%
   static const Color gradientOrangeEnd = Color(0xFFFFB057); // 100%
+
+  static const Color gradientBlackStart = Color(0xFF000000); // 0%
+  static const Color gradientBlackEnd = Color(0xFF666666); // 100%
 
   // Trạng thái (Nhập/Xuất, Lời/Lỗ)
   static const Color stockIn = Color(0xFF48CA93); // Xanh lá
@@ -56,4 +59,7 @@ class AppColors {
   // Error (E88B76 -> CA5048)
   static const Color toastErrorGradientStart = Color(0xFFE88B76);
   static const Color toastErrorGradientEnd = Color(0xFFCA5048);
+
+  static const Color alertBg = Color(0xFFFEF2F2); // Nền đỏ siêu nhạt
+  static const Color alertText = Color(0xFFE02424); // Đỏ gắt mạnh mẽ
 }

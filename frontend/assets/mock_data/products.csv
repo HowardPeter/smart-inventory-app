@@ -1,30 +1,73 @@
 product_id,name,image_url,created_at,updated_at,brand,store_id,category_id,active_status
-prod_101,Wireless Mouse,https://example.com/mouse.jpg,2026-03-24 08:30:00,2026-03-24 08:30:00,Logitech,store_1,cat_1,active
-prod_102,Mechanical Keyboard,https://example.com/keyboard.jpg,2026-03-24 09:15:00,2026-03-24 09:15:00,Keychron,store_1,cat_1,active
-prod_103,Gaming Headset,https://example.com/headset.jpg,2026-03-24 09:20:00,2026-03-24 09:20:00,Razer,store_1,cat_1,active
-prod_104,USB-C Hub,,2026-03-24 09:25:00,2026-03-24 09:25:00,Anker,store_1,cat_1,inactive
+11111111-1111-4111-a111-111111120001,Sony Bravia 55 Inch TV,https://cdn.mediamart.vn/images/product/smart-tivi-4k-sony-kd-55x75k-55-inch-google-tv_1494a379.webp,2026-03-26 10:00:00,2026-03-26 10:00:00,Sony,store_1,77777777-7777-4777-a777-777777777701,active
+11111111-1111-4111-a111-111111120002,MacBook Air M2,https://pos.nvncdn.com/a135ac-81120/ps/20221201_HNdi80NLF7IvJX0Ss2nQv3LG.png?v=1673516347,2026-03-26 10:00:00,2026-03-26 10:00:00,Apple,store_1,77777777-7777-4777-a777-777777777701,active
+11111111-1111-4111-a111-111111120003,Asus ROG Strix G15,https://product.hstatic.net/1000287389/product/h732__6__8bf1ab5c461a4caf97ac74a738911f8b_master.png,2026-03-26 10:00:00,2026-03-26 10:00:00,Asus,store_1,77777777-7777-4777-a777-777777777701,active
 
-prod_201,Cotton T-Shirt,,2026-03-24 10:00:00,2026-03-24 10:00:00,Uniqlo,store_1,cat_2,active
-prod_202,Denim Jeans,https://example.com/jeans.jpg,2026-03-24 10:05:00,2026-03-24 10:05:00,Levis,store_1,cat_2,active
-prod_203,Hoodie Jacket,,2026-03-24 10:10:00,2026-03-24 10:10:00,Nike,store_1,cat_2,inactive
-prod_204,Sports Shorts,https://example.com/shorts.jpg,2026-03-24 10:12:00,2026-03-24 10:12:00,Adidas,store_1,cat_2,active
+11111111-1111-4111-a111-111111120004,Men Cotton T-Shirt Basic,https://pos.nvncdn.com/f01d4a-83461/ps/20250812_VK2TBO47tH.jpeg?v=1754984456,2026-03-26 10:05:00,2026-03-26 10:05:00,H&M,store_1,77777777-7777-4777-a777-777777777702,active
+11111111-1111-4111-a111-111111120005,Levis 511 Slim Jeans,https://cdn.vuahanghieu.com/unsafe/0x900/left/top/smart/filters:quality(90)/https://admin.vuahanghieu.com/upload/product/2025/04/quan-jean-nam-levi-s-flex-511-slim-fit-mau-xanh-dam-size-29-6807645e8520e-22042025164150.jpg,2026-03-26 10:05:00,2026-03-26 10:05:00,Levis,store_1,77777777-7777-4777-a777-777777777702,active
 
-prod_301,Mineral Water 500ml,,2026-03-24 10:45:00,2026-03-24 10:45:00,Aquafina,store_1,cat_3,active
-prod_302,Orange Juice 1L,https://example.com/oj.jpg,2026-03-24 10:50:00,2026-03-24 10:50:00,Tropicana,store_1,cat_3,active
-prod_303,Instant Noodles,,2026-03-24 10:55:00,2026-03-24 10:55:00,Indomie,store_1,cat_3,active
-prod_304,Snack Chips,https://example.com/chips.jpg,2026-03-24 11:00:00,2026-03-24 11:00:00,Lays,store_1,cat_3,inactive
+11111111-1111-4111-a111-111111120006,Coca-Cola Original,https://product.hstatic.net/1000282430/product/nuoc-ngot-coca-cola-nhat-500ml_f61289e9a50d41398d9711800846f9b0_grande.jpg,2026-03-26 10:10:00,2026-03-26 10:10:00,Coca-Cola,store_1,77777777-7777-4777-a777-777777777703,active
+11111111-1111-4111-a111-111111120007,Pepsi Cola,https://vending-cdn.kootoro.com/torov-cms/upload/image/1718076206717-%C4%90%E1%BB%93%20u%E1%BB%91ng%20c%C3%B3%20gas%20Pepsi%20Cola.jpg,2026-03-26 10:10:00,2026-03-26 10:10:00,Pepsi,store_1,77777777-7777-4777-a777-777777777703,active
+11111111-1111-4111-a111-111111120008,Sprite Lemon Soda,https://www.liquidz.com.hk/wp-content/uploads/2020/07/Sprite-Lemon-Lime-Flavoured-Soda-24-Cans-330mL.jpg,2026-03-26 10:10:00,2026-03-26 10:10:00,Coca-Cola,store_1,77777777-7777-4777-a777-777777777703,active
+11111111-1111-4111-a111-111111120009,Fanta Orange Soda,https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTQA0y6k6XOKQzJtMrg2TCmGiP76h0NKqE3gA&s,2026-03-26 10:10:00,2026-03-26 10:10:00,Coca-Cola,store_1,77777777-7777-4777-a777-777777777703,active
+11111111-1111-4111-a111-111111120010,Tropicana Orange Juice,https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQlxSzSXdrZH6ZWEkeH09izw3rCQ4NFaMfY9Q&s,2026-03-26 10:10:00,2026-03-26 10:10:00,Tropicana,store_1,77777777-7777-4777-a777-777777777703,active
 
-prod_401,A4 Copy Paper,,2026-03-24 11:20:00,2026-03-24 11:20:00,Double A,store_1,cat_4,inactive
-prod_402,Ballpoint Pen Blue,https://example.com/pen.jpg,2026-03-24 11:25:00,2026-03-24 11:25:00,Pilot,store_1,cat_4,active
-prod_403,Notebook A5,,2026-03-24 11:30:00,2026-03-24 11:30:00,Kokuyo,store_1,cat_4,active
-prod_404,Stapler Mini,https://example.com/stapler.jpg,2026-03-24 11:35:00,2026-03-24 11:35:00,Deli,store_1,cat_4,inactive
+11111111-1111-4111-a111-111111120011,Lays Classic Chips,https://digitalassets.pepsico.com/asset/b7197cb5-49b3-4517-ad40-afb1afb5eef1/Presentation-PNG/lays-classic-front-00028400199148.png,2026-03-26 10:15:00,2026-03-26 10:15:00,Lays,store_1,77777777-7777-4777-a777-777777777703,active
 
-prod_501,LED Desk Lamp,https://example.com/lamp.jpg,2026-03-24 11:40:00,2026-03-24 11:40:00,Xiaomi,store_1,cat_5,active
-prod_502,Office Chair,,2026-03-24 11:45:00,2026-03-24 11:45:00,IKEA,store_1,cat_5,active
-prod_503,Standing Desk,,2026-03-24 11:50:00,2026-03-24 11:50:00,Flexispot,store_1,cat_5,inactive
-prod_504,Monitor 24 inch,https://example.com/monitor.jpg,2026-03-24 11:55:00,2026-03-24 11:55:00,Dell,store_1,cat_5,active
+11111111-1111-4111-a111-111111120012,Philips Desk Lamp,https://www.assets.signify.com/is/image/Signify/61013%20Air%20LED%20desklight%20Black%20-%20Matt%20Black,2026-03-26 10:20:00,2026-03-26 10:20:00,Philips,store_1,77777777-7777-4777-a777-777777777704,active
 
-prod_601,Phone Charger 20W,,2026-03-24 12:00:00,2026-03-24 12:00:00,Apple,store_1,cat_6,active
-prod_602,Power Bank 10000mAh,https://example.com/powerbank.jpg,2026-03-24 12:05:00,2026-03-24 12:05:00,Xiaomi,store_1,cat_6,active
-prod_603,Wireless Earbuds,,2026-03-24 12:10:00,2026-03-24 12:10:00,Samsung,store_1,cat_6,inactive
-prod_604,Smart Watch,https://example.com/watch.jpg,2026-03-24 12:15:00,2026-03-24 12:15:00,Huawei,store_1,cat_6,active
+11111111-1111-4111-a111-111111120013,IKEA Coffee Table Oak,https://www.ikea.com/gb/en/images/products/lack-coffee-table-white-stained-oak-effect__0411538_pe570463_s5.jpg?f=s,2026-03-26 10:25:00,2026-03-26 10:25:00,IKEA,store_1,77777777-7777-4777-a777-777777777705,active
+
+11111111-1111-4111-a111-111111120014,Spigen Liquid Air Case,https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRmd3Br8gtYb3tLX4kaCQHsKoq4Ih8JoUfcKA&s,2026-03-26 10:30:00,2026-03-26 10:30:00,Spigen,store_1,77777777-7777-4777-a777-777777777706,active
+
+11111111-1111-4111-a111-111111120015,Panasonic Electric Fan,https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcT-JqqHcBsG7Z21v3NzTFE47_nOQo1fuMPJdg&s,2026-03-26 10:35:00,2026-03-26 10:35:00,Panasonic,store_1,77777777-7777-4777-a777-777777777707,active
+
+11111111-1111-4111-a111-111111120016,Maybelline Matte Lipstick,https://images-na.ssl-images-amazon.com/images/I/61LKpwK0gRL.jpg,2026-03-26 10:40:00,2026-03-26 10:40:00,Maybelline,store_1,77777777-7777-4777-a777-777777777708,active
+
+11111111-1111-4111-a111-111111120017,Spalding Basketball,https://images-na.ssl-images-amazon.com/images/I/91A90PxvHHL.jpg,2026-03-26 10:45:00,2026-03-26 10:45:00,Spalding,store_1,77777777-7777-4777-a777-777777777709,active
+
+11111111-1111-4111-a111-111111120018,Hasbro Monopoly Classic,https://www.hasbro.com/common/productimages/en_MY/7EABAF9750569047F5778F4663C79E75/6391588b30a50c012b79797c4735b2ebff9dae7b.jpg,2026-03-26 10:50:00,2026-03-26 10:50:00,Hasbro,store_1,77777777-7777-4777-a777-777777777710,active
+
+11111111-1111-4111-a111-111111120019,Xiaomi Car Vacuum,https://ae01.alicdn.com/kf/Sfa67ee231acb47a69c0a313a72338cc7P.jpg?width=1080&height=1072&hash=2152,2026-03-26 10:55:00,2026-03-26 10:55:00,Xiaomi,store_1,77777777-7777-4777-a777-777777777711,active
+
+11111111-1111-4111-a111-111111120020,Pedigree Dog Food,https://www.lottemart.vn/media/catalog/product/cache/0x0/9/3/9334214022925-1.jpg.webp,2026-03-26 11:00:00,2026-03-26 11:00:00,Pedigree,store_1,77777777-7777-4777-a777-777777777712,active
+
+11111111-1111-4111-a111-111111120021,Deli Notebook A5,https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRo8fC5cp7ltoM-mRlI-jKAW86bQpNcvQ2Xeg&s,2026-03-26 11:05:00,2026-03-26 11:05:00,Deli,store_1,77777777-7777-4777-a777-777777777713,active
+
+11111111-1111-4111-a111-111111120022,Blackmores Vitamin C,https://product.hstatic.net/1000398092/product/anh_chup_man_hinh__372__li_8e19ab0087be4f7e830df3e4b2b5796a.jpg,2026-03-26 11:10:00,2026-03-26 11:10:00,Blackmores,store_1,77777777-7777-4777-a777-777777777714,active
+
+11111111-1111-4111-a111-111111120023,Pampers Baby Diapers,https://www.quickpantry.in/cdn/shop/products/pampers-baby-dry-pants-large-9-14-kg-quick-pantry.jpg?v=1710539045,2026-03-26 11:15:00,2026-03-26 11:15:00,Pampers,store_1,77777777-7777-4777-a777-777777777715,active
+
+11111111-1111-4111-a111-111111120024,Pandora Silver Necklace,https://cdn.vuahanghieu.com/unsafe/0x900/left/top/smart/filters:quality(90)/https://admin.vuahanghieu.com/upload/product/2023/11/day-chuyen-nu-pandora-sparkling-herbarium-circle-cluster-pendant-necklace-392620c01-45-mau-bac-65572cf68c363-17112023160558.jpg,2026-03-26 11:20:00,2026-03-26 11:20:00,Pandora,store_1,77777777-7777-4777-a777-777777777716,active
+
+11111111-1111-4111-a111-111111120025,ST25 Rice Premium,https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQ3DqVGQ6JyZti9k3xTMtSNVq5rlUIK1YGiRw&s,2026-03-26 11:25:00,2026-03-26 11:25:00,LocalBrand,store_1,77777777-7777-4777-a777-777777777717,active
+
+11111111-1111-4111-a111-111111120026,Bosch Electric Drill,https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSfGHY_Sxx5HKbNfSHgWLXCNWnbH3-V4-go7A&s,2026-03-26 11:30:00,2026-03-26 11:30:00,Bosch,store_1,77777777-7777-4777-a777-777777777718,active
+
+11111111-1111-4111-a111-111111120027,Yamaha Acoustic Guitar,https://vietmusic.vn/cdn/shop/files/AC3M_VN_a_0001_from_ac3m_vn_20200519_9afea37703f6963175a696dcb89d4a5e.jpg?v=1748754680&width=1946,2026-03-26 11:35:00,2026-03-26 11:35:00,Yamaha,store_1,77777777-7777-4777-a777-777777777719,active
+
+11111111-1111-4111-a111-111111120028,Sony PlayStation 5,https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRINYK8WnibfnDHVNjrcDlpVSBm2sArtZCFaw&s,2026-03-26 11:40:00,2026-03-26 11:40:00,Sony,store_1,77777777-7777-4777-a777-777777777720,active
+
+11111111-1111-4111-a111-111111120029,Canon EOS M50 Camera,https://bizweb.dktcdn.net/100/107/650/products/canon-eos-m50-kit-stm-ef-m15-45mm-f3-5-6-3-is-zshop-2.jpg?v=1616558527560,2026-03-26 11:45:00,2026-03-26 11:45:00,Canon,store_1,77777777-7777-4777-a777-777777777721,active
+
+11111111-1111-4111-a111-111111120030,Samsonite Travel Suitcase,https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSf3WnGAL7bkbD3iTW0Jmiw1tOwbc27mtanGg&s,2026-03-26 11:50:00,2026-03-26 11:50:00,Samsonite,store_1,77777777-7777-4777-a777-777777777722,active
+
+11111111-1111-4111-a111-111111120031,Converse Chuck Taylor,https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSlNJnp9Yy4L8nzOGw1uPk_-GPXnwiEdmdKBw&s,2026-03-26 11:55:00,2026-03-26 11:55:00,Converse,store_1,77777777-7777-4777-a777-777777777723,active
+
+11111111-1111-4111-a111-111111120032,Xiaomi Smart Bulb,https://bizweb.dktcdn.net/thumb/grande/100/450/414/products/cvv.jpg?v=1651582952520,2026-03-26 12:00:00,2026-03-26 12:00:00,Xiaomi,store_1,77777777-7777-4777-a777-777777777724,active
+
+11111111-1111-4111-a111-111111120033,Tefal Nonstick Pan,https://m.media-amazon.com/images/I/71rDouoEbRL._AC_UF894,1000_QL80_.jpg,2026-03-26 12:05:00,2026-03-26 12:05:00,Tefal,store_1,77777777-7777-4777-a777-777777777725,active
+
+11111111-1111-4111-a111-111111120034,Karcher Garden Hose,https://image.kingshop.vn/data/products/1000/guong-ong-15m-karcher-hose-reel-hr-25-1.jpg,2026-03-26 12:10:00,2026-03-26 12:10:00,Karcher,store_1,77777777-7777-4777-a777-777777777726,active
+
+11111111-1111-4111-a111-111111120035,Philips LED Ceiling Light,https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQ5W4gZynMo40x3plmtqO1TALHnFb4lxIkF4Q&s,2026-03-26 12:15:00,2026-03-26 12:15:00,Philips,store_1,77777777-7777-4777-a777-777777777727,active
+
+11111111-1111-4111-a111-111111120036,Ezviz Indoor Camera,https://kinghome.vn/data/products/1712221081camera-ip-wifi-trong-nha-ezviz-C6N-1080P-king-home.jpg,2026-03-26 12:20:00,2026-03-26 12:20:00,Ezviz,store_1,77777777-7777-4777-a777-777777777728,active
+
+11111111-1111-4111-a111-111111120037,Quechua Camping Tent,https://contents.mediadecathlon.com/p2579082/k$684efb64d5468fb773577cdf1cb57a08/camping-tent-mh100-2-person-quechua-8513471.jpg,2026-03-26 12:25:00,2026-03-26 12:25:00,Quechua,store_1,77777777-7777-4777-a777-777777777733,active
+
+11111111-1111-4111-a111-111111120038,Bowflex Adjustable Dumbbell,https://www.bowflex.com/dw/image/v2/AAYW_PRD/on/demandware.static/-/Sites-nautilus-master-catalog/default/dw7cf058f2/images/bfx/weights/ZMK4011008/bowflex-selecttech-results-series-552-dumbbell-weights-hero-sqr.png?sw=400&sh=400&sm=fit,2026-03-26 12:30:00,2026-03-26 12:30:00,Bowflex,store_1,77777777-7777-4777-a777-777777777734,active
+
+11111111-1111-4111-a111-111111120039,Handmade Scented Candle,https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRk9C1FWyEmadzkuu4wu0mgvL9itQmJsvtuYA&s,2026-03-26 12:35:00,2026-03-26 12:35:00,LocalCraft,store_1,77777777-7777-4777-a777-777777777735,active
+
+11111111-1111-4111-a111-111111120040,Christmas Decoration Set,https://m.media-amazon.com/images/I/81qkN+fmf3L._AC_UF894,1000_QL80_.jpg,2026-03-26 12:40:00,2026-03-26 12:40:00,NoBrand,store_1,77777777-7777-4777-a777-777777777736,active
