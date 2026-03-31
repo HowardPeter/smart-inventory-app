@@ -1,6 +1,7 @@
 import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:frontend/core/state/services/supabase_storage_service.dart';
+import 'package:frontend/core/ui/widgets/t_snackbars_widget.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 
@@ -54,10 +55,9 @@ class _SharedImagePickerState extends State<SharedImagePicker> {
         // Trả path về cho Form cha
         widget.onImageUploaded(uploadedPath);
       } else {
-        // Xử lý báo lỗi UI nếu upload fail
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-              content: Text('Upload ảnh thất bại. Vui lòng thử lại!')),
+        TSnackbarsWidget.error(
+          title: 'Lỗi',
+          message: 'Upload ảnh thất bại. Vui lòng thử lại!',
         );
         setState(() {
           _localFile = null; // Reset nếu lỗi
