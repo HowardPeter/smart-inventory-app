@@ -26,7 +26,6 @@ dependencies:
   # ----------------------------------------------------
   # UI & Design
   # ----------------------------------------------------
-  cached_network_image: ^3.4.1
   cupertino_icons: ^1.0.8
   fl_chart: ^1.2.0
   flutter_slidable: ^4.0.3
