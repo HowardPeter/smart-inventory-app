@@ -1,9 +1,3 @@
-/* Khai báo và cấu hình tập hợp các endpoints (routes) cho module Inventory.
-Nhiệm vụ duy nhất của file này là lắp ráp (assemble)
-request pipeline theo đúng chuẩn thứ tự:
-Authenticate -> Context -> Permission -> Validator -> Controller Handler.
-Tuyệt đối không chứa business logic tại đây. */
-
 import { Router } from 'express';
 
 import { asyncWrapper } from '../../common/middlewares/index.js';
@@ -23,11 +17,35 @@ import { requireStoreContext } from '../stores/index.js';
 
 const inventoryRouter = Router();
 
-// NOTE: Áp dụng middleware xác thực người dùng và
-// bắt buộc request phải có ngữ cảnh Store (storeId) cho toàn bộ API bên dưới
 inventoryRouter.use(authenticate, requireStoreContext);
 
-// Nhóm API thao tác trên cấp độ toàn danh sách kho của cửa hàng
+/**
+ * API endpoint: GET /api/inventories
+ * Lấy danh sách tồn kho của cửa hàng (có phân trang, lọc và sắp xếp)
+ *
+ * Query params:
+ *  - page?: number (default: 1)
+ *  - limit?: number (default: 10, max: 100)
+ *  - sortBy?:
+ *      'updatedAt'
+ *      | 'quantity'
+ *      | 'reorderThreshold'
+ *      | 'lastCount' (default: 'updatedAt')
+ *  - sortOrder?: 'asc' | 'desc' (default: 'desc')
+ *  - keyword?: string - từ khóa tìm kiếm
+ *  - categoryId?: string - lọc theo danh mục
+ *  - inventoryStatus?:
+ *      'inStock' | 'lowStock' | 'outOfStock' - lọc theo trạng thái tồn kho
+ *
+ * API endpoint: POST /api/inventories
+ * Tạo bản ghi tồn kho cho một product package
+ *
+ * Body:
+ *  - productPackageId: string (required) - id của product package
+ *  - quantity?: number (default: 0) - số lượng tồn ban đầu
+ *  - reorderThreshold?: number | null - ngưỡng cảnh báo sắp hết hàng
+ *  - lastCount?: number | null - số lượng kiểm kê gần nhất
+ */
 inventoryRouter.get(
   '/',
   requirePermission(PERMISSION.INVENTORY_READ),
@@ -41,8 +59,24 @@ inventoryRouter.post(
   asyncWrapper(inventoryController.createInventory),
 );
 
-// Endpoint phục vụ nghiệp vụ đặc thù: Truy vấn các mặt hàng
-// đang có số lượng chạm hoặc dưới ngưỡng cảnh báo
+/**
+ * API endpoint: GET /api/inventories/low-stock
+ * Lấy danh sách tồn kho đang chạm hoặc dưới ngưỡng cảnh báo
+ *
+ * Query params:
+ *  - page?: number (default: 1)
+ *  - limit?: number (default: 10, max: 100)
+ *  - sortBy?:
+ *      'updatedAt'
+ *      | 'quantity'
+ *      | 'reorderThreshold'
+ *      | 'lastCount' (default: 'updatedAt')
+ *  - sortOrder?: 'asc' | 'desc' (default: 'desc')
+ *  - keyword?: string - từ khóa tìm kiếm
+ *  - categoryId?: string - lọc theo danh mục
+ *  - inventoryStatus?:
+ *      'inStock' | 'lowStock' | 'outOfStock'
+ */
 inventoryRouter.get(
   '/low-stock',
   requirePermission(PERMISSION.INVENTORY_READ),
@@ -50,10 +84,29 @@ inventoryRouter.get(
   asyncWrapper(inventoryController.getLowStockInventories),
 );
 
-/* Gom nhóm (chaining) các thao tác CRUD thao tác
-trực tiếp trên cấu hình của một mặt hàng cụ thể.
-Sử dụng chung tham số đường dẫn (path parameter)
-để code DRY (Don't Repeat Yourself). */
+/**
+ * API endpoint: GET /api/inventories/product-packages/:productPackageId
+ * Lấy chi tiết tồn kho theo product package id
+ *
+ * Path params:
+ *  - productPackageId: string (UUID, required)
+ *
+ * API endpoint: PATCH /api/inventories/product-packages/:productPackageId
+ * Cập nhật cấu hình tồn kho, không thay đổi số lượng tồn thực tế
+ *
+ * Path params:
+ *  - productPackageId: string (UUID, required)
+ *
+ * Body:
+ *  - reorderThreshold?: number | null - ngưỡng cảnh báo sắp hết hàng
+ *  - lastCount?: number | null - số lượng kiểm kê gần nhất
+ *
+ * API endpoint: DELETE /api/inventories/product-packages/:productPackageId
+ * Xóa mềm bản ghi tồn kho theo product package id
+ *
+ * Path params:
+ *  - productPackageId: string (UUID, required)
+ */
 inventoryRouter
   .route('/product-packages/:productPackageId')
   .get(
@@ -67,15 +120,25 @@ inventoryRouter
     asyncWrapper(inventoryController.updateInventory),
   )
   .delete(
-    // NOTE: Xóa kho thực chất là thao tác xóa mềm
-    // (chuyển activeStatus sang inactive) để bảo vệ tính toàn vẹn của AuditLog
     requirePermission(PERMISSION.INVENTORY_WRITE),
     validateDeleteInventory,
     asyncWrapper(inventoryController.deleteInventory),
   );
 
-// Endpoint thực hiện nghiệp vụ cập nhật
-// biến động số lượng tồn kho (nhập, xuất, kiểm kê kho)
+/**
+ * API endpoint:
+ *   POST /api/inventories/product-packages/:productPackageId/adjustments
+ * Điều chỉnh số lượng tồn kho của một product package
+ *
+ * Path params:
+ *  - productPackageId: string (UUID, required)
+ *
+ * Body:
+ *  - type: 'set' | 'increase' | 'decrease' (required) - kiểu điều chỉnh tồn kho
+ *  - quantity: number (required) - số lượng áp dụng cho thao tác điều chỉnh
+ *  - reason?: string | null - lý do điều chỉnh
+ *  - note?: string | null - ghi chú thêm
+ */
 inventoryRouter.post(
   '/product-packages/:productPackageId/adjustments',
   requirePermission(PERMISSION.INVENTORY_WRITE),
