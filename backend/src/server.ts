@@ -11,6 +11,7 @@ import {
   productPackageRouter,
   productPackageProductRouter,
 } from './modules/product-packages/index.js';
+import { unitRouter } from './modules/product-packages/unit.route.js';
 import { productRouter } from './modules/products/index.js';
 import { searchRouter } from './modules/search/index.js';
 import { storeRouter } from './modules/stores/index.js';
@@ -42,6 +43,7 @@ app.use('/api/inventories', inventoryRouter);
 app.use('/api/audit-logs', auditLogRouter);
 app.use('/api/notification', notificationRouter);
 app.use('/api/search', searchRouter);
+app.use('/api/units', unitRouter);
 
 app.use(errorHandler);
 

@@ -15,4 +15,13 @@ export class UnitRepository {
       },
     });
   }
+  async findAll(): Promise<UnitResponseDto[]> {
+    return await prisma.unit.findMany({
+      select: {
+        unitId: true,
+        code: true,
+        name: true,
+      },
+    });
+  }
 }
