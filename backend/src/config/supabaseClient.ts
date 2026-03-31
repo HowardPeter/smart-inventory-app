@@ -16,7 +16,8 @@ export class SupabaseProvider {
     // NOTE: SUPABASE_ANON_KEY cho backend end-user client
     // NOTE: SUPABASE_SERVICE_ROLE_KEY cho backend admin client
     const supabaseUrl = process.env.SUPABASE_URL;
-    const supabaseServiceKey = process.env.SUPABASE_ANON_KEY;
+    // const supabaseServiceKey = process.env.SUPABASE_ANON_KEY;
+    const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
 
     if (!supabaseUrl || !supabaseServiceKey) {
       throw new CustomError({

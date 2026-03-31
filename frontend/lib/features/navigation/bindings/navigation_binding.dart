@@ -1,4 +1,5 @@
 import 'package:frontend/features/inventory/controllers/inventory_controller.dart';
+import 'package:frontend/features/notification/controller/notification_controller.dart';
 import 'package:get/get.dart';
 import 'package:frontend/features/navigation/controllers/navigation_controller.dart';
 import 'package:frontend/features/home/controllers/home_controller.dart';
@@ -17,5 +18,6 @@ class NavigationBinding extends Bindings {
     Get.lazyPut(() => InventoryController());
     Get.lazyPut(() => ProfileController());
     // Get.lazyPut(() => ReportsController());
+    Get.lazyPut(() => NotificationController());
   }
 }

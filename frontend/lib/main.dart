@@ -11,7 +11,6 @@ import 'package:frontend/core/state/services/auth_service.dart'
 import 'package:frontend/core/state/services/notification_service.dart';
 import 'package:frontend/core/state/services/store_service.dart';
 import 'package:frontend/core/state/services/user_service.dart';
-import 'package:frontend/features/notification/controller/notification_controller.dart';
 import 'package:frontend/firebase_options.dart';
 import 'package:frontend/routes/app_pages.dart';
 import 'package:get/get.dart';
@@ -51,9 +50,6 @@ void main() async {
   await Get.putAsync(() => AuthService().init());
   await Get.putAsync(() => UserService().init());
   await Get.putAsync(() => StoreService().init());
-
-  // Đăng ký Controller thông báo luôn sống
-  Get.put(NotificationController(), permanent: true);
 
   runApp(
     DevicePreview(
