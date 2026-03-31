@@ -26,6 +26,7 @@ import 'package:frontend/features/inventory/views/product_catalog_view.dart';
 import 'package:frontend/features/inventory/views/product_form_view.dart';
 import 'package:frontend/features/navigation/bindings/navigation_binding.dart';
 import 'package:frontend/features/navigation/views/navigation_view.dart';
+import 'package:frontend/features/notification/view/platform/notification_mobile_screen.dart';
 import 'package:frontend/features/onboarding/bindings/onboarding_binding.dart';
 import 'package:frontend/features/profile/views/profile_view.dart';
 import 'package:frontend/features/search/bindings/search_binding.dart';
@@ -221,7 +222,7 @@ class AppPages {
       transition: Transition.cupertino,
     ),
 
-    // -- Customize Catalog 
+    // -- Customize Catalog
     GetPage(
       name: AppRoutes.customizeCatalog,
       page: () => const CustomizeCatalogView(),
@@ -231,5 +232,11 @@ class AppPages {
 
     // -- Profile
     GetPage(name: AppRoutes.profile, page: () => const ProfileView()),
+
+    // -- Notification
+    GetPage(
+      name: AppRoutes.notification,
+      page: () => const NotificationMobileScreen(),
+    )
   ];
 }

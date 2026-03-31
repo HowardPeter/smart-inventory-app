@@ -39,14 +39,19 @@ export class NotificationRepository {
     });
   }
 
-  async getUserNotifications(userId: string, storeId: string) {
+  async getUserNotifications(
+    userId: string,
+    storeId: string,
+    page: number,
+    size: number,
+  ) {
+    const skip = (page - 1) * size;
+
     return await prisma.notification.findMany({
-      where: {
-        userId: userId,
-        storeId: storeId, // Đã có lọc theo storeId
-        activeStatus: 'active',
-      },
+      where: { userId, storeId, activeStatus: 'active' },
       orderBy: { createdAt: 'desc' },
+      skip: skip,
+      take: size,
     });
   }
 
@@ -70,6 +75,13 @@ export class NotificationRepository {
       where: {
         token: { in: tokens },
       },
+    });
+  }
+
+  async markAllAsRead(userId: string, storeId: string) {
+    return await prisma.notification.updateMany({
+      where: { userId, storeId, activeStatus: 'active', isRead: false },
+      data: { isRead: true },
     });
   }
 }

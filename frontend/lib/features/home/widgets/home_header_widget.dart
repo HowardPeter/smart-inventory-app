@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:frontend/core/infrastructure/constants/text_strings.dart';
+import 'package:frontend/routes/app_routes.dart';
 import 'package:get/get.dart';
 import 'package:iconsax_flutter/iconsax_flutter.dart'; // ĐẢM BẢO CÓ IMPORT NÀYtext_strings.dart';
 import 'package:frontend/core/ui/theme/app_colors.dart';
 import 'package:frontend/core/ui/theme/app_sizes.dart';
 import 'package:frontend/features/home/controllers/home_controller.dart';
-import 'package:frontend/core/ui/widgets/t_snackbars_widget.dart';
 
 class HomeHeaderWidget extends StatelessWidget {
   const HomeHeaderWidget({super.key});
@@ -13,6 +13,7 @@ class HomeHeaderWidget extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final homeController = Get.find<HomeController>();
+    print("Từ UI: ${homeController.unreadCount.value}");
 
     return Padding(
       padding: const EdgeInsets.fromLTRB(
@@ -56,9 +57,7 @@ class HomeHeaderWidget extends StatelessWidget {
           // NÚT CHUÔNG THÔNG BÁO (THAY THẾ CHO ROLE BADGE)
           InkWell(
             onTap: () {
-              // TODO: Điều hướng sang Notification Center
-              TSnackbarsWidget.info(
-                  title: TTexts.info.tr, message: TTexts.featureComingSoon.tr);
+              Get.toNamed(AppRoutes.notification);
             },
             borderRadius: BorderRadius.circular(16),
             child: Container(
@@ -75,11 +74,15 @@ class HomeHeaderWidget extends StatelessWidget {
                   ),
                 ],
               ),
-              child: const Badge(
-                backgroundColor: AppColors.stockOut,
-                smallSize: 10,
-                child: Icon(Iconsax.notification_bing_copy,
-                    color: AppColors.primaryText, size: 24),
+              child: Obx(
+                () => Badge(
+                  backgroundColor: homeController.unreadCount.value > 0
+                      ? AppColors.stockOut
+                      : Colors.transparent,
+                  smallSize: 10,
+                  child: const Icon(Iconsax.notification_bing_copy,
+                      color: AppColors.primaryText, size: 24),
+                ),
               ),
             ),
           ),

@@ -55,4 +55,10 @@ notificationRouter.delete(
   asyncWrapper(controller.deleteNotification),
 );
 
+notificationRouter.patch(
+  '/read-all',
+  authenticate,
+  asyncWrapper(controller.markAllAsRead),
+);
+
 export default notificationRouter;

@@ -1,126 +1,204 @@
 import 'package:flutter/material.dart';
 import 'package:frontend/core/infrastructure/models/notification_model.dart';
+import 'package:frontend/features/notification/providers/notification_provider.dart';
 import 'package:get/get.dart';
-import 'package:frontend/core/infrastructure/network/app_client.dart';
 import 'package:frontend/core/ui/widgets/t_snackbars_widget.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
 
 class NotificationController extends GetxController {
-  final ApiClient _apiClient = ApiClient();
+  final NotificationProvider _provider = NotificationProvider();
 
-  // Biến state GetX
+  // State quản lý danh sách và loading
   var notifications = <NotificationModel>[].obs;
   var isLoading = true.obs;
+  var isLoadMore = false.obs;
   var unreadCount = 0.obs;
+
+  // Logic phân trang
+  final ScrollController scrollController = ScrollController();
+  int _currentPage = 1; // Backend thường dùng page 1 làm trang đầu tiên
+  final int _pageSize = 15;
+  bool _hasMore = true;
 
   @override
   void onInit() {
     super.onInit();
     fetchNotifications();
+    _setupPagination();
+    _setupRealtime();
   }
 
-  // LẤY DANH SÁCH THÔNG BÁO TỪ BACKEND
+  // ==========================================
+  // 1. SETUP REALTIME (SUPABASE)
+  // ==========================================
+  void _setupRealtime() {
+    // Tạm thời hardcode userId để test, sau này bạn lấy từ State management của bạn (GetX/Provider)
+    const currentUserId = '665ef842-704d-4479-b996-fc9e2c663587';
+
+    if (currentUserId.isEmpty) return;
+
+    Supabase.instance.client
+        .channel('public:notification')
+        .onPostgresChanges(
+          event: PostgresChangeEvent.insert,
+          schema: 'public',
+          // 👇 SỬA Ở ĐÂY: Chữ 'notification' phải viết thường y hệt trong Database
+          table: 'notification',
+          filter: PostgresChangeFilter(
+            type: PostgresChangeFilterType.eq,
+            column:
+                'user_id', // 👈 LƯU Ý: Prisma thường map xuống DB là snake_case.
+            // Bạn hãy check lại trong bảng notification xem cột lưu ID
+            // người dùng là 'userId' hay 'user_id' để truyền cho đúng nhé!
+            value: currentUserId,
+          ),
+          callback: (payload) {
+            debugPrint(
+                '🔔 REALTIME BÁO CÓ THÔNG BÁO MỚI: ${payload.newRecord}');
+
+            // Tải lại danh sách từ trang 1
+            fetchNotifications();
+          },
+        )
+        .subscribe();
+  }
+
+  // ==========================================
+  // 2. PHÂN TRANG
+  // ==========================================
+  void _setupPagination() {
+    scrollController.addListener(() {
+      if (scrollController.position.pixels >=
+          scrollController.position.maxScrollExtent - 200) {
+        if (!_hasMore || isLoadMore.value || isLoading.value) return;
+        fetchMoreNotifications();
+      }
+    });
+  }
+
   Future<void> fetchNotifications() async {
     try {
+      _currentPage = 1;
+      _hasMore = true;
       isLoading.value = true;
 
-      // ApiClient đã tự động gắn Token và x-store-id vào header
-      // và baseUrl đã có sẵn /api nên chỉ cần gọi '/notification'
-      final response = await _apiClient.get('/api/notification');
+      final response = await _provider.fetchNotifications(
+          page: _currentPage, size: _pageSize);
 
       if (response.statusCode == 200) {
         final List data = response.data['data'] ?? [];
         notifications.value =
             data.map((json) => NotificationModel.fromJson(json)).toList();
 
+        if (data.length < _pageSize) _hasMore = false;
         _updateUnreadCount();
       }
-    } catch (e) {
-      debugPrint("❌ Lỗi fetch notifications: $e");
-      TSnackbarsWidget.error(
-        title: "Lỗi",
-        message: "Không thể tải thông báo. Vui lòng thử lại sau.",
-      );
     } finally {
       isLoading.value = false;
     }
   }
 
-  // ĐẾM SỐ LƯỢNG CHƯA ĐỌC (Hiển thị chấm đỏ)
+  Future<void> fetchMoreNotifications() async {
+    try {
+      isLoadMore.value = true;
+      _currentPage++;
+
+      final response = await _provider.fetchNotifications(
+          page: _currentPage, size: _pageSize);
+
+      if (response.statusCode == 200) {
+        final List data = response.data['data'] ?? [];
+        if (data.isEmpty) {
+          _hasMore = false;
+        } else {
+          final nextItems =
+              data.map((json) => NotificationModel.fromJson(json)).toList();
+          notifications.addAll(nextItems);
+          if (data.length < _pageSize) _hasMore = false;
+        }
+      }
+    } finally {
+      isLoadMore.value = false;
+    }
+  }
+
+  // ==========================================
+  // 3. LOGIC XỬ LÝ DỮ LIỆU
+  // ==========================================
   void _updateUnreadCount() {
     unreadCount.value = notifications.where((n) => !n.isRead).length;
   }
 
-  // ĐÁNH DẤU ĐÃ ĐỌC (Tối ưu UI Real-time)
   Future<void> markAsRead(String id) async {
-    // 1. Tìm thông báo trong RAM
     final index = notifications.indexWhere((n) => n.notificationId == id);
     if (index == -1 || notifications[index].isRead) return;
 
-    // 2. Cập nhật UI ngay lập tức (Optimistic Update)
     notifications[index].isRead = true;
-    notifications.refresh(); // Ép GetX vẽ lại màn hình
+    notifications.refresh();
     _updateUnreadCount();
 
-    // 3. Gọi API chạy ngầm
     try {
-      await _apiClient.patch('/api/notification/$id/read');
+      await _provider.markAsRead(id);
     } catch (e) {
       debugPrint("⚠️ Lỗi API markAsRead: $e");
-      // (Tuỳ chọn) Rollback UI nếu API lỗi
-      // notifications[index].isRead = false;
-      // notifications.refresh();
-      // _updateUnreadCount();
     }
   }
 
-  // ĐÁNH DẤU ĐỌC TẤT CẢ (Tính năng cộng thêm)
   Future<void> markAllAsRead() async {
-    final unreadList = notifications.where((n) => !n.isRead).toList();
-    if (unreadList.isEmpty) return;
+    if (unreadCount.value == 0) return;
 
-    for (var n in unreadList) {
-      n.isRead = true;
+    for (var noti in notifications) {
+      noti.isRead = true;
     }
     notifications.refresh();
-    unreadCount.value = 0;
+    _updateUnreadCount();
 
-    // Gọi API từng cái hoặc báo Backend làm thêm API /notification/read-all
-    for (var n in unreadList) {
-      _apiClient
-          .patch('/api/notification/${n.notificationId}/read')
-          // ignore: body_might_complete_normally_catch_error
-          .catchError((e) {
-        debugPrint("Lỗi patch: $e");
-      });
+    try {
+      await _provider.markAllAsRead();
+    } catch (e) {
+      debugPrint("⚠️ Lỗi API markAllAsRead: $e");
     }
   }
 
-  // XÓA THÔNG BÁO (Vuốt ngang để xóa)
   Future<void> deleteNotification(String id) async {
     final index = notifications.indexWhere((n) => n.notificationId == id);
     if (index == -1) return;
 
-    // 1. Lưu bản backup để rollback nếu API lỗi
     final backupItem = notifications[index];
-
-    // 2. Xóa khỏi UI ngay lập tức
     notifications.removeAt(index);
     _updateUnreadCount();
 
-    // 3. Gọi API chạy ngầm
     try {
-      await _apiClient.delete('/api/notification/$id');
+      await _provider.deleteNotification(id);
     } catch (e) {
-      debugPrint("❌ Lỗi API xóa thông báo: $e");
-
-      // Rollback lại UI nếu mất mạng
       notifications.insert(index, backupItem);
       _updateUnreadCount();
+      TSnackbarsWidget.error(title: "Lỗi", message: "Không thể xóa thông báo.");
+    }
+  }
 
-      TSnackbarsWidget.error(
-        title: "Lỗi",
-        message: "Không thể xóa thông báo do lỗi kết nối.",
-      );
+  // Hàm fomat thời gian chuẩn
+  String formatTimeAgo(dynamic timeData) {
+    if (timeData == null) return '';
+    try {
+      DateTime date = (timeData is DateTime)
+          ? timeData.toLocal()
+          : DateTime.parse(timeData.toString()).toLocal();
+      final difference = DateTime.now().difference(date);
+
+      if (difference.inDays > 7) {
+        return '${date.day.toString().padLeft(2, '0')}/${date.month.toString().padLeft(2, '0')}/${date.year}';
+      } else if (difference.inDays > 0) {
+        return '${difference.inDays} ngày trước';
+      } else if (difference.inHours > 0) {
+        return '${difference.inHours} giờ trước';
+      } else if (difference.inMinutes > 0) {
+        return '${difference.inMinutes} phút trước';
+      } else {
+        return 'Vừa xong';
+      }
+    } catch (e) {
+      return '';
     }
   }
 }

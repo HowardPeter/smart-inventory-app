@@ -28,4 +28,5 @@ class AppRoutes {
   static const customizeCatalog = '/customize-catalog';
 
   static const profile = '/profile';
+  static const notification = '/notification';
 }

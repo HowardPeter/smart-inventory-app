@@ -32,6 +32,9 @@ export class NotificationController {
     const user = requireReqUser(req);
     const storeId = req.headers['x-store-id'] as string;
 
+    const page = parseInt(req.query.page as string) || 1;
+    const size = parseInt(req.query.size as string) || 15;
+
     if (!storeId) {
       res.status(StatusCodes.BAD_REQUEST).json({
         success: false,
@@ -44,6 +47,8 @@ export class NotificationController {
     const notifications = await this.notificationService.getUserNotifications(
       user.userId,
       storeId,
+      page,
+      size,
     );
 
     sendResponse.success(res, notifications, { status: StatusCodes.OK });
@@ -73,6 +78,27 @@ export class NotificationController {
     sendResponse.success(res, null, {
       status: StatusCodes.OK,
       message: 'Đã xóa thông báo',
+    });
+  };
+
+  // Thêm API này
+  markAllAsRead = async (req: Request, res: Response): Promise<void> => {
+    const user = requireReqUser(req);
+    const storeId = req.headers['x-store-id'] as string;
+
+    if (!storeId) {
+      res.status(StatusCodes.BAD_REQUEST).json({
+        success: false,
+        message: 'Thiếu x-store-id trong Header',
+      });
+
+      return;
+    }
+
+    await this.notificationService.markAllAsRead(user.userId, storeId);
+    sendResponse.success(res, null, {
+      status: StatusCodes.OK,
+      message: 'Đã đánh dấu đọc tất cả',
     });
   };
 

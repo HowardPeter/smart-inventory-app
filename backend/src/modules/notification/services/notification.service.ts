@@ -106,11 +106,18 @@ export class NotificationService {
   }
 
   // Cung cấp dữ liệu cho API Frontend
-  public async getUserNotifications(userId: string, storeId: string) {
+  public async getUserNotifications(
+    userId: string,
+    storeId: string,
+    page: number,
+    size: number,
+  ) {
     // 👉 Thêm tham số storeId
     return await this.notificationRepository.getUserNotifications(
       userId,
       storeId,
+      page,
+      size,
     ); // 👉 Đồng bộ với Repo
   }
 
@@ -120,5 +127,9 @@ export class NotificationService {
 
   public async softDeleteNotification(userId: string, notificationId: string) {
     await this.notificationRepository.softDelete(userId, notificationId);
+  }
+
+  public async markAllAsRead(userId: string, storeId: string) {
+    await this.notificationRepository.markAllAsRead(userId, storeId);
   }
 }
