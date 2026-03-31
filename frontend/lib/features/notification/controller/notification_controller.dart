@@ -160,21 +160,61 @@ class NotificationController extends GetxController {
     }
   }
 
-  Future<void> deleteNotification(String id) async {
-    final index = notifications.indexWhere((n) => n.notificationId == id);
-    if (index == -1) return;
+  // ==========================================
+  // XÓA THÔNG BÁO CÓ HỖ TRỢ HOÀN TÁC (UNDO)
+  // ==========================================
+  void deleteNotificationWithUndo(NotificationModel item, int index) {
+    final context = Get.context;
+    if (context == null) return;
 
-    final backupItem = notifications[index];
+    // 1. Xóa tạm thời khỏi UI
     notifications.removeAt(index);
     _updateUnreadCount();
 
-    try {
-      await _provider.deleteNotification(id);
-    } catch (e) {
-      notifications.insert(index, backupItem);
-      _updateUnreadCount();
-      TSnackbarsWidget.error(title: "Lỗi", message: "Không thể xóa thông báo.");
-    }
+    bool isUndone = false;
+
+    // 2. Gọi Helper lấy giao diện SnackBar
+    final snackbar = TSnackbarsWidget.undoSnackBar(
+      context: context,
+      title: "Đã xóa thông báo",
+      message: "Có thể hoàn tác trong 5 giây",
+      onUndo: () {
+        // Logic hoàn tác (Chỉ Controller mới được quyền sửa data)
+        isUndone = true;
+        int safeIndex =
+            index > notifications.length ? notifications.length : index;
+        notifications.insert(safeIndex, item);
+        _updateUnreadCount();
+      },
+    );
+
+    // Xóa snackbar cũ nếu có
+    ScaffoldMessenger.of(context).hideCurrentSnackBar();
+
+    // 3. Hiển thị và xử lý luồng API ngầm
+    ScaffoldMessenger.of(context)
+        .showSnackBar(snackbar)
+        .closed
+        .then((reason) async {
+      if (!isUndone && reason != SnackBarClosedReason.action) {
+        try {
+          await _provider.deleteNotification(item.notificationId);
+          debugPrint("✅ Đã xóa thật: ${item.notificationId}");
+        } catch (e) {
+          debugPrint("⚠️ Lỗi API xóa thông báo: $e");
+
+          // Rollback data
+          int safeIndex =
+              index > notifications.length ? notifications.length : index;
+          notifications.insert(safeIndex, item);
+          _updateUnreadCount();
+
+          TSnackbarsWidget.error(
+              title: "Lỗi kết nối",
+              message: "Không thể xóa thông báo vào lúc này.");
+        }
+      }
+    });
   }
 
   // Hàm fomat thời gian chuẩn
