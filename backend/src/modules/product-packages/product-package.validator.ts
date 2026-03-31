@@ -88,6 +88,29 @@ const updateProductPackageBodySchema = z
     }
   });
 
+export const listPackageQuerySchema = z.object({
+  page: z.coerce.number().int().min(1).optional().default(1),
+  limit: z.coerce.number().int().min(1).max(100).optional().default(50),
+  sortBy: z
+    .enum(['displayName', 'createdAt', 'updatedAt'])
+    .optional()
+    .default('displayName'),
+  sortOrder: z.enum(['asc', 'desc']).optional().default('asc'),
+  categoryId: z.string().uuid('Invalid categoryId').optional(),
+});
+
+export const validateGetPackagesByStore = (
+  req: Request,
+  _res: Response,
+  next: NextFunction,
+): void => {
+  _res.locals.validatedQuery = validateSchema(
+    listPackageQuerySchema,
+    req.query,
+  );
+  next();
+};
+
 export const validateCreateProductPackage = (
   req: Request,
   _res: Response,

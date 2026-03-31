@@ -7,6 +7,7 @@ import {
   validateGetProductPackageById,
   validateGetProductPackagesByProductId,
   validateUpdateProductPackage,
+  validateGetPackagesByStore,
 } from './product-package.validator.js';
 import { asyncWrapper } from '../../common/middlewares/index.js';
 import { PERMISSION, requirePermission } from '../access-control/index.js';
@@ -18,6 +19,13 @@ const productPackageProductRouter = Router();
 
 productPackageRouter.use(authenticate, requireStoreContext);
 productPackageProductRouter.use(authenticate, requireStoreContext);
+
+productPackageRouter.get(
+  '/',
+  requirePermission(PERMISSION.PRODUCT_READ),
+  validateGetPackagesByStore,
+  asyncWrapper(productPackageController.getProductPackagesByStore),
+);
 
 productPackageProductRouter
   .route('/:productId/packages')
