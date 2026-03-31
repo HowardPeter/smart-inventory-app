@@ -201,7 +201,10 @@ export class ProductRepository {
     categoryId: string,
   ): Promise<ProductsByCategoryDto> {
     const products = await this.db.product.findMany({
-      where: { categoryId },
+      where: {
+        categoryId,
+        activeStatus: 'active',
+      },
       select: {
         productId: true,
         name: true,
