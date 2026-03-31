@@ -9,6 +9,7 @@ class TTextFormFieldWidget extends StatelessWidget {
     required this.label,
     required this.hintText,
     this.isObscure = false,
+    this.isRequired = false,
     this.suffixIcon,
     this.controller,
     this.onChanged,
@@ -21,6 +22,7 @@ class TTextFormFieldWidget extends StatelessWidget {
   final String label;
   final String hintText;
   final bool isObscure;
+  final bool isRequired;
   final Widget? suffixIcon;
   final TextEditingController? controller;
   final Function(String)? onChanged;
@@ -34,13 +36,26 @@ class TTextFormFieldWidget extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(
-          label,
-          style: const TextStyle(
-            fontFamily: 'Poppins',
-            fontSize: 12,
-            fontWeight: FontWeight.w500,
-            color: AppColors.subText,
+        RichText(
+          text: TextSpan(
+            text: label,
+            style: const TextStyle(
+              fontFamily: 'Poppins',
+              fontSize: 12,
+              fontWeight: FontWeight.w500,
+              color: AppColors.subText,
+            ),
+            children: [
+              if (isRequired)
+                const TextSpan(
+                  text: ' *',
+                  style: TextStyle(
+                    color: AppColors.alertText,
+                    fontWeight: FontWeight.bold,
+                    fontSize: 13,
+                  ),
+                ),
+            ],
           ),
         ),
         const SizedBox(height: AppSizes.p8),

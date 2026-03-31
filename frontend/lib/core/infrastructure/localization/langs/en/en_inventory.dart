@@ -114,6 +114,8 @@ final Map<String, String> enInventory = {
   TTexts.noCategoryDescription: 'This category does not have description',
   TTexts.emptyCategoryMessage:
       'We couldn\'t find any categories matching your search. Try a different keyword or add a new category.',
+  TTexts.viewAllProducts: 'All Products',
+  TTexts.viewAllProductsSub: 'View and manage all products in the store',
 
   // -- Category Detail
   TTexts.addNewProduct: 'Add New Product',
@@ -222,6 +224,11 @@ final Map<String, String> enInventory = {
   TTexts.cropImage: 'Edit Photo',
   TTexts.reorderThresholdLabel: 'Low Stock Alert At',
   TTexts.reorderThresholdHint: 'e.g. 5',
+  TTexts.zeroMeansNoLimit: '0 means No Limit / No Threshold',
+  TTexts.fieldRequired: 'This field is required',
+  TTexts.invalidNumber: 'Invalid number format',
+  TTexts.suggestedNames: 'Suggestions:',
+  TTexts.priceGreaterThanZero: 'Price must be greater than 0',
 
   // -- Edit Product
   TTexts.editProductImageTitle: 'Edit Product Image',

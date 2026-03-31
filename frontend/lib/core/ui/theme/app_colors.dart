@@ -33,6 +33,15 @@ class AppColors {
   static const Color stockOut = Color(0xFFCA5048); // Đỏ
 
   // ==========================================
+  // Màu Highlight Action (Dành cho các nút đặc biệt nổi bật)
+  // ==========================================
+  static const Color highlightAction =
+      Color(0xFF3B82F6); // Xanh dương đậm (Primary Blue)
+  static const Color highlightActionBg =
+      Color(0xFFEFF6FF); // Xanh dương siêu nhạt (Background)
+  static const Color highlightActionBorder = Color(0xFFBFDBFE);
+
+  // ==========================================
   // Màu Toast & Snackbar (Pastel Background & Gradient Icons)
   // ==========================================
 

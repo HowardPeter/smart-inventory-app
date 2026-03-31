@@ -64,7 +64,7 @@ class ProductCatalogController extends GetxController with TErrorHandler {
       // Gán data mới vào biến cục bộ
       categories.assignAll(fetchedData);
     } catch (e) {
-      handleError(e); // Tự động báo lỗi Snackbar nếu rớt mạng/lỗi server
+      handleError(e);
     } finally {
       if (!isRefresh) {
         _isLoading.value = false;
@@ -135,6 +135,14 @@ class ProductCatalogController extends GetxController with TErrorHandler {
         AppRoutes.categoryDetail,
         arguments: category,
       );
+    } catch (e) {
+      handleError(e);
+    }
+  }
+
+  void goToAllProducts() {
+    try {
+      Get.toNamed(AppRoutes.allProducts);
     } catch (e) {
       handleError(e);
     }

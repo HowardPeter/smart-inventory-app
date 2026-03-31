@@ -13,6 +13,7 @@ class TTexts {
   static const String strong = "strong";
   static const String create = "create";
   static const String cancel = "cancel";
+  static const String zero = "zero";
   static const String one = "one";
   static const String two = "two";
   static const String three = "three";
@@ -25,6 +26,8 @@ class TTexts {
   static const String errorNotFoundMessage = "error_not_found_message";
   static const String errorUnknownTitle = "error_unknown_title";
   static const String errorUnknownMessage = "error_unknown_message";
+  static const String fabScanBarcode = "fab_scan_barcode";
+  static const String fabAddManual = "fab_add_manual";
 
   // -- Search
   static const String searchHint = "search_hint";
@@ -404,7 +407,11 @@ class TTexts {
   static const String noCategoryDescription = 'no_description';
   static const String emptyCategoryMessage = 'empty_category_message';
 
-  // -- Category Detail ---
+  // --- View All Products ---
+  static const String viewAllProducts = 'view_all_products';
+  static const String viewAllProductsSub = 'view_all_products_sub';
+
+  // --- Category Detail ---
   static const String addNewProduct = 'add_new_product';
   static const String addNewProductSub = 'add_new_product_sub';
   static const String editCategory = 'editCategory';
@@ -414,7 +421,7 @@ class TTexts {
   static const String deleteCategoryConfirm = 'delete_category_confirm';
   static const String deleting = 'deleting';
 
-  // -- Product Catalog Deatail
+  // --- Product Catalog Deatail ---
   static const String brand = 'brand';
   static const String packagesOrVariants = 'packages_or_variants';
   static const String add = 'add';
@@ -503,6 +510,11 @@ class TTexts {
   static const String cropImage = 'crop_image';
   static const String reorderThresholdLabel = 'reorder_threshold_label';
   static const String reorderThresholdHint = 'reorder_threshold_hint';
+  static const String zeroMeansNoLimit = 'zero_means_no_limit';
+  static const String fieldRequired = 'field_required';
+  static const String invalidNumber = 'invalid_number';
+  static const String suggestedNames = 'suggested_names';
+  static const String priceGreaterThanZero = 'price_greater_than_zero';
 
   // -- Edit Product
   static const String editProductImageTitle = 'edit_product_image_title';

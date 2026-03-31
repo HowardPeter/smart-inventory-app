@@ -7,6 +7,7 @@ import 'package:frontend/features/auth/views/login_view.dart';
 import 'package:frontend/features/auth/views/register_view.dart';
 import 'package:frontend/features/auth/views/verify_email_view.dart';
 import 'package:frontend/features/home/views/home_view.dart';
+import 'package:frontend/features/inventory/bindings/all_products_binding.dart';
 import 'package:frontend/features/inventory/bindings/category_form_binding.dart';
 import 'package:frontend/features/inventory/bindings/category_detail_binding.dart';
 import 'package:frontend/features/inventory/bindings/customize_catalog_binding.dart';
@@ -15,6 +16,7 @@ import 'package:frontend/features/inventory/bindings/inventory_insight_binding.d
 import 'package:frontend/features/inventory/bindings/product_catalog_bindings.dart';
 import 'package:frontend/features/inventory/bindings/product_catalog_detail_binding.dart';
 import 'package:frontend/features/inventory/bindings/product_form_binding.dart';
+import 'package:frontend/features/inventory/views/all_products_view.dart';
 import 'package:frontend/features/inventory/views/category_form_view.dart';
 import 'package:frontend/features/inventory/views/category_detail_view.dart';
 import 'package:frontend/features/inventory/views/customize_catalog_view.dart';
@@ -189,6 +191,14 @@ class AppPages {
       transition: Transition.cupertino,
     ),
 
+    // -- All Products
+    GetPage(
+      name: AppRoutes.allProducts,
+      page: () => const AllProductsView(),
+      binding: AllProductsBinding(),
+      transition: Transition.cupertino,
+    ),
+
     // -- Category Detail
     GetPage(
       name: AppRoutes.categoryDetail,
@@ -221,7 +231,7 @@ class AppPages {
       transition: Transition.cupertino,
     ),
 
-    // -- Customize Catalog 
+    // -- Customize Catalog
     GetPage(
       name: AppRoutes.customizeCatalog,
       page: () => const CustomizeCatalogView(),

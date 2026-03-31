@@ -1,6 +1,7 @@
+import 'dart:io';
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
-import 'package:frontend/core/ui/theme/app_sizes.dart';
+import 'package:frontend/core/state/services/supabase_storage_service.dart';
 import 'package:get/get.dart';
 import 'package:image_cropper/image_cropper.dart';
 import 'package:image_picker/image_picker.dart';
@@ -12,6 +13,7 @@ import 'package:frontend/core/infrastructure/models/product_package_model.dart';
 import 'package:frontend/core/infrastructure/utils/error_handler_utils.dart';
 import 'package:frontend/core/infrastructure/utils/full_screen_loader_utils.dart';
 import 'package:frontend/core/ui/theme/app_colors.dart';
+import 'package:frontend/core/ui/theme/app_sizes.dart';
 import 'package:frontend/core/ui/widgets/t_bottom_sheet_widget.dart';
 import 'package:frontend/core/ui/widgets/t_custom_dialog_widget.dart';
 import 'package:frontend/core/ui/widgets/t_snackbars_widget.dart';
@@ -21,52 +23,50 @@ import 'package:frontend/features/inventory/providers/inventory_provider.dart';
 
 class ProductFormController extends GetxController with TErrorHandler {
   final InventoryProvider _provider = InventoryProvider();
+  final SupabaseStorageService _supabaseStorageService =
+      SupabaseStorageService();
 
-  // ===========================================================================
-  // 1. KHAI BÁO BIẾN (STATE & CONTROLLERS)
-  // ===========================================================================
-
-  /// Form keys dùng để validate (kiểm tra rỗng, lỗi) trước khi gửi API
+  // ==========================================
+  // 1. STATE & FORM KEYS
+  // ==========================================
   final GlobalKey<FormState> baseFormKey = GlobalKey<FormState>();
   final GlobalKey<FormState> packageFormKey = GlobalKey<FormState>();
 
-  /// Quản lý trạng thái UI chung
-  final RxInt currentStep = 1.obs; // Dành cho luồng tạo mới (Step 1 -> 3)
-  final RxBool isSaving = false.obs; // Khóa nút bấm khi đang gọi API
-  final RxBool isPickingImage =
-      false.obs; // Hiệu ứng xoay khi đang mở thư viện ảnh
+  final RxInt currentStep = 1.obs;
+  final RxBool isSaving = false.obs;
+  final RxBool isPickingImage = false.obs;
 
-  /// Xác định Form đang được dùng để làm gì ('create', 'info', 'image', 'edit_package', 'add_package')
   final RxString formMode = 'create'.obs;
   bool isEditMode = false;
 
-  /// Chứa dữ liệu cũ truyền từ màn hình trước sang để edit
   ProductModel? productToEdit;
   ProductPackageModel? packageToEdit;
 
-  // --- TRƯỜNG DỮ LIỆU: ẢNH ---
+  // ==========================================
+  // 2. DATA FIELDS (INPUTS)
+  // ==========================================
+  // --- Ảnh ---
   final ImagePicker _picker = ImagePicker();
-  final Rx<XFile?> selectedImage = Rx<XFile?>(null); // Ảnh mới chọn từ thiết bị
-  final RxString existingImageUrl = ''.obs; // Link ảnh cũ từ backend
+  final Rx<File?> selectedImage = Rx<File?>(null);
+  final RxString existingImageUrl = ''.obs;
 
-  // --- TRƯỜNG DỮ LIỆU: THÔNG TIN GỐC (PRODUCT) ---
+  // --- Thông tin Base ---
   final TextEditingController nameController = TextEditingController();
   final TextEditingController brandController = TextEditingController();
   final Rx<CategoryModel?> selectedCategory = Rx<CategoryModel?>(null);
   List<CategoryModel> allCategories = [];
-  bool isCategoryLocked =
-      false; // Khóa không cho đổi danh mục nếu truyền từ Category Detail sang
+  bool isCategoryLocked = false;
 
-  // --- TRƯỜNG DỮ LIỆU: CẤU HÌNH GÓI HÀNG (PACKAGE) ---
+  // --- Thông tin Package ---
   final TextEditingController packageDisplayNameController =
       TextEditingController();
   final TextEditingController importPriceController = TextEditingController();
   final TextEditingController salePriceController = TextEditingController();
-  final TextEditingController thresholdController =
-      TextEditingController(text: '0');
+
+  // Đã bỏ giá trị '0' mặc định, để input trống tự nhiên
+  final TextEditingController thresholdController = TextEditingController();
   final TextEditingController barcodeController = TextEditingController();
 
-  /// Mock data các đơn vị tính (Sẽ thay bằng API sau này)
   final List<Map<String, String>> mockUnits = [
     {
       'id': '88888888-8888-4888-a888-888888888801',
@@ -109,12 +109,11 @@ class ProductFormController extends GetxController with TErrorHandler {
       'name': 'Tube'
     },
   ];
-  final RxString selectedUnitId = '88888888-8888-4888-a888-888888888802'.obs;
+  final RxString selectedUnitId = ''.obs;
 
-  // ===========================================================================
-  // 2. VÒNG ĐỜI & KHỞI TẠO (LIFECYCLE)
-  // ===========================================================================
-
+  // ==========================================
+  // 3. LIFECYCLE (INIT & DISPOSE)
+  // ==========================================
   @override
   void onInit() {
     super.onInit();
@@ -122,7 +121,6 @@ class ProductFormController extends GetxController with TErrorHandler {
     _parseArguments();
   }
 
-  /// Hàm đọc tham số truyền sang từ trang trước (Arguments) và gán vào các Controller
   void _parseArguments() {
     if (Get.arguments == null) return;
 
@@ -130,7 +128,6 @@ class ProductFormController extends GetxController with TErrorHandler {
       final args = Get.arguments as Map<String, dynamic>;
       formMode.value = args['mode'] ?? 'create';
 
-      // 1. Nếu có gửi Product -> Chế độ Edit
       if (args['product'] != null) {
         isEditMode = true;
         isCategoryLocked = true;
@@ -140,9 +137,9 @@ class ProductFormController extends GetxController with TErrorHandler {
         existingImageUrl.value = productToEdit!.imageUrl ?? '';
       }
 
-      // 2. Nếu có gửi Package -> Đổ data của Package vào UI
       if (args['package'] != null) {
         packageToEdit = args['package'] as ProductPackageModel;
+
         packageDisplayNameController.text = packageToEdit!.displayName;
         importPriceController.text = packageToEdit!.importPrice.toString();
         salePriceController.text = packageToEdit!.sellingPrice.toString();
@@ -152,7 +149,6 @@ class ProductFormController extends GetxController with TErrorHandler {
         _fetchAndSetThreshold(packageToEdit!.productPackageId);
       }
 
-      // 3. Nếu truyền từ Category Detail sang -> Khóa ô chọn Danh mục
       if (args['category'] != null) {
         isCategoryLocked = true;
         selectedCategory.value = args['category'] as CategoryModel;
@@ -163,7 +159,6 @@ class ProductFormController extends GetxController with TErrorHandler {
     }
   }
 
-  /// Load danh sách Category để người dùng chọn
   Future<void> _loadCategories() async {
     try {
       allCategories = await _provider.getCategories();
@@ -172,31 +167,111 @@ class ProductFormController extends GetxController with TErrorHandler {
             .firstWhereOrNull((c) => c.categoryId == productToEdit!.categoryId);
       }
     } catch (e) {
-      handleError(
-          e); // Bẫy lỗi và báo cho người dùng nếu không load được danh mục
+      handleError(e);
     }
   }
 
-  /// Tải thông số Cảnh báo tồn kho (Threshold) từ backend và gán vào Input
   Future<void> _fetchAndSetThreshold(String packageId) async {
     try {
       final threshold =
           await _provider.getInventoryThresholdByPackage(packageId);
-      thresholdController.text = threshold.toString();
+      // Nếu threshold = 0 thì để trống cho UI đẹp, ngược lại thì hiện số
+      thresholdController.text = threshold == 0 ? '' : threshold.toString();
     } catch (e) {
-      debugPrint("Could not fetch threshold: $e");
-      thresholdController.text = '0';
+      thresholdController.text = '';
     }
   }
 
-  // ===========================================================================
-  // 3. ĐIỀU HƯỚNG WIZARD (STEP NAVIGATION)
-  // ===========================================================================
+  // ==========================================
+  // 4. SMART AUTO-FILL LOGIC
+  // ==========================================
+  // ==========================================
+  // 4. SMART AUTO-FILL LOGIC
+  // ==========================================
+  List<String> get variantNameSuggestions {
+    if (formMode.value == 'edit_package' || packageToEdit != null) {
+      return [];
+    }
 
-  /// Tiến tới bước tiếp theo (Có kèm Validate logic)
+    final unitId = selectedUnitId.value;
+    if (unitId.isEmpty) return [];
+
+    final unit = mockUnits.firstWhereOrNull((u) => u['id'] == unitId);
+    if (unit == null) return [];
+
+    final unitName = unit['name']!;
+    final unitCode = unit['code']!; // Lấy Code (CAN, BOX, BTL...) để phân tích
+    final productName = nameController.text.trim();
+
+    if (productName.isEmpty) return [unitName, '1 $unitName'];
+
+    List<String> suggestions = [];
+
+    suggestions.add('$productName $unitName');
+
+    switch (unitCode) {
+      case 'CAN':
+      case 'BTL':
+        suggestions.addAll([
+          '330ml $productName $unitName',
+          '500ml $productName $unitName',
+          '1.5L $productName $unitName',
+        ]);
+        break;
+
+      case 'BOX':
+      case 'CRT':
+        suggestions.addAll([
+          '6-Pack $productName $unitName',
+          '12 $unitName of $productName',
+          '24 $productName $unitName',
+        ]);
+        break;
+
+      case 'PKT':
+      case 'BAG':
+        suggestions.addAll([
+          'Small $productName $unitName',
+          'XL $productName $unitName',
+          '500g $productName $unitName',
+        ]);
+        break;
+
+      case 'PCS':
+        suggestions.addAll([
+          'Standard $productName',
+          'Premium $productName',
+          'Single $productName $unitName',
+        ]);
+        break;
+
+      case 'TUBE':
+        suggestions.addAll([
+          '50g $productName $unitName',
+          '150ml $productName $unitName',
+        ]);
+        break;
+
+      default:
+        suggestions.addAll([
+          'Standard $productName $unitName',
+          'Premium $productName $unitName',
+        ]);
+    }
+
+    return suggestions;
+  }
+
+  // Hàm khi người dùng bấm vào Chip
+  void selectVariantSuggestion(String suggestion) {
+    packageDisplayNameController.text = suggestion;
+  }
+
+  // ==========================================
+  // 5. NAVIGATION (WIZARD STEPS)
+  // ==========================================
   void nextStep() {
     if (currentStep.value == 1) {
-      // Validate rỗng và danh mục
       if (baseFormKey.currentState?.validate() != true) return;
       if (selectedCategory.value == null) {
         TSnackbarsWidget.warning(
@@ -206,7 +281,6 @@ class ProductFormController extends GetxController with TErrorHandler {
       }
       currentStep.value = 2;
     } else if (currentStep.value == 2) {
-      // Hỏi xác nhận nếu cố tình không chọn ảnh
       if (selectedImage.value == null) {
         Get.dialog(
           TCustomDialogWidget(
@@ -229,16 +303,13 @@ class ProductFormController extends GetxController with TErrorHandler {
     }
   }
 
-  /// Quay lại bước trước
   void previousStep() {
     if (currentStep.value > 1) currentStep.value--;
   }
 
-  // ===========================================================================
-  // 4. XỬ LÝ ẢNH (IMAGE PICKER & CROPPER)
-  // ===========================================================================
-
-  /// Mở Camera hoặc Thư viện, sau đó gọi thư viện Crop ảnh theo tỷ lệ 1:1 vuông
+  // ==========================================
+  // 6. IMAGE HANDLING (PICK & CROP)
+  // ==========================================
   Future<void> pickImage(ImageSource source) async {
     if (isPickingImage.value) return;
     try {
@@ -260,39 +331,34 @@ class ProductFormController extends GetxController with TErrorHandler {
       if (image != null) {
         CroppedFile? croppedFile = await ImageCropper().cropImage(
           sourcePath: image.path,
-          aspectRatio: const CropAspectRatio(
-              ratioX: 1, ratioY: 1), // Ép tỉ lệ 1:1 cho ảnh sản phẩm
+          aspectRatio: const CropAspectRatio(ratioX: 1, ratioY: 1),
           uiSettings: [
             AndroidUiSettings(
-              // Cấu hình thanh công cụ phía trên
               toolbarTitle: TTexts.cropImage.tr,
-              toolbarColor: AppColors.background, // Trắng
-              toolbarWidgetColor: AppColors.primaryText, // Chữ đen/xám đậm
-
-              // Cấu hình vùng cắt
-              backgroundColor: AppColors.background, // Trắng
-              activeControlsWidgetColor:
-                  AppColors.primary, // Màu cam chủ đạo khi nhấn nút
+              toolbarColor: AppColors.background,
+              toolbarWidgetColor: AppColors.primaryText,
+              backgroundColor: AppColors.background,
+              activeControlsWidgetColor: AppColors.primary,
               statusBarColor: AppColors.background,
-
-              // Cấu hình các nút chức năng (Gọn gàng hơn)
               initAspectRatio: CropAspectRatioPreset.square,
-              lockAspectRatio: true, // Khóa tỉ lệ vuông
-              hideBottomControls: false, // Hiện nút xoay ảnh nếu cần
-              showCropGrid: true, // Hiện lưới để căn chỉnh cho đẹp
+              lockAspectRatio: true,
+              hideBottomControls: false,
+              showCropGrid: true,
             ),
             IOSUiSettings(
               title: TTexts.cropImage.tr,
-              aspectRatioLockEnabled: true, // Khóa tỉ lệ vuông trên iOS
+              aspectRatioLockEnabled: true,
               resetButtonHidden: false,
-              aspectRatioPickerButtonHidden: true, // Ẩn nút chọn tỉ lệ khác
-              doneButtonTitle: TTexts.done.tr, // Text nút hoàn tất
-              cancelButtonTitle: TTexts.cancel.tr, // Text nút hủy
+              aspectRatioPickerButtonHidden: true,
+              doneButtonTitle: TTexts.done.tr,
+              cancelButtonTitle: TTexts.cancel.tr,
             ),
           ],
         );
 
-        if (croppedFile != null) selectedImage.value = XFile(croppedFile.path);
+        if (croppedFile != null) {
+          selectedImage.value = File(croppedFile.path);
+        }
       }
     } catch (e) {
       if (!e.toString().contains('camera_access_denied')) handleError(e);
@@ -301,17 +367,14 @@ class ProductFormController extends GetxController with TErrorHandler {
     }
   }
 
-  /// Xóa ảnh hiện tại (cả link mạng và link máy)
   void removeSelectedImage() {
     selectedImage.value = null;
     existingImageUrl.value = '';
   }
 
-  // ===========================================================================
-  // 5. NGHIỆP VỤ LƯU DỮ LIỆU (SAVE DATA TO API)
-  // ===========================================================================
-
-  /// Lưu MỚI TOÀN BỘ (Product + Package + Inventory)
+  // ==========================================
+  // 7. API CALLS (SAVE DATA)
+  // ==========================================
   Future<void> saveProduct() async {
     if (packageFormKey.currentState?.validate() != true) return;
     if (isSaving.value) return;
@@ -320,10 +383,26 @@ class ProductFormController extends GetxController with TErrorHandler {
       isSaving.value = true;
       FullScreenLoaderUtils.openLoadingDialog(TTexts.saving.tr);
 
+      String? imageUrl;
+
+      if (selectedImage.value != null) {
+        imageUrl = await _supabaseStorageService.uploadImage(
+            imageFile: selectedImage.value!, folderPath: 'products');
+
+        if (imageUrl == null) {
+          FullScreenLoaderUtils.stopLoading();
+          TSnackbarsWidget.error(
+              title: TTexts.errorTitle.tr,
+              message: 'Upload ảnh thất bại. Vui lòng thử lại!');
+          return;
+        }
+      }
+
       final productPayload = {
         'name': nameController.text.trim(),
         'brand': brandController.text.trim(),
         'categoryId': selectedCategory.value!.categoryId,
+        if (imageUrl != null) 'imageUrl': imageUrl,
       };
       final newProduct = await _provider.createProduct(productPayload);
 
@@ -361,7 +440,6 @@ class ProductFormController extends GetxController with TErrorHandler {
     }
   }
 
-  /// Cập nhật MỘT MÌNH thông tin Tên, Nhãn hiệu, Danh mục
   Future<void> saveProductInfo() async {
     if (baseFormKey.currentState?.validate() != true) return;
     if (isSaving.value) return;
@@ -375,10 +453,10 @@ class ProductFormController extends GetxController with TErrorHandler {
         'brand': brandController.text.trim(),
         'categoryId': selectedCategory.value!.categoryId,
       };
+
       await _provider.updateProduct(productToEdit!.productId, payload);
 
       FullScreenLoaderUtils.stopLoading();
-
       _triggerRefreshAndClose(
         TTexts.productUpdatedSuccess.tr,
         newName: nameController.text.trim(),
@@ -392,9 +470,8 @@ class ProductFormController extends GetxController with TErrorHandler {
     }
   }
 
-  /// Cập nhật MỘT MÌNH ảnh Sản phẩm
   Future<void> saveProductImage() async {
-    if (selectedImage.value == null && existingImageUrl.value.isEmpty) {
+    if (selectedImage.value == null) {
       TSnackbarsWidget.warning(
           title: TTexts.errorTitle.tr, message: TTexts.requirePhoto.tr);
       return;
@@ -405,16 +482,26 @@ class ProductFormController extends GetxController with TErrorHandler {
       isSaving.value = true;
       FullScreenLoaderUtils.openLoadingDialog(TTexts.saving.tr);
 
-      // TODO: API Upload ảnh thực tế (Ví dụ upload lên Supabase/S3 rồi lấy URL), thêm, sửa ảnh chuyển thành https
-      await Future.delayed(const Duration(seconds: 1));
-      final mockNewUrl =
-          'https://picsum.photos/400/400?random=${DateTime.now().millisecondsSinceEpoch}';
+      final newImageUrl = await _supabaseStorageService.uploadImage(
+          imageFile: selectedImage.value!, folderPath: 'products');
+
+      if (newImageUrl == null) {
+        FullScreenLoaderUtils.stopLoading();
+        TSnackbarsWidget.error(
+            title: TTexts.errorTitle.tr, message: 'Upload ảnh thất bại!');
+        return;
+      }
+
+      final payload = {
+        'imageUrl': newImageUrl,
+      };
+      await _provider.updateProduct(productToEdit!.productId, payload);
 
       FullScreenLoaderUtils.stopLoading();
 
       _triggerRefreshAndClose(
         TTexts.imageUpdatedSuccess.tr,
-        newImageUrl: mockNewUrl,
+        newImageUrl: newImageUrl,
       );
     } catch (e) {
       FullScreenLoaderUtils.stopLoading();
@@ -424,7 +511,6 @@ class ProductFormController extends GetxController with TErrorHandler {
     }
   }
 
-  /// Cập nhật HOẶC Tạo mới Gói hàng (Package + Inventory)
   Future<void> savePackageData() async {
     if (packageFormKey.currentState?.validate() != true) return;
     if (isSaving.value) return;
@@ -447,15 +533,12 @@ class ProductFormController extends GetxController with TErrorHandler {
       };
 
       if (formMode.value == 'edit_package' && packageToEdit != null) {
-        // Cập nhật Package
         await _provider.updateProductPackage(
             packageToEdit!.productPackageId, packagePayload);
 
-        // Cập nhật Inventory (Không bọc try-catch tĩnh để quăng lỗi đỏ nếu hỏng)
         await _provider.updateInventoryByPackage(
             packageToEdit!.productPackageId, inventoryPayload);
 
-        // Tạo Model Ảo để UI update ngay lập tức
         final updatedPkg = ProductPackageModel(
           productPackageId: packageToEdit!.productPackageId,
           displayName: packageDisplayNameController.text.trim(),
@@ -472,7 +555,6 @@ class ProductFormController extends GetxController with TErrorHandler {
         _triggerRefreshAndClose(TTexts.packageUpdatedSuccess.tr,
             updatedPackage: updatedPkg);
       } else {
-        // Tạo mới Package và Inventory
         final newPackage = await _provider.createProductPackage(
             productToEdit!.productId, packagePayload);
         final pkgId = newPackage['productPackageId'] ?? newPackage['id'];
@@ -503,27 +585,23 @@ class ProductFormController extends GetxController with TErrorHandler {
     }
   }
 
-  // ===========================================================================
-  // 6. UI HELPERS (BOTTOM SHEETS & DIALOGS)
-  // ===========================================================================
-
-  /// Hàm đóng Form, làm mới lại danh sách ở màn hình cũ (Catalog/Detail) và báo thành công
+  // ==========================================
+  // 8. UI HELPERS (BOTTOM SHEETS & DIALOGS)
+  // ==========================================
   void _triggerRefreshAndClose(String successMessage,
       {String? newName,
       String? newBrand,
       String? newImageUrl,
       ProductPackageModel? updatedPackage}) {
-    // 1. Refresh lại màn hình danh sách Product
     if (Get.isRegistered<CategoryDetailController>()) {
       Get.find<CategoryDetailController>().fetchProducts(isRefresh: true);
     }
 
-    // 2. Refresh lại màn hình Catalog (Chi tiết Product)
     if (Get.isRegistered<ProductCatalogDetailController>()) {
       final detailCtrl = Get.find<ProductCatalogDetailController>();
 
       if (updatedPackage != null) {
-        detailCtrl.updateLocalPackage(updatedPackage); // Ép UI cập nhật mượt mà
+        detailCtrl.updateLocalPackage(updatedPackage);
       } else {
         detailCtrl.fetchPackages(isRefresh: true);
       }
@@ -532,21 +610,19 @@ class ProductFormController extends GetxController with TErrorHandler {
           name: newName, brand: newBrand, imageUrl: newImageUrl);
     }
 
-    Get.back(); // Thoát khỏi form
+    Get.back();
     Future.delayed(const Duration(milliseconds: 300), () {
       TSnackbarsWidget.success(
           title: TTexts.successTitle.tr, message: successMessage);
     });
   }
 
-  /// Mở Bottom Sheet tìm kiếm và chọn Category
   void openCategoryPicker() {
     if (isCategoryLocked) return;
 
     TBottomSheetWidget.show(
       title: TTexts.selectCategory.tr,
       child: Container(
-        // Giới hạn chiều cao và thêm khoảng cách dưới để tránh dính sát màn hình
         constraints: BoxConstraints(maxHeight: Get.height * 0.4),
         padding: const EdgeInsets.only(bottom: AppSizes.p16),
         child: allCategories.isEmpty
@@ -560,7 +636,6 @@ class ProductFormController extends GetxController with TErrorHandler {
                 shrinkWrap: true,
                 physics: const BouncingScrollPhysics(),
                 itemCount: allCategories.length,
-                // Tạo đường kẻ mảnh giữa các item cho chuyên nghiệp
                 separatorBuilder: (_, __) => const Divider(
                   height: 1,
                   color: AppColors.divider,
@@ -569,7 +644,6 @@ class ProductFormController extends GetxController with TErrorHandler {
                 ),
                 itemBuilder: (context, index) {
                   final cat = allCategories[index];
-                  // Obx để đổi màu icon check nếu danh mục đang được chọn
                   return Obx(() {
                     final isSelected =
                         selectedCategory.value?.categoryId == cat.categoryId;
@@ -590,7 +664,6 @@ class ProductFormController extends GetxController with TErrorHandler {
                               : AppColors.primaryText,
                         ),
                       ),
-                      // Hiển thị icon check bên phải nếu đang chọn danh mục đó
                       trailing: isSelected
                           ? const Icon(Icons.check_circle,
                               color: AppColors.primary, size: 20)
@@ -607,7 +680,6 @@ class ProductFormController extends GetxController with TErrorHandler {
     );
   }
 
-  /// Dialog hỏi xác nhận khi người dùng lỡ tay vuốt thoát khỏi form đang nhập dở
   void confirmExit() {
     Get.dialog(
       TCustomDialogWidget(

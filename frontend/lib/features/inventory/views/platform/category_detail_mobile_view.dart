@@ -10,7 +10,7 @@ import 'package:frontend/core/ui/widgets/t_app_bar_widget.dart';
 import 'package:frontend/core/ui/widgets/t_empty_state_widget.dart';
 import 'package:frontend/core/ui/widgets/t_form_skeleton_widget.dart';
 import 'package:frontend/features/inventory/controllers/category_detail_controller.dart';
-import 'package:frontend/features/inventory/widgets/category_detail/category_detail_product_item_widget.dart';
+import 'package:frontend/features/inventory/widgets/shared/inventory_category_detail_product_item_widget.dart';
 import 'package:frontend/features/inventory/widgets/category_detail/category_detail_add_product_widget.dart'; // Import widget thêm SP
 
 class CategoryDetailMobileView extends GetView<CategoryDetailController> {
@@ -132,7 +132,7 @@ class CategoryDetailMobileView extends GetView<CategoryDetailController> {
                         itemCount: controller.products.length,
                         itemBuilder: (context, index) {
                           final product = controller.products[index];
-                          return CategoryDetailProductItemWidget(
+                          return InventoryCategoryDetailProductItemWidget(
                             product: product,
                             onTap: () => controller.goToProductDetail(product),
                           );
