@@ -1,13 +1,13 @@
-import type {
-  PaginationQuery,
-  PaginationResponseDto,
-} from '../../common/types/index.js';
+import { z } from 'zod';
+
+import type { searchByKeywordQuerySchema } from './search.validator.js';
+import type { PaginationResponseDto } from '../../common/types/index.js';
 import type { BarcodeType, Prisma } from '../../generated/prisma/client.js';
 import type { Product } from '../products/index.js';
 
-export type SearchByKeywordQueryDto = PaginationQuery & {
-  keyword: string;
-};
+export type SearchByKeywordQueryDto = z.infer<
+  typeof searchByKeywordQuerySchema
+>;
 
 export type SearchByBarcodeQueryDto = {
   barcode: string;

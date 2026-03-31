@@ -89,9 +89,7 @@ export class SearchRepository {
     storeId: string,
     query: SearchByKeywordQueryDto,
   ): Promise<ListPaginationResponseDto<SearchProductItemDto>> {
-    const keyword = query.keyword.trim();
-    const page = query.page ?? 1;
-    const limit = query.limit ?? 20;
+    const { keyword, page, limit } = query;
     const offset = getPaginationSkip({ page, limit });
 
     if (!keyword) {

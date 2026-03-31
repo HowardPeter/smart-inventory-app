@@ -1,7 +1,4 @@
-import {
-  normalizePagination,
-  getPaginationSkip,
-} from '../../common/utils/index.js';
+import { getPaginationSkip } from '../../common/utils/index.js';
 
 import type {
   CreateProductData,
@@ -25,8 +22,7 @@ export class ProductRepository {
     storeId: string,
     query: ListProductsQueryDto,
   ): Promise<ListPaginationResponseDto<ProductListItemDto>> {
-    const { page, limit } = normalizePagination(query);
-    const { sortBy = 'name', sortOrder = 'desc', categoryId, brand } = query;
+    const { page, limit, sortBy, sortOrder, categoryId, brand } = query;
 
     const where: Prisma.ProductWhereInput = {
       storeId,

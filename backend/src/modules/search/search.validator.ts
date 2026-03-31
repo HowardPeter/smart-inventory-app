@@ -4,14 +4,14 @@ import { validateSchema } from '../../common/utils/index.js';
 
 import type { NextFunction, Request, Response } from 'express';
 
-const searchByKeywordQuerySchema = z.object({
+export const searchByKeywordQuerySchema = z.object({
   keyword: z
     .string()
     .trim()
     .min(1, 'Keyword is required')
     .max(100, 'Keyword must be at most 100 characters'),
-  page: z.coerce.number().int().min(1).optional(),
-  limit: z.coerce.number().int().min(1).max(50).optional(),
+  page: z.coerce.number().int().min(1).optional().default(1),
+  limit: z.coerce.number().int().min(1).max(50).optional().default(50),
 });
 
 const searchByPrefixQuerySchema = z.object({
