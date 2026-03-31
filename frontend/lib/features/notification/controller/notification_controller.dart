@@ -25,7 +25,7 @@ class NotificationController extends GetxController {
 
       // ApiClient đã tự động gắn Token và x-store-id vào header
       // và baseUrl đã có sẵn /api nên chỉ cần gọi '/notification'
-      final response = await _apiClient.get('/notification');
+      final response = await _apiClient.get('/api/notification');
 
       if (response.statusCode == 200) {
         final List data = response.data['data'] ?? [];
@@ -63,7 +63,7 @@ class NotificationController extends GetxController {
 
     // 3. Gọi API chạy ngầm
     try {
-      await _apiClient.patch('/notification/$id/read');
+      await _apiClient.patch('/api/notification/$id/read');
     } catch (e) {
       debugPrint("⚠️ Lỗi API markAsRead: $e");
       // (Tuỳ chọn) Rollback UI nếu API lỗi
@@ -87,7 +87,7 @@ class NotificationController extends GetxController {
     // Gọi API từng cái hoặc báo Backend làm thêm API /notification/read-all
     for (var n in unreadList) {
       _apiClient
-          .patch('/notification/${n.notificationId}/read')
+          .patch('/api/notification/${n.notificationId}/read')
           // ignore: body_might_complete_normally_catch_error
           .catchError((e) {
         debugPrint("Lỗi patch: $e");
@@ -109,7 +109,7 @@ class NotificationController extends GetxController {
 
     // 3. Gọi API chạy ngầm
     try {
-      await _apiClient.delete('/notification/$id');
+      await _apiClient.delete('/api/notification/$id');
     } catch (e) {
       debugPrint("❌ Lỗi API xóa thông báo: $e");
 
