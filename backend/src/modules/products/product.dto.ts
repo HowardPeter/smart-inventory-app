@@ -1,12 +1,15 @@
+import { z } from 'zod';
+
 import type { Product } from './product.type.js';
-import type {
-  ListPaginationQueryDto,
-  PaginationResponseDto,
-} from '../../common/types/index.js';
+import type { listProductsQuerySchema } from './product.validator.js';
+import type { PaginationResponseDto } from '../../common/types/index.js';
 import type { Category } from '../categories/index.js';
 import type { ProductPackage, Unit } from '../product-packages/index.js';
 
-type ProductSimpleResponseDto = Omit<Product, 'activeStatus' | 'createdAt' | 'updatedAt'>;
+type ProductSimpleResponseDto = Omit<
+  Product,
+  'activeStatus' | 'createdAt' | 'updatedAt'
+>;
 
 export type ProductsByCategoryDto = {
   count: number;
@@ -46,10 +49,7 @@ export type UpdateProductDto = Partial<
   Pick<Product, 'brand' | 'imageUrl' | 'name' | 'categoryId'>
 >;
 
-export type ProductSortBy = 'name' | 'createdAt' | 'updatedAt';
-
-export type ListProductsQueryDto = ListPaginationQueryDto<ProductSortBy> &
-  Partial<Pick<Product, 'categoryId' | 'brand'>>;
+export type ListProductsQueryDto = z.infer<typeof listProductsQuerySchema>;
 
 export type ProductListItemDto = ProductResponseDto;
 
