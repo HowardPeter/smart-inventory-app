@@ -8,7 +8,6 @@ import 'package:get/get.dart';
 import 'package:frontend/routes/app_routes.dart';
 import 'package:frontend/core/state/services/user_service.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
-// import 'package:frontend/features/auth/providers/auth_provider.dart';
 
 class ProfileController extends GetxController {
   // Lấy thẳng UserService đã nạp trên RAM từ lúc Splash khởi động
@@ -44,5 +43,27 @@ class ProfileController extends GetxController {
       // Hiển thị lỗi bằng chuẩn TSnackbarsWidget của App thay vì Get.snackbar mặc định
       TSnackbarsWidget.error(title: 'Lỗi đăng xuất', message: e.toString());
     }
+  }
+
+  void goToStoreSelect() {
+    final user = userService.currentUser.value;
+
+    if (user == null) {
+      Get.toNamed(AppRoutes.createStore);
+    } else {
+      Get.toNamed(AppRoutes.storeSelection);
+    }
+  }
+
+  void goToEditProfile() {
+    Get.toNamed(
+      AppRoutes.editProfile,
+    );
+  }
+
+  void goToChangePasswordProfile() {
+    Get.toNamed(
+      AppRoutes.changePassword,
+    );
   }
 }

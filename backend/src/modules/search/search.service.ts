@@ -5,7 +5,8 @@ import {
 
 import type {
   SearchByKeywordQueryDto,
-  ListSearchByKeywordResponseDto,
+  ListProductPackageByKeywordResponseDto,
+  ListProductByKeywordResponseDto,
   SearchByPrefixQueryDto,
   SearchProductPrefixResponseDto,
 } from './search.dto.js';
@@ -14,19 +15,32 @@ import type { SearchRepository } from './search.repository.js';
 export class SearchService {
   constructor(private readonly searchRepository: SearchRepository) {}
 
+  async searchProductPackagesByKeyword(
+    storeId: string,
+    query: SearchByKeywordQueryDto,
+  ): Promise<ListProductPackageByKeywordResponseDto> {
+    const normalizedPagination = normalizePagination(query);
+
+    const { items, totalItems } =
+      await this.searchRepository.searchProductPackagesByKeyword(storeId, {
+        ...query,
+        ...normalizedPagination,
+      });
+
+    return buildPaginatedResponse(items, totalItems, normalizedPagination);
+  }
+
   async searchProductsByKeyword(
     storeId: string,
     query: SearchByKeywordQueryDto,
-  ): Promise<ListSearchByKeywordResponseDto> {
+  ): Promise<ListProductByKeywordResponseDto> {
     const normalizedPagination = normalizePagination(query);
 
-    const { items, totalItems } = await this.searchRepository.searchByKeyword(
-      storeId,
-      {
+    const { items, totalItems } =
+      await this.searchRepository.searchProductsByKeyword(storeId, {
         ...query,
         ...normalizedPagination,
-      },
-    );
+      });
 
     return buildPaginatedResponse(items, totalItems, normalizedPagination);
   }
@@ -35,6 +49,6 @@ export class SearchService {
     storeId: string,
     query: SearchByPrefixQueryDto,
   ): Promise<SearchProductPrefixResponseDto[]> {
-    return await this.searchRepository.searchByPrefix(storeId, query);
+    return await this.searchRepository.searchProductsByPrefix(storeId, query);
   }
 }

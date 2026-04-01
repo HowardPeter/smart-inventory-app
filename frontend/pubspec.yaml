@@ -87,6 +87,7 @@ flutter:
     - assets/icons/
     - assets/images/auth/
     - assets/images/core/
+    - assets/images/profile/
     - assets/images/onboarding/
     - assets/mock_data/
 

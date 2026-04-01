@@ -9,8 +9,8 @@ import 'package:frontend/features/inventory/controllers/product_form_controller.
 import 'package:iconsax_flutter/iconsax_flutter.dart';
 import 'package:frontend/core/ui/widgets/t_bottom_sheet_widget.dart';
 
-class ProductFormImageWidget extends GetView<ProductFormController> {
-  const ProductFormImageWidget({super.key});
+class InventoryProductFormImageWidget extends GetView<ProductFormController> {
+  const InventoryProductFormImageWidget({super.key});
 
   @override
   Widget build(BuildContext context) {

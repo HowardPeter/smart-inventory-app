@@ -32,6 +32,8 @@ class UserProfileModel {
     );
   }
 
+  get profilePicture => null;
+
   // Chuyển từ Model sang JSON (để gửi lên Backend nếu cần)
   Map<String, dynamic> toJson() {
     return {

@@ -1,7 +1,13 @@
-import type { DbClient } from '../../../common/types/index.js';
+import { getPaginationSkip } from '../../../common/utils/index.js';
+
+import type {
+  DbClient,
+  ListPaginationResponseDto,
+} from '../../../common/types/index.js';
 import type { Prisma } from '../../../generated/prisma/client.js';
 import type {
   CreateProductPackageData,
+  PackageQueryDto,
   ProductPackageResponseDto,
   UpdateProductPackageDto,
 } from '../product-package.dto.js';
@@ -28,6 +34,12 @@ const productPackageResponseSelect = {
       productId: true,
       name: true,
       storeId: true,
+      category: {
+        select: {
+          categoryId: true,
+          name: true,
+        },
+      },
     },
   },
 } satisfies Prisma.ProductPackageSelect;
@@ -44,9 +56,62 @@ export class ProductPackageRepository {
     productPackage: ProductPackageRecord,
   ): ProductPackageResponseDto {
     return {
-      ...productPackage,
+      productPackageId: productPackage.productPackageId,
+      displayName: productPackage.displayName,
       importPrice: productPackage.importPrice?.toNumber() ?? null,
       sellingPrice: productPackage.sellingPrice?.toNumber() ?? null,
+      activeStatus: productPackage.activeStatus,
+      barcodeValue: productPackage.barcodeValue,
+      barcodeType: productPackage.barcodeType,
+      createdAt: productPackage.createdAt,
+      updatedAt: productPackage.updatedAt,
+      unit: productPackage.unit,
+      category: productPackage.product.category,
+      product: {
+        productId: productPackage.product.productId,
+        name: productPackage.product.name,
+        storeId: productPackage.product.storeId,
+      },
+    };
+  }
+
+  async findManyByStore(
+    storeId: string,
+    query: PackageQueryDto,
+  ): Promise<ListPaginationResponseDto<ProductPackageResponseDto>> {
+    const { page, limit, categoryId, sortBy, sortOrder } = query;
+
+    const where: Prisma.ProductPackageWhereInput = {
+      activeStatus: 'active',
+      product: {
+        storeId,
+        activeStatus: 'active',
+        ...(categoryId ? { categoryId } : {}),
+      },
+    };
+
+    const [productPackages, totalItems] = await this.db.$transaction([
+      this.db.productPackage.findMany({
+        where,
+        orderBy: {
+          [sortBy]: sortOrder,
+        },
+        skip: getPaginationSkip({ page, limit }),
+        take: limit,
+        select: productPackageResponseSelect,
+      }),
+      this.db.productPackage.count({
+        where,
+      }),
+    ]);
+
+    const items = productPackages.map((productPackage) =>
+      this.toResponseDto(productPackage),
+    );
+
+    return {
+      items,
+      totalItems,
     };
   }
 

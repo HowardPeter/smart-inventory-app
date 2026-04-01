@@ -8,6 +8,7 @@ final Map<String, String> enCore = {
   TTexts.errorTitle: 'Error',
   TTexts.successTitle: 'Success',
   TTexts.warningTitle: 'Warning',
+  TTexts.zero: '0',
   TTexts.one: '1',
   TTexts.two: '2',
   TTexts.three: '3',
@@ -29,6 +30,8 @@ final Map<String, String> enCore = {
   TTexts.errorNotFoundMessage: 'The requested data could not be found.',
   TTexts.errorUnknownTitle: 'Unknown Error',
   TTexts.errorUnknownMessage: 'An unexpected error occurred. Please try again.',
+  TTexts.fabScanBarcode: 'Scan Barcode',
+  TTexts.fabAddManual: 'Add Manual',
 
   // -- Search
   TTexts.searchHint: 'Search by name,...',

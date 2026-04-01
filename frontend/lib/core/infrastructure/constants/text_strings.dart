@@ -13,6 +13,7 @@ class TTexts {
   static const String strong = "strong";
   static const String create = "create";
   static const String cancel = "cancel";
+  static const String zero = "zero";
   static const String one = "one";
   static const String two = "two";
   static const String three = "three";
@@ -25,6 +26,8 @@ class TTexts {
   static const String errorNotFoundMessage = "error_not_found_message";
   static const String errorUnknownTitle = "error_unknown_title";
   static const String errorUnknownMessage = "error_unknown_message";
+  static const String fabScanBarcode = "fab_scan_barcode";
+  static const String fabAddManual = "fab_add_manual";
 
   // -- Search
   static const String searchHint = "search_hint";
@@ -33,6 +36,11 @@ class TTexts {
   static const String noResultsTitle = "no_results_title";
   static const String noResultsMessage = "no_results_message";
   static const String searchItemsPackages = "search_items_packages";
+
+  // -- Search Module
+  static const String searchEverything = "search_everything";
+  static const String noResultsFound = "no_results_found";
+  static const String didYouMean = "didYouMean";
 
   // -- Network Error Dialog
   static const String netErrorTitle = "net_error_title";
@@ -404,7 +412,11 @@ class TTexts {
   static const String noCategoryDescription = 'no_description';
   static const String emptyCategoryMessage = 'empty_category_message';
 
-  // -- Category Detail ---
+  // --- View All Products ---
+  static const String viewAllProducts = 'view_all_products';
+  static const String viewAllProductsSub = 'view_all_products_sub';
+
+  // --- Category Detail ---
   static const String addNewProduct = 'add_new_product';
   static const String addNewProductSub = 'add_new_product_sub';
   static const String editCategory = 'editCategory';
@@ -414,7 +426,7 @@ class TTexts {
   static const String deleteCategoryConfirm = 'delete_category_confirm';
   static const String deleting = 'deleting';
 
-  // -- Product Catalog Deatail
+  // --- Product Catalog Deatail ---
   static const String brand = 'brand';
   static const String packagesOrVariants = 'packages_or_variants';
   static const String add = 'add';
@@ -503,6 +515,11 @@ class TTexts {
   static const String cropImage = 'crop_image';
   static const String reorderThresholdLabel = 'reorder_threshold_label';
   static const String reorderThresholdHint = 'reorder_threshold_hint';
+  static const String zeroMeansNoLimit = 'zero_means_no_limit';
+  static const String fieldRequired = 'field_required';
+  static const String invalidNumber = 'invalid_number';
+  static const String suggestedNames = 'suggested_names';
+  static const String priceGreaterThanZero = 'price_greater_than_zero';
 
   // -- Edit Product
   static const String editProductImageTitle = 'edit_product_image_title';
@@ -577,4 +594,45 @@ class TTexts {
   static const String filterAlerts = "filter_alerts";
   static const String filterTransactions = "filter_transactions";
   static const String filterSystem = "filter_system";
+  //--Profile
+  static const String profileTitle = 'profile_title';
+  static const String profileNameUser = 'profile_name_user';
+  static const String profileEmaiUser = 'profile_mail_user';
+  static const String profileNameStore = 'profile_name_store';
+  static const String profileBtnSwitchStore = 'profile_btn_switch_store';
+  static const String profileAccount = 'profile_account';
+  static const String profileSecurity = 'profile_security';
+  static const String profileMyAccount = 'profile_my_account';
+  static const String profileChangePassword = 'profile_change_password';
+  static const String profileUserPermissions = 'proflie_user_permissions';
+  static const String profileBtnLogout = 'profile_btn_logout';
+  static const String profileDialogTitleLogout = 'profile_dialog_title_logout';
+  static const String profileDialogDescriptionLogout =
+      'profile_dialog_description_logout';
+  static const String profileDialogBtnLogout = 'profile_dialog_btn_logout';
+
+  //--Edit profile
+  static const String editTitle = 'edit_title';
+  static const String editLoading = 'edit_loading';
+  static const String editName = 'edit_name';
+  static const String editEmail = 'edit_email';
+  static const String editHintName = 'edit_hint_name';
+  static const String editHintEmail = 'edit_hint_email';
+  static const String editUpdate = 'edit_update';
+
+  //--Change password
+  static const String changePasswordTitle = "change_password_title";
+  static const String changePasswordOldPassword =
+      "change_password_old_password";
+  static const String changePasswordNewPassword =
+      "change_password_new_password";
+  static const String changePasswordConfirm = "change_password_confirm";
+  static const String changePasswordBtnConfirm = "change_password_btn_confirm";
+
+  static const String changePasswordHintOldPassword =
+      "change_password_hint_old_password";
+  static const String changePasswordHintNewPassword =
+      "change_password_hint_new_password";
+  static const String changePasswordHintConfirmPassword =
+      "change_password_hint_confirm";
 }

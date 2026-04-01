@@ -7,6 +7,7 @@ import 'package:frontend/features/auth/views/login_view.dart';
 import 'package:frontend/features/auth/views/register_view.dart';
 import 'package:frontend/features/auth/views/verify_email_view.dart';
 import 'package:frontend/features/home/views/home_view.dart';
+import 'package:frontend/features/inventory/bindings/all_products_binding.dart';
 import 'package:frontend/features/inventory/bindings/category_form_binding.dart';
 import 'package:frontend/features/inventory/bindings/category_detail_binding.dart';
 import 'package:frontend/features/inventory/bindings/customize_catalog_binding.dart';
@@ -15,6 +16,7 @@ import 'package:frontend/features/inventory/bindings/inventory_insight_binding.d
 import 'package:frontend/features/inventory/bindings/product_catalog_bindings.dart';
 import 'package:frontend/features/inventory/bindings/product_catalog_detail_binding.dart';
 import 'package:frontend/features/inventory/bindings/product_form_binding.dart';
+import 'package:frontend/features/inventory/views/all_products_view.dart';
 import 'package:frontend/features/inventory/views/category_form_view.dart';
 import 'package:frontend/features/inventory/views/category_detail_view.dart';
 import 'package:frontend/features/inventory/views/customize_catalog_view.dart';
@@ -28,6 +30,10 @@ import 'package:frontend/features/navigation/bindings/navigation_binding.dart';
 import 'package:frontend/features/navigation/views/navigation_view.dart';
 import 'package:frontend/features/notification/view/platform/notification_mobile_screen.dart';
 import 'package:frontend/features/onboarding/bindings/onboarding_binding.dart';
+import 'package:frontend/features/profile/bindings/profile_binding.dart';
+import 'package:frontend/features/profile/bindings/profile_edit_profile_binding.dart';
+import 'package:frontend/features/profile/views/profile_change_password_view.dart';
+import 'package:frontend/features/profile/views/profile_edit_view.dart';
 import 'package:frontend/features/profile/views/profile_view.dart';
 import 'package:frontend/features/search/bindings/search_binding.dart';
 import 'package:frontend/features/search/views/search_view.dart';
@@ -52,7 +58,7 @@ class AppPages {
 
   // Đổi từ onboarding sang splash để app luôn khởi động từ màn hình loading
   static const initial = AppRoutes.splash;
-
+  // static const initial = AppRoutes.main;
   static final routes = [
     // -- Splash
     GetPage(
@@ -190,6 +196,14 @@ class AppPages {
       transition: Transition.cupertino,
     ),
 
+    // -- All Products
+    GetPage(
+      name: AppRoutes.allProducts,
+      page: () => const AllProductsView(),
+      binding: AllProductsBinding(),
+      transition: Transition.cupertino,
+    ),
+
     // -- Category Detail
     GetPage(
       name: AppRoutes.categoryDetail,
@@ -230,13 +244,32 @@ class AppPages {
       transition: Transition.cupertino,
     ),
 
-    // -- Profile
-    GetPage(name: AppRoutes.profile, page: () => const ProfileView()),
-
     // -- Notification
     GetPage(
       name: AppRoutes.notification,
       page: () => const NotificationMobileScreen(),
     )
+    
+    // -- Profile
+    GetPage(
+      name: AppRoutes.profile,
+      page: () => const ProfileView(),
+    ),
+
+    // -- Edit profile
+    GetPage(
+      name: AppRoutes.editProfile,
+      page: () => const ProfileEditView(),
+      binding: ProfileEditBinding(),
+      transition: Transition.cupertino,
+    ),
+
+    //-- Change password
+    GetPage(
+      name: AppRoutes.changePassword,
+      page: () => const ProfileChangePasswordView(),
+      binding: ProfileBinding(),
+      transition: Transition.cupertino,
+    ),
   ];
 }

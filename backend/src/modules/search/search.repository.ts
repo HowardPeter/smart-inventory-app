@@ -5,6 +5,8 @@ import type {
   SearchByKeywordQueryDto,
   SearchByPrefixQueryDto,
   SearchProductPrefixResponseDto,
+  SearchProductPackageItemDto,
+  SearchProductPackageRow,
   SearchProductItemDto,
   SearchProductRow,
   SearchCountRow,
@@ -63,7 +65,9 @@ export class SearchRepository {
     return token.replace(/[&|!():*']/g, ' ');
   }
 
-  private mapSearchProductRow(row: SearchProductRow): SearchProductItemDto {
+  private mapSearchProductPackageRow(
+    row: SearchProductPackageRow,
+  ): SearchProductPackageItemDto {
     return {
       productId: row.productId,
       productName: row.productName,
@@ -85,13 +89,22 @@ export class SearchRepository {
     };
   }
 
-  async searchByKeyword(
+  private mapSearchProduct(row: SearchProductRow): SearchProductItemDto {
+    return {
+      productId: row.productId,
+      productName: row.productName,
+      imageUrl: row.imageUrl,
+      brand: row.brand,
+      categoryId: row.categoryId,
+      categoryName: row.categoryName,
+    };
+  }
+
+  async searchProductPackagesByKeyword(
     storeId: string,
     query: SearchByKeywordQueryDto,
-  ): Promise<ListPaginationResponseDto<SearchProductItemDto>> {
-    const keyword = query.keyword.trim();
-    const page = query.page ?? 1;
-    const limit = query.limit ?? 20;
+  ): Promise<ListPaginationResponseDto<SearchProductPackageItemDto>> {
+    const { keyword, page, limit } = query;
     const offset = getPaginationSkip({ page, limit });
 
     if (!keyword) {
@@ -135,7 +148,7 @@ export class SearchRepository {
     );
 
     // search result trả về cho user
-    const rows = await this.db.$queryRaw<SearchProductRow[]>(
+    const rows = await this.db.$queryRaw<SearchProductPackageRow[]>(
       Prisma.sql`
         WITH search_data AS (
           SELECT
@@ -212,11 +225,110 @@ export class SearchRepository {
     );
 
     const total = Number(countRows[0]?.total ?? 0n);
-    const items = rows.map((row) => this.mapSearchProductRow(row));
+    const items = rows.map((row) => this.mapSearchProductPackageRow(row));
 
     return {
       items: items,
       totalItems: total,
+    };
+  }
+
+  async searchProductsByKeyword(
+    storeId: string,
+    query: SearchByKeywordQueryDto,
+  ): Promise<ListPaginationResponseDto<SearchProductItemDto>> {
+    const { keyword, page, limit } = query;
+    const offset = getPaginationSkip({ page, limit });
+
+    if (!keyword) {
+      return {
+        items: [],
+        totalItems: 0,
+      };
+    }
+
+    const { strictQuery, broadQuery } = this.buildSearchTsQueries(keyword);
+
+    if (!broadQuery) {
+      return {
+        items: [],
+        totalItems: 0,
+      };
+    }
+
+    const countRows = await this.db.$queryRaw<SearchCountRow[]>(
+      Prisma.sql`
+      WITH search_data AS (
+        SELECT
+          p.product_id,
+          (
+            setweight(to_tsvector('simple', coalesce(p.name, '')), 'A') ||
+            setweight(to_tsvector('simple', coalesce(p.brand, '')), 'B') ||
+            setweight(to_tsvector('simple', coalesce(c.name, '')), 'C') ||
+            setweight(to_tsvector('simple', coalesce(c.description, '')), 'D')
+          ) AS document
+        FROM "Product" p
+        INNER JOIN "Category" c
+          ON c.category_id = p.category_id
+        WHERE p.store_id = ${storeId}
+          AND p.active_status = 'active'
+      )
+      SELECT COUNT(*)::bigint AS total
+      FROM search_data
+      WHERE document @@ to_tsquery('simple', ${broadQuery});
+    `,
+    );
+
+    const rows = await this.db.$queryRaw<SearchProductRow[]>(
+      Prisma.sql`
+      WITH search_data AS (
+        SELECT
+          p.product_id AS "productId",
+          p.name AS "productName",
+          p.image_url AS "imageUrl",
+          p.brand AS "brand",
+          c.category_id AS "categoryId",
+          c.name AS "categoryName",
+          (
+            setweight(to_tsvector('simple', coalesce(p.name, '')), 'A') ||
+            setweight(to_tsvector('simple', coalesce(p.brand, '')), 'B') ||
+            setweight(to_tsvector('simple', coalesce(c.name, '')), 'C') ||
+            setweight(to_tsvector('simple', coalesce(c.description, '')), 'D')
+          ) AS document
+        FROM "Product" p
+        INNER JOIN "Category" c
+          ON c.category_id = p.category_id
+        WHERE p.store_id = ${storeId}
+          AND p.active_status = 'active'
+      )
+      SELECT
+        "productId",
+        "productName",
+        "imageUrl",
+        "brand",
+        "categoryId",
+        "categoryName",
+        CASE
+          WHEN document @@ to_tsquery('simple', ${strictQuery}) THEN
+            ts_rank(document, to_tsquery('simple', ${strictQuery})) + 1
+          ELSE
+            ts_rank(document, to_tsquery('simple', ${broadQuery}))
+        END AS rank
+      FROM search_data
+      WHERE document @@ to_tsquery('simple', ${broadQuery})
+      ORDER BY
+        rank DESC,
+        "productName" ASC
+      LIMIT ${limit}
+      OFFSET ${offset};
+    `,
+    );
+
+    const totalItems = Number(countRows[0]?.total ?? 0n);
+
+    return {
+      items: rows.map((row) => this.mapSearchProduct(row)),
+      totalItems,
     };
   }
 
@@ -229,7 +341,7 @@ export class SearchRepository {
 
   // Hàm cho các ô nhập tên product
   // và dropdown danh sách tên product theo prefix
-  async searchByPrefix(
+  async searchProductsByPrefix(
     storeId: string,
     query: SearchByPrefixQueryDto,
   ): Promise<SearchProductPrefixResponseDto[]> {

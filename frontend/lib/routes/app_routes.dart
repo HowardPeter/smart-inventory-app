@@ -21,6 +21,7 @@ class AppRoutes {
   static const inventorySight = '/inventory_insight';
   static const inventoryDetail = '/inventory_detail';
   static const productCatalog = '/product_catalog';
+  static const allProducts = '/all_products';
   static const categoryDetail = '/category_detail';
   static const productCatalogDetail = '/product_catalog_detail';
   static const categoryForm = '/category_form';
@@ -29,4 +30,6 @@ class AppRoutes {
 
   static const profile = '/profile';
   static const notification = '/notification';
+  static const editProfile = '/edit_profile';
+  static const changePassword = '/change_password';
 }

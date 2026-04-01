@@ -3,13 +3,17 @@ import 'package:frontend/core/infrastructure/localization/langs/en/en_core.dart'
 import 'package:frontend/core/infrastructure/localization/langs/en/en_home.dart';
 import 'package:frontend/core/infrastructure/localization/langs/en/en_inventory.dart';
 import 'package:frontend/core/infrastructure/localization/langs/en/en_notification.dart';
+import 'package:frontend/core/infrastructure/localization/langs/en/en_search.dart';
 import 'package:frontend/core/infrastructure/localization/langs/en/en_workspace.dart';
+import 'package:frontend/core/infrastructure/localization/langs/en/en_profile.dart';
 
 final Map<String, String> enUS = {
   ...enCore,
+  ...enSearch,
   ...enAuth,
   ...enWorkspace,
   ...enHome,
   ...enInventory,
   ...enNotification,
+  ...enProfile,
 };

@@ -8,6 +8,8 @@ import {
 
 import type {
   CreateProductPackageDto,
+  ListProductPackagesResponseDto,
+  PackageQueryDto,
   ProductPackageResponseDto,
   UpdateProductPackageDto,
 } from './product-package.dto.js';
@@ -18,6 +20,23 @@ export class ProductPackageController {
   constructor(
     private readonly productPackageService: ProductPackageService,
   ) {}
+
+  getProductPackagesByStore = async (
+    req: Request,
+    res: Response<ApiResponse<ListProductPackagesResponseDto>>,
+  ): Promise<void> => {
+    const storeId = requireReqStoreContext(req).storeId;
+
+    const productPackages =
+      await this.productPackageService.getProductPackagesByStore(
+        storeId,
+        res.locals.validatedQuery as unknown as PackageQueryDto,
+      );
+
+    sendResponse.success(res, productPackages, {
+      status: StatusCodes.OK,
+    });
+  };
 
   getProductPackagesByProductId = async (
     req: Request,
