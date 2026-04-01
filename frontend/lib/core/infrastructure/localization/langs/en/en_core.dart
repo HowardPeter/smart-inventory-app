@@ -48,6 +48,10 @@ final Map<String, String> enCore = {
   TTexts.good: 'Good',
   TTexts.strong: 'Strong',
 
+  TTexts.loading: 'Loading...',
+  TTexts.saving: 'Saving...',
+  TTexts.deleting: 'Deleting...',
+
   // -- Splash Screen
   TTexts.splashSlogan: 'Smart Inventory, Smarter Business',
   TTexts.splashVersion: 'Version',

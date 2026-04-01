@@ -117,8 +117,27 @@ class ProductFormController extends GetxController with TErrorHandler {
   @override
   void onInit() {
     super.onInit();
-    _loadCategories();
-    _parseArguments();
+
+    if (Get.arguments != null) {
+      formMode.value = Get.arguments['mode'] ?? 'create';
+      productToEdit = Get.arguments['product'];
+
+      if (productToEdit != null) {
+        // 1. HỨNG DỮ LIỆU MỚI TỪ TRANG DETAIL TRUYỀN SANG (Nếu có)
+        final freshImageUrl = Get.arguments['freshImageUrl'];
+        final freshName = Get.arguments['freshName'];
+        final freshBrand = Get.arguments['freshBrand'];
+
+        // 2. Ưu tiên gán dữ liệu mới
+        existingImageUrl.value = freshImageUrl ?? productToEdit!.imageUrl ?? '';
+
+        // Cập nhật luôn cho các field text lỡ bạn có sửa thông tin
+        nameController.text = freshName ?? productToEdit!.name;
+        brandController.text = freshBrand ?? productToEdit!.brand ?? '';
+
+        // (Bên dưới bạn giữ nguyên code cũ lấy categoryId... của bạn)
+      }
+    }
   }
 
   void _parseArguments() {
@@ -173,9 +192,8 @@ class ProductFormController extends GetxController with TErrorHandler {
 
   Future<void> _fetchAndSetThreshold(String packageId) async {
     try {
-      final threshold =
-          await _provider.getInventoryThresholdByPackage(packageId);
-      // Nếu threshold = 0 thì để trống cho UI đẹp, ngược lại thì hiện số
+      final inv = await _provider.getInventoryDetail(packageId);
+      final threshold = inv.reorderThreshold;
       thresholdController.text = threshold == 0 ? '' : threshold.toString();
     } catch (e) {
       thresholdController.text = '';
@@ -418,12 +436,9 @@ class ProductFormController extends GetxController with TErrorHandler {
           newProduct.productId, packagePayload);
 
       final packageId = newPackage['productPackageId'] ?? newPackage['id'];
-      await _provider.createInventory({
-        'productPackageId': packageId,
-        'stockQuantity': 0,
-        'reorderThreshold': int.tryParse(thresholdController.text) ?? 0,
-      });
-
+      // 3. Tạo Inventory Settings (Đã sửa theo API mới)
+      await _provider.createInventory(packageId,
+          reorderThreshold: int.tryParse(thresholdController.text) ?? 0);
       FullScreenLoaderUtils.stopLoading();
       _triggerRefreshAndClose(TTexts.productCreatedSuccess.tr);
     } on DioException catch (e) {
@@ -533,39 +548,31 @@ class ProductFormController extends GetxController with TErrorHandler {
       };
 
       if (formMode.value == 'edit_package' && packageToEdit != null) {
+        // ==========================================
+        // 1. TRƯỜNG HỢP CẬP NHẬT (EDIT)
+        // ==========================================
         await _provider.updateProductPackage(
             packageToEdit!.productPackageId, packagePayload);
-
-        await _provider.updateInventoryByPackage(
-            packageToEdit!.productPackageId, inventoryPayload);
-
-        final updatedPkg = ProductPackageModel(
-          productPackageId: packageToEdit!.productPackageId,
-          displayName: packageDisplayNameController.text.trim(),
-          importPrice: double.tryParse(importPriceController.text) ?? 0,
-          sellingPrice: double.tryParse(salePriceController.text) ?? 0,
-          barcodeValue: barcodeController.text.trim(),
-          barcodeType: 'ean',
-          unitId: selectedUnitId.value,
-          productId: productToEdit!.productId,
-          activeStatus: packageToEdit!.activeStatus,
-        );
+        await _provider.updateInventorySettings(packageToEdit!.productPackageId,
+            reorderThreshold: inventoryPayload['reorderThreshold']);
 
         FullScreenLoaderUtils.stopLoading();
-        _triggerRefreshAndClose(TTexts.packageUpdatedSuccess.tr,
-            updatedPackage: updatedPkg);
+        // Không truyền updatedPackage vì trang Detail thường tự fetch lại
+        _triggerRefreshAndClose(TTexts.packageUpdatedSuccess.tr);
       } else {
-        final newPackage = await _provider.createProductPackage(
+        // ==========================================
+        // 2. TRƯỜNG HỢP THÊM MỚI (CREATE)
+        // ==========================================
+        final newPackageData = await _provider.createProductPackage(
             productToEdit!.productId, packagePayload);
-        final pkgId = newPackage['productPackageId'] ?? newPackage['id'];
+        final pkgId =
+            newPackageData['productPackageId'] ?? newPackageData['id'];
 
-        await _provider.createInventory({
-          'productPackageId': pkgId,
-          'stockQuantity': 0,
-          'reorderThreshold': inventoryPayload['reorderThreshold'],
-        });
+        await _provider.createInventory(pkgId,
+            reorderThreshold: inventoryPayload['reorderThreshold']);
 
-        final createdPkg = ProductPackageModel.fromJson(newPackage);
+        // Biến này giờ đã nằm đúng chỗ của nó (có chứa data thật)
+        final createdPkg = ProductPackageModel.fromJson(newPackageData);
 
         FullScreenLoaderUtils.stopLoading();
         _triggerRefreshAndClose(TTexts.packageCreatedSuccess.tr,

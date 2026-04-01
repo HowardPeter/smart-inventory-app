@@ -28,6 +28,9 @@ class TTexts {
   static const String errorUnknownMessage = "error_unknown_message";
   static const String fabScanBarcode = "fab_scan_barcode";
   static const String fabAddManual = "fab_add_manual";
+  static const String loading = "loading";
+  static const String saving = "saving";
+  static const String deleting = "deleting";
 
   // -- Search
   static const String searchHint = "search_hint";
@@ -424,7 +427,6 @@ class TTexts {
   static const String noProductsFound = 'no_products_found';
   static const String noProductsAssigned = 'no_products_assigned';
   static const String deleteCategoryConfirm = 'delete_category_confirm';
-  static const String deleting = 'deleting';
 
   // --- Product Catalog Deatail ---
   static const String brand = 'brand';
@@ -437,6 +439,11 @@ class TTexts {
   static const String addNewPackage = 'add_new_package';
   static const String editPackage = 'edit_package';
   static const String noPackagesFound = 'no_packages_found';
+  static const String deleteCategoryTitle = "delete_category_title";
+  static const String deleteCategoryWarning = "delete_category_warning";
+  static const String deleteCategoryConfirmBtn = "delete_category_confirm_btn";
+  static const String deleteCategorySuccess = "delete_category_success";
+  static const String productDataRefreshing = "product_data_refreshing";
 
   // -- Add Category
   static const String categoryNameLabel = 'category_name_label';
@@ -450,7 +457,6 @@ class TTexts {
   static const String categoryCreatedSuccessMessage =
       'category_created_success_message';
   static const String categoryNameExists = 'category_name_exists';
-  static const String saving = 'saving';
   static const String savingCategory = 'saving_category';
 
   // -- Edit Category

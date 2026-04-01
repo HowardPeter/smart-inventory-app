@@ -116,6 +116,14 @@ final Map<String, String> enInventory = {
       'We couldn\'t find any categories matching your search. Try a different keyword or add a new category.',
   TTexts.viewAllProducts: 'All Products',
   TTexts.viewAllProductsSub: 'View and manage all products in the store',
+  TTexts.deleteCategoryTitle: 'Delete Category',
+  TTexts.deleteCategoryWarning:
+      'This category contains products. Do you want to move all products to "Uncategorized" and proceed with deletion?',
+  TTexts.deleteCategoryConfirmBtn: 'Confirm Delete',
+  TTexts.deleteCategorySuccess: 'Category deleted successfully.',
+  TTexts.productDataRefreshing: 'Refreshing product data...',
+  TTexts.packageUpdatedSuccess: 'Package updated successfully.',
+  TTexts.packageCreatedSuccess: 'Package created successfully.',
 
   // -- Category Detail
   TTexts.addNewProduct: 'Add New Product',
@@ -244,8 +252,6 @@ final Map<String, String> enInventory = {
   TTexts.deletePackage: 'Delete Package',
   TTexts.addPackageBtn: 'Add Package',
   TTexts.imageUpdatedSuccess: 'Product image updated successfully.',
-  TTexts.packageUpdatedSuccess: 'Package updated successfully.',
-  TTexts.packageCreatedSuccess: 'New package created successfully.',
   TTexts.deletingProduct: 'Deleting product...',
   TTexts.productDeletedSuccess: 'Product has been moved to trash.',
   TTexts.deletingPackage: 'Deleting package...',
