@@ -569,6 +569,31 @@ class TTexts {
   static const String homeInStock = "home_in_stock";
   static const String homeOutOfStock = "home_out_of_stock";
 
+  // -- Notifications
+  static const String notificationTitle = "notification_title";
+  static const String loadingNotifications = "loading_notifications";
+  static const String emptyNotificationTitle = "empty_notification_title";
+  static const String emptyNotificationSub = "empty_notification_sub";
+  static const String reload = "reload";
+
+  // -- Notification Snackbars & Actions
+  static const String notificationDeleted = "notification_deleted";
+  static const String undoAvailable = "undo_available";
+  static const String connectionError = "connection_error";
+  static const String cannotDeleteNotification = "cannot_delete_notification";
+  static const String undoButton = "undo_button";
+
+  // -- Time Ago
+  static const String daysAgo = "days_ago";
+  static const String hoursAgo = "hours_ago";
+  static const String minutesAgo = "minutes_ago";
+  static const String justNow = "just_now";
+
+  // -- Notification Filters
+  static const String filterAll = "filter_all";
+  static const String filterAlerts = "filter_alerts";
+  static const String filterTransactions = "filter_transactions";
+  static const String filterSystem = "filter_system";
   //--Profile
   static const String profileTitle = 'profile_title';
   static const String profileNameUser = 'profile_name_user';

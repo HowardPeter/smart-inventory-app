@@ -25,27 +25,33 @@ export class NotificationService {
     type: string,
     referenceId?: string,
   ): Promise<void> {
-    // 1. Lưu vào Database
+    // ==========================================
+    // 1. LẤY TÊN CỬA HÀNG SIÊU NHANH GỌN
+    // ==========================================
+    const storeName =
+      await this.notificationRepository.getStoreNameById(storeId);
+    const displayTitle = `[${storeName}]\n${title}`;
+
+    // 2. Lưu vào Database
     const newNoti = await this.notificationRepository.createNotification(
       userId,
-      storeId, // 👉 Truyền storeId xuống Repo
-      title,
+      storeId,
+      displayTitle, // 👉 Đưa title có tên cửa hàng vào DB
       body,
       type,
       referenceId,
     );
 
-    // 2. Lấy Token để bắn Push
+    // 3. Lấy Token để bắn Push
     const tokens = await this.notificationRepository.findTokensByUserId(userId);
 
-    console.info(`[FCM] Tìm thấy ${tokens.length} tokens cho user ${userId}`);
     if (tokens.length === 0) {
       return;
     }
 
-    // 3. Đóng gói Payload chuẩn
+    // 4. Đóng gói Payload chuẩn
     const message: MulticastMessage = {
-      notification: { title, body },
+      notification: { title: displayTitle, body },
       data: {
         notificationId: newNoti.notificationId,
         type: newNoti.type,
@@ -106,11 +112,20 @@ export class NotificationService {
   }
 
   // Cung cấp dữ liệu cho API Frontend
-  public async getUserNotifications(userId: string, storeId: string) {
+  public async getUserNotifications(
+    userId: string,
+    storeId: string,
+    page: number,
+    size: number,
+    type: string,
+  ) {
     // 👉 Thêm tham số storeId
     return await this.notificationRepository.getUserNotifications(
       userId,
       storeId,
+      page,
+      size,
+      type,
     ); // 👉 Đồng bộ với Repo
   }
 
@@ -120,5 +135,9 @@ export class NotificationService {
 
   public async softDeleteNotification(userId: string, notificationId: string) {
     await this.notificationRepository.softDelete(userId, notificationId);
+  }
+
+  public async markAllAsRead(userId: string, storeId: string) {
+    await this.notificationRepository.markAllAsRead(userId, storeId);
   }
 }

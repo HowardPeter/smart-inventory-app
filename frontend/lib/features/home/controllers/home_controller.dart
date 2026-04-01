@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'dart:math';
 import 'package:flutter/services.dart';
 import 'package:flutter/widgets.dart';
+import 'package:frontend/features/notification/controller/notification_controller.dart';
 import 'package:get/get.dart';
 import 'package:fl_chart/fl_chart.dart';
 
@@ -26,6 +27,10 @@ class HomeController extends GetxController {
   var userProfile = Rxn<UserProfileModel>();
   final UserProfileProvider userProfileProvider = UserProfileProvider();
 
+  // Xử lý notification
+  final notificationController = Get.find<NotificationController>();
+  RxInt unreadCount = 0.obs;
+
   // ==========================================
   // 2. LIFECYCLE VÀ GETTERS CƠ BẢN
   // ==========================================
@@ -43,6 +48,15 @@ class HomeController extends GetxController {
     // Chạy song song cả load data ảo và lấy profile thật
     loadAllHomeData();
     getMyProfile();
+
+    // Lắng nghe: Cứ khi nào unreadCount bên Notification thay đổi,
+    // thì cập nhật unreadCount của Home
+    ever(notificationController.unreadCount, (int count) {
+      unreadCount.value = count;
+    });
+
+    // Lấy giá trị hiện tại (phòng trường hợp đã có data rồi)
+    unreadCount.value = notificationController.unreadCount.value;
   }
 
   // ==========================================

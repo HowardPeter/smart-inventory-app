@@ -28,6 +28,7 @@ import 'package:frontend/features/inventory/views/product_catalog_view.dart';
 import 'package:frontend/features/inventory/views/product_form_view.dart';
 import 'package:frontend/features/navigation/bindings/navigation_binding.dart';
 import 'package:frontend/features/navigation/views/navigation_view.dart';
+import 'package:frontend/features/notification/view/platform/notification_mobile_screen.dart';
 import 'package:frontend/features/onboarding/bindings/onboarding_binding.dart';
 import 'package:frontend/features/profile/bindings/profile_binding.dart';
 import 'package:frontend/features/profile/bindings/profile_edit_profile_binding.dart';
@@ -243,6 +244,12 @@ class AppPages {
       transition: Transition.cupertino,
     ),
 
+    // -- Notification
+    GetPage(
+      name: AppRoutes.notification,
+      page: () => const NotificationMobileScreen(),
+    ),
+    
     // -- Profile
     GetPage(
       name: AppRoutes.profile,
