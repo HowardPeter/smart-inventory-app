@@ -1,3 +1,5 @@
+import 'package:flutter_dotenv/flutter_dotenv.dart';
+
 class AppConstants {
   // Dùng String.fromEnvironment thay cho dotenv
   static const String baseUrl = String.fromEnvironment(

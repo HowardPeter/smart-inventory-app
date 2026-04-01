@@ -29,4 +29,6 @@ class AppRoutes {
   static const customizeCatalog = '/customize-catalog';
 
   static const profile = '/profile';
+  static const editProfile = '/edit_profile';
+  static const changePassword = '/change_password';
 }

@@ -4,6 +4,7 @@ import 'package:frontend/core/infrastructure/localization/langs/en/en_home.dart'
 import 'package:frontend/core/infrastructure/localization/langs/en/en_inventory.dart';
 import 'package:frontend/core/infrastructure/localization/langs/en/en_search.dart';
 import 'package:frontend/core/infrastructure/localization/langs/en/en_workspace.dart';
+import 'package:frontend/core/infrastructure/localization/langs/en/en_profile.dart';
 
 final Map<String, String> enUS = {
   ...enCore,
@@ -11,5 +12,6 @@ final Map<String, String> enUS = {
   ...enAuth,
   ...enWorkspace,
   ...enHome,
+  ...enProfile,
   ...enInventory
 };

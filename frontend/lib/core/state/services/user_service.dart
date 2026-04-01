@@ -12,6 +12,8 @@ class UserService extends GetxService {
   // Biến loading để UI (ví dụ màn hình splash) có thể lắng nghe
   final RxBool isLoading = false.obs;
 
+  Object? get stores => null;
+
   Future<UserService> init() async {
     return this;
   }

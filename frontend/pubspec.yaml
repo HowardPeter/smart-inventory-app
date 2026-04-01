@@ -83,10 +83,12 @@ flutter:
   uses-material-design: true
 
   assets:
+    - .env
     - assets/logos/
     - assets/icons/
     - assets/images/auth/
     - assets/images/core/
+    - assets/images/profile/
     - assets/images/onboarding/
     - assets/mock_data/
 

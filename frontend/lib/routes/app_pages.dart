@@ -29,6 +29,10 @@ import 'package:frontend/features/inventory/views/product_form_view.dart';
 import 'package:frontend/features/navigation/bindings/navigation_binding.dart';
 import 'package:frontend/features/navigation/views/navigation_view.dart';
 import 'package:frontend/features/onboarding/bindings/onboarding_binding.dart';
+import 'package:frontend/features/profile/bindings/profile_binding.dart';
+import 'package:frontend/features/profile/bindings/profile_edit_profile_binding.dart';
+import 'package:frontend/features/profile/views/profile_change_password_view.dart';
+import 'package:frontend/features/profile/views/profile_edit_view.dart';
 import 'package:frontend/features/profile/views/profile_view.dart';
 import 'package:frontend/features/search/bindings/search_binding.dart';
 import 'package:frontend/features/search/views/search_view.dart';
@@ -53,7 +57,7 @@ class AppPages {
 
   // Đổi từ onboarding sang splash để app luôn khởi động từ màn hình loading
   static const initial = AppRoutes.splash;
-
+  // static const initial = AppRoutes.main;
   static final routes = [
     // -- Splash
     GetPage(
@@ -240,6 +244,25 @@ class AppPages {
     ),
 
     // -- Profile
-    GetPage(name: AppRoutes.profile, page: () => const ProfileView()),
+    GetPage(
+      name: AppRoutes.profile,
+      page: () => const ProfileView(),
+    ),
+
+    // -- Edit profile
+    GetPage(
+      name: AppRoutes.editProfile,
+      page: () => const ProfileEditView(),
+      binding: ProfileEditBinding(),
+      transition: Transition.cupertino,
+    ),
+
+    //-- Change password
+    GetPage(
+      name: AppRoutes.changePassword,
+      page: () => const ProfileChangePasswordView(),
+      binding: ProfileBinding(),
+      transition: Transition.cupertino,
+    ),
   ];
 }

@@ -17,6 +17,9 @@ class TImages {
 
   // Auth Images
   static const authImages = AuthImages();
+
+  //Profile Images
+  static const profileImages = ProfileImages();
 }
 
 // ==========================================
@@ -73,4 +76,11 @@ class AuthImages {
       'assets/images/auth/forgot-password-content-1.png';
   final String verifyEmailContent1 =
       'assets/images/auth/verify-email-content-1.png';
+}
+
+class ProfileImages {
+  const ProfileImages();
+
+  final String profileImageUser =
+      'assets/images/profile/profile_image_user.png';
 }

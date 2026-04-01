@@ -568,4 +568,46 @@ class TTexts {
   static const String homeTapToViewAll = "home_tap_to_view_all";
   static const String homeInStock = "home_in_stock";
   static const String homeOutOfStock = "home_out_of_stock";
+
+  //--Profile
+  static const String profileTitle = 'profile_title';
+  static const String profileNameUser = 'profile_name_user';
+  static const String profileEmaiUser = 'profile_mail_user';
+  static const String profileNameStore = 'profile_name_store';
+  static const String profileBtnSwitchStore = 'profile_btn_switch_store';
+  static const String profileAccount = 'profile_account';
+  static const String profileSecurity = 'profile_security';
+  static const String profileMyAccount = 'profile_my_account';
+  static const String profileChangePassword = 'profile_change_password';
+  static const String profileUserPermissions = 'proflie_user_permissions';
+  static const String profileBtnLogout = 'profile_btn_logout';
+  static const String profileDialogTitleLogout = 'profile_dialog_title_logout';
+  static const String profileDialogDescriptionLogout =
+      'profile_dialog_description_logout';
+  static const String profileDialogBtnLogout = 'profile_dialog_btn_logout';
+
+  //--Edit profile
+  static const String editTitle = 'edit_title';
+  static const String editLoading = 'edit_loading';
+  static const String editName = 'edit_name';
+  static const String editEmail = 'edit_email';
+  static const String editHintName = 'edit_hint_name';
+  static const String editHintEmail = 'edit_hint_email';
+  static const String editUpdate = 'edit_update';
+
+  //--Change password
+  static const String changePasswordTitle = "change_password_title";
+  static const String changePasswordOldPassword =
+      "change_password_old_password";
+  static const String changePasswordNewPassword =
+      "change_password_new_password";
+  static const String changePasswordConfirm = "change_password_confirm";
+  static const String changePasswordBtnConfirm = "change_password_btn_confirm";
+
+  static const String changePasswordHintOldPassword =
+      "change_password_hint_old_password";
+  static const String changePasswordHintNewPassword =
+      "change_password_hint_new_password";
+  static const String changePasswordHintConfirmPassword =
+      "change_password_hint_confirm";
 }
