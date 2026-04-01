@@ -1,25 +1,23 @@
 import { StatusCodes } from 'http-status-codes';
 
-import { ProductPackageService } from './product-package.service.js';
 import {
   requireReqStoreContext,
   sendResponse,
-} from '../../common/utils/index.js';
+} from '../../../common/utils/index.js';
+import { ProductPackageService } from '../services/product-package.service.js';
 
+import type { ApiResponse } from '../../../common/types/index.js';
 import type {
   CreateProductPackageDto,
   ListProductPackagesResponseDto,
   PackageQueryDto,
   ProductPackageResponseDto,
   UpdateProductPackageDto,
-} from './product-package.dto.js';
-import type { ApiResponse } from '../../common/types/index.js';
+} from '../product-package.dto.js';
 import type { Request, Response } from 'express';
 
 export class ProductPackageController {
-  constructor(
-    private readonly productPackageService: ProductPackageService,
-  ) {}
+  constructor(private readonly productPackageService: ProductPackageService) {}
 
   getProductPackagesByStore = async (
     req: Request,
