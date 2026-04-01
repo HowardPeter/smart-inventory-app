@@ -17,4 +17,6 @@ class AppRoutes {
   static const main = '/main';
   static const home = '/home';
   static const profile = '/profile';
+  static const editProfile = '/edit_profile';
+  static const changePassword = '/change_password';
 }

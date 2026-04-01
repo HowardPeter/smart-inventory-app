@@ -3,10 +3,12 @@ import 'package:frontend/core/infrastructure/localization/langs/en/en_workspace.
 import 'en/en_core.dart';
 import 'en/en_auth.dart';
 import 'en/en_home.dart';
+import 'en/en_profile.dart';
 
 final Map<String, String> enUS = {
   ...enCore,
   ...enAuth,
   ...enHome,
-  ...enWorkspace
+  ...enProfile,
+  ...enWorkspace,
 };
