@@ -27,8 +27,8 @@ class ProfileEditController extends GetxController {
     final user = userService.currentUser.value;
 
     if (user != null) {
-      nameController.text = user.fullName ?? '';
-      emailController.text = user.email ?? '';
+      nameController.text = user.fullName;
+      emailController.text = user.email;
     }
   }
 
