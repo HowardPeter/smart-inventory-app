@@ -153,8 +153,9 @@ class ProductFormMobileView extends GetView<ProductFormController> {
     if (step == 1) {
       return const InventoryProductFormBaseInfoWidget(key: ValueKey('step1'));
     }
-    if (step == 2)
+    if (step == 2) {
       return const InventoryProductFormImageWidget(key: ValueKey('step2'));
+    }
     return const Form(
         key: ValueKey('step3'),
         child: InventoryProductPackageFormFieldsWidget());
