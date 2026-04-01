@@ -55,10 +55,9 @@ class NotificationMobileScreen extends StatelessWidget {
             title: "Không có thông báo nào",
             subtitle: "Khi có cập nhật mới, thông báo sẽ hiển thị tại đây.",
             actionButton: SizedBox(
-              width: 200, // Thu nhỏ chiều ngang của nút cho đẹp
+              width: 150, // Thu nhỏ chiều ngang của nút cho đẹp
               child: TPrimaryButtonWidget(
                 text: "Tải lại",
-                icon: Iconsax.refresh,
                 onPressed: () => controller.fetchNotifications(),
               ),
             ),

@@ -13,7 +13,6 @@ class HomeHeaderWidget extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final homeController = Get.find<HomeController>();
-    print("Từ UI: ${homeController.unreadCount.value}");
 
     return Padding(
       padding: const EdgeInsets.fromLTRB(
@@ -57,7 +56,8 @@ class HomeHeaderWidget extends StatelessWidget {
           // NÚT CHUÔNG THÔNG BÁO (THAY THẾ CHO ROLE BADGE)
           InkWell(
             onTap: () {
-              Get.toNamed(AppRoutes.notification);
+              Get.toNamed(AppRoutes.notification,
+                  arguments: homeController.userProfile.value);
             },
             borderRadius: BorderRadius.circular(16),
             child: Container(

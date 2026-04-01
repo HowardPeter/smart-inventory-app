@@ -21,11 +21,11 @@ class NotificationCard extends StatelessWidget {
     final iconConfig = _getIconConfig(notification.type, isUnread);
 
     return Container(
-      // NẾU CHƯA ĐỌC: Hiện bóng mờ cực nhẹ và nổi bật lên.
-      // NẾU ĐÃ ĐỌC: Mất bóng mờ, chìm vào nền surface để nhường sự chú ý cho thông báo mới.
       decoration: BoxDecoration(
         color: AppColors.white,
         borderRadius: BorderRadius.circular(AppSizes.radius16),
+        border: BoxBorder.all(
+            color: isUnread ? AppColors.secondPrimary : Colors.transparent),
         boxShadow: isUnread
             ? [
                 BoxShadow(
@@ -40,7 +40,7 @@ class NotificationCard extends StatelessWidget {
       child: Material(
         color: Colors.transparent,
         child: InkWell(
-          onTap: onTap,
+          onLongPress: onTap,
           borderRadius: BorderRadius.circular(AppSizes.radius16),
           child: Padding(
             padding: const EdgeInsets.all(AppSizes.p16),

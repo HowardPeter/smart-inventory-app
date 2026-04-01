@@ -84,4 +84,14 @@ export class NotificationRepository {
       data: { isRead: true },
     });
   }
+
+  async getStoreNameById(storeId: string): Promise<string> {
+    const store = await prisma.store.findUnique({
+      where: { storeId: storeId },
+      select: { name: true }, // Chỉ lấy mỗi cột name cho nhẹ DB
+    });
+
+    // Nếu có store thì trả về tên, nếu không có (null) thì trả về 'Cửa hàng'
+    return store?.name ?? 'Cửa hàng';
+  }
 }

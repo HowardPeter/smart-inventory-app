@@ -1,9 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:frontend/core/infrastructure/models/notification_model.dart';
+import 'package:frontend/core/infrastructure/models/user_profile_model.dart';
 import 'package:frontend/features/notification/providers/notification_provider.dart';
 import 'package:get/get.dart';
 import 'package:frontend/core/ui/widgets/t_snackbars_widget.dart';
-import 'package:supabase_flutter/supabase_flutter.dart';
+// import 'package:supabase_flutter/supabase_flutter.dart';
 
 class NotificationController extends GetxController {
   final NotificationProvider _provider = NotificationProvider();
@@ -13,55 +14,83 @@ class NotificationController extends GetxController {
   var isLoading = true.obs;
   var isLoadMore = false.obs;
   var unreadCount = 0.obs;
+  UserProfileModel? currentUser;
 
   // Logic phân trang
   final ScrollController scrollController = ScrollController();
-  int _currentPage = 1; // Backend thường dùng page 1 làm trang đầu tiên
+  int _currentPage = 1;
   final int _pageSize = 15;
   bool _hasMore = true;
 
   @override
   void onInit() {
     super.onInit();
+    // _getArgument();
     fetchNotifications();
+
     _setupPagination();
-    _setupRealtime();
+    // _setupRealtime();
   }
+
+  // ==========================================
+  // HÀM LẤY ARGUMENT TỪ ROUTE
+  // ==========================================
+  // void _getArgument() {
+  //   final args = Get.arguments;
+
+  //   if (args != null) {
+  //     if (args is UserProfileModel) {
+  //       currentUser = args;
+  //     } else if (args is Rxn<UserProfileModel>) {
+  //       currentUser = args.value;
+  //     }
+
+  //     if (currentUser != null) {
+  //       debugPrint("🎯 Đã nhận thông báo cho user: ${currentUser!.fullName}");
+  //     } else {
+  //       debugPrint(
+  //           "⚠️ Argument có tồn tại nhưng dữ liệu bên trong bị rỗng (null)");
+  //     }
+  //   } else {
+  //     // Đây là nơi thông báo lỗi bạn đang thấy xuất hiện
+  //     debugPrint("⚠️ Không nhận được bất kỳ argument nào từ trang trước!");
+  //   }
+  // }
 
   // ==========================================
   // 1. SETUP REALTIME (SUPABASE)
   // ==========================================
-  void _setupRealtime() {
-    // Tạm thời hardcode userId để test, sau này bạn lấy từ State management của bạn (GetX/Provider)
-    const currentUserId = '665ef842-704d-4479-b996-fc9e2c663587';
+  // void _setupRealtime(String currentUserId) {
+  //   // Tạm thời hardcode userId để test, sau này bạn lấy từ State management của bạn (GetX/Provider)
+  //   //const currentUserId = '665ef842-704d-4479-b996-fc9e2c663587';
 
-    if (currentUserId.isEmpty) return;
+  //   if (currentUserId.isEmpty) return;
 
-    Supabase.instance.client
-        .channel('public:notification')
-        .onPostgresChanges(
-          event: PostgresChangeEvent.insert,
-          schema: 'public',
-          // 👇 SỬA Ở ĐÂY: Chữ 'notification' phải viết thường y hệt trong Database
-          table: 'notification',
-          filter: PostgresChangeFilter(
-            type: PostgresChangeFilterType.eq,
-            column:
-                'user_id', // 👈 LƯU Ý: Prisma thường map xuống DB là snake_case.
-            // Bạn hãy check lại trong bảng notification xem cột lưu ID
-            // người dùng là 'userId' hay 'user_id' để truyền cho đúng nhé!
-            value: currentUserId,
-          ),
-          callback: (payload) {
-            debugPrint(
-                '🔔 REALTIME BÁO CÓ THÔNG BÁO MỚI: ${payload.newRecord}');
+  //   Supabase.instance.client
+  //       .channel('public:notification')
+  //       .onPostgresChanges(
+  //         event: PostgresChangeEvent.insert,
+  //         schema: 'public',
+  //         // 👇 SỬA Ở ĐÂY: Chữ 'notification' phải viết thường y hệt trong Database
+  //         table: 'notification',
+  //         filter: PostgresChangeFilter(
+  //           type: PostgresChangeFilterType.eq,
+  //           column:
+  //               'user_id', // 👈 LƯU Ý: Prisma thường map xuống DB là snake_case.
+  //           // Bạn hãy check lại trong bảng notification xem cột lưu ID
+  //           // người dùng là 'userId' hay 'user_id' để truyền cho đúng nhé!
+  //           value: currentUserId,
+  //         ),
+  //         callback: (payload) {
+  //           debugPrint(
+  //               '🔔 REALTIME BÁO CÓ THÔNG BÁO MỚI: ${payload.newRecord}');
 
-            // Tải lại danh sách từ trang 1
-            fetchNotifications();
-          },
-        )
-        .subscribe();
-  }
+  //           // Tải lại danh sách từ trang 1
+  //           fetchNotifications();
+  //         },
+  //       )
+  //       .subscribe();
+  // }
 
   // ==========================================
   // 2. PHÂN TRANG

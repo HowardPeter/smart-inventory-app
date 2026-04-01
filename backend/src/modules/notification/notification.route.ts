@@ -11,8 +11,10 @@ import {
 } from './validators/notification.validator.js';
 import { validate } from '../notification/validators/validate.middleware.js';
 
+
 const notificationRouter = Router();
 const repository = new NotificationRepository();
+
 const service = new NotificationService(repository);
 const controller = new NotificationController(service);
 
