@@ -24,12 +24,10 @@ class ProductModel {
   });
 
   factory ProductModel.fromJson(Map<String, dynamic> json) {
-    final imageUrlFormat = UrlHelper.normalizeImageUrl(json['imageUrl']);
-
     return ProductModel(
       productId: json['productId'] ?? '',
       name: json['name'] ?? 'Unknown Product',
-      imageUrl: imageUrlFormat,
+      imageUrl: UrlHelper.normalizeImageUrl(json['imageUrl']),
       createdAt: json['createdAt'] != null
           ? DateTime.parse(json['createdAt'])
           : DateTime.now(),

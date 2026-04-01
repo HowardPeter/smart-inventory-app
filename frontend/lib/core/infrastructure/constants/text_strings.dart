@@ -37,6 +37,11 @@ class TTexts {
   static const String noResultsMessage = "no_results_message";
   static const String searchItemsPackages = "search_items_packages";
 
+  // -- Search Module
+  static const String searchEverything = "search_everything";
+  static const String noResultsFound = "no_results_found";
+  static const String didYouMean = "didYouMean";
+
   // -- Network Error Dialog
   static const String netErrorTitle = "net_error_title";
   static const String netErrorDescription = "net_error_description";
