@@ -1,5 +1,5 @@
-import type { UnitResponseDto } from './product-package.dto.js';
-import type { UnitRepository } from './repositories/unit.repository.js';
+import type { UnitResponseDto } from '../product-package.dto.js';
+import type { UnitRepository } from '../repositories/unit.repository.js';
 
 export class UnitService {
   constructor(private readonly unitRepository: UnitRepository) {}
