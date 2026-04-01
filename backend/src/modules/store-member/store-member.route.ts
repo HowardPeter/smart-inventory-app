@@ -17,7 +17,6 @@ storeMemberRouter.delete(
   authenticate,
   requireStoreContext,
   requirePermission(PERMISSION.STORE_MEMBER_DELETE),
-  // Đảm bảo người dùng có quyền xoá
   validate(removeStoreMemberSchema),
   asyncWrapper(storeMemberController.removeUser),
 );

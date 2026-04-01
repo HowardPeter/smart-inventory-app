@@ -3,15 +3,17 @@ import { prisma } from '../../db/prismaClient.js';
 import type { StoreMemberResponseDto } from './store-member.dto.js';
 
 export class StoreMemberRepository {
-  async findByIds(
+  async findByIdsWithStore(
     userId: string,
     storeId: string,
-  ): Promise<StoreMemberResponseDto | null> {
+  ): Promise<(StoreMemberResponseDto & { store: { userId: string } }) | null> {
     return await prisma.storeMember.findUnique({
       where: {
-        userId_storeId: {
-          userId,
-          storeId,
+        userId_storeId: { userId, storeId },
+      },
+      include: {
+        store: {
+          select: { userId: true }, // Lấy ID của chủ cửa hàng (Owner)
         },
       },
     });
