@@ -4,16 +4,16 @@ import 'package:frontend/core/ui/theme/app_sizes.dart';
 import 'package:iconsax_flutter/iconsax_flutter.dart';
 
 class NotificationCard extends StatelessWidget {
-  final dynamic notification;
-  final VoidCallback onTap;
-  final String timeAgo;
-
   const NotificationCard({
     super.key,
     required this.notification,
     required this.onTap,
     required this.timeAgo,
   });
+
+  final dynamic notification;
+  final VoidCallback onTap;
+  final String timeAgo;
 
   @override
   Widget build(BuildContext context) {
@@ -47,15 +47,11 @@ class NotificationCard extends StatelessWidget {
             child: Row(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                // =====================================
-                // 1. ICON BOX (Squircle - Bo góc 12px)
-                // =====================================
                 Container(
                   width: 48,
                   height: 48,
                   decoration: BoxDecoration(
                     color: iconConfig['bg'],
-                    // Bo góc 12px giống hệt các icon container trên màn hình Dashboard của bạn
                     borderRadius: BorderRadius.circular(AppSizes.radius12),
                   ),
                   child: Center(
@@ -67,10 +63,6 @@ class NotificationCard extends StatelessWidget {
                   ),
                 ),
                 const SizedBox(width: AppSizes.p16),
-
-                // =====================================
-                // 2. NỘI DUNG TEXT
-                // =====================================
                 Expanded(
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
@@ -80,7 +72,6 @@ class NotificationCard extends StatelessWidget {
                         style: TextStyle(
                           fontFamily: 'Poppins',
                           fontSize: 15,
-                          // Tiêu đề đậm đen nếu chưa đọc, xám và mỏng đi nếu đã đọc
                           fontWeight:
                               isUnread ? FontWeight.w700 : FontWeight.w500,
                           color: isUnread
@@ -116,10 +107,6 @@ class NotificationCard extends StatelessWidget {
                     ],
                   ),
                 ),
-
-                // =====================================
-                // 3. CHẤM TRÒN CHƯA ĐỌC (Unread Dot)
-                // =====================================
                 if (isUnread) ...[
                   const SizedBox(width: AppSizes.p12),
                   Container(

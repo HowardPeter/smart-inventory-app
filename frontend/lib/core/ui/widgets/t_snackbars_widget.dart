@@ -229,6 +229,7 @@ class TSnackbarsWidget {
     required BuildContext context,
     required String title,
     required String message,
+    required String buttonName,
     required VoidCallback onUndo,
   }) {
     return SnackBar(
@@ -324,9 +325,9 @@ class TSnackbarsWidget {
                     borderRadius: BorderRadius.circular(8)),
                 backgroundColor: Colors.white,
               ),
-              child: const Text(
-                "Hoàn tác",
-                style: TextStyle(
+              child: Text(
+                buttonName,
+                style: const TextStyle(
                   fontFamily: 'Poppins',
                   color: AppColors.primaryText,
                   fontSize: 12,

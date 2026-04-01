@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:iconsax_flutter/iconsax_flutter.dart';
 
-// -- IMPORTS UI KIT CỦA BẠN --
 import 'package:frontend/core/ui/theme/app_colors.dart';
 import 'package:frontend/core/ui/theme/app_sizes.dart';
 import 'package:frontend/core/ui/widgets/t_app_bar_widget.dart';
@@ -11,8 +10,8 @@ import 'package:frontend/core/ui/widgets/t_primary_button_widget.dart';
 import 'package:frontend/core/ui/widgets/t_refresh_indicator_widget.dart';
 import 'package:frontend/core/ui/widgets/t_animation_loader_widget.dart';
 import 'package:frontend/core/ui/widgets/t_bottom_nav_spacer_widget.dart';
+import 'package:frontend/core/infrastructure/constants/text_strings.dart';
 
-// -- IMPORTS MODULE NOTIFICATION --
 import 'package:frontend/features/notification/controller/notification_controller.dart';
 import 'package:frontend/features/notification/widgets/notification_card.dart';
 
@@ -24,10 +23,9 @@ class NotificationMobileScreen extends StatelessWidget {
     final controller = Get.find<NotificationController>();
 
     return Scaffold(
-      backgroundColor: AppColors.background, // Hoặc AppColors.surface
-      // 1. TÁI SỬ DỤNG TAppBarWidget (Chuẩn Blur Effect & Nút Back)
+      backgroundColor: AppColors.background,
       appBar: TAppBarWidget(
-        title: "Thông báo",
+        title: TTexts.notificationTitle.tr,
         showBackArrow: true,
         centerTitle: true,
         actions: [
@@ -43,28 +41,25 @@ class NotificationMobileScreen extends StatelessWidget {
         ],
       ),
       body: Obx(() {
-        // 2. TÁI SỬ DỤNG TAnimationLoaderWidget (Lúc mới vào)
         if (controller.isLoading.value && controller.notifications.isEmpty) {
-          return const TAnimationLoaderWidget(text: 'Đang tải thông báo...');
+          return TAnimationLoaderWidget(text: TTexts.loadingNotifications.tr);
         }
 
-        // 3. TÁI SỬ DỤNG TEmptyStateWidget & TPrimaryButtonWidget
         if (controller.notifications.isEmpty) {
           return TEmptyStateWidget(
             icon: Iconsax.notification_bing_copy,
-            title: "Không có thông báo nào",
-            subtitle: "Khi có cập nhật mới, thông báo sẽ hiển thị tại đây.",
+            title: TTexts.emptyNotificationTitle.tr,
+            subtitle: TTexts.emptyNotificationSub.tr,
             actionButton: SizedBox(
-              width: 150, // Thu nhỏ chiều ngang của nút cho đẹp
+              width: 150,
               child: TPrimaryButtonWidget(
-                text: "Tải lại",
+                text: TTexts.reload.tr,
                 onPressed: () => controller.fetchNotifications(),
               ),
             ),
           );
         }
 
-        // 4. TÁI SỬ DỤNG TRefreshIndicatorWidget
         return TRefreshIndicatorWidget(
           onRefresh: controller.fetchNotifications,
           child: ListView.builder(
@@ -72,12 +67,10 @@ class NotificationMobileScreen extends StatelessWidget {
             physics: const AlwaysScrollableScrollPhysics(),
             padding: const EdgeInsets.symmetric(
                 horizontal: AppSizes.p16, vertical: AppSizes.p16),
-            // Tính số lượng item = Data length + 1 (Loader nếu có) + 1 (Spacer ở đáy)
             itemCount: controller.notifications.length +
                 (controller.isLoadMore.value ? 1 : 0) +
                 1,
             itemBuilder: (context, index) {
-              // Render Item thông báo
               if (index < controller.notifications.length) {
                 final item = controller.notifications[index];
                 return Padding(
@@ -106,9 +99,7 @@ class NotificationMobileScreen extends StatelessWidget {
                     ),
                   ),
                 );
-              }
-              // Render Loading quay vòng tròn khi scroll xuống đáy
-              else if (controller.isLoadMore.value &&
+              } else if (controller.isLoadMore.value &&
                   index == controller.notifications.length) {
                 return const Padding(
                   padding: EdgeInsets.symmetric(vertical: AppSizes.p24),
@@ -117,9 +108,7 @@ class NotificationMobileScreen extends StatelessWidget {
                         strokeWidth: 3, color: AppColors.primary),
                   ),
                 );
-              }
-              // 5. TÁI SỬ DỤNG TBottomNavSpacerWidget (Vị trí cuối cùng)
-              else {
+              } else {
                 return const TBottomNavSpacerWidget();
               }
             },

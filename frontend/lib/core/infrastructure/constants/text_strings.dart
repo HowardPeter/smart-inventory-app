@@ -551,4 +551,24 @@ class TTexts {
   static const String homeTapToViewAll = "home_tap_to_view_all";
   static const String homeInStock = "home_in_stock";
   static const String homeOutOfStock = "home_out_of_stock";
+
+  // -- Notifications
+  static const String notificationTitle = "notification_title";
+  static const String loadingNotifications = "loading_notifications";
+  static const String emptyNotificationTitle = "empty_notification_title";
+  static const String emptyNotificationSub = "empty_notification_sub";
+  static const String reload = "reload";
+
+  // -- Notification Snackbars & Actions
+  static const String notificationDeleted = "notification_deleted";
+  static const String undoAvailable = "undo_available";
+  static const String connectionError = "connection_error";
+  static const String cannotDeleteNotification = "cannot_delete_notification";
+  static const String undoButton = "undo_button";
+
+  // -- Time Ago
+  static const String daysAgo = "days_ago";
+  static const String hoursAgo = "hours_ago";
+  static const String minutesAgo = "minutes_ago";
+  static const String justNow = "just_now";
 }

@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:frontend/core/infrastructure/constants/text_strings.dart';
 import 'package:frontend/core/infrastructure/models/notification_model.dart';
 import 'package:frontend/core/infrastructure/models/user_profile_model.dart';
 import 'package:frontend/features/notification/providers/notification_provider.dart';
 import 'package:get/get.dart';
 import 'package:frontend/core/ui/widgets/t_snackbars_widget.dart';
-// import 'package:supabase_flutter/supabase_flutter.dart';
 
 class NotificationController extends GetxController {
   final NotificationProvider _provider = NotificationProvider();
@@ -93,7 +93,7 @@ class NotificationController extends GetxController {
   // }
 
   // ==========================================
-  // 2. PHÂN TRANG
+  // PHÂN TRANG
   // ==========================================
   void _setupPagination() {
     scrollController.addListener(() {
@@ -196,19 +196,17 @@ class NotificationController extends GetxController {
     final context = Get.context;
     if (context == null) return;
 
-    // 1. Xóa tạm thời khỏi UI
     notifications.removeAt(index);
     _updateUnreadCount();
 
     bool isUndone = false;
 
-    // 2. Gọi Helper lấy giao diện SnackBar
     final snackbar = TSnackbarsWidget.undoSnackBar(
       context: context,
-      title: "Đã xóa thông báo",
-      message: "Có thể hoàn tác trong 5 giây",
+      title: TTexts.notificationDeleted.tr,
+      message: TTexts.undoAvailable.tr,
+      buttonName: TTexts.undoButton.tr,
       onUndo: () {
-        // Logic hoàn tác (Chỉ Controller mới được quyền sửa data)
         isUndone = true;
         int safeIndex =
             index > notifications.length ? notifications.length : index;
@@ -217,10 +215,8 @@ class NotificationController extends GetxController {
       },
     );
 
-    // Xóa snackbar cũ nếu có
     ScaffoldMessenger.of(context).hideCurrentSnackBar();
 
-    // 3. Hiển thị và xử lý luồng API ngầm
     ScaffoldMessenger.of(context)
         .showSnackBar(snackbar)
         .closed
@@ -228,25 +224,24 @@ class NotificationController extends GetxController {
       if (!isUndone && reason != SnackBarClosedReason.action) {
         try {
           await _provider.deleteNotification(item.notificationId);
-          debugPrint("✅ Đã xóa thật: ${item.notificationId}");
         } catch (e) {
-          debugPrint("⚠️ Lỗi API xóa thông báo: $e");
-
-          // Rollback data
           int safeIndex =
               index > notifications.length ? notifications.length : index;
           notifications.insert(safeIndex, item);
           _updateUnreadCount();
 
+          // 🌐 DỊCH CHỮ TRONG SNACKBAR LỖI
           TSnackbarsWidget.error(
-              title: "Lỗi kết nối",
-              message: "Không thể xóa thông báo vào lúc này.");
+              title: TTexts.connectionError.tr,
+              message: TTexts.cannotDeleteNotification.tr);
         }
       }
     });
   }
 
-  // Hàm fomat thời gian chuẩn
+  // ==========================================
+  // HÀM FORMAT THỜI GIAN
+  // ==========================================
   String formatTimeAgo(dynamic timeData) {
     if (timeData == null) return '';
     try {
@@ -255,16 +250,17 @@ class NotificationController extends GetxController {
           : DateTime.parse(timeData.toString()).toLocal();
       final difference = DateTime.now().difference(date);
 
+      // 🌐 DỊCH KHOẢNG THỜI GIAN
       if (difference.inDays > 7) {
         return '${date.day.toString().padLeft(2, '0')}/${date.month.toString().padLeft(2, '0')}/${date.year}';
       } else if (difference.inDays > 0) {
-        return '${difference.inDays} ngày trước';
+        return '${difference.inDays} ${TTexts.daysAgo.tr}';
       } else if (difference.inHours > 0) {
-        return '${difference.inHours} giờ trước';
+        return '${difference.inHours} ${TTexts.hoursAgo.tr}';
       } else if (difference.inMinutes > 0) {
-        return '${difference.inMinutes} phút trước';
+        return '${difference.inMinutes} ${TTexts.minutesAgo.tr}';
       } else {
-        return 'Vừa xong';
+        return TTexts.justNow.tr;
       }
     } catch (e) {
       return '';
