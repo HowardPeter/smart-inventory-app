@@ -1,9 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:frontend/core/infrastructure/constants/image_strings.dart';
+import 'package:frontend/core/infrastructure/constants/text_strings.dart';
 import 'package:frontend/core/ui/theme/app_colors.dart';
 import 'package:frontend/core/ui/theme/app_sizes.dart';
+import 'package:frontend/core/ui/widgets/t_bottom_sheet_widget.dart';
 import 'package:frontend/features/inventory/views/inventory_view.dart';
 import 'package:frontend/features/profile/views/profile_view.dart';
+import 'package:frontend/features/transaction/widgets/transaction_bottom_sheet_widget.dart';
 import 'package:get/get.dart';
 import 'package:iconsax_flutter/iconsax_flutter.dart';
 import 'package:frontend/features/navigation/controllers/navigation_controller.dart';
@@ -20,7 +23,6 @@ class NavigationMobileView extends GetView<NavigationController> {
       body: Stack(
         children: [
           // 1. CHỨA CÁC MÀN HÌNH BÊN TRONG
-          // 1. CHỨA CÁC MÀN HÌNH BÊN TRONG (Đã loại bỏ IndexedStack)
           Obx(() {
             final index = controller.selectedIndex.value;
             Widget currentScreen;
@@ -45,7 +47,6 @@ class NavigationMobileView extends GetView<NavigationController> {
                 currentScreen = const SizedBox.shrink();
             }
 
-            
             return AnimatedSwitcher(
               duration: const Duration(milliseconds: 300),
               child: KeyedSubtree(
@@ -113,7 +114,14 @@ class NavigationMobileView extends GetView<NavigationController> {
                   Positioned(
                     bottom: 30,
                     child: GestureDetector(
-                      onTap: () => controller.changeIndex(2),
+                      // ĐÃ SỬA: Bấm vào thì hiện Bottom Sheet thay vì đổi tab
+                      onTap: () {
+                        TBottomSheetWidget.show(
+                          title: TTexts.createNewTransaction.tr,
+                          child: const TransactionBottomSheetWidget(),
+                        );
+                      },
+                      // Giữ nguyên giao diện nút giữa của bạn
                       child: Obx(() {
                         final isSelected = controller.selectedIndex.value == 2;
                         return AnimatedScale(

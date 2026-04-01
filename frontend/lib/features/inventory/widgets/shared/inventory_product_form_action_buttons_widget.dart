@@ -52,7 +52,7 @@ class InventoryProductFormActionButtonsWidget
                   flex: 1,
                   child: TPrimaryButtonWidget(
                       text: TTexts.previousStep.tr,
-                      isOutlined: true,
+                      backgroundColor: AppColors.softGrey.withOpacity(0.15),
                       textColor: AppColors.primaryText,
                       onPressed: () => controller.previousStep())),
               const SizedBox(width: 16),
@@ -70,7 +70,7 @@ class InventoryProductFormActionButtonsWidget
                   flex: 1,
                   child: TPrimaryButtonWidget(
                       text: TTexts.previousStep.tr,
-                      isOutlined: true,
+                      backgroundColor: AppColors.softGrey.withOpacity(0.15),
                       textColor: AppColors.primaryText,
                       onPressed: () => controller.previousStep())),
               const SizedBox(width: 16),

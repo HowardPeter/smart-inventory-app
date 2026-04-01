@@ -11,7 +11,6 @@ import 'package:frontend/features/inventory/providers/inventory_provider.dart';
 class ProductCatalogController extends GetxController with TErrorHandler {
   // 1. TỰ QUẢN LÝ PROVIDER VÀ STATE NỘI BỘ
   final InventoryProvider _provider = InventoryProvider();
-
   final RxList<CategoryModel> categories = <CategoryModel>[].obs;
   final RxBool _isLoading = true.obs;
 

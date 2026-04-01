@@ -569,6 +569,14 @@ class TTexts {
   static const String homeInStock = "home_in_stock";
   static const String homeOutOfStock = "home_out_of_stock";
 
+  // --- Transaction ---
+  static const String createNewTransaction = "createNewTransaction";
+  static const String manageInventory = "manageInventory";
+  static const String manageInventoryDesc = "manageInventoryDesc";
+  static const String inbound = "inbound";
+  static const String outbound = "outbound";
+  static const String stockAdjustment = "stockAdjustment";
+
   //--Profile
   static const String profileTitle = 'profile_title';
   static const String profileNameUser = 'profile_name_user';
