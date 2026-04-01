@@ -8,16 +8,16 @@ import 'package:frontend/core/ui/widgets/t_text_form_field_widget.dart';
 import 'package:frontend/features/inventory/controllers/product_form_controller.dart';
 import 'package:iconsax_flutter/iconsax_flutter.dart';
 
-class ProductPackageUnitDropdownWidget extends StatefulWidget {
-  const ProductPackageUnitDropdownWidget({super.key});
+class InventoryProductPackageUnitDropdownWidget extends StatefulWidget {
+  const InventoryProductPackageUnitDropdownWidget({super.key});
 
   @override
-  State<ProductPackageUnitDropdownWidget> createState() =>
-      _ProductPackageUnitDropdownWidgetState();
+  State<InventoryProductPackageUnitDropdownWidget> createState() =>
+      _InventoryProductPackageUnitDropdownWidgetState();
 }
 
-class _ProductPackageUnitDropdownWidgetState
-    extends State<ProductPackageUnitDropdownWidget>
+class _InventoryProductPackageUnitDropdownWidgetState
+    extends State<InventoryProductPackageUnitDropdownWidget>
     with SingleTickerProviderStateMixin {
   final LayerLink _layerLink = LayerLink();
   OverlayEntry? _overlayEntry;

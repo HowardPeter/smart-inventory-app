@@ -1,3 +1,5 @@
+import 'package:frontend/core/infrastructure/utils/url_helper.dart';
+
 class ProductModel {
   final String productId;
   final String name;
@@ -25,7 +27,7 @@ class ProductModel {
     return ProductModel(
       productId: json['productId'] ?? '',
       name: json['name'] ?? 'Unknown Product',
-      imageUrl: json['imageUrl'],
+      imageUrl: UrlHelper.normalizeImageUrl(json['imageUrl']),
       createdAt: json['createdAt'] != null
           ? DateTime.parse(json['createdAt'])
           : DateTime.now(),

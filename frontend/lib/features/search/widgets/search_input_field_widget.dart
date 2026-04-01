@@ -20,6 +20,7 @@ class SearchInputFieldWidget extends GetView<TSearchController> {
             controller: controller.textController,
             focusNode: controller.focusNode,
             onChanged: controller.onSearchChanged,
+            cursorColor: AppColors.primary,
             style: const TextStyle(fontSize: 14, color: AppColors.primaryText),
             decoration: InputDecoration(
               hintText: controller.dynamicHint,

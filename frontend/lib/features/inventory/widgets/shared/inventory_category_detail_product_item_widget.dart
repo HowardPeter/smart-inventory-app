@@ -4,11 +4,11 @@ import 'package:frontend/core/ui/theme/app_colors.dart';
 import 'package:frontend/core/ui/theme/app_sizes.dart';
 import 'package:iconsax_flutter/iconsax_flutter.dart';
 
-class CategoryDetailProductItemWidget extends StatelessWidget {
+class InventoryCategoryDetailProductItemWidget extends StatelessWidget {
   final ProductModel product;
   final VoidCallback onTap;
 
-  const CategoryDetailProductItemWidget({
+  const InventoryCategoryDetailProductItemWidget({
     super.key,
     required this.product,
     required this.onTap,

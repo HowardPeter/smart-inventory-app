@@ -6,8 +6,9 @@ import 'package:frontend/core/ui/widgets/t_text_form_field_widget.dart';
 import 'package:frontend/features/inventory/controllers/product_form_controller.dart';
 import 'package:iconsax_flutter/iconsax_flutter.dart';
 
-class ProductFormBaseInfoWidget extends GetView<ProductFormController> {
-  const ProductFormBaseInfoWidget({super.key});
+class InventoryProductFormBaseInfoWidget
+    extends GetView<ProductFormController> {
+  const InventoryProductFormBaseInfoWidget({super.key});
 
   @override
   Widget build(BuildContext context) {

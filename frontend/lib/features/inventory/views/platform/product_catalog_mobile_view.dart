@@ -5,6 +5,7 @@ import 'package:frontend/core/ui/widgets/t_refresh_indicator_widget.dart';
 import 'package:frontend/features/inventory/widgets/product_catalog/product_catalog_category_list_item_widget.dart';
 import 'package:frontend/features/inventory/widgets/product_catalog/product_catalog_search_bar_widget.dart';
 import 'package:frontend/features/inventory/widgets/product_catalog/product_catalog_add_category_widget.dart';
+import 'package:frontend/features/inventory/widgets/product_catalog/product_catalog_view_all_widget.dart';
 import 'package:get/get.dart';
 import 'package:iconsax_flutter/iconsax_flutter.dart';
 import 'package:frontend/core/infrastructure/constants/text_strings.dart';
@@ -78,7 +79,19 @@ class ProductCatalogMobileView extends GetView<ProductCatalogController> {
 
               return SliverMainAxisGroup(
                 slivers: [
-                  // ITEM "ADD NEW CATEGORY"
+                  // THÊM VÀO ĐÂY: ITEM "VIEW ALL PRODUCTS" (Luôn hiện ở đầu nếu không search)
+                  if (controller.searchQuery.value.isEmpty)
+                    SliverPadding(
+                      padding:
+                          const EdgeInsets.symmetric(horizontal: AppSizes.p20),
+                      sliver: SliverToBoxAdapter(
+                        child: ProductCatalogViewAllWidget(
+                          onTap: () => controller.goToAllProducts(),
+                        ),
+                      ),
+                    ),
+
+                  // ITEM "ADD NEW CATEGORY" (Giữ nguyên của bạn)
                   if (controller.canManageCategory &&
                       controller.searchQuery.value.isEmpty)
                     SliverPadding(

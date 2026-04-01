@@ -6,8 +6,9 @@ import 'package:frontend/core/ui/theme/app_sizes.dart';
 import 'package:frontend/core/ui/widgets/t_primary_button_widget.dart';
 import 'package:frontend/features/inventory/controllers/product_form_controller.dart';
 
-class ProductFormActionButtonsWidget extends GetView<ProductFormController> {
-  const ProductFormActionButtonsWidget({super.key});
+class InventoryProductFormActionButtonsWidget
+    extends GetView<ProductFormController> {
+  const InventoryProductFormActionButtonsWidget({super.key});
 
   @override
   Widget build(BuildContext context) {

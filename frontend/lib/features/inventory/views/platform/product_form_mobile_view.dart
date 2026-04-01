@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:frontend/features/inventory/widgets/shared/product_form_action_buttons_widget.dart';
-import 'package:frontend/features/inventory/widgets/shared/product_form_base_info_widget.dart';
-import 'package:frontend/features/inventory/widgets/shared/product_form_image_widget.dart';
-import 'package:frontend/features/inventory/widgets/shared/product_package_form_fields_widget.dart';
+import 'package:frontend/features/inventory/widgets/shared/inventory_product_form_action_buttons_widget.dart';
+import 'package:frontend/features/inventory/widgets/shared/inventory_product_form_base_info_widget.dart';
+import 'package:frontend/features/inventory/widgets/shared/inventory_product_form_image_widget.dart';
+import 'package:frontend/features/inventory/widgets/shared/inventory_product_package_form_fields_widget.dart';
 import 'package:get/get.dart';
 import 'package:frontend/core/infrastructure/constants/text_strings.dart';
 import 'package:frontend/core/ui/theme/app_colors.dart';
@@ -83,7 +83,7 @@ class ProductFormMobileView extends GetView<ProductFormController> {
                   ),
 
                   // 3. KHU VỰC NÚT BẤM (Cũng thay đổi theo Mode)
-                  const ProductFormActionButtonsWidget(),
+                  const InventoryProductFormActionButtonsWidget(),
                 ],
               );
             }),
@@ -138,22 +138,26 @@ class ProductFormMobileView extends GetView<ProductFormController> {
   Widget _renderCurrentForm(String mode, int step) {
     // ÉP CỨNG GIAO DIỆN NẾU ĐANG Ở CHẾ ĐỘ SỬA LẺ TẺ
     if (mode == 'info') {
-      return const ProductFormBaseInfoWidget(key: ValueKey('info'));
+      return const InventoryProductFormBaseInfoWidget(key: ValueKey('info'));
     }
     if (mode == 'image') {
-      return const ProductFormImageWidget(key: ValueKey('image'));
+      return const InventoryProductFormImageWidget(key: ValueKey('image'));
     }
     if (mode == 'edit_package' || mode == 'add_package') {
       return const Form(
-          key: ValueKey('pkg'), child: ProductPackageFormFieldsWidget());
+          key: ValueKey('pkg'),
+          child: InventoryProductPackageFormFieldsWidget());
     }
 
     // NẾU LÀ TẠO MỚI (WIZARD) THÌ CHẠY THEO STEP
     if (step == 1) {
-      return const ProductFormBaseInfoWidget(key: ValueKey('step1'));
+      return const InventoryProductFormBaseInfoWidget(key: ValueKey('step1'));
     }
-    if (step == 2) return const ProductFormImageWidget(key: ValueKey('step2'));
+    if (step == 2) {
+      return const InventoryProductFormImageWidget(key: ValueKey('step2'));
+    }
     return const Form(
-        key: ValueKey('step3'), child: ProductPackageFormFieldsWidget());
+        key: ValueKey('step3'),
+        child: InventoryProductPackageFormFieldsWidget());
   }
 }
