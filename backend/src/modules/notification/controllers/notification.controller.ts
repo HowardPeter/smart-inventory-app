@@ -34,6 +34,7 @@ export class NotificationController {
 
     const page = parseInt(req.query.page as string) || 1;
     const size = parseInt(req.query.size as string) || 15;
+    const type = req.query.type as string;
 
     if (!storeId) {
       res.status(StatusCodes.BAD_REQUEST).json({
@@ -49,6 +50,7 @@ export class NotificationController {
       storeId,
       page,
       size,
+      type
     );
 
     sendResponse.success(res, notifications, { status: StatusCodes.OK });

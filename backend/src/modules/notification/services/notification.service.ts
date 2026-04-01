@@ -117,6 +117,7 @@ export class NotificationService {
     storeId: string,
     page: number,
     size: number,
+    type: string,
   ) {
     // 👉 Thêm tham số storeId
     return await this.notificationRepository.getUserNotifications(
@@ -124,6 +125,7 @@ export class NotificationService {
       storeId,
       page,
       size,
+      type,
     ); // 👉 Đồng bộ với Repo
   }
 

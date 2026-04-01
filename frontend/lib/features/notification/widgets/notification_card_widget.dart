@@ -3,16 +3,18 @@ import 'package:frontend/core/ui/theme/app_colors.dart';
 import 'package:frontend/core/ui/theme/app_sizes.dart';
 import 'package:iconsax_flutter/iconsax_flutter.dart';
 
-class NotificationCard extends StatelessWidget {
-  const NotificationCard({
+class NotificationCardWidget extends StatelessWidget {
+  const NotificationCardWidget({
     super.key,
     required this.notification,
-    required this.onTap,
+    required this.onLongPress,
     required this.timeAgo,
+    required this.onTap,
   });
 
   final dynamic notification;
-  final VoidCallback onTap;
+  final VoidCallback onLongPress;
+  final Function onTap;
   final String timeAgo;
 
   @override
@@ -40,7 +42,10 @@ class NotificationCard extends StatelessWidget {
       child: Material(
         color: Colors.transparent,
         child: InkWell(
-          onLongPress: onTap,
+          onLongPress: onLongPress,
+          onTap: () {
+            onTap();
+          },
           borderRadius: BorderRadius.circular(AppSizes.radius16),
           child: Padding(
             padding: const EdgeInsets.all(AppSizes.p16),

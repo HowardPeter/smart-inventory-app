@@ -44,14 +44,25 @@ export class NotificationRepository {
     storeId: string,
     page: number,
     size: number,
+    type?: string, // 👉 Bổ sung param type
   ) {
     const skip = (page - 1) * size;
 
     return await prisma.notification.findMany({
-      where: { userId, storeId, activeStatus: 'active' },
+      // Đưa trực tiếp object vào bên trong where
+      where: {
+        userId,
+        storeId,
+        activeStatus: 'active',
+        // Dùng đúng 1 dòng này để nội suy biến type
+        ...(type && type !== 'ALL' ? { type } : {}),
+      },
       orderBy: { createdAt: 'desc' },
       skip: skip,
       take: size,
+      include: {
+        store: { select: { name: true } },
+      },
     });
   }
 

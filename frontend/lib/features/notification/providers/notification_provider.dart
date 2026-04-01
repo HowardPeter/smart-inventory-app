@@ -4,12 +4,14 @@ class NotificationProvider {
   final ApiClient _apiClient = ApiClient();
 
   // Lấy danh sách từ Backend có phân trang
-  Future<dynamic> fetchNotifications({int page = 0, int size = 15}) async {
+  Future<dynamic> fetchNotifications(
+      {int page = 0, int size = 15, String type = 'ALL'}) async {
     return await _apiClient.get(
       '/api/notification',
       queryParameters: {
         'page': page,
         'size': size,
+        'type': type,
       },
     );
   }

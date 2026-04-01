@@ -21,4 +21,9 @@ final Map<String, String> enNotification = {
   TTexts.hoursAgo: 'hours ago',
   TTexts.minutesAgo: 'minutes ago',
   TTexts.justNow: 'Just now',
+
+  TTexts.filterAll: 'All',
+  TTexts.filterAlerts: 'Alerts',
+  TTexts.filterTransactions: 'Transactions',
+  TTexts.filterSystem: 'System',
 };

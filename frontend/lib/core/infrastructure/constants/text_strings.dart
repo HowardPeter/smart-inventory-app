@@ -571,4 +571,10 @@ class TTexts {
   static const String hoursAgo = "hours_ago";
   static const String minutesAgo = "minutes_ago";
   static const String justNow = "just_now";
+
+  // -- Notification Filters
+  static const String filterAll = "filter_all";
+  static const String filterAlerts = "filter_alerts";
+  static const String filterTransactions = "filter_transactions";
+  static const String filterSystem = "filter_system";
 }

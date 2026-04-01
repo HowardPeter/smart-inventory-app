@@ -22,6 +22,9 @@ class NotificationController extends GetxController {
   final int _pageSize = 15;
   bool _hasMore = true;
 
+  // Biến quản lý Filter
+  var selectedFilter = 'ALL'.obs;
+
   @override
   void onInit() {
     super.onInit();
@@ -112,7 +115,7 @@ class NotificationController extends GetxController {
       isLoading.value = true;
 
       final response = await _provider.fetchNotifications(
-          page: _currentPage, size: _pageSize);
+          page: _currentPage, size: _pageSize, type: selectedFilter.value);
 
       if (response.statusCode == 200) {
         final List data = response.data['data'] ?? [];
@@ -237,6 +240,13 @@ class NotificationController extends GetxController {
         }
       }
     });
+  }
+
+  // Hàm chuyển Filter khi bấm nút
+  void changeFilter(String newFilter) {
+    if (selectedFilter.value == newFilter) return; // Nếu bấm trùng thì bỏ qua
+    selectedFilter.value = newFilter;
+    fetchNotifications(); // Gọi lại API từ trang 1 với filter mới
   }
 
   // ==========================================
