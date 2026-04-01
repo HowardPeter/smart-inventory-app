@@ -1,12 +1,12 @@
 import { Router } from 'express';
 
+import { storeMemberController } from './store-member.module.js';
 import { asyncWrapper } from '../../common/middlewares/index.js';
 import { requirePermission } from '../access-control/require-permission.middleware.js';
 import { PERMISSION } from '../access-control/role-permission.constant.js';
 import { authenticate } from '../auth/index.js';
 import { validate } from '../notification/validators/validate.middleware.js';
 import { removeStoreMemberSchema } from '../store-member/store-member.validator.js';
-import { storeMemberController } from '../store-member/store.module.js';
 import { requireStoreContext } from '../stores/index.js';
 
 const storeMemberRouter = Router();
@@ -16,7 +16,7 @@ storeMemberRouter.delete(
   '/:userId',
   authenticate,
   requireStoreContext,
-  requirePermission(PERMISSION.STORE_MEMBER_READ),
+  requirePermission(PERMISSION.STORE_MEMBER_DELETE),
   // Đảm bảo người dùng có quyền xoá
   validate(removeStoreMemberSchema),
   asyncWrapper(storeMemberController.removeUser),
