@@ -248,7 +248,7 @@ class AppPages {
     GetPage(
       name: AppRoutes.notification,
       page: () => const NotificationMobileScreen(),
-    )
+    ),
     
     // -- Profile
     GetPage(
