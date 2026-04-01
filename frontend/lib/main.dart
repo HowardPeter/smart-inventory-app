@@ -1,52 +1,72 @@
+import 'dart:io'; // Giữ lại từ HEAD để dùng cho HttpOverrides
+import 'package:firebase_core/firebase_core.dart'; // Giữ lại từ main
+import 'package:firebase_messaging/firebase_messaging.dart'; // Giữ lại từ main
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:frontend/core/infrastructure/constants/app_constants.dart';
 import 'package:frontend/core/infrastructure/localization/app_translations.dart';
 import 'package:frontend/core/state/bindings/initial_binding.dart';
 import 'package:frontend/core/state/services/auth_service.dart'
     show AuthService;
+import 'package:frontend/core/state/services/notification_service.dart';
 import 'package:frontend/core/state/services/store_service.dart';
 import 'package:frontend/core/state/services/user_service.dart';
+import 'package:frontend/firebase_options.dart';
 import 'package:frontend/routes/app_pages.dart';
 import 'package:get/get.dart';
 import 'package:device_preview/device_preview.dart';
 import 'package:get_storage/get_storage.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'core/ui/theme/app_theme.dart';
-// import 'core/network/api_client.dart'; // Sau này mở ra để inject ApiClient
+
+// Hàm xử lý thông báo khi app chạy ngầm (Top-level function)
+@pragma('vm:entry-point')
+Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
+  await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
+}
 
 void main() async {
-  // Đảm bảo Flutter core đã được khởi tạo trước khi chạy các setup khác
   WidgetsFlutterBinding.ensureInitialized();
-  await dotenv.load(fileName: ".env");
-  // ---------------------------------------------------------
-  // KHỞI TẠO CÁC DỊCH VỤ TOÀN CẦU (GLOBAL SERVICES) Ở ĐÂY
-  // Ví dụ: Get.put(ApiClient());
 
-  // 1. Khởi tạo GetStorage
+  // Cho phép bỏ qua kiểm tra chứng chỉ SSL (Hữu ích khi dev với backend local)
+  HttpOverrides.global = MyHttpOverrides();
+
+  // 1. Khởi tạo Storage và Supabase
   await GetStorage.init();
-  // 2. Khởi tạo AuthService một cách bất đồng bộ
-  // Việc dùng putAsync giúp App chờ AuthService check ổ cứng xong mới chạy tiếp
-  await Get.putAsync(() => AuthService().init());
-  await Get.putAsync(() => UserService().init());
-  await Get.putAsync(() => StoreService().init());
-  // ---------------------------------------------------------
-  // 3. Khởi tạo supabase để kích hoạt các tính năng authen
   await Supabase.initialize(
     url: AppConstants.supabaseUrl,
     anonKey: AppConstants.supabaseAnonKey,
   );
 
+  // 2. Khởi tạo Firebase và Notification Service
+  await Firebase.initializeApp(
+    options: DefaultFirebaseOptions.currentPlatform,
+  );
+  FirebaseMessaging.onBackgroundMessage(_firebaseMessagingBackgroundHandler);
+  await NotificationService.initialize();
+
+  // 3. Khởi tạo các Dịch vụ toàn cục (Global Services)
+  // App sẽ đợi các dịch vụ này nạp xong dữ liệu cũ trước khi render UI
+  await Get.putAsync(() => AuthService().init());
+  await Get.putAsync(() => UserService().init());
+  await Get.putAsync(() => StoreService().init());
+
   runApp(
-    // Bọc toàn bộ app trong DevicePreview
     DevicePreview(
-      // Chỉ bật DevicePreview khi đang code (Debug Mode).
-      // Khi xuất file .apk hoặc build lên app store, nó sẽ tự động ẩn đi.
       enabled: !kReleaseMode,
       builder: (context) => const App(),
     ),
   );
+}
+
+// Lớp hỗ trợ xử lý lỗi chứng chỉ HTTP
+class MyHttpOverrides extends HttpOverrides {
+  @override
+  HttpClient createHttpClient(SecurityContext? context) {
+    return super.createHttpClient(context)
+      ..badCertificateCallback =
+          (X509Certificate cert, String host, int port) => true;
+  }
 }
 
 class App extends StatelessWidget {
@@ -58,26 +78,23 @@ class App extends StatelessWidget {
       title: 'Smart Inventory',
       debugShowCheckedModeBanner: false,
 
-      // 1. Cấu hình Device Preview kết hợp với GetX
-      builder: DevicePreview.appBuilder,
+      // Cấu hình Device Preview kết hợp tự động tắt bàn phím khi chạm ngoài màn hình
+      builder: (context, child) {
+        final devicePreviewChild = DevicePreview.appBuilder(context, child);
+        return GestureDetector(
+          onTap: () => FocusManager.instance.primaryFocus?.unfocus(),
+          behavior: HitTestBehavior.opaque,
+          child: devicePreviewChild,
+        );
+      },
 
-      // 2. Cấu hình Theme (Chỉ dùng Light Theme nguyên bản)
       theme: AppTheme.lightTheme,
-      themeMode: ThemeMode.light, // Ép app luôn chạy ở chế độ Sáng
-      // 3. Khai báo bộ dịch
+      themeMode: ThemeMode.light,
       translations: AppTranslations(),
-
-      // 4. Ngôn ngữ mặc định khi mở app
       locale: const Locale('en', 'US'),
-
-      // 5. Khai báo danh sách binding toàn cục
       initialBinding: InitialBinding(),
-
-      // 6. Cấu hình Định tuyến (Routing)
       initialRoute: AppPages.initial,
       getPages: AppPages.routes,
-
-      // 7. Quản lý bộ nhớ của GetX (Giữ nguyên factory để tránh lỗi trùng lặp controller)
       smartManagement: SmartManagement.keepFactory,
     );
   }

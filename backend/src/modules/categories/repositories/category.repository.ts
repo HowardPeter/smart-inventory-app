@@ -1,5 +1,4 @@
-import { prisma } from '../../../db/prismaClient.js';
-
+import type { DbClient } from '../../../common/types/index.js';
 import type {
   CategoryResponseDto,
   CreateCategoryDto,
@@ -7,8 +6,10 @@ import type {
 } from '../category.dto.js';
 
 export class CategoryRepository {
+  constructor(private readonly db: DbClient) {}
+
   async findAll(storeId: string): Promise<CategoryResponseDto[]> {
-    return await prisma.category.findMany({
+    return await this.db.category.findMany({
       // lấy category mặc định + không có trong hidedDefault và custom category
       where: {
         OR: [
@@ -46,7 +47,7 @@ export class CategoryRepository {
   }
 
   async findById(categoryId: string): Promise<CategoryResponseDto | null> {
-    return await prisma.category.findUnique({
+    return await this.db.category.findUnique({
       where: {
         categoryId,
       },
@@ -60,11 +61,37 @@ export class CategoryRepository {
     });
   }
 
+  async checkDuplicateName(storeId: string, name: string): Promise<boolean> {
+    const existingCategory = await this.db.category.findFirst({
+      where: {
+        name: {
+          equals: name,
+          mode: 'insensitive', // không phân biệt hoa thường
+        },
+        OR: [
+          {
+            storeId,
+            isDefault: false,
+          },
+          {
+            isDefault: true,
+            storeId: null,
+          },
+        ],
+      },
+      select: {
+        categoryId: true,
+      },
+    });
+
+    return !!existingCategory;
+  }
+
   async createOne(
     storeId: string,
     payload: CreateCategoryDto,
   ): Promise<CategoryResponseDto> {
-    return await prisma.category.create({
+    return await this.db.category.create({
       data: {
         name: payload.name,
         description: payload.description,
@@ -85,7 +112,7 @@ export class CategoryRepository {
     categoryId: string,
     payload: UpdateCategoryDto,
   ): Promise<CategoryResponseDto> {
-    return await prisma.category.update({
+    return await this.db.category.update({
       where: { categoryId },
       data: {
         ...(payload.name !== undefined && { name: payload.name }),
@@ -103,16 +130,23 @@ export class CategoryRepository {
     });
   }
 
-  public async countProductsByCategoryId(categoryId: string): Promise<number> {
-    return await prisma.product.count({
+  async getUncategorizedId(): Promise<string> {
+    const category = await this.db.category.findFirstOrThrow({
       where: {
-        categoryId,
+        name: 'Uncategorized',
+        isDefault: true,
+        storeId: null,
+      },
+      select: {
+        categoryId: true,
       },
     });
+
+    return category.categoryId;
   }
 
   public async deleteCustomCategory(categoryId: string): Promise<void> {
-    await prisma.category.delete({
+    await this.db.category.delete({
       where: { categoryId },
     });
   }

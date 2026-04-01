@@ -1,16 +1,13 @@
-import 'package:flutter/material.dart';
 import 'package:frontend/core/infrastructure/network/app_client.dart';
 import 'package:frontend/core/infrastructure/utils/full_screen_loader_utils.dart';
 import 'package:frontend/core/state/services/auth_service.dart';
 import 'package:frontend/core/state/services/store_service.dart';
 import 'package:frontend/core/ui/widgets/t_snackbars_widget.dart';
 import 'package:frontend/features/auth/providers/auth_provider.dart';
-// import 'package:frontend/features/auth/providers/auth_provider.dart';
 import 'package:get/get.dart';
 import 'package:frontend/routes/app_routes.dart';
 import 'package:frontend/core/state/services/user_service.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
-// import 'package:frontend/features/auth/providers/auth_provider.dart';
 
 class ProfileController extends GetxController {
   // Lấy thẳng UserService đã nạp trên RAM từ lúc Splash khởi động

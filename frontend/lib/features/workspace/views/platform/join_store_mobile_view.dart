@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:frontend/features/workspace/widgets/join_store/join_store_header_widget.dart';
-import 'package:frontend/core/ui/widgets/t_app_bar_widget.dart';
+import 'package:frontend/core/ui/widgets/t_blur_app_bar_widget.dart';
 import 'package:get/get.dart';
 import 'package:frontend/core/ui/theme/app_colors.dart';
 import 'package:frontend/core/ui/theme/app_sizes.dart';
@@ -18,7 +18,7 @@ class JoinStoreMobileView extends GetView<JoinStoreController> {
       backgroundColor: AppColors.background,
 
       // Header Component chung cho 2 trang
-      appBar: const TAppBarWidget(),
+      appBar: const TBlurAppBarWidget(),
 
       // BODY: Chỉ chứa nội dung Form, không chứa nút bấm
       body: SafeArea(

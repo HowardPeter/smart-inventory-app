@@ -2,25 +2,30 @@ import { StatusCodes } from 'http-status-codes';
 
 import { ProductRepository } from './product.repository.js';
 import { CustomError } from '../../common/errors/index.js';
+import { StorageService } from '../../common/services/storage.service.js';
 import {
   normalizePagination,
   buildPaginatedResponse,
 } from '../../common/utils/index.js';
-import { CategoryRepository } from '../categories/index.js';
+import { prisma } from '../../db/prismaClient.js'; // gọi prisma để dùng cơ chế $transaction
+import { categoryRepository } from '../categories/index.js';
+import { ProductPackageRepository } from '../product-packages/index.js';
 
 import type {
   CreateProductData,
+  ProductResponseDto,
   DetailProductResponseDto,
   UpdateProductDto,
   ListProductsQueryDto,
   ListProductsResponseDto,
+  ProductsByCategoryDto,
 } from './product.dto.js';
 
+// Khai báo tên bucket dạng hằng số để dễ quản lý và tái sử dụng
+const STORAGE_BUCKET = 'images';
+
 export class ProductService {
-  constructor(
-    private readonly productRepository: ProductRepository,
-    private readonly categoryRepository: CategoryRepository,
-  ) {}
+  constructor(private readonly productRepository: ProductRepository) {}
 
   private async checkProductExisted(
     storeId: string,
@@ -39,6 +44,17 @@ export class ProductService {
     }
   }
 
+  private async checkCategoryExisted(categoryId: string): Promise<void> {
+    const category = await categoryRepository.findById(categoryId);
+
+    if (!category) {
+      throw new CustomError({
+        message: 'Category not found',
+        status: StatusCodes.NOT_FOUND,
+      });
+    }
+  }
+
   async getProductsbyStoreId(
     storeId: string,
     query: ListProductsQueryDto,
@@ -51,7 +67,23 @@ export class ProductService {
         ...normalizedPagination,
       });
 
-    return buildPaginatedResponse(items, totalItems, normalizedPagination);
+    // Tạo Signed URL cho danh sách sản phẩm
+    const itemsWithSignedUrls = await Promise.all(
+      items.map(async (item) => ({
+        ...item,
+        imageUrl: await StorageService.getSignedUrl(
+          STORAGE_BUCKET,
+          item.imageUrl,
+        ),
+      })),
+    );
+
+    // FIX: Trả về itemsWithSignedUrls thay vì items gốc từ DB
+    return buildPaginatedResponse(
+      itemsWithSignedUrls, // Đã sửa
+      totalItems,
+      normalizedPagination,
+    );
   }
 
   async getProductById(
@@ -67,48 +99,86 @@ export class ProductService {
       });
     }
 
+    // Tạo Signed URL cho chi tiết sản phẩm
+    product.imageUrl = await StorageService.getSignedUrl(
+      STORAGE_BUCKET,
+      product.imageUrl,
+    );
+
     return product;
   }
 
-  async createProduct(
-    data: CreateProductData,
-  ): Promise<DetailProductResponseDto> {
-    const category = await this.categoryRepository.findById(data.categoryId);
+  async getProductsByCategory(
+    categoryId: string,
+  ): Promise<ProductsByCategoryDto> {
+    await this.checkCategoryExisted(categoryId);
 
-    if (!category) {
-      throw new CustomError({
-        message: 'Category not found',
-        status: StatusCodes.NOT_FOUND,
-      });
-    }
+    const result =
+      await this.productRepository.findProductsByCategoryId(categoryId);
 
-    return await this.productRepository.createOne(data);
+    // Tạo Signed URL cho mảng products trong category
+    const productsWithSignedUrls = await Promise.all(
+      result.products.map(async (p) => ({
+        ...p,
+        imageUrl: await StorageService.getSignedUrl(STORAGE_BUCKET, p.imageUrl),
+      })),
+    );
+
+    return {
+      count: result.count,
+      products: productsWithSignedUrls,
+    };
+  }
+
+  async createProduct(data: CreateProductData): Promise<ProductResponseDto> {
+    await this.checkCategoryExisted(data.categoryId);
+
+    const newProduct = await this.productRepository.createOne(data);
+
+    // Trả về kèm Signed URL ngay sau khi tạo thành công để UI hiển thị luôn
+    newProduct.imageUrl = await StorageService.getSignedUrl(
+      STORAGE_BUCKET,
+      newProduct.imageUrl,
+    );
+
+    return newProduct;
   }
 
   async updateProduct(
     storeId: string,
     productId: string,
     data: UpdateProductDto,
-  ): Promise<DetailProductResponseDto> {
+  ): Promise<ProductResponseDto> {
     await this.checkProductExisted(storeId, productId);
 
     if (data.categoryId) {
-      const category = await this.categoryRepository.findById(data.categoryId);
-
-      if (!category) {
-        throw new CustomError({
-          message: 'Category not found',
-          status: StatusCodes.NOT_FOUND,
-        });
-      }
+      await this.checkCategoryExisted(data.categoryId);
     }
 
-    return await this.productRepository.updateOne(productId, data);
+    const updatedProduct = await this.productRepository.updateOne(
+      productId,
+      data,
+    );
+
+    // Trả về kèm Signed URL sau khi update
+    updatedProduct.imageUrl = await StorageService.getSignedUrl(
+      STORAGE_BUCKET,
+      updatedProduct.imageUrl,
+    );
+
+    return updatedProduct;
   }
 
   async softDeleteProduct(storeId: string, productId: string): Promise<void> {
     await this.checkProductExisted(storeId, productId);
 
-    return await this.productRepository.softDeleteOne(productId);
+    await prisma.$transaction(async (tx) => {
+      const productRepositoryTx = new ProductRepository(tx);
+      const productPackageRepositoryTx = new ProductPackageRepository(tx);
+
+      await productRepositoryTx.softDeleteOne(productId);
+
+      await productPackageRepositoryTx.softDeleteMany(productId);
+    });
   }
 }

@@ -30,6 +30,12 @@ export type ListPaginationQueryDto<T> = PaginationQuery & {
   sortOrder?: SortOrder;
 };
 
+// Dto cho kiểu trả về các hàm repository có pagination
+export type ListPaginationResponseDto<T> = {
+  items: T[];
+  totalItems: number;
+};
+
 // dto dùng chung để in response các hàm service có pagination
 export type PaginationResponseDto<T> = {
   items: T[];

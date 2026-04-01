@@ -1,3 +1,5 @@
+import 'package:frontend/features/inventory/controllers/inventory_controller.dart';
+import 'package:frontend/features/notification/controller/notification_controller.dart';
 import 'package:get/get.dart';
 import 'package:frontend/features/navigation/controllers/navigation_controller.dart';
 import 'package:frontend/features/home/controllers/home_controller.dart';
@@ -13,8 +15,9 @@ class NavigationBinding extends Bindings {
     // 2. Các Controller của Tab con thì dùng lazyPut.
     // Chúng sẽ chỉ được khởi tạo trên RAM khi View tương ứng gọi Get.find()
     Get.lazyPut(() => HomeController());
+    Get.lazyPut(() => InventoryController());
     Get.lazyPut(() => ProfileController());
-    // Get.lazyPut(() => InventoryController());
     // Get.lazyPut(() => ReportsController());
+    Get.lazyPut(() => NotificationController());
   }
 }

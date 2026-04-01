@@ -15,21 +15,21 @@ class CategoryModel {
 
   factory CategoryModel.fromJson(Map<String, dynamic> json) {
     return CategoryModel(
-      categoryId: json['category_id'] ?? '',
+      categoryId: json['categoryId'] ?? '',
       name: json['name'] ?? 'Unknown Category',
       description: json['description'],
-      storeId: json['store_id'] ?? '',
-      isDefault: json['is_default'] ?? false,
+      storeId: json['storeId'] ?? '',
+      isDefault: json['isDefault'] ?? false,
     );
   }
 
   Map<String, dynamic> toJson() {
     return {
-      'category_id': categoryId,
+      'categoryId': categoryId,
       'name': name,
       'description': description,
-      'store_id': storeId,
-      'is_default': isDefault,
+      'storeId': storeId,
+      'isDefault': isDefault,
     };
   }
 }

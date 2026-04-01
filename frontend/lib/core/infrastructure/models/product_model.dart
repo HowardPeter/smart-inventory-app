@@ -1,3 +1,5 @@
+import 'package:frontend/core/infrastructure/utils/url_helper.dart';
+
 class ProductModel {
   final String productId;
   final String name;
@@ -23,34 +25,33 @@ class ProductModel {
 
   factory ProductModel.fromJson(Map<String, dynamic> json) {
     return ProductModel(
-      productId: json['product_id'] ?? '',
+      productId: json['productId'] ?? '',
       name: json['name'] ?? 'Unknown Product',
-      imageUrl: json['image_url'],
-      // Xử lý an toàn cho kiểu DateTime từ String của Supabase
-      createdAt: json['created_at'] != null
-          ? DateTime.parse(json['created_at'])
+      imageUrl: UrlHelper.normalizeImageUrl(json['imageUrl']),
+      createdAt: json['createdAt'] != null
+          ? DateTime.parse(json['createdAt'])
           : DateTime.now(),
-      updatedAt: json['updated_at'] != null
-          ? DateTime.parse(json['updated_at'])
+      updatedAt: json['updatedAt'] != null
+          ? DateTime.parse(json['updatedAt'])
           : DateTime.now(),
       brand: json['brand'],
-      storeId: json['store_id'] ?? '',
-      categoryId: json['category_id'] ?? '',
-      activeStatus: json['active_status'] ?? 'active',
+      storeId: json['storeId'] ?? json['store']?['storeId'] ?? '',
+      categoryId: json['categoryId'] ?? json['category']?['categoryId'] ?? '',
+      activeStatus: json['activeStatus'] ?? 'active',
     );
   }
 
   Map<String, dynamic> toJson() {
     return {
-      'product_id': productId,
+      'productId': productId,
       'name': name,
-      'image_url': imageUrl,
-      'created_at': createdAt.toIso8601String(),
-      'updated_at': updatedAt.toIso8601String(),
+      'imageUrl': imageUrl,
+      'createdAt': createdAt.toIso8601String(),
+      'updatedAt': updatedAt.toIso8601String(),
       'brand': brand,
-      'store_id': storeId,
-      'category_id': categoryId,
-      'active_status': activeStatus,
+      'storeId': storeId,
+      'categoryId': categoryId,
+      'activeStatus': activeStatus,
     };
   }
 }

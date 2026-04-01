@@ -6,11 +6,12 @@ mixin TErrorHandler {
   void handleError(dynamic e) {
     // Gọi class xử lý lỗi tập trung
     final error = TExceptions.getErrorMessage(e);
-
-    // Gọi Snackbar
-    TSnackbarsWidget.error(
-      title: error['title']!,
-      message: error['message']!,
-    );
+    Future.delayed(Duration.zero, () {
+      // Gọi Snackbar
+      TSnackbarsWidget.error(
+        title: error['title']!,
+        message: error['message']!,
+      );
+    });
   }
 }

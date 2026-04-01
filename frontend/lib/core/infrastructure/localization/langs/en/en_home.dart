@@ -36,6 +36,9 @@ final Map<String, String> enHome = {
   TTexts.homeScanBarcode: "Scan Barcode",
   TTexts.homeAddProduct: "Add Product",
   TTexts.homeViewReports: "View Reports",
+  TTexts.homeScanBarcodeSub: "Quickly identify\nitems",
+  TTexts.homeAddProductSub: "Add new\ninventory",
+  TTexts.homeViewReportsSub: "Analyze daily\nsales",
 
   // Low Stock Alerts
   TTexts.homeLowStockAlerts: "Low Stock Alerts",

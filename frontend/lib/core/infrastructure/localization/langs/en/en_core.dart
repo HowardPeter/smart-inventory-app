@@ -7,6 +7,11 @@ final Map<String, String> enCore = {
   // -- Global Errors
   TTexts.errorTitle: 'Error',
   TTexts.successTitle: 'Success',
+  TTexts.warningTitle: 'Warning',
+  TTexts.zero: '0',
+  TTexts.one: '1',
+  TTexts.two: '2',
+  TTexts.three: '3',
   TTexts.errorAccessRestrictedTitle: 'Access Restricted',
   TTexts.errorAccessRestrictedSubtitle:
       'This application is exclusively optimized for Smartphones. Please access via a mobile device or a standard desktop web browser for the full experience.',
@@ -17,6 +22,7 @@ final Map<String, String> enCore = {
   TTexts.errorTooManyRequestsMessage:
       'You have requested too many times. Please wait a moment before trying again.',
   TTexts.exit: 'Exit',
+  TTexts.done: 'Done',
   TTexts.errorServerTitle: 'Server Error',
   TTexts.errorServerMessage:
       'Our servers are currently facing an issue. Please try again later.',
@@ -24,6 +30,17 @@ final Map<String, String> enCore = {
   TTexts.errorNotFoundMessage: 'The requested data could not be found.',
   TTexts.errorUnknownTitle: 'Unknown Error',
   TTexts.errorUnknownMessage: 'An unexpected error occurred. Please try again.',
+  TTexts.fabScanBarcode: 'Scan Barcode',
+  TTexts.fabAddManual: 'Add Manual',
+
+  // -- Search
+  TTexts.searchHint: 'Search by name,...',
+  TTexts.searchItemsPackages: "Search items, packages,...",
+  TTexts.recentSearches: 'Recent Searches',
+  TTexts.clearAll: 'Clear All',
+  TTexts.noResultsTitle: 'No Results Found',
+  TTexts.noResultsMessage:
+      'We could not find anything matching your search. Please try another keyword.',
 
   // -- Password Strength
   TTexts.weak: 'Weak',
@@ -56,4 +73,7 @@ final Map<String, String> enCore = {
 
   TTexts.create: "Create",
   TTexts.cancel: "Cancel",
+
+  TTexts.unknownProduct: 'Unknown Product',
+  TTexts.na: 'N/A',
 };

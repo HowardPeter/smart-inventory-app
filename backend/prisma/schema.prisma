@@ -67,6 +67,8 @@ model UserProfile {
   transactions Transaction[]
   auditLogs    AuditLog[]
   storeMembers StoreMember[]
+  fcmTokens    FcmToken[]
+  notifications Notification[]
 }
 
 model Store {
@@ -85,6 +87,7 @@ model Store {
   auditLogs     AuditLog[]
   storeMembers  StoreMember[]
   hidedDefaults HidedDefault[]
+  notifications Notification[]
 }
 
 model StoreMember {
@@ -164,17 +167,18 @@ model ProductPackage {
 
   unit               Unit                @relation(fields: [unitId], references: [unitId])
   product            Product             @relation(fields: [productId], references: [productId])
-  inventories        Inventory[]
+  inventory          Inventory?
   transactionDetails TransactionDetail[]
 }
 
 model Inventory {
-  inventoryId      String   @id @default(uuid()) @map("inventory_id")
+  inventoryId      String       @id @default(uuid()) @map("inventory_id")
   quantity         Int
-  reorderThreshold Int?     @map("reorder_threshold")
-  lastCount        Int?     @map("last_count")
-  updatedAt        DateTime @updatedAt @map("updated_at")
-  productPackageId String   @map("product_package_id")
+  reorderThreshold Int?         @map("reorder_threshold")
+  lastCount        Int?         @map("last_count")
+  updatedAt        DateTime     @updatedAt @map("updated_at")
+  activeStatus     ActiveStatus @default(active) @map("active_status")
+  productPackageId String       @unique @map("product_package_id")
 
   productPackage ProductPackage @relation(fields: [productPackageId], references: [productPackageId])
 }
@@ -200,6 +204,7 @@ model AuditLog {
   performedAt DateTime         @default(now()) @map("performed_at")
   userId      String           @map("user_id")
   storeId     String           @map("store_id")
+  note        String?           
 
   user  UserProfile @relation(fields: [userId], references: [userId])
   store Store       @relation(fields: [storeId], references: [storeId])
@@ -222,4 +227,37 @@ model HidedDefault {
   category Category @relation(fields: [categoryId], references: [categoryId])
 
   @@id([storeId, categoryId])
+}
+
+model FcmToken {
+  tokenId   String   @id @default(uuid()) @map("token_id")
+  token     String   @unique
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+  
+  userId    String   @map("user_id")
+  user      UserProfile @relation(fields: [userId], references: [userId], onDelete: Cascade)
+
+  @@map("fcm_token")
+}
+
+model Notification {
+  notificationId String   @id @default(uuid()) @map("notification_id")
+  title          String
+  body           String
+  type           String
+  referenceId    String?  @map("reference_id") 
+  isRead         Boolean  @default(false) @map("is_read")
+  
+  activeStatus   ActiveStatus @default(active) @map("active_status")
+
+  storeId        String?  @map("store_id")
+  
+  createdAt      DateTime @default(now()) @map("created_at")
+  userId         String   @map("user_id")
+
+  user UserProfile @relation(fields: [userId], references: [userId], onDelete: Cascade)
+  store Store?      @relation(fields: [storeId], references: [storeId], onDelete: Cascade)
+
+  @@map("notification")
 }

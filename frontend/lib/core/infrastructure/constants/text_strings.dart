@@ -13,12 +13,34 @@ class TTexts {
   static const String strong = "strong";
   static const String create = "create";
   static const String cancel = "cancel";
+  static const String zero = "zero";
+  static const String one = "one";
+  static const String two = "two";
+  static const String three = "three";
+  static const String unknownProduct = "unknown_product";
+  static const String na = "n_a";
+  static const String warningTitle = "warning_title";
   static const String errorServerTitle = "error_server_title";
   static const String errorServerMessage = "error_server_message";
   static const String errorNotFoundTitle = "error_not_found_title";
   static const String errorNotFoundMessage = "error_not_found_message";
   static const String errorUnknownTitle = "error_unknown_title";
   static const String errorUnknownMessage = "error_unknown_message";
+  static const String fabScanBarcode = "fab_scan_barcode";
+  static const String fabAddManual = "fab_add_manual";
+
+  // -- Search
+  static const String searchHint = "search_hint";
+  static const String recentSearches = "recent_searches";
+  static const String clearAll = "clear_all";
+  static const String noResultsTitle = "no_results_title";
+  static const String noResultsMessage = "no_results_message";
+  static const String searchItemsPackages = "search_items_packages";
+
+  // -- Search Module
+  static const String searchEverything = "search_everything";
+  static const String noResultsFound = "no_results_found";
+  static const String didYouMean = "didYouMean";
 
   // -- Network Error Dialog
   static const String netErrorTitle = "net_error_title";
@@ -45,6 +67,7 @@ class TTexts {
   static const String errorTooManyRequestsMessage =
       "error_too_many_requests_message";
   static const String exit = "exit";
+  static const String done = "done";
 
   // -- Splash Screen
   static const String splashSlogan = "splash_slogan";
@@ -270,14 +293,275 @@ class TTexts {
   static const String homeInboundShipment = "home_inbound_shipment";
   static const String homeOutboundDelivery = "home_outbound_delivery";
   static const String homeStockAdjustment = "home_stock_adjustment";
+  static const String homeScanBarcode = "home_scan_barcode";
+  static const String homeScanBarcodeSub = "home_scan_barcode_sub";
+  static const String homeAddProduct = "home_add_product";
+  static const String homeAddProductSub = "home_add_product_sub";
+  static const String homeViewReports = "home_view_reports";
+  static const String homeViewReportsSub = "home_view_reports_sub";
+
+  // -- Inventory
+  static const String inventoryHub = "inventory_hub";
+  static const String manageProductsStock = "manage_products_stock";
+  static const String details = "details";
+  static const String inboundOutbound7Days = "inbound_outbound_7_days";
+  static const String inventoryTitle = "inventory_title";
+  static const String inventoryInsights = "inventory_insights";
+  static const String manageData = "manage_data";
+  static const String productCatalog = "product_catalog";
+  static const String totalItems = "total_items";
+  static const String stockValue = "stock_value";
+  static const String stockHealth = "stock_health";
+  static const String statusHealthy = "status_healthy";
+  static const String statusLow = "status_low";
+  static const String statusOut = "status_out";
+  static const String topCategoriesByVolume = "top_categories_by_volume";
+  static const String stockFlow = "stock_flow";
+  static const String flowIn = "flow_in";
+  static const String flowOut = "flow_out";
+  static const String items = "items";
+  static const String more = "more";
+  static const String noDataAvailable = "no_data_available";
+  static const String noCategoriesFound = "no_categories_found";
+  static const String totalInventory = "total_inventory";
+  static const String clearFilters = "clear_filters";
+  static const String emptyFilterMessage = "empty_filter_message";
+  static const String totalActiveProducts = 'total_active_products';
+  static const String totalStockValue = 'total_stock_value';
+  static const String inventoryHealth = 'inventory_health';
+  static const String topCategories = 'top_categories';
+  static const String inventoryFlow = 'inventory_flow';
+
+  // -- Customize Catalog
+  static const String customizeCatalog = "customize_catalog";
+  static const String pinnedOnHome = "pinned_on_home";
+  static const String tapAndHoldToDrag = "tap_and_hold_to_drag";
+  static const String save = "save";
+
+  // -- Inventory Insight
+  static const String inventoryList = "inventory_list";
+  static const String tabAll = "tab_all";
+  static const String tabHealthy = "tab_healthy";
+  static const String allItems = "all_items";
+  static const String tabLowStock = "tab_low_stock";
+  static const String tabOutStock = "tab_out_stock";
+  static const String sku = "sku";
+  static const String inStock = "in_stock";
+  static const String insightsOverview = "insights_overview";
+  static const String actionRequired = "action_required";
+  static const String goodCondition = "good_condition";
+
+  // -- Inventory Detail
+  static const String inventoryDetails = "inventory_details";
+  static const String quantityInStock = "quantity_in_stock";
+  static const String reorderThreshold = "reorder_threshold";
+  static const String importPrice = "import_price";
+  static const String adjustStock = "adjust_stock";
+  static const String totalInStock = "total_in_stock";
+  static const String lowStockAlert = "low_stock_alert";
+  static const String noThreshold = "no_threshold";
+  static const String productSku = "product_sku";
+  static const String productPrice = "product_price";
+  static const String totalValue = "total_value";
+  static const String editItem = "edit_item";
+  static const String deleteItem = "delete_item";
+  static const String addToTransaction = "add_to_transaction";
+  static const String deleteConfirmation = "delete_confirmation";
+  static const String confirmDeleteText =
+      "are_you_sure_you_want_to_delete_this_item";
+  static const String delete = "delete";
+  static const String barcodeType = "barcode_type";
+  static const String noLimit = "no_limit";
+  static const String thresholdTitle = "threshold_title";
+  static const String totalStockTitle = "total_stock_title";
+  static const String featureComingSoon = "feature_coming_soon";
+  static const String itemDeletedSuccess = "item_deleted_success";
+  static const String itemDeletedMessage = "item_deleted_message";
+  static const String info = "info";
+  static const String totalStockInTitle = "total_stock_in_title";
+  static const String totalStockOutTitle = "total_stock_out_title";
+  static const String importCost = "import_cost";
+  static const String salePrice = "sale_price";
+  static const String profitMargin = "profit_margin";
+  static const String barcodeLabel = "barcode_label";
+  static const String noRelatedPackages = "no_related_packages";
+  static const String unknownPackage = "unknown_package";
+  static const String left = "left";
+  static const String stockMovement = "stock_movement";
+  static const String data = "data";
+  static const String chart = "chart";
+  static const String stockIn = "stock_in";
+  static const String stockOut = "stock_out";
+  static const String inventoryStatus = "inventory_status";
+  static const String relatedPackages = "related_packages";
+  static const String inventoryHistory = "inventory_history";
+  static const String latestInventoryCount = "latest_inventory_count";
+  static const String restockFromSupplier = "restock_from_supplier";
+  static const String salesOrder = "sales_order";
+  static const String loadingProduct = "loading_product";
+  static const String viewProductInfo = 'view_product_info';
+
+  // --- Product Catalog & Categories ---
+  static const String categoryCatalog = 'category_catalog';
+  static const String searchCategories = 'search_categories';
+  static const String totalCategories = 'total_categories';
+  static const String categoriesUnit = 'categories_unit';
+  static const String addNewCategory = 'add_new_category';
+  static const String addNewCategorySub = 'add_new_category_sub';
+  static const String categoryDescription = 'category_description';
+  static const String noCategoryDescription = 'no_description';
+  static const String emptyCategoryMessage = 'empty_category_message';
+
+  // --- View All Products ---
+  static const String viewAllProducts = 'view_all_products';
+  static const String viewAllProductsSub = 'view_all_products_sub';
+
+  // --- Category Detail ---
+  static const String addNewProduct = 'add_new_product';
+  static const String addNewProductSub = 'add_new_product_sub';
+  static const String editCategory = 'editCategory';
+  static const String deleteCategory = 'delete_category';
+  static const String noProductsFound = 'no_products_found';
+  static const String noProductsAssigned = 'no_products_assigned';
+  static const String deleteCategoryConfirm = 'delete_category_confirm';
+  static const String deleting = 'deleting';
+
+  // --- Product Catalog Deatail ---
+  static const String brand = 'brand';
+  static const String packagesOrVariants = 'packages_or_variants';
+  static const String add = 'add';
+  static const String addPackageSubtitle = 'add_package_subtitle';
+  static const String noBarcode = 'no_barcode';
+  static const String editProduct = 'edit_product';
+  static const String deleteProduct = 'delete_product';
+  static const String addNewPackage = 'add_new_package';
+  static const String editPackage = 'edit_package';
+  static const String noPackagesFound = 'no_packages_found';
+
+  // -- Add Category
+  static const String categoryNameLabel = 'category_name_label';
+  static const String categoryNameHint = 'category_name_hint';
+  static const String categoryDescLabel = 'category_desc_label';
+  static const String categoryDescHint = 'category_desc_hint';
+  static const String saveCategory = 'save_category';
+  static const String categoryNameRequired = 'category_name_required';
+  static const String categoryCreatedSuccessTitle =
+      'category_created_success_title';
+  static const String categoryCreatedSuccessMessage =
+      'category_created_success_message';
+  static const String categoryNameExists = 'category_name_exists';
+  static const String saving = 'saving';
+  static const String savingCategory = 'saving_category';
+
+  // -- Edit Category
+  static const String editCategoryTitle = 'edit_category_title';
+  static const String categoryUpdatedSuccessMessage =
+      'category_updated_success_message';
+  static const String deleteCategorySuccessMessage =
+      'delete_category_success_message';
+  static const String categoryNotEmptyError = 'category_not_empty_error';
+
+  // -- Add Product
+  static const String addNewProductTitle = 'add_new_product_title';
+  static const String editProductTitle = 'edit_product_title';
+  static const String productNameLabel = 'product_name_label';
+  static const String productNameSubLabel = 'product_name_sub_label';
+  static const String brandSub = 'brand_Sub';
+  static const String selectCategory = 'select_category';
+  static const String initialPackageInfo = 'initial_package_info';
+  static const String unitLabel = 'unitLabel';
+  static const String productCreatedSuccess = 'product_created_success';
+  static const String productUpdatedSuccess = 'product_updated_success';
+  static const String step1 = 'step_1';
+  static const String step2 = 'step_2';
+  static const String baseInfo = 'base_info';
+  static const String packageInfo = 'package_info';
+  static const String nextStep = 'next_step';
+  static const String previousStep = 'previous_step';
+  static const String variantNameLabel = 'variant_name_label';
+  static const String variantNameHint = 'variant_name_hint';
+  static const String selectCategoryWarning = 'select_category_warning';
+  static const String tapToSelect = 'tap_to_select';
+  static const String step1Title = 'step_1_title';
+  static const String step1Sub = 'step_1_sub';
+  static const String step2Title = 'step_2_title';
+  static const String step2Sub = 'step_2_sub';
+  static const String productImage = 'product_image';
+  static const String uploadImage = 'upload_image';
+  static const String takePhoto = 'take_photo';
+  static const String chooseFromGallery = 'choose_from_gallery';
+  static const String stepProductBaseInfo = 'step_product_base_info';
+  static const String stepProductImage = 'step_product_image';
+  static const String stepProductPackage = 'step_product_package';
+  static const String productBaseTitle = 'product_base_title';
+  static const String productBaseSub = 'product_base_sub';
+  static const String productImageTitle = 'product_image_title';
+  static const String productImageSub = 'product_image_sub';
+  static const String productPackageTitle = 'product_package_title';
+  static const String productPackageSub = 'product_package_sub';
+  static const String requirePhoto = 'require_photo';
+  static const String cameraPermissionDenied = 'camera_permission_denied';
+  static const String scanOrTypeBarcode = 'scan_or_type';
+  static const String zeroPointZero = 'zero_point_zero';
+  static const String selectUnit = 'select_unit';
+  static const String discardChangesTitle = 'discard_changes_title';
+  static const String discardChangesMessage = 'discard_changes_message';
+  static const String discard = 'discard';
+  static const String keepEditing = 'keep_editing';
+  static const String confirmNoImageTitle = 'confirm_no_image_title';
+  static const String confirmNoImageMessage = 'confirm_no_image_message';
+  static const String yesContinue = 'yes_continue';
+  static const String addPhoto = 'add_photo';
+  static const String cropImage = 'crop_image';
+  static const String reorderThresholdLabel = 'reorder_threshold_label';
+  static const String reorderThresholdHint = 'reorder_threshold_hint';
+  static const String zeroMeansNoLimit = 'zero_means_no_limit';
+  static const String fieldRequired = 'field_required';
+  static const String invalidNumber = 'invalid_number';
+  static const String suggestedNames = 'suggested_names';
+  static const String priceGreaterThanZero = 'price_greater_than_zero';
+
+  // -- Edit Product
+  static const String editProductImageTitle = 'edit_product_image_title';
+  static const String editProductImageSub = 'edit_product_image_sub';
+  static const String editPackageTitle = 'edit_package_title';
+  static const String editPackageSub = 'edit_package_sub';
+  static const String addPackageTitle = 'add_package_title';
+  static const String addPackageSub = 'add_package_sub';
+  static const String saveChanges = 'save_changes';
+  static const String saveImage = 'save_image';
+  static const String savePackage = 'save_package';
+  static const String deletePackage = 'delete_package';
+  static const String addPackageBtn = 'add_package_btn';
+  static const String imageUpdatedSuccess = 'image_updated_success';
+  static const String packageUpdatedSuccess = 'package_updated_success';
+  static const String packageCreatedSuccess = 'package_created_success';
+  static const String deletingProduct = "deleting_product";
+  static const String productDeletedSuccess = "product_deleted_success";
+  static const String deletingPackage = "deleting_package";
+  static const String packageDeletedSuccess = "package_deleted_success";
+  static const String productDataMissing = "product_data_missing";
+  static const String productNotEmptyError = "product_not_empty_error";
+  static const String confirmMoveProductToTrash =
+      "confirm_move_product_to_trash";
+  static const String confirmMovePackageToTrash =
+      "confirm_move_package_to_trash";
+  static const String inventoryNotEmptyTitle = "inventory_not_empty_title";
+  static const String inventoryNotEmptyMessage = "inventory_not_empty_message";
+  static const String makeTransaction = "make_transaction";
+  static const String confirmDeletePackageMessage =
+      "confirm_delete_package_message";
+  static const String currentStockWithCount = "current_stock_with_count";
+  static const String importPriceLabel = 'import_price_label';
+  static const String sellingPriceLabel = 'selling_price_label';
+  static const String stockQuantityLabel = 'stock_quantity_label';
+  static const String inventoryThreshold = 'inventory_threshold';
+  static const String sellingPrice = 'selling_price';
 
   // Empty State
   static const String emptyTransactionTitle = "empty_transaction_title";
   static const String emptyTransactionSubtitle = "empty_transaction_subtitle";
   static const String homeQuickActions = "home_quick_actions";
-  static const String homeScanBarcode = "home_scan_barcode";
-  static const String homeAddProduct = "home_add_product";
-  static const String homeViewReports = "home_view_reports";
   static const String homeLowStockAlerts = "home_low_stock_alerts";
   static const String homeItems = "home_items";
   static const String homeOnlyLeft = "home_only_left";
