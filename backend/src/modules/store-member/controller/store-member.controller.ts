@@ -20,10 +20,10 @@ export class StoreMemberController {
     res: Response<ApiResponse<StoreMemberResponseDto>>,
   ): Promise<void> => {
     const user = requireReqUser(req);
-    // Lấy ID của người đang thao tác [cite: 338, 355]
+    // Lấy ID của người đang thao tác
     const storeContext = requireReqStoreContext(req);
-    // Có chứa storeId và role ('owner', 'manager', 'staff') [cite: 412-417]
-    const targetUserId = req.params.userId as string; // Target User ID muốn xóa
+    // Có chứa storeId và role ('owner', 'manager', 'staff')
+    const targetUserId = req.params.userId as string;
 
     if (!targetUserId) {
       throw new CustomError({
@@ -33,13 +33,12 @@ export class StoreMemberController {
     }
 
     const removedMember = await this.storeMemberService.removeUserFromStore(
-      user.userId, // Ai đang xoá?
-      storeContext.role, // Role của người xoá là gì?
-      targetUserId, // Xoá ai?
-      storeContext.storeId, // Ở store nào?
+      user.userId,
+      storeContext.role,
+      targetUserId,
+      storeContext.storeId,
     );
 
     sendResponse.success(res, removedMember, { status: StatusCodes.OK });
-    // [cite: 430]
   };
 }
