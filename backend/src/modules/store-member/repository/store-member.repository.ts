@@ -1,6 +1,6 @@
-import { prisma } from '../../db/prismaClient.js';
+import { prisma } from '../../../db/prismaClient.js';
 
-import type { StoreMemberResponseDto } from './store-member.dto.js';
+import type { StoreMemberResponseDto } from '../dto/store-member.dto.js';
 
 export class StoreMemberRepository {
   async findByIdsWithStore(

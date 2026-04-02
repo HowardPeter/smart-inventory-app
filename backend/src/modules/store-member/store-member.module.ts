@@ -1,6 +1,6 @@
-import { StoreMemberController } from './store-member.controller.js';
-import { StoreMemberRepository } from './store-member.repository.js';
-import { StoreMemberService } from './store-member.service.js';
+import { StoreMemberController } from './controller/store-member.controller.js';
+import { StoreMemberRepository } from './repository/store-member.repository.js';
+import { StoreMemberService } from './service/store-member.service.js';
 
 const storeMemberRepository = new StoreMemberRepository();
 const storeMemberService = new StoreMemberService(storeMemberRepository);
