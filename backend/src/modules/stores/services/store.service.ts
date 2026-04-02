@@ -90,7 +90,7 @@ export class StoreService {
       await storeMemberRepositoryTx.createOne({
         userId,
         storeId: createdStore.storeId,
-        role: 'manager',
+        role: 'owner',
       });
 
       return createdStore;
