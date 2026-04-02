@@ -79,6 +79,31 @@ export class ProductPackageService {
     return await this.checkProductPackageExisted(storeId, productPackageId);
   }
 
+  async getProductPackagesByIds(
+    storeId: string,
+    productPackageIds: string[],
+  ): Promise<
+    Array<{
+      productPackageId: string;
+      productId: string;
+      displayName: string | null;
+      importPrice: number | null;
+    }>
+  > {
+    return await this.productPackageRepository.findManyActiveByIds(
+      storeId,
+      productPackageIds,
+    );
+  }
+
+  async getProductIdsHavingPackages(
+    storeId: string,
+    productIds: string[],
+  ): Promise<string[]> {
+    return await this.productPackageRepository
+      .findProductIdsHavingActivePackages(storeId, productIds);
+  }
+
   async createProductPackage(
     storeId: string,
     productId: string,

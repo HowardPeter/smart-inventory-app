@@ -10,6 +10,7 @@ import type {
   CreateInventoryDto,
   InventoryDetailResponseDto,
   InventoryListItemDto,
+  InventoryResponseDto,
   ListInventoriesQueryDto,
   UpdateInventoryDto,
 } from '../dto/inventory.dto.js';
@@ -272,6 +273,41 @@ export class InventoryRepository {
     return this.toInventoryListItem(inventory);
   }
 
+  async findManyActiveByProductPackageIds(
+    storeId: string,
+    productPackageIds: string[],
+  ): Promise<
+    Pick<
+      InventoryResponseDto,
+      'inventoryId' | 'quantity' | 'productPackageId'
+    >[]
+  > {
+    if (productPackageIds.length === 0) {
+      return [];
+    }
+
+    return await this.prisma.inventory.findMany({
+      where: {
+        productPackageId: {
+          in: productPackageIds,
+        },
+        activeStatus: 'active',
+        productPackage: {
+          activeStatus: 'active',
+          product: {
+            storeId,
+            activeStatus: 'active',
+          },
+        },
+      },
+      select: {
+        inventoryId: true,
+        productPackageId: true,
+        quantity: true,
+      },
+    });
+  }
+
   async updateOne(
     tx: Prisma.TransactionClient,
     inventoryId: string,
@@ -314,7 +350,7 @@ export class InventoryRepository {
   async getInventoryStatusByProductPackageId(productPackageId: string) {
     return await this.prisma.inventory.findUnique({
       where: { productPackageId },
-      select: { inventoryId: true, activeStatus: true },
+      select: { inventoryId: true, activeStatus: true, quantity: true },
     });
   }
 
@@ -359,6 +395,54 @@ export class InventoryRepository {
       where: { productPackageId },
       data: { activeStatus: 'inactive' },
     });
+  }
+
+  async increaseManyForImport(
+    storeId: string,
+    userId: string,
+    items: {
+      inventoryId: string;
+      productPackageId: string;
+      currentQuantity: number;
+      importQuantity: number;
+      unitPrice: number;
+      transactionId: string;
+    }[],
+  ): Promise<void> {
+    for (const item of items) {
+      const nextQuantity = item.currentQuantity + item.importQuantity;
+
+      await this.prisma.inventory.update({
+        where: {
+          inventoryId: item.inventoryId,
+        },
+        data: {
+          quantity: nextQuantity,
+        },
+      });
+
+      await this.prisma.auditLog.create({
+        data: {
+          actionType: 'update',
+          entityType: 'Inventory',
+          userId,
+          storeId,
+          note: `Import transaction ${item.transactionId}`,
+          oldValue: {
+            quantity: item.currentQuantity,
+          },
+          newValue: {
+            quantity: nextQuantity,
+            changedQuantity: item.importQuantity,
+            adjustmentType: 'increase',
+            reason: 'import transaction',
+            productPackageId: item.productPackageId,
+            transactionId: item.transactionId,
+            unitPrice: item.unitPrice,
+          },
+        },
+      });
+    }
   }
 
   async delete(

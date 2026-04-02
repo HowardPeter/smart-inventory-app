@@ -158,6 +158,76 @@ export class ProductPackageRepository {
     return productPackage ? this.toResponseDto(productPackage) : null;
   }
 
+  async findManyActiveByIds(
+    storeId: string,
+    productPackageIds: string[],
+  ): Promise<
+    Array<{
+      productPackageId: string;
+      productId: string;
+      displayName: string | null;
+      importPrice: number | null;
+    }>
+  > {
+    if (productPackageIds.length === 0) {
+      return [];
+    }
+
+    const productPackages = await this.db.productPackage.findMany({
+      where: {
+        productPackageId: {
+          in: productPackageIds,
+        },
+        activeStatus: 'active',
+        product: {
+          storeId,
+          activeStatus: 'active',
+        },
+      },
+      select: {
+        productPackageId: true,
+        productId: true,
+        displayName: true,
+        importPrice: true,
+      },
+    });
+
+    return productPackages.map((productPackage) => ({
+      productPackageId: productPackage.productPackageId,
+      productId: productPackage.productId,
+      displayName: productPackage.displayName,
+      importPrice: productPackage.importPrice?.toNumber() ?? null,
+    }));
+  }
+
+  async findProductIdsHavingActivePackages(
+    storeId: string,
+    productIds: string[],
+  ): Promise<string[]> {
+    if (productIds.length === 0) {
+      return [];
+    }
+
+    const productPackages = await this.db.productPackage.findMany({
+      where: {
+        productId: {
+          in: productIds,
+        },
+        activeStatus: 'active',
+        product: {
+          storeId,
+          activeStatus: 'active',
+        },
+      },
+      distinct: ['productId'],
+      select: {
+        productId: true,
+      },
+    });
+
+    return productPackages.map((productPackage) => productPackage.productId);
+  }
+
   async findActiveByProductIdAndUnitId(
     productId: string,
     unitId: string,

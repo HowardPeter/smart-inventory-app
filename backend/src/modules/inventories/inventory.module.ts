@@ -17,4 +17,5 @@ const inventoryService = new InventoryService(
   auditLogRepository,
 );
 
+export { inventoryService };
 export const inventoryController = new InventoryController(inventoryService);

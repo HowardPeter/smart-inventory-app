@@ -51,6 +51,10 @@ export const sendResponse = {
       response.errors = options.errors;
     }
 
+    if (options?.data !== undefined) {
+      response.data = options.data;
+    }
+
     return res.status(status).json(response);
   },
 };

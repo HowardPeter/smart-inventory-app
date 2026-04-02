@@ -8,6 +8,7 @@ import {
 import { prisma } from '../../../db/prismaClient.js';
 import { InventoryRepository } from '../repository/inventory.repository.js';
 
+import type { DbClient } from '../../../common/types/index.js';
 import type { Prisma } from '../../../generated/prisma/client.js';
 import type { AuditLogRepository } from '../../audit-log/repository/audit-log.repository.js';
 import type {
@@ -271,6 +272,68 @@ export class InventoryService {
 
       return created;
     });
+  }
+
+  async increaseInventoriesForImport(
+    storeId: string,
+    userId: string,
+    items: {
+      productPackageId: string;
+      quantity: number;
+      unitPrice: number;
+      transactionId: string;
+    }[],
+    db: DbClient,
+  ): Promise<void> {
+    // NOTE: Truyền db (TransactionClient) từ ngoài vào
+    // NOTE: để đảm bảo tất cả query chạy trong cùng transaction
+    const inventoryRepository = new InventoryRepository(db);
+
+    // Lấy tất cả inventory đang active theo danh sách productPackageId
+    const inventoryRecords =
+      await inventoryRepository.findManyActiveByProductPackageIds(
+        storeId,
+        // map để lấy list productPackageId từ items
+        items.map((item) => item.productPackageId),
+      );
+
+    // Tạo Map để lookup inventory theo productPackageId (O(1))
+    const inventoryMap = new Map(
+      inventoryRecords.map((inventory) => [
+        inventory.productPackageId,
+        inventory,
+      ]),
+    );
+
+    // Transform items về data shape của hàm increaseManyForImport
+    const inventoryItems = items.map((item) => {
+      // Lấy inventory hiện tại từ Map
+      const inventory = inventoryMap.get(item.productPackageId);
+
+      // Defensive check (trên lý thuyết không xảy ra vì đã filter)
+      if (!inventory) {
+        throw new CustomError({
+          message: 'Inventory not found for product package',
+          status: StatusCodes.NOT_FOUND,
+        });
+      }
+
+      // Trả về data shape làm tham số hàm increaseManyForImport
+      return {
+        inventoryId: inventory.inventoryId,
+        productPackageId: item.productPackageId,
+        currentQuantity: inventory.quantity, // quantity hiện tại trong DB
+        importQuantity: item.quantity, // số lượng nhập thêm
+        unitPrice: item.unitPrice, // giá nhập (audit log/valuation nếu cần)
+        transactionId: item.transactionId, // liên kết transaction để trace
+      };
+    });
+
+    await inventoryRepository.increaseManyForImport(
+      storeId,
+      userId,
+      inventoryItems,
+    );
   }
 
   async deleteInventory(
