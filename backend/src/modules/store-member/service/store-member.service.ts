@@ -1,9 +1,10 @@
 import { StatusCodes } from 'http-status-codes';
 
-import { CustomError } from '../../../common/errors/index.js';
-import { StoreMemberRepository } from '../repository/store-member.repository.js';
+import { CustomError } from '../../../common/errors/custom-error.js';
+import { ROLE } from '../../access-control/role-permission.constant.js'; // IMPORT CONSTANT MỚI Ở ĐÂY
 
 import type { StoreMemberResponseDto } from '../dto/store-member.dto.js';
+import type { StoreMemberRepository } from '../repository/store-member.repository.js';
 
 export class StoreMemberService {
   constructor(private readonly storeMemberRepository: StoreMemberRepository) {}
@@ -14,7 +15,6 @@ export class StoreMemberService {
     targetUserId: string,
     storeId: string,
   ): Promise<StoreMemberResponseDto> {
-    // 1. Lấy thông tin member bị xoá
     const targetMember = await this.storeMemberRepository.findByIdsWithStore(
       targetUserId,
       storeId,
@@ -34,8 +34,6 @@ export class StoreMemberService {
       });
     }
 
-    // 2. Chặn tự xóa chính mình
-    // (nếu muốn tự out thì nên làm 1 API /leave riêng)
     if (requesterUserId === targetUserId) {
       throw new CustomError({
         message: 'You cannot remove yourself using this feature',
@@ -43,7 +41,6 @@ export class StoreMemberService {
       });
     }
 
-    // 3. Chặn tuyệt đối việc xoá Owner của Store
     if (targetMember.store.userId === targetUserId) {
       throw new CustomError({
         message: 'Cannot remove the store owner',
@@ -51,22 +48,24 @@ export class StoreMemberService {
       });
     }
 
-    // 4. ÁP DỤNG LUẬT PHÂN CẤP (HIERARCHY RULES)
-    // Nếu requester là 'manager', họ không được phép xoá một 'manager' khác
-    if (requesterRole === 'manager' && targetMember.role === 'manager') {
+    // ĐỒNG BỘ CHỮ HOA ĐỂ TRÁNH LỖI CASE-SENSITIVE
+    const reqRoleStandardized = requesterRole.toUpperCase();
+    const targetRoleStandardized = targetMember.role.toUpperCase();
+
+    // Dùng hằng số ROLE để kiểm tra thay vì hardcode string
+    if (
+      reqRoleStandardized === ROLE.MANAGER &&
+      targetRoleStandardized === ROLE.MANAGER
+    ) {
       throw new CustomError({
         message: 'Managers can only remove staff members, not other managers',
         status: StatusCodes.FORBIDDEN,
       });
     }
 
-    // Ghi chú: Nếu requesterRole là 'owner',
-    // code sẽ lướt qua if trên và đi tiếp xuống dưới.
-    // Nếu targetMember.role là 'staff', code cũng đi tiếp bình thường.
-
-    // 5. Hợp lệ tất cả -> Xoá mềm
     return await this.storeMemberRepository.softDeleteMember(
       targetUserId,
+
       storeId,
     );
   }
