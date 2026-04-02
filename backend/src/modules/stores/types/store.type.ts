@@ -1,5 +1,4 @@
-type ActiveStatus = 'active' | 'inactive';
-export type StoreRole = 'manager' | 'staff';
+import type { ActiveStatus, StoreRole } from '../../../generated/prisma/enums.js';
 
 export type Store = {
   storeId: string;

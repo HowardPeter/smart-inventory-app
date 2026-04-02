@@ -2,9 +2,9 @@ import { StatusCodes } from 'http-status-codes';
 
 import { CustomError } from '../../../common/errors/index.js';
 
+import type { StoreRole } from '../../../generated/prisma/enums.js';
 import type { StoreMembershipResponseDto } from '../dtos/store-member.dto.js';
 import type { StoreMemberRepository } from '../repositories/store-member.repository.js';
-import type { StoreRole } from '../types/store.type.js';
 
 export class StoreMemberService {
   constructor(private readonly storeMemberRepository: StoreMemberRepository) {}
