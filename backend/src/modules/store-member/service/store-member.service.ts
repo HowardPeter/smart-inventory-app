@@ -65,7 +65,6 @@ export class StoreMemberService {
 
     return await this.storeMemberRepository.softDeleteMember(
       targetUserId,
-
       storeId,
     );
   }
