@@ -6,7 +6,7 @@ import 'package:frontend/core/ui/theme/app_sizes.dart';
 import 'package:frontend/core/ui/widgets/t_bottom_sheet_widget.dart';
 import 'package:frontend/features/inventory/views/inventory_view.dart';
 import 'package:frontend/features/profile/views/profile_view.dart';
-import 'package:frontend/features/transaction/widgets/transaction_bottom_sheet_widget.dart';
+import 'package:frontend/features/transaction/widgets/shared/transaction_bottom_sheet_widget.dart';
 import 'package:get/get.dart';
 import 'package:iconsax_flutter/iconsax_flutter.dart';
 import 'package:frontend/features/navigation/controllers/navigation_controller.dart';

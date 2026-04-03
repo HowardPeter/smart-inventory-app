@@ -14,6 +14,7 @@ class InventoryDetailHeaderWidget extends GetView<InventoryDetailController> {
 
   @override
   Widget build(BuildContext context) {
+    print(controller.imageUrl);
     return SliverAppBar(
       expandedHeight: 280.0,
       pinned: true,

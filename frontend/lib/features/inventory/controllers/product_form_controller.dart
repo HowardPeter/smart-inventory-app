@@ -118,26 +118,8 @@ class ProductFormController extends GetxController with TErrorHandler {
   void onInit() {
     super.onInit();
 
-    if (Get.arguments != null) {
-      formMode.value = Get.arguments['mode'] ?? 'create';
-      productToEdit = Get.arguments['product'];
-
-      if (productToEdit != null) {
-        // 1. HỨNG DỮ LIỆU MỚI TỪ TRANG DETAIL TRUYỀN SANG (Nếu có)
-        final freshImageUrl = Get.arguments['freshImageUrl'];
-        final freshName = Get.arguments['freshName'];
-        final freshBrand = Get.arguments['freshBrand'];
-
-        // 2. Ưu tiên gán dữ liệu mới
-        existingImageUrl.value = freshImageUrl ?? productToEdit!.imageUrl ?? '';
-
-        // Cập nhật luôn cho các field text lỡ bạn có sửa thông tin
-        nameController.text = freshName ?? productToEdit!.name;
-        brandController.text = freshBrand ?? productToEdit!.brand ?? '';
-
-        // (Bên dưới bạn giữ nguyên code cũ lấy categoryId... của bạn)
-      }
-    }
+    _loadCategories();
+    _parseArguments();
   }
 
   void _parseArguments() {
@@ -151,9 +133,16 @@ class ProductFormController extends GetxController with TErrorHandler {
         isEditMode = true;
         isCategoryLocked = true;
         productToEdit = args['product'] as ProductModel;
-        nameController.text = productToEdit!.name;
-        brandController.text = productToEdit!.brand ?? '';
-        existingImageUrl.value = productToEdit!.imageUrl ?? '';
+
+        // --- ĐOẠN ĐÃ ĐƯỢC CẬP NHẬT ĐỂ NHẬN ẢNH VÀ TÊN MỚI NHẤT ---
+        final freshImageUrl = args['freshImageUrl'];
+        final freshName = args['freshName'];
+        final freshBrand = args['freshBrand'];
+
+        // Ưu tiên gán dữ liệu mới (để Form hiện ảnh/tên vừa sửa), nếu không có mới lấy cái cũ
+        existingImageUrl.value = freshImageUrl ?? productToEdit!.imageUrl ?? '';
+        nameController.text = freshName ?? productToEdit!.name;
+        brandController.text = freshBrand ?? productToEdit!.brand ?? '';
       }
 
       if (args['package'] != null) {

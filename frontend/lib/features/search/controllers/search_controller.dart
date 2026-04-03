@@ -235,11 +235,21 @@ class TSearchController extends GetxController with TErrorHandler {
 
   void handleItemTap(InventoryInsightDisplayModel item) {
     saveRecentSearch(currentSearchQuery.value);
-    Get.toNamed(
-      AppRoutes.inventoryDetail,
-      arguments:
-          item.product?.productId ?? item.inventory.productPackage?.productId,
-    );
+    final target =
+        Get.arguments?['target'] as SearchTarget? ?? SearchTarget.inventory;
+
+    if (target == SearchTarget.transactions) {
+      Get.toNamed(
+        AppRoutes.transactionItemAdd,
+        arguments: item,
+      );
+    } else {
+      Get.toNamed(
+        AppRoutes.inventoryDetail,
+        arguments:
+            item.product?.productId ?? item.inventory.productPackage?.productId,
+      );
+    }
   }
 
   void _loadRecentSearches() {

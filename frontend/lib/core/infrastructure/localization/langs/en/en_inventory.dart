@@ -66,7 +66,6 @@ final Map<String, String> enInventory = {
   TTexts.totalValue: 'Total Value',
   TTexts.editItem: 'Edit Item',
   TTexts.deleteItem: 'Delete Item',
-  TTexts.addToTransaction: 'Add to Transaction',
   TTexts.deleteConfirmation: 'Delete Confirmation',
   TTexts.confirmDeleteText: 'Are you sure you want to delete this item?',
   TTexts.delete: 'Delete',
@@ -101,6 +100,13 @@ final Map<String, String> enInventory = {
   TTexts.loadingProduct: 'Loading product details...',
   TTexts.viewProductInfo: 'View Product Info',
   TTexts.productDataMissing: 'Product data is missing',
+
+  // --- Transaction Bottom Sheet ở trang Detail ---
+  TTexts.addToTransaction: 'Add to Transaction',
+  TTexts.enterQuantityToAdd: 'Enter Quantity',
+  TTexts.quantityToImport: 'Quantity to import',
+  TTexts.importPriceLot: 'Import Price (VND)',
+  TTexts.confirmAndAdd: 'Confirm & Add',
 
   // -- Product Catalog & Categories ---
   TTexts.categoryCatalog: 'Product Catalog',

@@ -28,6 +28,9 @@ class AppRoutes {
   static const productForm = '/product_form';
   static const customizeCatalog = '/customize-catalog';
 
+  static const inboundTransaction = '/inbound_transaction';
+  static const transactionItemAdd = '/transaction_item_add';
+
   static const profile = '/profile';
   static const editProfile = '/edit_profile';
   static const changePassword = '/change_password';

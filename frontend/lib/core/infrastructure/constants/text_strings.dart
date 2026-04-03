@@ -368,7 +368,6 @@ class TTexts {
   static const String totalValue = "total_value";
   static const String editItem = "edit_item";
   static const String deleteItem = "delete_item";
-  static const String addToTransaction = "add_to_transaction";
   static const String deleteConfirmation = "delete_confirmation";
   static const String confirmDeleteText =
       "are_you_sure_you_want_to_delete_this_item";
@@ -403,6 +402,37 @@ class TTexts {
   static const String salesOrder = "sales_order";
   static const String loadingProduct = "loading_product";
   static const String viewProductInfo = 'view_product_info';
+
+  // --- Transaction Bottom Sheet ở trang Detail ---
+  static const String addToTransaction = "add_to_transaction";
+  static const String enterQuantityToAdd = "enter_quantity_to_add";
+  static const String quantityToImport = "quantity_to_import";
+  static const String importPriceLot = "import_price_lot";
+  static const String confirmAndAdd = "confirm_and_add";
+
+  // --- Transaction Item Add ---
+  static const String loadingAddingToCart = "loading_adding_to_cart";
+  static const String productNameUnknown = "product_name_unknown";
+  static const String labelNoBarcode = "label_no_barcode";
+  static const String labelStock = "label_stock";
+  static const String labelImportPrice = "label_import_price";
+  static const String labelQuantity = "label_quantity";
+  static const String labelTicket = "label_ticket";
+  static const String errorNoPackageId = "error_no_package_id";
+  static const String subtotal = "subtotal";
+  static const String item = "item";
+  static const String removeItem = "remove_item";
+  static const String confirmRemoveItemTransaction = "confirm_remove_item_transaction";
+  static const String remove = "remove";
+  static const String creatingImportTicket = "creating_import_ticket";
+  static const String manualImport = "manual_import";
+  static const String importTicketCreated = "import_ticket_created";
+  static const String errorCreatingImportTicket = "error_creating_import_ticket";
+  static const String uncategorized = "uncategorized";
+  static const String noBrand = "no_brand";
+  static const String inactive = "inactive";
+  static const String product = "product";
+  static const String recentlyAddedSuggested = "recently_added_suggested";
 
   // --- Product Catalog & Categories ---
   static const String categoryCatalog = 'category_catalog';
@@ -565,8 +595,6 @@ class TTexts {
   static const String sellingPrice = 'selling_price';
 
   // Empty State
-  static const String emptyTransactionTitle = "empty_transaction_title";
-  static const String emptyTransactionSubtitle = "empty_transaction_subtitle";
   static const String homeQuickActions = "home_quick_actions";
   static const String homeLowStockAlerts = "home_low_stock_alerts";
   static const String homeItems = "home_items";
@@ -582,6 +610,20 @@ class TTexts {
   static const String inbound = "inbound";
   static const String outbound = "outbound";
   static const String stockAdjustment = "stockAdjustment";
+  // --- Inbound ---
+  static const String inboundTransaction = "inbound_transaction";
+  static const String emptyInboundCartTitle = "empty_inbound_cart_title";
+  static const String emptyInboundCartSub = "empty_inbound_cart_sub";
+  static const String completeImport = "complete_import";
+  static const String totalFunds = "total_funds";
+  static const String searchProductToAdd = "search_product_to_add";
+  static const String emptyTransactionTitle = "empty_transaction_title";
+  static const String emptyTransactionSubtitle = "empty_transaction_subtitle";
+  static const String transactionCompletedTitle = "transaction_completed_title";
+  static const String transactionCompletedSubtitle =
+      "transaction_completed_subtitle";
+  static const String backToHome = "back_to_home";
+  static const String scanProductBarcode = "scan_product_barcode";
 
   //--Profile
   static const String profileTitle = 'profile_title';

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:frontend/routes/app_routes.dart';
 import 'package:get/get.dart';
 import 'package:iconsax_flutter/iconsax_flutter.dart';
 import 'package:frontend/core/ui/theme/app_colors.dart';
@@ -58,8 +59,7 @@ class TransactionBottomSheetWidget extends StatelessWidget {
           customIcon: _buildLayerIcon(isPlus: true),
           fontSize: 16,
           onPressed: () {
-            Get.back();
-            // Điều hướng Inbound
+            Get.toNamed(AppRoutes.inboundTransaction);
           },
         ),
         const SizedBox(height: AppSizes.p12),
