@@ -5,8 +5,11 @@ import {
   buildPaginatedResponse,
   normalizePagination,
 } from '../../../common/utils/index.js';
+import { prisma } from '../../../db/prismaClient.js';
 import { InventoryRepository } from '../repository/inventory.repository.js';
 
+import type { Prisma } from '../../../generated/prisma/client.js';
+import type { AuditLogRepository } from '../../audit-log/repository/audit-log.repository.js';
 import type {
   CreateInventoryDto,
   InventoryAdjustmentDto,
@@ -23,7 +26,10 @@ Chịu trách nhiệm kiểm tra tính hợp lệ của dữ liệu,
 áp dụng các ràng buộc nghiệp vụ
 trước khi gọi Repository để thao tác với cơ sở dữ liệu. */
 export class InventoryService {
-  constructor(private readonly inventoryRepository: InventoryRepository) {}
+  constructor(
+    private readonly inventoryRepository: InventoryRepository,
+    private readonly auditLogRepository: AuditLogRepository,
+  ) {}
 
   // Hàm helper dùng chung để kiểm tra sự tồn tại của kho hàng,
   // ném lỗi 404 nếu không tìm thấy
@@ -94,12 +100,32 @@ export class InventoryService {
       productPackageId,
     );
 
-    return await this.inventoryRepository.updateOne(
-      storeId,
-      existingInventory.inventoryId,
-      data,
-      userId,
-    );
+    // MỞ TRANSACTION TẠI SERVICE
+    return await prisma.$transaction(async (tx) => {
+      const updated = await this.inventoryRepository.updateOne(
+        tx,
+        existingInventory.inventoryId,
+        data,
+      );
+
+      await this.auditLogRepository.createLog(tx, {
+        actionType: 'update',
+        entityType: 'Inventory',
+        userId,
+        storeId,
+        oldValue: {
+          reorderThreshold: existingInventory.reorderThreshold,
+          lastCount: existingInventory.lastCount,
+        } as Prisma.InputJsonObject,
+        newValue: {
+          reorderThreshold: updated.reorderThreshold,
+          lastCount: updated.lastCount,
+          productPackageId: updated.productPackage.productPackageId,
+        } as Prisma.InputJsonObject,
+      });
+
+      return updated;
+    });
   }
 
   async adjustInventory(
@@ -115,7 +141,6 @@ export class InventoryService {
 
     let nextQuantity = existingInventory.quantity;
 
-    // NOTE: Tính toán số lượng tồn kho mới dựa trên loại điều chỉnh
     if (data.type === 'set') {
       nextQuantity = data.quantity;
     } else if (data.type === 'increase') {
@@ -124,7 +149,6 @@ export class InventoryService {
       nextQuantity = existingInventory.quantity - data.quantity;
     }
 
-    // Đảm bảo số lượng tồn kho không được phép âm theo quy định nghiệp vụ
     if (nextQuantity < 0) {
       throw new CustomError({
         message: 'Inventory quantity cannot be negative',
@@ -132,24 +156,44 @@ export class InventoryService {
       });
     }
 
-    const result = await this.inventoryRepository.adjustQuantity(
-      storeId,
-      existingInventory.inventoryId,
-      data.type,
-      nextQuantity,
-      userId,
-      data.reason,
-      data.note,
-    );
+    const changedQty = nextQuantity - existingInventory.quantity;
 
-    if (!result) {
-      throw new CustomError({
-        message: 'Failed to adjust inventory. Record might have been removed.',
-        status: StatusCodes.NOT_FOUND,
+    return await prisma.$transaction(async (tx) => {
+      const updated = await this.inventoryRepository.adjustQuantity(
+        tx,
+        existingInventory.inventoryId,
+        nextQuantity,
+      );
+
+      await this.auditLogRepository.createLog(tx, {
+        actionType: 'update',
+        entityType: 'Inventory',
+        userId,
+        storeId,
+        note: data.note ?? null,
+        oldValue: {
+          quantity: existingInventory.quantity,
+        } as Prisma.InputJsonObject,
+        newValue: {
+          quantity: updated.quantity,
+          changedQuantity: changedQty,
+          adjustmentType: data.type,
+          reason: data.reason ?? null,
+          productPackageId: updated.productPackage.productPackageId,
+        } as Prisma.InputJsonObject,
       });
-    }
 
-    return result;
+      return {
+        productPackageId: updated.productPackage.productPackageId,
+        previousQuantity: existingInventory.quantity,
+        currentQuantity: updated.quantity,
+        changedQuantity: changedQty,
+        adjustmentType: data.type,
+        reason: data.reason ?? null,
+        note: data.note ?? null,
+        updatedAt: updated.updatedAt,
+      };
+    });
   }
 
   async createInventory(
@@ -157,8 +201,6 @@ export class InventoryService {
     data: CreateInventoryDto,
     userId: string,
   ): Promise<InventoryDetailResponseDto> {
-    // Kiểm tra xem sản phẩm có thực sự thuộc quyền sở hữu
-    // của cửa hàng hiện tại không
     const isBelongsToStore =
       await this.inventoryRepository.checkProductPackageBelongsToStore(
         storeId,
@@ -172,34 +214,63 @@ export class InventoryService {
       });
     }
 
-    // Kiểm tra trạng thái tồn kho hiện tại
-    // để quyết định luồng tạo mới hoặc khôi phục
     const existingInventory =
       await this.inventoryRepository.getInventoryStatusByProductPackageId(
         data.productPackageId,
       );
 
-    if (existingInventory) {
-      if (existingInventory.activeStatus === 'active') {
-        throw new CustomError({
-          message:
-            'Inventory record already exists and is active for this Product Package',
-          status: StatusCodes.CONFLICT,
-        });
-      } else {
-        // Khôi phục lại kho đã bị xóa mềm (inactive)
-        // thay vì tạo mới để tránh lỗi duplicate khóa unique
-        return await this.inventoryRepository.restoreInventory(
-          storeId,
-          existingInventory.inventoryId,
-          data,
-          userId,
-        );
-      }
-    }
+    return await prisma.$transaction(async (tx) => {
+      if (existingInventory) {
+        if (existingInventory.activeStatus === 'active') {
+          throw new CustomError({
+            message:
+              'Inventory record already exists and is active for this Product Package',
+            status: StatusCodes.CONFLICT,
+          });
+        } else {
+          const restored = await this.inventoryRepository.restoreInventory(
+            tx,
+            existingInventory.inventoryId,
+            data,
+          );
 
-    // Nếu dữ liệu chưa từng tồn tại, tiến hành tạo mới hoàn toàn
-    return await this.inventoryRepository.create(storeId, data, userId);
+          await this.auditLogRepository.createLog(tx, {
+            actionType: 'create',
+            entityType: 'Inventory',
+            userId,
+            storeId,
+            oldValue: { activeStatus: 'inactive' } as Prisma.InputJsonObject,
+            newValue: {
+              activeStatus: 'active',
+              quantity: restored.quantity,
+              reorderThreshold: restored.reorderThreshold,
+              lastCount: restored.lastCount,
+              productPackageId: restored.productPackage.productPackageId,
+            } as Prisma.InputJsonObject,
+          });
+
+          return restored;
+        }
+      }
+
+      const created = await this.inventoryRepository.create(tx, data);
+
+      await this.auditLogRepository.createLog(tx, {
+        actionType: 'create',
+        entityType: 'Inventory',
+        userId,
+        storeId,
+        oldValue: null,
+        newValue: {
+          quantity: created.quantity,
+          reorderThreshold: created.reorderThreshold,
+          lastCount: created.lastCount,
+          productPackageId: created.productPackage.productPackageId,
+        } as Prisma.InputJsonObject,
+      });
+
+      return created;
+    });
   }
 
   async deleteInventory(
@@ -212,10 +283,20 @@ export class InventoryService {
       productPackageId,
     );
 
-    await this.inventoryRepository.delete(
-      storeId,
-      existingInventory.inventoryId,
-      userId,
-    );
+    await prisma.$transaction(async (tx) => {
+      await this.inventoryRepository.delete(tx, existingInventory.inventoryId);
+
+      await this.auditLogRepository.createLog(tx, {
+        actionType: 'delete',
+        entityType: 'Inventory',
+        userId,
+        storeId,
+        oldValue: { activeStatus: 'active' } as Prisma.InputJsonObject,
+        newValue: {
+          activeStatus: 'inactive',
+          productPackageId: existingInventory.productPackage.productPackageId,
+        } as Prisma.InputJsonObject,
+      });
+    });
   }
 }
