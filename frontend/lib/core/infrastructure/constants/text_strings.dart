@@ -71,6 +71,8 @@ class TTexts {
       "error_too_many_requests_message";
   static const String exit = "exit";
   static const String done = "done";
+  static const String next = "next";
+  static const String confirm = "confirm";
 
   // -- Splash Screen
   static const String splashSlogan = "splash_slogan";
@@ -422,12 +424,14 @@ class TTexts {
   static const String subtotal = "subtotal";
   static const String item = "item";
   static const String removeItem = "remove_item";
-  static const String confirmRemoveItemTransaction = "confirm_remove_item_transaction";
+  static const String confirmRemoveItemTransaction =
+      "confirm_remove_item_transaction";
   static const String remove = "remove";
   static const String creatingImportTicket = "creating_import_ticket";
   static const String manualImport = "manual_import";
   static const String importTicketCreated = "import_ticket_created";
-  static const String errorCreatingImportTicket = "error_creating_import_ticket";
+  static const String errorCreatingImportTicket =
+      "error_creating_import_ticket";
   static const String uncategorized = "uncategorized";
   static const String noBrand = "no_brand";
   static const String inactive = "inactive";
@@ -556,6 +560,25 @@ class TTexts {
   static const String invalidNumber = 'invalid_number';
   static const String suggestedNames = 'suggested_names';
   static const String priceGreaterThanZero = 'price_greater_than_zero';
+  static const String displayNameLabel = "display_name_label";
+  static const String displayNameHint = "display_name_hint";
+  static const String instructionTitle = "instruction_title";
+  static const String instructionBaseInfo = "instruction_base_info";
+  static const String instructionImage = "instruction_image";
+  static const String instructionPackage = "instruction_package";
+  static const String fillRequiredFields = "fill_required_fields";
+  static const String confirmCreateTitle = "confirm_create_title";
+  static const String confirmCreateMessage = "confirm_create_message";
+  static const String confirmUpdateTitle = "confirm_update_title";
+  static const String confirmUpdateMessage = "confirm_update_message";
+  static const String confirmDeleteTitle = "confirm_delete_title";
+  static const String confirmDeleteMessage = "confirm_delete_message";
+  static const String confirmSkipPackageTitle = "confirm_skip_package_title";
+  static const String confirmSkipPackageMessage =
+      "confirm_skip_package_message";
+  static const String createOnlyProduct = "create_only_product";
+  static const String createFullProduct = "create_full_product";
+  static const String skipAndCreate = "skip_and_create";
 
   // -- Edit Product
   static const String editProductImageTitle = 'edit_product_image_title';

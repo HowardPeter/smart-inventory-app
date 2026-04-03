@@ -30,58 +30,72 @@ class InventoryProductFormActionButtonsWidget
               text: TTexts.saveImage.tr,
               onPressed: () => controller.saveProductImage());
         }
-        if (mode == 'edit_package') {
+        if (mode == 'edit_package' || mode == 'add_package') {
           return TPrimaryButtonWidget(
               text: TTexts.savePackage.tr,
               onPressed: () => controller.savePackageData());
         }
-        if (mode == 'add_package') {
-          return TPrimaryButtonWidget(
-              text: TTexts.addPackageBtn.tr,
-              onPressed: () => controller.savePackageData());
-        }
 
         // 2. CÁC NÚT BẤM DÀNH CHO WIZARD TẠO MỚI HOÀN TOÀN (CREATE)
-        if (step == 1) {
-          return TPrimaryButtonWidget(
-              text: TTexts.nextStep.tr, onPressed: () => controller.nextStep());
-        } else if (step == 2) {
-          return Row(
-            children: [
-              Expanded(
+        return Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Row(
+              children: [
+                // 🟢 NÚT TRÁI (BACK HOẶC CANCEL)
+                Expanded(
                   flex: 1,
                   child: TPrimaryButtonWidget(
-                      text: TTexts.previousStep.tr,
-                      backgroundColor: AppColors.softGrey.withOpacity(0.15),
-                      textColor: AppColors.primaryText,
-                      onPressed: () => controller.previousStep())),
-              const SizedBox(width: 16),
-              Expanded(
+                    text: step == 1 ? TTexts.cancel.tr : TTexts.previousStep.tr,
+                    backgroundColor: AppColors.softGrey.withOpacity(0.15),
+                    textColor: AppColors.primaryText,
+                    onPressed: () => step == 1
+                        ? controller.confirmExit()
+                        : controller.previousStep(),
+                  ),
+                ),
+                const SizedBox(width: 16),
+
+                // 🟢 NÚT PHẢI (NEXT HOẶC CREATE FULL PRODUCT)
+                Expanded(
                   flex: 2,
                   child: TPrimaryButtonWidget(
-                      text: TTexts.nextStep.tr,
-                      onPressed: () => controller.nextStep())),
-            ],
-          );
-        } else {
-          return Row(
-            children: [
-              Expanded(
-                  flex: 1,
-                  child: TPrimaryButtonWidget(
-                      text: TTexts.previousStep.tr,
-                      backgroundColor: AppColors.softGrey.withOpacity(0.15),
-                      textColor: AppColors.primaryText,
-                      onPressed: () => controller.previousStep())),
-              const SizedBox(width: 16),
-              Expanded(
-                  flex: 2,
-                  child: TPrimaryButtonWidget(
-                      text: TTexts.create.tr,
-                      onPressed: () => controller.saveProduct())),
-            ],
-          );
-        }
+                    text: step == 3
+                        ? TTexts.createFullProduct.tr
+                        : TTexts.nextStep.tr,
+                    onPressed: () {
+                      if (step == 3) {
+                        controller
+                            .saveProduct(); // Hàm này sẽ gọi Dialog xác nhận
+                      } else {
+                        controller.nextStep();
+                      }
+                    },
+                  ),
+                ),
+              ],
+            ),
+
+            // 🟢 NÚT SKIP CHỈ XUẤT HIỆN Ở BƯỚC 3 NẰM BÊN DƯỚI
+            if (step == 3) ...[
+              const SizedBox(height: 20),
+              GestureDetector(
+                onTap: () => controller.confirmSkipAndCreateProductOnly(),
+                child: Text(
+                  TTexts.skipAndCreate.tr,
+                  style: const TextStyle(
+                    fontFamily: 'Poppins',
+                    fontSize: 13,
+                    fontWeight: FontWeight.w500,
+                    color: AppColors.subText, // Màu xám nhẹ
+                    decoration: TextDecoration.underline, // Gạch chân mảnh
+                    decorationColor: AppColors.softGrey,
+                  ),
+                ),
+              ),
+            ]
+          ],
+        );
       }),
     );
   }

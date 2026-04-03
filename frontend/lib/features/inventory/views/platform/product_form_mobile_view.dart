@@ -10,6 +10,7 @@ import 'package:frontend/core/ui/theme/app_sizes.dart';
 import 'package:frontend/core/ui/widgets/t_app_bar_widget.dart';
 import 'package:frontend/features/inventory/controllers/product_form_controller.dart';
 import 'package:frontend/features/inventory/widgets/product_form/product_form_progress_bar_widget.dart';
+import 'package:iconsax_flutter/iconsax_flutter.dart'; // IMPORT ICON
 
 class ProductFormMobileView extends GetView<ProductFormController> {
   const ProductFormMobileView({super.key});
@@ -24,11 +25,17 @@ class ProductFormMobileView extends GetView<ProductFormController> {
       child: Scaffold(
         backgroundColor: AppColors.background,
         appBar: TAppBarWidget(
-          // APPBAR TITLE ĐỘNG
           title: _getAppBarTitle(),
           centerTitle: true,
           showBackArrow: true,
           onBackPress: () => controller.confirmExit(),
+          actions: [
+            IconButton(
+              icon: const Icon(Iconsax.info_circle_copy,
+                  color: AppColors.primaryText),
+              onPressed: () => controller.showInstructionBottomSheet(),
+            ),
+          ],
         ),
         body: SafeArea(
           child: SingleChildScrollView(

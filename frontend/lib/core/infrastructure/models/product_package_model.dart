@@ -1,3 +1,5 @@
+import 'package:frontend/core/infrastructure/models/unit_model.dart'; // 🟢 BẮT BUỘC IMPORT
+
 class ProductPackageModel {
   final String productPackageId;
   final String? barcodeValue;
@@ -8,6 +10,7 @@ class ProductPackageModel {
   final String productId;
   final String activeStatus;
   final String? barcodeType;
+  final UnitModel? unit; 
 
   ProductPackageModel({
     required this.productPackageId,
@@ -19,6 +22,7 @@ class ProductPackageModel {
     required this.productId,
     required this.activeStatus,
     this.barcodeType,
+    this.unit, 
   });
 
   factory ProductPackageModel.fromJson(Map<String, dynamic> json) {
@@ -34,6 +38,7 @@ class ProductPackageModel {
       productId: json['productId'] ?? json['product']?['productId'] ?? '',
       activeStatus: json['activeStatus'] ?? 'active',
       barcodeType: json['barcodeType'],
+      unit: json['unit'] != null ? UnitModel.fromJson(json['unit']) : null,
     );
   }
 }
