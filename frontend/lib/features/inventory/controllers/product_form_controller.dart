@@ -10,6 +10,7 @@ import 'package:frontend/core/infrastructure/constants/text_strings.dart';
 import 'package:frontend/core/infrastructure/models/category_model.dart';
 import 'package:frontend/core/infrastructure/models/product_model.dart';
 import 'package:frontend/core/infrastructure/models/product_package_model.dart';
+import 'package:frontend/core/infrastructure/models/unit_model.dart';
 import 'package:frontend/core/infrastructure/utils/error_handler_utils.dart';
 import 'package:frontend/core/infrastructure/utils/full_screen_loader_utils.dart';
 import 'package:frontend/core/ui/theme/app_colors.dart';
@@ -45,70 +46,25 @@ class ProductFormController extends GetxController with TErrorHandler {
   // ==========================================
   // 2. DATA FIELDS (INPUTS)
   // ==========================================
-  // --- Ảnh ---
   final ImagePicker _picker = ImagePicker();
   final Rx<File?> selectedImage = Rx<File?>(null);
   final RxString existingImageUrl = ''.obs;
 
-  // --- Thông tin Base ---
   final TextEditingController nameController = TextEditingController();
   final TextEditingController brandController = TextEditingController();
+
   final Rx<CategoryModel?> selectedCategory = Rx<CategoryModel?>(null);
   List<CategoryModel> allCategories = [];
   bool isCategoryLocked = false;
 
-  // --- Thông tin Package ---
   final TextEditingController packageDisplayNameController =
       TextEditingController();
   final TextEditingController importPriceController = TextEditingController();
   final TextEditingController salePriceController = TextEditingController();
-
-  // Đã bỏ giá trị '0' mặc định, để input trống tự nhiên
   final TextEditingController thresholdController = TextEditingController();
   final TextEditingController barcodeController = TextEditingController();
 
-  final List<Map<String, String>> mockUnits = [
-    {
-      'id': '88888888-8888-4888-a888-888888888801',
-      'code': 'BOX',
-      'name': 'Box'
-    },
-    {
-      'id': '88888888-8888-4888-a888-888888888802',
-      'code': 'PCS',
-      'name': 'Piece'
-    },
-    {
-      'id': '88888888-8888-4888-a888-888888888803',
-      'code': 'CAN',
-      'name': 'Can'
-    },
-    {
-      'id': '88888888-8888-4888-a888-888888888804',
-      'code': 'CRT',
-      'name': 'Carton'
-    },
-    {
-      'id': '88888888-8888-4888-a888-888888888805',
-      'code': 'PKT',
-      'name': 'Packet'
-    },
-    {
-      'id': '88888888-8888-4888-a888-888888888806',
-      'code': 'BTL',
-      'name': 'Bottle'
-    },
-    {
-      'id': '88888888-8888-4888-a888-888888888807',
-      'code': 'BAG',
-      'name': 'Bag'
-    },
-    {
-      'id': '88888888-8888-4888-a888-888888888808',
-      'code': 'TUBE',
-      'name': 'Tube'
-    },
-  ];
+  final RxList<UnitModel> allUnits = <UnitModel>[].obs;
   final RxString selectedUnitId = ''.obs;
 
   // ==========================================
@@ -117,8 +73,8 @@ class ProductFormController extends GetxController with TErrorHandler {
   @override
   void onInit() {
     super.onInit();
-
     _loadCategories();
+    _loadUnits();
     _parseArguments();
   }
 
@@ -131,15 +87,13 @@ class ProductFormController extends GetxController with TErrorHandler {
 
       if (args['product'] != null) {
         isEditMode = true;
-        isCategoryLocked = true;
+        isCategoryLocked = true; // 🔒 Khóa mặc định khi Edit
         productToEdit = args['product'] as ProductModel;
 
-        // --- ĐOẠN ĐÃ ĐƯỢC CẬP NHẬT ĐỂ NHẬN ẢNH VÀ TÊN MỚI NHẤT ---
         final freshImageUrl = args['freshImageUrl'];
         final freshName = args['freshName'];
         final freshBrand = args['freshBrand'];
 
-        // Ưu tiên gán dữ liệu mới (để Form hiện ảnh/tên vừa sửa), nếu không có mới lấy cái cũ
         existingImageUrl.value = freshImageUrl ?? productToEdit!.imageUrl ?? '';
         nameController.text = freshName ?? productToEdit!.name;
         brandController.text = freshBrand ?? productToEdit!.brand ?? '';
@@ -173,9 +127,29 @@ class ProductFormController extends GetxController with TErrorHandler {
       if (isEditMode && productToEdit != null) {
         selectedCategory.value = allCategories
             .firstWhereOrNull((c) => c.categoryId == productToEdit!.categoryId);
+
+        // 🟢 LOGIC MỞ KHÓA NẾU LÀ UNCATEGORIZED
+        final currentCat = selectedCategory.value;
+        if (currentCat != null) {
+          // Kiểm tra xem danh mục hiện tại có phải là Mặc định (isDefault)
+          // Hoặc có tên là Uncategorized không
+          if (currentCat.isDefault ||
+              currentCat.name.toLowerCase() == 'uncategorized') {
+            isCategoryLocked = false; // 🔓 Bẻ khóa cho phép chọn lại Category
+          }
+        }
       }
     } catch (e) {
       handleError(e);
+    }
+  }
+
+  Future<void> _loadUnits() async {
+    try {
+      final fetchedUnits = await _provider.getUnits();
+      allUnits.assignAll(fetchedUnits);
+    } catch (e) {
+      debugPrint("Lỗi tải Unit: $e");
     }
   }
 
@@ -192,9 +166,6 @@ class ProductFormController extends GetxController with TErrorHandler {
   // ==========================================
   // 4. SMART AUTO-FILL LOGIC
   // ==========================================
-  // ==========================================
-  // 4. SMART AUTO-FILL LOGIC
-  // ==========================================
   List<String> get variantNameSuggestions {
     if (formMode.value == 'edit_package' || packageToEdit != null) {
       return [];
@@ -203,17 +174,16 @@ class ProductFormController extends GetxController with TErrorHandler {
     final unitId = selectedUnitId.value;
     if (unitId.isEmpty) return [];
 
-    final unit = mockUnits.firstWhereOrNull((u) => u['id'] == unitId);
+    final unit = allUnits.firstWhereOrNull((u) => u.unitId == unitId);
     if (unit == null) return [];
 
-    final unitName = unit['name']!;
-    final unitCode = unit['code']!; // Lấy Code (CAN, BOX, BTL...) để phân tích
+    final unitName = unit.name;
+    final unitCode = unit.code.toUpperCase();
     final productName = nameController.text.trim();
 
     if (productName.isEmpty) return [unitName, '1 $unitName'];
 
     List<String> suggestions = [];
-
     suggestions.add('$productName $unitName');
 
     switch (unitCode) {
@@ -269,7 +239,6 @@ class ProductFormController extends GetxController with TErrorHandler {
     return suggestions;
   }
 
-  // Hàm khi người dùng bấm vào Chip
   void selectVariantSuggestion(String suggestion) {
     packageDisplayNameController.text = suggestion;
   }
@@ -425,7 +394,7 @@ class ProductFormController extends GetxController with TErrorHandler {
           newProduct.productId, packagePayload);
 
       final packageId = newPackage['productPackageId'] ?? newPackage['id'];
-      // 3. Tạo Inventory Settings (Đã sửa theo API mới)
+
       await _provider.createInventory(packageId,
           reorderThreshold: int.tryParse(thresholdController.text) ?? 0);
       FullScreenLoaderUtils.stopLoading();
@@ -452,6 +421,7 @@ class ProductFormController extends GetxController with TErrorHandler {
       isSaving.value = true;
       FullScreenLoaderUtils.openLoadingDialog(TTexts.saving.tr);
 
+      // 🟢 Payload sẽ tự động lấy ID của Category mới nếu người dùng vừa chọn lại
       final payload = {
         'name': nameController.text.trim(),
         'brand': brandController.text.trim(),
@@ -537,21 +507,14 @@ class ProductFormController extends GetxController with TErrorHandler {
       };
 
       if (formMode.value == 'edit_package' && packageToEdit != null) {
-        // ==========================================
-        // 1. TRƯỜNG HỢP CẬP NHẬT (EDIT)
-        // ==========================================
         await _provider.updateProductPackage(
             packageToEdit!.productPackageId, packagePayload);
         await _provider.updateInventorySettings(packageToEdit!.productPackageId,
             reorderThreshold: inventoryPayload['reorderThreshold']);
 
         FullScreenLoaderUtils.stopLoading();
-        // Không truyền updatedPackage vì trang Detail thường tự fetch lại
         _triggerRefreshAndClose(TTexts.packageUpdatedSuccess.tr);
       } else {
-        // ==========================================
-        // 2. TRƯỜNG HỢP THÊM MỚI (CREATE)
-        // ==========================================
         final newPackageData = await _provider.createProductPackage(
             productToEdit!.productId, packagePayload);
         final pkgId =
@@ -560,7 +523,6 @@ class ProductFormController extends GetxController with TErrorHandler {
         await _provider.createInventory(pkgId,
             reorderThreshold: inventoryPayload['reorderThreshold']);
 
-        // Biến này giờ đã nằm đúng chỗ của nó (có chứa data thật)
         final createdPkg = ProductPackageModel.fromJson(newPackageData);
 
         FullScreenLoaderUtils.stopLoading();
@@ -582,7 +544,7 @@ class ProductFormController extends GetxController with TErrorHandler {
   }
 
   // ==========================================
-  // 8. UI HELPERS (BOTTOM SHEETS & DIALOGS)
+  // 8. UI HELPERS
   // ==========================================
   void _triggerRefreshAndClose(String successMessage,
       {String? newName,
@@ -614,7 +576,7 @@ class ProductFormController extends GetxController with TErrorHandler {
   }
 
   void openCategoryPicker() {
-    if (isCategoryLocked) return;
+    if (isCategoryLocked) return; // Không làm gì cả nếu đang bị khóa
 
     TBottomSheetWidget.show(
       title: TTexts.selectCategory.tr,

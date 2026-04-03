@@ -3,9 +3,18 @@ import 'package:frontend/core/infrastructure/network/app_client.dart';
 import 'package:frontend/core/infrastructure/models/category_model.dart';
 import 'package:frontend/core/infrastructure/models/product_model.dart';
 import 'package:frontend/core/infrastructure/models/inventory_model.dart';
+import 'package:frontend/core/infrastructure/models/unit_model.dart'; // 🟢 IMPORT THÊM UNIT MODEL
 
 class InventoryProvider {
   final _apiClient = ApiClient();
+
+  // ==========================================
+  // UNITS
+  // ==========================================
+  Future<List<UnitModel>> getUnits() async {
+    final listData = await _apiClient.getList('/api/units');
+    return listData.map((json) => UnitModel.fromJson(json)).toList();
+  }
 
   // ==========================================
   // CATEGORIES

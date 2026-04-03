@@ -64,7 +64,6 @@ class _InventoryProductPackageUnitDropdownWidgetState
 
   void _closeDropdown() {
     _animationController.reverse().then((_) {
-      // ĐÃ FIX: Chỉ xóa overlay và gọi setState nếu Widget CÒN SỐNG
       if (mounted) {
         _removeOverlay();
       }
@@ -113,7 +112,6 @@ class _InventoryProductPackageUnitDropdownWidgetState
                           sigmaX: 20, sigmaY: 20), // Tăng độ mờ
                       child: Container(
                         decoration: BoxDecoration(
-                          // ĐÃ SỬA: DÙNG GRADIENT TRONG SUỐT ĐỂ TẠO KÍNH MỜ CHUẨN
                           gradient: LinearGradient(
                             colors: [
                               Colors.white
@@ -135,44 +133,47 @@ class _InventoryProductPackageUnitDropdownWidgetState
                                 offset: const Offset(0, 10))
                           ],
                         ),
-                        child: ListView.separated(
-                          padding: EdgeInsets.zero,
-                          shrinkWrap: true,
-                          itemCount: controller.mockUnits.length,
-                          separatorBuilder: (_, __) => Divider(
-                              height: 1, color: Colors.white.withOpacity(0.3)),
-                          itemBuilder: (context, index) {
-                            final unit = controller.mockUnits[index];
-                            return InkWell(
-                              onTap: () {
-                                controller.selectedUnitId.value = unit['id']!;
-                                _closeDropdown();
+                        // 🟢 ĐÃ FIX LỖI Ở ĐÂY: Dùng allUnits và UnitModel
+                        child: Obx(() => ListView.separated(
+                              padding: EdgeInsets.zero,
+                              shrinkWrap: true,
+                              itemCount: controller.allUnits.length,
+                              separatorBuilder: (_, __) => Divider(
+                                  height: 1,
+                                  color: Colors.white.withOpacity(0.3)),
+                              itemBuilder: (context, index) {
+                                final unit = controller.allUnits[index];
+                                return InkWell(
+                                  onTap: () {
+                                    controller.selectedUnitId.value =
+                                        unit.unitId;
+                                    _closeDropdown();
+                                  },
+                                  child: Padding(
+                                    padding: const EdgeInsets.symmetric(
+                                        horizontal: 16, vertical: 14),
+                                    child: Row(
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.spaceBetween,
+                                      children: [
+                                        Text(unit.name,
+                                            style: const TextStyle(
+                                                fontFamily: 'Poppins',
+                                                fontSize: 14,
+                                                color: AppColors.primaryText,
+                                                fontWeight: FontWeight.w600)),
+                                        Text(unit.code,
+                                            style: const TextStyle(
+                                                fontFamily: 'Poppins',
+                                                fontSize: 12,
+                                                color: AppColors.primary,
+                                                fontWeight: FontWeight.bold)),
+                                      ],
+                                    ),
+                                  ),
+                                );
                               },
-                              child: Padding(
-                                padding: const EdgeInsets.symmetric(
-                                    horizontal: 16, vertical: 14),
-                                child: Row(
-                                  mainAxisAlignment:
-                                      MainAxisAlignment.spaceBetween,
-                                  children: [
-                                    Text(unit['name']!,
-                                        style: const TextStyle(
-                                            fontFamily: 'Poppins',
-                                            fontSize: 14,
-                                            color: AppColors.primaryText,
-                                            fontWeight: FontWeight.w600)),
-                                    Text(unit['code']!,
-                                        style: const TextStyle(
-                                            fontFamily: 'Poppins',
-                                            fontSize: 12,
-                                            color: AppColors.primary,
-                                            fontWeight: FontWeight.bold)),
-                                  ],
-                                ),
-                              ),
-                            );
-                          },
-                        ),
+                            )),
                       ),
                     ),
                   ),
@@ -195,13 +196,12 @@ class _InventoryProductPackageUnitDropdownWidgetState
         onTap: _toggleDropdown,
         child: AbsorbPointer(
           child: Obx(() {
-            final selectedUnit = controller.mockUnits.firstWhereOrNull(
-                (u) => u['id'] == controller.selectedUnitId.value);
+            final selectedUnit = controller.allUnits.firstWhereOrNull(
+                (u) => u.unitId == controller.selectedUnitId.value);
             return TTextFormFieldWidget(
               label: TTexts.unitLabel.tr,
               hintText: TTexts.selectUnit.tr,
-              controller:
-                  TextEditingController(text: selectedUnit?['name'] ?? ''),
+              controller: TextEditingController(text: selectedUnit?.name ?? ''),
               suffixIcon: AnimatedRotation(
                 turns: _isOpen ? 0.5 : 0.0,
                 duration: const Duration(milliseconds: 200),
