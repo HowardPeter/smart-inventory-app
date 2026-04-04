@@ -320,6 +320,7 @@ export class InventoryService {
         if (inventory.quantity < item.quantity) {
           throw new CustomError({
             message: 'Insufficient inventory quantity',
+            code: 'INSUFFICIENT_INVENTORY',
             status: StatusCodes.BAD_REQUEST,
           });
         }
@@ -353,6 +354,7 @@ export class InventoryService {
         if (failedProductPackageIds.size > 0) {
           throw new CustomError({
             message: 'Insufficient inventory quantity',
+            code: 'INSUFFICIENT_INVENTORY',
             status: StatusCodes.BAD_REQUEST,
             details: {
               productPackageIds: failedProductPackageIds,
