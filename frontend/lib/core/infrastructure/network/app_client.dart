@@ -1,10 +1,16 @@
 import 'package:dio/dio.dart';
+import 'package:flutter/material.dart';
 import 'package:frontend/core/infrastructure/constants/app_constants.dart';
+import 'package:frontend/core/infrastructure/constants/text_strings.dart';
+import 'package:frontend/core/ui/widgets/t_snackbars_widget.dart';
+import 'package:get/get.dart' hide Response;
 import 'package:get_storage/get_storage.dart';
+import 'package:google_sign_in/google_sign_in.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 class ApiClient {
   late Dio dio;
+  final supabase = Supabase.instance.client;
 
   ApiClient() {
     dio = Dio(
@@ -40,7 +46,33 @@ class ApiClient {
           return handler.next(options);
         },
         onResponse: (response, handler) => handler.next(response),
-        onError: (DioException e, handler) => handler.next(e),
+        onError: (DioException e, handler) async {
+          final statusCode = e.response?.statusCode;
+
+          //TODO: Bẫy lỗi 401 (Token hết hạn/Sai token) hoặc 403 (Không có quyền/Bị giáng chức)
+          if (statusCode == 401 || statusCode == 403) {
+            debugPrint('🚨 Token lỗi hoặc bị từ chối quyền. Ép đăng xuất...');
+
+            // 1. Clear session của Supabase
+            // Gọi xóa token ở server TRƯỚC KHI Supabase sign out
+
+            await supabase.auth.signOut();
+            // Đăng xuất Google để lần sau hiện lại popup chọn tài khoản
+            await GoogleSignIn.instance.signOut();
+
+            // 2. Xoá StoreID hoặc data local
+            GetStorage().remove('STORE_ID');
+
+            // 3. Điều hướng về màn Login
+            // Get.offAllNamed(AppRoutes.login);
+            TSnackbarsWidget.warning(
+                title: TTexts.systemSnackbarTitle.tr,
+                message: TTexts.systemSnackbarTitle.tr);
+          }
+
+          // Trả lỗi về cho UI xử lý tiếp (nếu cần show snackbar báo lỗi)
+          return handler.next(e);
+        },
       ),
     );
   }

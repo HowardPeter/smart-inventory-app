@@ -73,5 +73,6 @@ export const ROLE_PERMISSIONS: Record<AppRole, AppPermission[]> = {
     PERMISSION.AUDIT_LOG_WRITE,
 
     PERMISSION.STORE_MEMBER_DELETE,
+    PERMISSION.STORE_MEMBER_WRITE,
   ],
 };

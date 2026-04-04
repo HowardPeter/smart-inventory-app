@@ -19,6 +19,7 @@ export class StoreMemberRepository {
         userId: true,
         storeId: true,
         role: true,
+        activeStatus: true,
       },
     });
   }
@@ -33,13 +34,14 @@ export class StoreMemberRepository {
         storeId,
         activeStatus: 'active',
         store: {
-          activeStatus: 'active'
-        }
+          activeStatus: 'active',
+        },
       },
       select: {
         userId: true,
         storeId: true,
         role: true,
+        activeStatus: true,
       },
     });
   }

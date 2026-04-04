@@ -8,7 +8,10 @@ import {
 } from '../../../common/utils/require-req.js';
 
 import type { ApiResponse } from '../../../common/types/api-response.type.js';
-import type { StoreMemberResponseDto } from '../dto/store-member.dto.js';
+import type {
+  StoreMemberResponseDto,
+  UpdateStoreMemberRoleDto,
+} from '../dto/store-member.dto.js';
 import type { StoreMemberService } from '../service/store-member.service.js';
 import type { Request, Response } from 'express';
 
@@ -40,5 +43,23 @@ export class StoreMemberController {
     );
 
     sendResponse.success(res, removedMember, { status: StatusCodes.OK });
+  };
+
+  updateRole = async (
+    req: Request,
+    res: Response<ApiResponse<StoreMemberResponseDto>>,
+  ): Promise<void> => {
+    const storeContext = requireReqStoreContext(req);
+    const targetUserId = req.params.userId as string;
+    const { role: newRole } = req.body as UpdateStoreMemberRoleDto;
+
+    const updatedMember = await this.storeMemberService.updateMemberRole(
+      storeContext.role,
+      targetUserId,
+      storeContext.storeId,
+      newRole,
+    );
+
+    sendResponse.success(res, updatedMember, { status: StatusCodes.OK });
   };
 }

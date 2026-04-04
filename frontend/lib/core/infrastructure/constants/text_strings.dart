@@ -635,4 +635,8 @@ class TTexts {
       "change_password_hint_new_password";
   static const String changePasswordHintConfirmPassword =
       "change_password_hint_confirm";
+
+  //-- System
+  static const String systemSnackbarTitle = "system_snackbar_title";
+  static const String systemSnackbar403Error = "system_snackbar_403_error";
 }
