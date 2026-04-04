@@ -46,8 +46,8 @@ class OutboundTransactionItemAddMobileView
                   Obx(() => TransactionBatchSelectorWidget(
                         inboundTransactions:
                             controller.availableInboundTxs.toList(),
-                        selectedBatchesQty: Map.from(controller
-                            .selectedBatchesQty), 
+                        selectedBatchesQty:
+                            Map.from(controller.selectedBatchesQty),
                         onUpdateQty: controller.updateBatchQty,
                         currentPackageId:
                             controller.initialItem.inventory.productPackageId,
@@ -98,8 +98,8 @@ class OutboundTransactionItemAddMobileView
                         Row(
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: [
-                            const Text('Total Quantity',
-                                style: TextStyle(
+                            Text(TTexts.totalQuantity.tr,
+                                style: const TextStyle(
                                     fontFamily: 'Poppins',
                                     fontSize: 14,
                                     color: AppColors.subText)),
@@ -107,8 +107,8 @@ class OutboundTransactionItemAddMobileView
                                 style: const TextStyle(
                                     fontFamily: 'Poppins',
                                     fontSize: 16,
-                                    fontWeight: FontWeight.bold,
-                                    color: AppColors.primaryText))),
+                                    fontWeight: FontWeight.w500,
+                                    color: AppColors.subText))),
                           ],
                         ),
                         const SizedBox(height: 12),

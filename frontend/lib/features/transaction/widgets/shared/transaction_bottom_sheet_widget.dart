@@ -27,7 +27,6 @@ class TransactionBottomSheetWidget extends StatelessWidget {
           ),
         ),
         const SizedBox(height: AppSizes.p16),
-
         Text(
           TTexts.manageInventory.tr,
           style: const TextStyle(
@@ -37,7 +36,6 @@ class TransactionBottomSheetWidget extends StatelessWidget {
           ),
         ),
         const SizedBox(height: AppSizes.p8),
-
         Padding(
           padding: const EdgeInsets.symmetric(horizontal: 24.0),
           child: Text(
@@ -51,43 +49,38 @@ class TransactionBottomSheetWidget extends StatelessWidget {
           ),
         ),
         const SizedBox(height: AppSizes.p24),
-
-        // 4. Các nút thao tác (Sử dụng TPrimaryButtonWidget)
         TPrimaryButtonWidget(
           text: TTexts.inbound.tr,
           height: 56,
           customIcon: _buildLayerIcon(isPlus: true),
           fontSize: 16,
           onPressed: () {
+            Get.back();
             Get.toNamed(AppRoutes.inboundTransaction);
           },
         ),
         const SizedBox(height: AppSizes.p12),
-
         TPrimaryButtonWidget(
           text: TTexts.outbound.tr,
           height: 56,
           customIcon: _buildLayerIcon(isMinus: true),
           fontSize: 16,
           onPressed: () {
+            Get.back();
             Get.toNamed(AppRoutes.outboundTransaction);
           },
         ),
         const SizedBox(height: AppSizes.p12),
-
         TPrimaryButtonWidget(
           text: TTexts.stockAdjustment.tr,
           height: 56,
-          icon: Iconsax.layer_copy, // Chỉ dùng icon thường
+          icon: Iconsax.layer_copy,
           fontSize: 16,
           onPressed: () {
             Get.back();
-            // Điều hướng Stock Adjustment
           },
         ),
         const SizedBox(height: AppSizes.p16),
-
-        // 5. Nút Exit
         TPrimaryButtonWidget(
           text: TTexts.exit.tr,
           height: 56,
@@ -100,7 +93,6 @@ class TransactionBottomSheetWidget extends StatelessWidget {
     );
   }
 
-  // --- HÀM TẠO ICON LAYER CÓ DẤU + / - (Giữ nguyên) ---
   Widget _buildLayerIcon({bool isPlus = false, bool isMinus = false}) {
     return SizedBox(
       width: 28,

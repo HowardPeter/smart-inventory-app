@@ -12,7 +12,6 @@ final Map<String, String> enInventory = {
   TTexts.productCatalog: 'Product Catalog',
 
   // -- Inventory Header & Health
-  TTexts.totalItems: 'Total Items',
   TTexts.stockValue: 'Stock Value',
   TTexts.stockHealth: 'Stock Health',
   TTexts.statusHealthy: 'Healthy',

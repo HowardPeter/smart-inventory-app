@@ -39,8 +39,6 @@ class TTexts {
   static const String noResultsTitle = "no_results_title";
   static const String noResultsMessage = "no_results_message";
   static const String searchItemsPackages = "search_items_packages";
-
-  // -- Search Module
   static const String searchEverything = "search_everything";
   static const String noResultsFound = "no_results_found";
   static const String didYouMean = "didYouMean";
@@ -54,10 +52,9 @@ class TTexts {
   static const String netChecking = "net_checking";
   static const String netErrorRetryFailedMessage =
       "net_error_retry_failed_message";
-
   static const String barCodeScan = "bar_code_scan";
 
-// -- Error / Restricted Access
+  // -- Error / Restricted Access
   static const String errorTitle = "error_title";
   static const String errorAccessRestrictedTitle =
       "error_access_restricted_title";
@@ -236,7 +233,6 @@ class TTexts {
   static const String inviteCodeSubtitle = "invite_code_subtitle";
   static const String inviteCodeCopiedTitle = "invite_code_copied_title";
   static const String inviteCodeCopiedMessage = "invite_code_copied_message";
-
   static const String joinWorkspaceTitle = "join_workspace_title";
   static const String joinWorkspaceSubtitle = "join_workspace_subtitle";
   static const String enterInviteCodeLabel = "enter_invite_code_label";
@@ -244,7 +240,6 @@ class TTexts {
   static const String joinBtn = "join_btn";
   static const String joiningBtn = "joining_btn";
   static const String checkingInviteCode = "checking_invite_code";
-
   static const String joinMissingCodeTitle = "join_missing_code_title";
   static const String joinMissingCodeMessage = "join_missing_code_message";
   static const String joinInvalidCodeTitle = "join_invalid_code_title";
@@ -261,7 +256,6 @@ class TTexts {
   static const String roleManager = "role_manager";
   static const String roleStaff = "role_staff";
   static const String youBadge = "you_badge";
-
   static const String generateInviteCodeBtn = "generate_invite_code_btn";
   static const String generateCodeDialogTitle = "generate_code_dialog_title";
   static const String generateCodeDialogMessage =
@@ -314,7 +308,7 @@ class TTexts {
   static const String inventoryInsights = "inventory_insights";
   static const String manageData = "manage_data";
   static const String productCatalog = "product_catalog";
-  static const String totalItems = "total_items";
+  static const String totalItemsValue = "total_items_value"; // updated
   static const String stockValue = "stock_value";
   static const String stockHealth = "stock_health";
   static const String statusHealthy = "status_healthy";
@@ -405,14 +399,14 @@ class TTexts {
   static const String loadingProduct = "loading_product";
   static const String viewProductInfo = 'view_product_info';
 
-  // --- Transaction Bottom Sheet ở trang Detail ---
+  // --- Transaction Bottom Sheet
   static const String addToTransaction = "add_to_transaction";
   static const String enterQuantityToAdd = "enter_quantity_to_add";
   static const String quantityToImport = "quantity_to_import";
   static const String importPriceLot = "import_price_lot";
   static const String confirmAndAdd = "confirm_and_add";
 
-  // --- Product Catalog & Categories ---
+  // --- Product Catalog & Categories
   static const String categoryCatalog = 'category_catalog';
   static const String searchCategories = 'search_categories';
   static const String totalCategories = 'total_categories';
@@ -423,11 +417,11 @@ class TTexts {
   static const String noCategoryDescription = 'no_description';
   static const String emptyCategoryMessage = 'empty_category_message';
 
-  // --- View All Products ---
+  // --- View All Products
   static const String viewAllProducts = 'view_all_products';
   static const String viewAllProductsSub = 'view_all_products_sub';
 
-  // --- Category Detail ---
+  // --- Category Detail
   static const String addNewProduct = 'add_new_product';
   static const String addNewProductSub = 'add_new_product_sub';
   static const String editCategory = 'editCategory';
@@ -436,7 +430,7 @@ class TTexts {
   static const String noProductsAssigned = 'no_products_assigned';
   static const String deleteCategoryConfirm = 'delete_category_confirm';
 
-  // --- Product Catalog Deatail ---
+  // --- Product Catalog Detail
   static const String brand = 'brand';
   static const String packagesOrVariants = 'packages_or_variants';
   static const String add = 'add';
@@ -622,6 +616,10 @@ class TTexts {
       "transaction_completed_subtitle";
   static const String backToHome = "back_to_home";
   static const String scanProductBarcode = "scan_product_barcode";
+  static const String confirmImportTitle = "confirm_import_title";
+  static const String confirmImportDescription = "confirm_import_description";
+  static const String proceedImport = "proceed_import";
+  
 
   // --- Outbound ---
   static const String outboundTransactionTitle = "outbound_transaction_title";
@@ -633,6 +631,7 @@ class TTexts {
   // --- Inbound/Outbound Transaction Item Add ---
   static const String loadingAddingToCart = "loading_adding_to_cart";
   static const String productNameUnknown = "product_name_unknown";
+  static const String completeExport = "complete_export";
   static const String labelNoBarcode = "label_no_barcode";
   static const String labelStock = "label_stock";
   static const String labelImportPrice = "label_import_price";
@@ -672,10 +671,19 @@ class TTexts {
   static const String totalItemsTransaction = "total_items_transaction";
   static const String checkDetails = "check_details";
   static const String transactionDetails = "transaction_details";
-  static const String reasonSales = "reason_sales";
+  static const String selectExportType = "select_export_type";
+
+  // Specific Reasons
+  static const String reasonRetailSale = "reason_retail_sale";
+  static const String reasonWholesale = "reason_wholesale";
   static const String reasonDamaged = "reason_damaged";
+  static const String reasonInternalTransfer = "reason_internal_transfer";
   static const String reasonReturn = "reason_return";
   static const String reasonOther = "reason_other";
+  static const String reasonIncome = "reason_income";
+  static const String reasonNeutral = "reason_neutral";
+  static const String reasonExpense = "reason_expense";
+
   static const String selectBatchFIFO = "select_batch_fifo";
   static const String batchRemaining = "batch_remaining";
   static const String expiresOn = "expires_on";
@@ -684,6 +692,21 @@ class TTexts {
   static const String sellingPriceLot = "selling_price_lot";
   static const String importedOn = "imported_on";
   static const String outOfStockBatch = "out_of_stock_batch";
+
+  // Export process
+  static const String confirmExportTitle = "confirm_export_title";
+  static const String confirmExportDescription = "confirm_export_description";
+  static const String processingExport = "processing_export";
+  static const String exportSuccessMessage = "export_success_message";
+  static const String noteLabel = "note_label";
+  static const String emptyCartWarning = "empty_cart_warning";
+  static const String priceChangeDetectedTitle = "price_change_detected_title";
+  static const String priceChangeDetectedDesc = "price_change_detected_desc";
+  static const String proceedExport = "proceed_export";
+  static const String reasonForExport = "reason_for_export";
+  static const String total = "total";
+  static const String totalQuantity = "total_quantity";
+  static const String specifyBatchQuantity = "specify_batch_quantity";
 
   //--Profile
   static const String profileTitle = 'profile_title';

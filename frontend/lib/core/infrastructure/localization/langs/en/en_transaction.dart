@@ -26,11 +26,14 @@ final Map<String, String> enTransaction = {
       "Your transaction has been processed and saved successfully.",
   TTexts.backToHome: "Back to Home",
   TTexts.scanProductBarcode: "Scan Product Barcode",
+  TTexts.confirmImportTitle: "Confirm Import",
+  TTexts.confirmImportDescription: "Are you sure you want to complete this inbound transaction? This action will add stock to your inventory.",
+  TTexts.proceedImport: "Confirm & Import",
 
   // -- Outbound
   TTexts.outboundTransactionTitle: 'Outbound Transaction',
   TTexts.searchDot: 'Search ...',
-  TTexts.confirmExport: 'Confirm export',
+  TTexts.completeExport: 'Complete Export',
   TTexts.stocksLabel: 'Stocks:',
   TTexts.outOfStockAlert: 'Not enough stock available!',
 
@@ -77,10 +80,19 @@ final Map<String, String> enTransaction = {
   TTexts.totalItemsTransaction: 'Total Items / Transaction',
   TTexts.checkDetails: 'Check Details',
   TTexts.transactionDetails: 'Transaction Details',
-  TTexts.reasonSales: 'Sales',
+  TTexts.selectExportType: "Select Export Types:",
+
+  // Specific Reasons
+  TTexts.reasonRetailSale: 'Retail Sale',
+  TTexts.reasonWholesale: 'Wholesale',
   TTexts.reasonDamaged: 'Damaged / Expired',
+  TTexts.reasonInternalTransfer: 'Internal Transfer',
   TTexts.reasonReturn: 'Returned to Supplier',
   TTexts.reasonOther: 'Other',
+  TTexts.reasonIncome: 'Income (+)',
+  TTexts.reasonNeutral: 'No Revenue (0)',
+  TTexts.reasonExpense: 'Expense / Loss (-)',
+
   TTexts.selectBatchFIFO: 'Select batches',
   TTexts.batchRemaining: 'left',
   TTexts.expiresOn: 'Exp',
@@ -91,4 +103,21 @@ final Map<String, String> enTransaction = {
   TTexts.quantityToImport: 'Quantity to import',
   TTexts.importedOn: "Imported",
   TTexts.outOfStockBatch: "Out of stock",
+  TTexts.confirmExportTitle: "Confirm Export",
+  TTexts.confirmExportDescription:
+      "Are you sure you want to complete this outbound transaction? This action will update your inventory levels.",
+  TTexts.processingExport: "Processing Export...",
+  TTexts.exportSuccessMessage: "Export transaction completed successfully!",
+  TTexts.noteLabel: "Note",
+  TTexts.emptyCartWarning:
+      "Your cart is empty. Please add products before exporting.",
+  TTexts.priceChangeDetectedTitle: "Price Change Detected",
+  TTexts.priceChangeDetectedDesc:
+      "The following items have modified selling prices:",
+  TTexts.proceedExport: "Confirm & Export",
+  TTexts.reasonForExport: "Reason for Export",
+  TTexts.total: "Total",
+  TTexts.totalQuantity: "Total Quantity",
+  TTexts.specifyBatchQuantity:
+      "Please specify the quantity from the batches above.",
 };

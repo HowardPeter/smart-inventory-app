@@ -24,34 +24,46 @@ class InboundTransactionBottomBarWidget
         ],
       ),
       child: SafeArea(
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Text(TTexts.totalFunds.tr,
+        child: Obx(() {
+          final isEmpty = controller.cartItems.isEmpty;
+
+          return Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Text(
+                    TTexts.totalFunds.tr,
                     style: const TextStyle(
-                        fontSize: 16, fontWeight: FontWeight.bold)),
-                Obx(() => Text('\$${controller.totalFunds.toStringAsFixed(2)}',
-                    style: const TextStyle(
-                        fontSize: 18,
-                        fontWeight: FontWeight.bold,
-                        color: AppColors.primary))),
-              ],
-            ),
-            const SizedBox(height: 16),
-            Obx(() => TPrimaryButtonWidget(
+                        fontSize: 16, fontWeight: FontWeight.bold),
+                  ),
+                  Text(
+                    '${controller.totalItems} ${TTexts.items.tr.toLowerCase()} • \$${controller.totalFunds.toStringAsFixed(2)}',
+                    style: TextStyle(
+                      fontSize: 16,
+                      fontWeight: FontWeight.bold,
+                      color: isEmpty ? AppColors.softGrey : AppColors.primary,
+                    ),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 16),
+              SizedBox(
+                width: double.infinity,
+                child: TPrimaryButtonWidget(
                   text: TTexts.completeImport.tr,
-                  onPressed: controller.cartItems.isEmpty
-                      ? null
-                      : () => controller.completeImport(),
-                  backgroundColor: controller.cartItems.isEmpty
-                      ? AppColors.softGrey
+                  backgroundColor: isEmpty
+                      ? AppColors.softGrey.withOpacity(0.5)
                       : AppColors.primary,
-                )),
-          ],
-        ),
+                  onPressed: isEmpty
+                      ? () {}
+                      : () => controller.handleImportWithPriceCheck(),
+                ),
+              ),
+            ],
+          );
+        }),
       ),
     );
   }

@@ -141,7 +141,7 @@ class OutboundTransactionItemAddController extends GetxController
       if (totalQty <= 0) {
         TSnackbarsWidget.warning(
             title: TTexts.warningTitle.tr,
-            message: "Please specify the quantity from the batches above.");
+            message: TTexts.specifyBatchQuantity.tr); // 🟢 Sửa text cứng
         return;
       }
 

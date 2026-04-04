@@ -70,7 +70,7 @@ class InventoryFlowChartWidget extends GetView<InventoryController> {
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               Obx(() => _buildBottomStat(
-                  TTexts.totalItems.tr,
+                  TTexts.totalItemsTransaction.tr,
                   "${controller.totalActiveProducts.value}",
                   AppColors.primaryText)),
               Obx(() => _buildBottomStat(TTexts.flowIn.tr,

@@ -30,7 +30,6 @@ class OutboundTransactionBottomBarWidget
       ),
       child: SafeArea(
         child: Obx(() {
-          // Kiểm tra giỏ hàng để chỉnh trạng thái nút
           final isEmpty = controller.cartItems.isEmpty;
 
           return Column(
@@ -39,9 +38,9 @@ class OutboundTransactionBottomBarWidget
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  const Text(
-                    'Total',
-                    style: TextStyle(
+                  Text(
+                    TTexts.total.tr, // 🟢 Sửa text cứng
+                    style: const TextStyle(
                       fontFamily: 'Poppins',
                       fontSize: 16,
                       fontWeight: FontWeight.bold,
@@ -49,7 +48,7 @@ class OutboundTransactionBottomBarWidget
                     ),
                   ),
                   Text(
-                    '${controller.totalItems} items • \$${controller.totalAmount.toStringAsFixed(2)}',
+                    '${controller.totalItems} ${TTexts.items.tr.toLowerCase()} • \$${controller.totalAmount.toStringAsFixed(2)}', // 🟢 Sửa text cứng
                     style: TextStyle(
                       fontFamily: 'Poppins',
                       fontSize: 14,
@@ -63,11 +62,13 @@ class OutboundTransactionBottomBarWidget
               SizedBox(
                 width: double.infinity,
                 child: TPrimaryButtonWidget(
-                  text: TTexts.next.tr,
+                  text: TTexts.completeExport.tr,
                   backgroundColor: isEmpty
                       ? AppColors.softGrey.withOpacity(0.5)
                       : AppColors.primary,
-                  onPressed: isEmpty ? () {} : () => controller.goToSummary(),
+                  onPressed: isEmpty
+                      ? () {}
+                      : () => controller.handleExportWithPriceCheck(),
                 ),
               ),
             ],

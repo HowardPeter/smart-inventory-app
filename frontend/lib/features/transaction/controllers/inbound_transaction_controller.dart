@@ -9,7 +9,6 @@ import 'package:get/get.dart';
 import 'package:frontend/core/infrastructure/utils/full_screen_loader_utils.dart';
 import 'package:frontend/core/ui/widgets/t_snackbars_widget.dart';
 import 'package:frontend/core/ui/widgets/t_custom_dialog_widget.dart';
-import 'package:iconsax_flutter/iconsax_flutter.dart';
 import 'package:frontend/core/ui/theme/app_colors.dart';
 
 class InboundTransactionController extends GetxController with TErrorHandler {
@@ -17,6 +16,10 @@ class InboundTransactionController extends GetxController with TErrorHandler {
 
   final RxList<TransactionDetailModel> cartItems =
       <TransactionDetailModel>[].obs;
+
+  final TextEditingController noteController = TextEditingController();
+
+  int get totalItems => cartItems.fold(0, (sum, item) => sum + item.quantity);
 
   double get totalFunds =>
       cartItems.fold(0, (sum, item) => sum + (item.quantity * item.unitPrice));
@@ -48,32 +51,17 @@ class InboundTransactionController extends GetxController with TErrorHandler {
       cartItems.add(TransactionDetailModel(
         productPackageId: pkgId,
         quantity: quantity,
-        unitPrice: customPrice ?? productData['importPrice'],
+        unitPrice: customPrice ?? productData['importPrice'] ?? 0.0,
         packageInfo: productData['packageInfo'],
-        currentStock: productData['currentStock'],
-        reorderThreshold: productData['reorderThreshold'],
+        currentStock: productData['currentStock'] ?? 0,
+        reorderThreshold: productData['reorderThreshold'] ?? 0,
       ));
     }
   }
 
   void updateQuantity(int index, int newQuantity) {
     if (newQuantity <= 0) {
-      Get.dialog(
-        TCustomDialogWidget(
-          title: TTexts.removeItem.tr,
-          description: TTexts.confirmRemoveItemTransaction.tr,
-          icon: const Icon(Iconsax.trash_copy,
-              color: AppColors.stockOut, size: 32),
-          primaryButtonText: TTexts.remove.tr,
-          onPrimaryPressed: () {
-            cartItems.removeAt(index);
-            Get.back();
-          },
-          secondaryButtonText: TTexts.cancel.tr,
-          onSecondaryPressed: () => Get.back(),
-        ),
-        barrierDismissible: false,
-      );
+      removeItem(index);
     } else {
       final item = cartItems[index];
       cartItems[index] = TransactionDetailModel(
@@ -87,20 +75,116 @@ class InboundTransactionController extends GetxController with TErrorHandler {
     }
   }
 
-  Future<void> completeImport() async {
-    if (cartItems.isEmpty) return;
+  // 🟢 XÓA SẢN PHẨM (Dùng Emoji Icon)
+  void removeItem(int index) {
+    Get.dialog(
+      TCustomDialogWidget(
+        title: TTexts.removeItem.tr,
+        description: TTexts.confirmRemoveItemTransaction.tr,
+        icon:
+            const Text('🗑️', style: TextStyle(fontSize: 40)), // 🟢 EMOJI ICON
+        primaryButtonText: TTexts.remove.tr,
+        onPrimaryPressed: () {
+          cartItems.removeAt(index);
+          Get.back();
+        },
+        secondaryButtonText: TTexts.cancel.tr,
+        onSecondaryPressed: () => Get.back(),
+      ),
+      barrierDismissible: false,
+    );
+  }
 
+  // 🟢 1. KIỂM TRA THAY ĐỔI GIÁ (IMPORT PRICE)
+  void handleImportWithPriceCheck() {
+    if (cartItems.isEmpty) {
+      TSnackbarsWidget.warning(
+          title: TTexts.warningTitle.tr, message: TTexts.emptyCartWarning.tr);
+      return;
+    }
+
+    // Lọc ra các item có giá nhập thay đổi so với giá nhập gốc
+    final changedPriceItems = cartItems.where((item) {
+      final originalPrice = item.packageInfo?.importPrice ?? 0.0;
+      return (item.unitPrice - originalPrice).abs() > 0.01;
+    }).toList();
+
+    if (changedPriceItems.isNotEmpty) {
+      Get.dialog(
+        TCustomDialogWidget(
+          title: TTexts.priceChangeDetected.tr,
+          description: TTexts.priceChangeMessage.tr,
+          icon:
+              const Text('💰', style: TextStyle(fontSize: 40)), // 🟢 EMOJI ICON
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: changedPriceItems.map((item) {
+              final original = item.packageInfo?.importPrice ?? 0.0;
+              return Padding(
+                padding: const EdgeInsets.symmetric(vertical: 4),
+                child: Text(
+                  "${item.packageInfo?.displayName}: \$${original.toStringAsFixed(2)} ➔ \$${item.unitPrice.toStringAsFixed(2)}",
+                  style: const TextStyle(
+                      fontSize: 13, color: AppColors.primaryText),
+                ),
+              );
+            }).toList(),
+          ),
+          primaryButtonText: TTexts.updatePricesAndCreate.tr,
+          onPrimaryPressed: () {
+            Get.back();
+            _showConfirmImportDialog(updatePrice: true); // Cập nhật giá luôn
+          },
+          secondaryButtonText: TTexts.justCreateTransaction.tr,
+          onSecondaryPressed: () {
+            Get.back();
+            _showConfirmImportDialog(
+                updatePrice: false); // Chỉ nhập hàng, không cập nhật giá gốc
+          },
+        ),
+      );
+    } else {
+      _showConfirmImportDialog(updatePrice: false);
+    }
+  }
+
+  // 🟢 2. XÁC NHẬN NHẬP KHO CHÍNH THỨC
+  void _showConfirmImportDialog({required bool updatePrice}) {
+    Get.dialog(
+      TCustomDialogWidget(
+        title: TTexts.confirmImportTitle.tr,
+        description: TTexts.confirmImportDescription.tr,
+        icon: const Text('📦', style: TextStyle(fontSize: 40)), // 🟢 EMOJI ICON
+        primaryButtonText: TTexts.proceedImport.tr,
+        onPrimaryPressed: () {
+          Get.back();
+          completeImport(updatePrice: updatePrice);
+        },
+        secondaryButtonText: TTexts.cancel.tr,
+        onSecondaryPressed: () => Get.back(),
+      ),
+      barrierDismissible: false,
+    );
+  }
+
+  // 🟢 3. THỰC THI API CÓ BẪY LỖI
+  Future<void> completeImport({required bool updatePrice}) async {
     try {
       FullScreenLoaderUtils.openLoadingDialog(TTexts.creatingImportTicket.tr);
 
-      // 1. Tạo Transaction (HIỆN TẠI ĐANG FAKE)
+      final finalNote = noteController.text.trim().isNotEmpty
+          ? noteController.text.trim()
+          : TTexts.manualImport.tr;
+
+      // 1. Tạo Transaction Model
       final transaction = TransactionModel(
         totalPrice: totalFunds,
         type: 'INBOUND',
         status: 'COMPLETED',
-        note: TTexts.manualImport.tr,
+        note: finalNote,
         items: cartItems.toList(),
       );
+
       await _provider.createTransaction(transaction);
 
       // =========================================================================
@@ -114,46 +198,45 @@ class InboundTransactionController extends GetxController with TErrorHandler {
       // Việc này đảm bảo tính nhất quán (All or Nothing), Frontend không nên tự gọi 3 API.
       // =========================================================================
 
-      // Lấy danh sách item hợp lệ
+      // 2. Cập nhật kho và cập nhật giá (Nếu updatePrice = true)
       final validItems = cartItems.where((item) =>
           item.productPackageId != null && item.productPackageId!.isNotEmpty);
 
-      // Mảng chứa các request song song
       List<Future<void>> updateTasks = [];
 
       for (var item in validItems) {
         final pkgId = item.productPackageId!;
 
-        // A. CẬP NHẬT INVENTORY (Tăng số lượng kho thực tế)
+        // Tăng tồn kho
         updateTasks.add(_provider.adjustInventory(
           pkgId,
           type: 'increase',
           quantity: item.quantity,
-          note: TTexts.manualImport.tr,
+          note: finalNote,
         ));
 
-        // B. CẬP NHẬT PRODUCT PACKAGE (Cập nhật lại giá nhập - importPrice)
-        // item.unitPrice chính là giá tiền người dùng đã nhập ở ô Import Price
-        updateTasks.add(_provider
-            .updateProductPackage(pkgId, {'importPrice': item.unitPrice}));
+        // 🟢 NẾU CHỌN CẬP NHẬT GIÁ -> BẮN API ĐỔI IMPORT PRICE
+        if (updatePrice) {
+          updateTasks.add(_provider
+              .updateProductPackage(pkgId, {'importPrice': item.unitPrice}));
+        }
       }
 
-      // Đẩy tất cả các API đi cùng một lúc (Chờ tất cả hoàn thành)
       await Future.wait(updateTasks);
 
       FullScreenLoaderUtils.stopLoading();
 
-      // Xóa giỏ hàng và thoát
+      // Reset dữ liệu
       cartItems.clear();
+      noteController.clear();
+
       Get.back();
       TSnackbarsWidget.success(
           title: TTexts.successTitle.tr,
           message: TTexts.importTicketCreated.tr);
     } catch (e) {
       FullScreenLoaderUtils.stopLoading();
-      TSnackbarsWidget.error(
-          title: TTexts.errorTitle.tr,
-          message: TTexts.errorCreatingImportTicket.tr);
+      handleError(e); // 🟢 Bẫy lỗi an toàn
     }
   }
 
@@ -162,12 +245,16 @@ class InboundTransactionController extends GetxController with TErrorHandler {
       () => TBarcodeScannerLayout(
         title: TTexts.scanProductBarcode.tr,
         onScanned: (code) {
-          TSnackbarsWidget.info(
-              title: TTexts.info.tr, message: "Quét được mã: $code");
           Get.back();
         },
       ),
       transition: Transition.downToUp,
     );
+  }
+
+  @override
+  void onClose() {
+    noteController.dispose();
+    super.onClose();
   }
 }
