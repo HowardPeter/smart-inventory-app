@@ -1,13 +1,12 @@
 import { StatusCodes } from 'http-status-codes';
 
+import { TransactionDetailRepository } from './repositories/transaction-detail.repository.js';
+import { TransactionRepository } from './repositories/transaction.repository.js';
 import { CustomError } from '../../common/errors/index.js';
 import { prisma } from '../../db/prismaClient.js';
 import { Prisma } from '../../generated/prisma/client.js';
 import { InventoryService } from '../inventories/index.js';
 import { ProductPackageService } from '../product-packages/index.js';
-import { ProductService } from '../products/index.js';
-import { TransactionDetailRepository } from './repositories/transaction-detail.repository.js';
-import { TransactionRepository } from './repositories/transaction.repository.js';
 
 import type {
   CreateImportTransactionDto,
@@ -17,7 +16,6 @@ import type {
 
 export class TransactionService {
   constructor(
-    private readonly productService: ProductService,
     private readonly productPackageService: ProductPackageService,
     private readonly inventoryService: InventoryService,
   ) {}
@@ -114,42 +112,19 @@ export class TransactionService {
 
     this.ensureNoDuplicateProductPackageIds(data);
 
-    // Lấy danh sách productId unique
-    // Set -> loại duplicate, Array.from -> convert lại thành array
-    const productIds = Array.from(
-      new Set(data.items.map((item) => item.productId)),
-    );
-
     // Lấy danh sách productPackageId unique
     const productPackageIds = Array.from(
       new Set(data.items.map((item) => item.productPackageId)),
     );
 
-    // Gọi song song 3 API để tối ưu performance (Promise.all)
-    // destructuring để lấy kết quả theo thứ tự
-    const [products, productIdsHavingPackages, productPackages] =
-      await Promise.all([
-        // Lấy product active theo store
-        this.productService.getActiveProductsByIds(storeId, productIds),
-
-        // Lấy danh sách productId đã có ít nhất 1 package
-        this.productPackageService.getProductIdsHavingPackages(
-          storeId,
-          productIds,
-        ),
-
-        // Lấy danh sách ProductPackage
-        this.productPackageService.getProductPackagesByIds(
-          storeId,
-          productPackageIds,
-        ),
-      ]);
+    // Lấy danh sách ProductPackage
+    const productPackages =
+      await this.productPackageService.getProductPackagesByIds(
+        storeId,
+        productPackageIds,
+      );
 
     // INFO: Sử dụng Map để lookup O(1) thay vì find O(n)
-    const productMap = new Map(
-      products.map((product) => [product.productId, product]),
-    );
-
     // Map để lookup ProductPackage theo id
     const productPackageMap = new Map(
       productPackages.map((productPackage) => [
@@ -158,34 +133,7 @@ export class TransactionService {
       ]),
     );
 
-    // Tạo Set để check nhanh product có package chưa
-    const productIdsHavingPackagesSet = new Set(productIdsHavingPackages);
-
     for (const item of data.items) {
-      const product = productMap.get(item.productId);
-
-      if (!product) {
-        throw new CustomError({
-          message: 'Product not found',
-          status: StatusCodes.NOT_FOUND,
-        });
-      }
-
-      // NOTE: Business rule:
-      // NOTE: Product chưa có package -> frontend cần mở overlay tạo package
-      if (!productIdsHavingPackagesSet.has(item.productId)) {
-        throw new CustomError({
-          message:
-            'Product has no package. Please create a package and inventory first.',
-          status: StatusCodes.CONFLICT,
-          code: 'PRODUCT_HAS_NO_PACKAGE',
-          details: {
-            productId: product.productId,
-            productName: product.name,
-          },
-        });
-      }
-
       const productPackage = productPackageMap.get(item.productPackageId);
 
       // Package không tồn tại
@@ -194,15 +142,6 @@ export class TransactionService {
         throw new CustomError({
           message: 'Product package not found',
           status: StatusCodes.NOT_FOUND,
-        });
-      }
-
-      // Package không thuộc product đã chọn
-      // Tránh trường hợp frontend load lỗi, data chưa sync, race condition
-      if (productPackage.productId !== item.productId) {
-        throw new CustomError({
-          message: 'Product package does not belong to the selected product',
-          status: StatusCodes.BAD_REQUEST,
         });
       }
     }

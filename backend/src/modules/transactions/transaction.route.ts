@@ -18,7 +18,6 @@ transactionRouter.use(authenticate, requireStoreContext);
  * Body:
  *  - note?: string | null
  *  - items: {
- *      productId: string;
  *      productPackageId: string;
  *      quantity: number;
  *      unitPrice: number;

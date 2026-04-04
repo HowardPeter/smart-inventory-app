@@ -10,7 +10,6 @@ const createImportTransactionBodySchema = z
     items: z
       .array(
         z.object({
-          productId: z.uuid('Invalid productId'),
           productPackageId: z.uuid('Invalid productPackageId'),
           quantity: z.coerce
             .number()

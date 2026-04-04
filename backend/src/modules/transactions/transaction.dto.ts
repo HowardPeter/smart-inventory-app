@@ -27,9 +27,7 @@ export type CreateImportTransactionData = {
 export type CreateImportTransactionItemDto = Omit<
   TransactionDetail,
   'transactionId'
-> & {
-  productId: string;
-};
+>;
 
 export type CreateImportTransactionDto = {
   note?: string | null;
