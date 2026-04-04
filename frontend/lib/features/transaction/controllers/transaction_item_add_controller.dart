@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:frontend/features/transaction/providers/transaction_provider.dart';
 import 'package:frontend/features/transaction/controllers/inbound_transaction_controller.dart';
+import 'package:frontend/features/transaction/controllers/outbound_transaction_controller.dart'; // 🟢 ĐÃ IMPORT OUTBOUND
 import 'package:frontend/features/inventory/controllers/inventory_controller.dart';
 import 'package:frontend/core/ui/widgets/t_snackbars_widget.dart';
 import 'package:frontend/core/infrastructure/models/inventory_model.dart';
@@ -31,26 +32,25 @@ class TransactionItemAddController extends GetxController with TErrorHandler {
     super.onInit();
     if (Get.arguments is InventoryInsightDisplayModel) {
       initialItem = Get.arguments;
-      priceController.text = initialItem.inventory.productPackage?.importPrice
-              .toStringAsFixed(2) ??
-          '0.00';
+
+      // Mặc định nạp giá tuỳ thuộc vào việc đang ở Nhập kho hay Xuất kho
+      if (Get.isRegistered<OutboundTransactionController>()) {
+        priceController.text = initialItem
+                .inventory.productPackage?.sellingPrice
+                .toStringAsFixed(2) ??
+            '0.00';
+      } else {
+        priceController.text = initialItem.inventory.productPackage?.importPrice
+                .toStringAsFixed(2) ??
+            '0.00';
+      }
+
       _calculateSubtotal();
-
-      // 🟢 DEBUG LOG: In ra để xem ID truyền sang từ trang Search có sống không
-      debugPrint('========== [DEBUG: INIT TRANG ADD] ==========');
-      debugPrint('1. Tên Sản phẩm (Display Name): $displayName');
-      debugPrint(
-          '2. ID Gói (Từ Inventory): ${initialItem.inventory.productPackageId}');
-      debugPrint(
-          '3. ID Gói (Từ Package Info): ${initialItem.inventory.productPackage?.productPackageId}');
-      debugPrint('=============================================');
-
       fetchFreshData(initialItem.inventory.productPackageId);
     } else {
       Get.back();
       TSnackbarsWidget.error(
-          title: TTexts.errorTitle.tr,
-          message: TTexts.errorUnknownMessage.tr); // Something went wrong
+          title: TTexts.errorTitle.tr, message: TTexts.errorUnknownMessage.tr);
     }
 
     quantityController.addListener(_calculateSubtotal);
@@ -108,26 +108,16 @@ class TransactionItemAddController extends GetxController with TErrorHandler {
   }
 
   Future<void> fetchFreshData(String packageId) async {
-    // 🟢 DEBUG LOG: Xem gói gửi đi fetch là gì
-    debugPrint('========== [DEBUG: FETCH DỮ LIỆU TỒN KHO] ==========');
-    debugPrint('PackageId gửi đi lấy API: "$packageId"');
-
-    if (packageId.isEmpty || packageId == 'null') {
-      debugPrint('❌ BỊ CHẶN: PackageId trống hoặc chuỗi "null", dừng gọi API!');
-      // Xóa Snackbar ở đây cho đỡ phiền người dùng
-      return;
-    }
+    if (packageId.isEmpty || packageId == 'null') return;
 
     try {
       isLoadingFreshData.value = true;
       final data = await _provider.getInventoryDetailByPackageId(packageId);
       freshInventoryData.value = InventoryModel.fromJson(data);
-      debugPrint('✅ FETCH THÀNH CÔNG: Đã lấy được dữ liệu mới nhất!');
     } catch (e) {
-      debugPrint('❌ LỖI FETCH DATA NGẦM: $e');
+      debugPrint('Lỗi fetch data: $e');
     } finally {
       isLoadingFreshData.value = false;
-      debugPrint('====================================================');
     }
   }
 
@@ -148,64 +138,63 @@ class TransactionItemAddController extends GetxController with TErrorHandler {
       FullScreenLoaderUtils.openLoadingDialog(TTexts.loadingAddingToCart.tr);
       await Future.delayed(const Duration(milliseconds: 500));
 
-      if (Get.isRegistered<InboundTransactionController>()) {
-        final inboundCtrl = Get.find<InboundTransactionController>();
-        final package = _activeInventory.productPackage ??
-            initialItem.inventory.productPackage;
+      final package = _activeInventory.productPackage ??
+          initialItem.inventory.productPackage;
 
-        // 🟢 TIẾN HÀNH THU THẬP TẤT CẢ CÁC NGUỒN ID CÓ THỂ
-        final String activeId = _activeInventory.productPackageId;
-        final String packageInfoId = package?.productPackageId ?? '';
-        final String initialId = initialItem.inventory.productPackageId;
+      final String activeId = _activeInventory.productPackageId;
+      final String packageInfoId = package?.productPackageId ?? '';
+      final String initialId = initialItem.inventory.productPackageId;
 
-        // Dò xem cái nào có dữ liệu thật sự
-        String realPkgId = '';
-        if (activeId.isNotEmpty && activeId != 'null') {
-          realPkgId = activeId;
-        } else if (packageInfoId.isNotEmpty && packageInfoId != 'null') {
-          realPkgId = packageInfoId;
-        } else if (initialId.isNotEmpty && initialId != 'null') {
-          realPkgId = initialId;
-        }
+      String realPkgId = '';
+      if (activeId.isNotEmpty && activeId != 'null') {
+        realPkgId = activeId;
+      } else if (packageInfoId.isNotEmpty && packageInfoId != 'null') {
+        realPkgId = packageInfoId;
+      } else if (initialId.isNotEmpty && initialId != 'null') {
+        realPkgId = initialId;
+      }
 
-        if (realPkgId.isEmpty) {
-          debugPrint('========== [❌ LỖI NGHIÊM TRỌNG: ADD TO CART] ==========');
-          debugPrint('Không thể tìm thấy ID gói nào hợp lệ để thêm vào giỏ:');
-          debugPrint('1. Từ _activeInventory: "$activeId"');
-          debugPrint('2. Từ packageInfo: "$packageInfoId"');
-          debugPrint('3. Từ initialItem: "$initialId"');
-          debugPrint(
-              '==========================================================');
-
-          FullScreenLoaderUtils.stopLoading();
-          TSnackbarsWidget.error(
+      if (realPkgId.isEmpty) {
+        FullScreenLoaderUtils.stopLoading();
+        TSnackbarsWidget.error(
             title: TTexts.errorTitle.tr,
-            message: TTexts.errorUnknownMessage.tr,
-          );
-          return;
-        }
+            message: TTexts.errorUnknownMessage.tr);
+        return;
+      }
 
-        // Nếu ID ổn, thêm vào giỏ
-        inboundCtrl.addToCart(
-          {
-            'productPackageId': realPkgId,
-            'displayName': displayName,
-            'packageInfo': package,
-            'importPrice': package?.importPrice ?? 0.0,
-            'currentStock': currentStock,
-            'reorderThreshold': threshold,
-          },
+      // Đóng gói data chung
+      final Map<String, dynamic> cartData = {
+        'productPackageId': realPkgId,
+        'displayName': displayName,
+        'packageInfo': package,
+        'importPrice': package?.importPrice ?? 0.0,
+        'sellingPrice': package?.sellingPrice ?? 0.0,
+        'currentStock': currentStock,
+        'reorderThreshold': threshold,
+      };
+
+      // CHIA NHÁNH: XEM ĐANG MỞ TỪ INBOUND HAY OUTBOUND
+      if (Get.isRegistered<InboundTransactionController>()) {
+        Get.find<InboundTransactionController>().addToCart(
+          cartData,
           quantity: int.tryParse(quantityController.text) ?? 1,
           customPrice: double.tryParse(priceController.text),
         );
+        FullScreenLoaderUtils.stopLoading();
+        Get.until(
+            (route) => route.settings.name == AppRoutes.inboundTransaction);
+      } else if (Get.isRegistered<OutboundTransactionController>()) {
+        // Get.find<OutboundTransactionController>().addToCart(
+        //   cartData,
+        //   quantity: int.tryParse(quantityController.text) ?? 1,
+        //   customPrice: double.tryParse(priceController.text),
+        // );
+        FullScreenLoaderUtils.stopLoading();
+        Get.until(
+            (route) => route.settings.name == AppRoutes.outboundTransaction);
       }
-
-      FullScreenLoaderUtils.stopLoading();
-      Get.until((route) => route.settings.name == AppRoutes.inboundTransaction);
     } catch (e) {
       FullScreenLoaderUtils.stopLoading();
-      debugPrint('========== [❌ LỖI EXCEPTION THÊM GIỎ HÀNG] ==========');
-      debugPrint(e.toString());
       handleError(e);
     }
   }

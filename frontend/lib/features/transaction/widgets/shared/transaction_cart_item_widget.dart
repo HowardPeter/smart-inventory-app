@@ -5,12 +5,12 @@ import 'package:frontend/core/ui/theme/app_colors.dart';
 import 'package:get/get.dart';
 import 'package:iconsax_flutter/iconsax_flutter.dart';
 
-class InboundTransactionCartItemWidget extends StatelessWidget {
+class TransactionCartItemWidget extends StatelessWidget {
   final TransactionDetailModel item;
   final VoidCallback onIncrease;
   final VoidCallback onDecrease;
 
-  const InboundTransactionCartItemWidget({
+  const TransactionCartItemWidget({
     super.key,
     required this.item,
     required this.onIncrease,
@@ -19,13 +19,16 @@ class InboundTransactionCartItemWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    // Nếu không có tên thì fallback về ID
     final name = item.packageInfo?.displayName ??
         '${TTexts.product.tr} #${item.productPackageId?.substring(0, 5) ?? TTexts.labelNoBarcode.tr}';
 
+    // Giá tiền (Đô la)
     final price = item.unitPrice.toStringAsFixed(2);
 
     return Container(
       padding: const EdgeInsets.all(12),
+      margin: const EdgeInsets.only(bottom: 12), // Cách khoảng cho danh sách
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(16),
@@ -39,6 +42,7 @@ class InboundTransactionCartItemWidget extends StatelessWidget {
       ),
       child: Row(
         children: [
+          // 1. ICON BOX ĐƠN GIẢN (THAY CHO ẢNH)
           Container(
             width: 60,
             height: 60,
@@ -49,6 +53,8 @@ class InboundTransactionCartItemWidget extends StatelessWidget {
             child: const Icon(Iconsax.box_1_copy, color: AppColors.subText),
           ),
           const SizedBox(width: 12),
+
+          // 2. THÔNG TIN (TÊN & GIÁ)
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -76,6 +82,8 @@ class InboundTransactionCartItemWidget extends StatelessWidget {
               ],
             ),
           ),
+
+          // 3. CỤM TĂNG / GIẢM SỐ LƯỢNG
           Row(
             children: [
               GestureDetector(

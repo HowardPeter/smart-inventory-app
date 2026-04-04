@@ -70,8 +70,7 @@ class TransactionBottomSheetWidget extends StatelessWidget {
           customIcon: _buildLayerIcon(isMinus: true),
           fontSize: 16,
           onPressed: () {
-            Get.back();
-            // Điều hướng Outbound
+            Get.toNamed(AppRoutes.outboundTransaction);
           },
         ),
         const SizedBox(height: AppSizes.p12),

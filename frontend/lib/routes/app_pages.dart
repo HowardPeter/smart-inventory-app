@@ -37,8 +37,10 @@ import 'package:frontend/features/profile/views/profile_view.dart';
 import 'package:frontend/features/search/bindings/search_binding.dart';
 import 'package:frontend/features/search/views/search_view.dart';
 import 'package:frontend/features/transaction/bindings/inbound_transaction_binding.dart';
+import 'package:frontend/features/transaction/bindings/outbound_transaction_binding.dart';
 import 'package:frontend/features/transaction/bindings/transaction_item_add_binding.dart';
 import 'package:frontend/features/transaction/views/inbound_transaction_view.dart';
+import 'package:frontend/features/transaction/views/outbound_transaction_view.dart';
 import 'package:frontend/features/transaction/views/transaction_item_add_view.dart';
 import 'package:frontend/features/workspace/bindings/add_members_binding.dart';
 import 'package:frontend/features/workspace/bindings/create_store_binding.dart';
@@ -252,6 +254,14 @@ class AppPages {
       name: AppRoutes.inboundTransaction,
       page: () => const InboundTransactionView(),
       binding: InboundTransactionBinding(),
+      transition: Transition.cupertino,
+    ),
+
+    // -- Outbound Transaction
+    GetPage(
+      name: AppRoutes.outboundTransaction,
+      page: () => const OutboundTransactionView(),
+      binding: OutboundTransactionBinding(),
       transition: Transition.cupertino,
     ),
 

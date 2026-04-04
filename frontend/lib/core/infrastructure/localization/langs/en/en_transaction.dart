@@ -27,6 +27,13 @@ final Map<String, String> enTransaction = {
   TTexts.backToHome: "Back to Home",
   TTexts.scanProductBarcode: "Scan Product Barcode",
 
+  // -- Outbound
+  TTexts.outboundTransactionTitle: 'Outbound Transaction',
+  TTexts.searchDot: 'Search ...',
+  TTexts.confirmExport: 'Confirm export',
+  TTexts.stocksLabel: 'Stocks:',
+  TTexts.outOfStockAlert: 'Not enough stock available!',
+
   // --- Transaction Item Add ---
   TTexts.loadingAddingToCart: "Adding to transaction...",
   TTexts.productNameUnknown: "Unknown Product",
@@ -53,4 +60,26 @@ final Map<String, String> enTransaction = {
   TTexts.inactive: "Inactive",
   TTexts.product: "Product",
   TTexts.recentlyAddedSuggested: "Recently Added / Suggested",
+
+  TTexts.checkoutDetails: 'Checkout Details',
+  TTexts.transactionReason: 'Reason',
+  TTexts.selectReason: 'Select a reason',
+  TTexts.transactionNote: 'Note (Optional)',
+  TTexts.noteHint: 'Enter any additional details...',
+  TTexts.priceChangeDetected: 'Price Change Detected',
+  TTexts.priceChangeMessage: 'You have modified the prices for some items in this transaction. Do you want to permanently update their default prices in the catalog?',
+  TTexts.updatePricesAndCreate: 'Update Prices & Complete',
+  TTexts.justCreateTransaction: 'No, Just Complete Transaction',
+  TTexts.transactionSuccessTitle: 'Transaction success!!!',
+  TTexts.transactionSuccessSub: 'Your transaction is complete.\nPlease check your stock!',
+  TTexts.transactionNumber: 'Transaction Number',
+  TTexts.transactionDate: 'Transaction Date',
+  TTexts.transactionType: 'Transaction Type',
+  TTexts.totalItemsTransaction: 'Total Items / Transaction',
+  TTexts.checkDetails: 'Check Details',
+  TTexts.transactionDetails: 'Transaction Details',
+  TTexts.reasonSales: 'Sales',
+  TTexts.reasonDamaged: 'Damaged / Expired',
+  TTexts.reasonReturn: 'Returned to Supplier',
+  TTexts.reasonOther: 'Other',
 };
