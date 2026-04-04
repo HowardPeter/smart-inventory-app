@@ -1,51 +1,75 @@
 import 'package:frontend/core/infrastructure/models/transaction_model.dart';
+import 'package:frontend/core/infrastructure/models/transaction_detail_model.dart';
 import 'package:frontend/core/infrastructure/network/app_client.dart';
 
 class TransactionProvider {
   final _apiClient = ApiClient();
 
-  // ==========================================
-  // 1. CÁC HÀM MOCK (Dùng để test UI)
-  // ==========================================
-
   Future<bool> createTransaction(TransactionModel data) async {
-    await Future.delayed(const Duration(seconds: 2)); // Giả lập call mạng
+    await Future.delayed(const Duration(seconds: 2));
     return true;
   }
 
-  Future<List<Map<String, dynamic>>> getSuggestedPackagesForInbound() async {
-    await Future.delayed(const Duration(milliseconds: 500));
-    return [
-      {
-        'productPackageId': 'pkg-001',
-        'displayName': 'Coca-cola (330ml)',
-        'importPrice': 15000.0,
-        'imageUrl': 'https://example.com/coca.png',
-        'currentStock': 0,
-        'reorderThreshold': 20,
-      },
-      {
-        'productPackageId': 'pkg-002',
-        'displayName': 'Lay\'s Classic Potato Chips',
-        'importPrice': 45000.0,
-        'imageUrl': 'https://example.com/lays.png',
-        'currentStock': 5,
-        'reorderThreshold': 10,
-      },
-      {
-        'productPackageId': 'pkg-003',
-        'displayName': 'Oreo Sandwich Cookies',
-        'importPrice': 40000.0,
-        'imageUrl': 'https://example.com/oreo.png',
-        'currentStock': 50,
-        'reorderThreshold': 15,
-      },
-    ];
-  }
+ 
 
-  // ==========================================
-  // 2. CÁC HÀM GỌI API THẬT
-  // ==========================================
+  // 🟢 MOCK: LẤY CÁC GIAO DỊCH NHẬP KHO (INBOUND) CŨ LÀM LÔ HÀNG (FIFO)
+  Future<List<TransactionModel>> getInboundTransactionsForPackage(
+      String packageId) async {
+    await Future.delayed(const Duration(milliseconds: 300));
+
+    // Test với Coca Carton (hoặc Coca Can)
+    if (packageId == '22222222-2222-4222-a222-222222222010' ||
+        packageId == '22222222-2222-4222-a222-222222222009') {
+      return [
+        TransactionModel(
+          transactionId: "tx-inbound-001",
+          createdAt: DateTime.parse("2026-01-10 08:00:00"),
+          type: "INBOUND",
+          status: "COMPLETED",
+          totalPrice: 0,
+          items: [
+            TransactionDetailModel(
+                productPackageId: packageId, quantity: 5, unitPrice: 6.0)
+          ],
+        ),
+        TransactionModel(
+          transactionId: "tx-inbound-002",
+          createdAt: DateTime.parse("2026-01-15 09:30:00"),
+          type: "INBOUND",
+          status: "COMPLETED",
+          totalPrice: 0,
+          items: [
+            TransactionDetailModel(
+                productPackageId: packageId, quantity: 10, unitPrice: 6.0)
+          ],
+        ),
+        TransactionModel(
+          transactionId: "tx-inbound-003",
+          createdAt: DateTime.parse("2026-02-01 10:00:00"),
+          note: "Lô này đã hết hàng để test UI",
+          type: "INBOUND",
+          status: "COMPLETED",
+          totalPrice: 0,
+          items: [
+            TransactionDetailModel(
+                productPackageId: packageId, quantity: 0, unitPrice: 6.0)
+          ], // 🟢 Lô hết hàng
+        ),
+        TransactionModel(
+          transactionId: "tx-inbound-004",
+          createdAt: DateTime.parse("2026-03-26 16:30:00"),
+          type: "INBOUND",
+          status: "COMPLETED",
+          totalPrice: 0,
+          items: [
+            TransactionDetailModel(
+                productPackageId: packageId, quantity: 20, unitPrice: 6.0)
+          ],
+        ),
+      ];
+    }
+    return [];
+  }
 
   Future<Map<String, dynamic>> getInventoryDetailByPackageId(
       String packageId) async {
@@ -58,7 +82,6 @@ class TransactionProvider {
     }
   }
 
-  // 🟢 THÊM MỚI: API cập nhật số lượng tồn kho (Mượn từ Inventory)
   Future<void> adjustInventory(String packageId,
       {required String type,
       required int quantity,
@@ -70,11 +93,10 @@ class TransactionProvider {
           'type': type,
           'quantity': quantity,
           if (reason != null) 'reason': reason,
-          if (note != null) 'note': note,
+          if (note != null) 'note': note
         });
   }
 
-  // 🟢 THÊM MỚI: API cập nhật cấu hình Product Package (Giá nhập)
   Future<void> updateProductPackage(
       String productPackageId, Map<String, dynamic> data) async {
     await _apiClient.patch('/api/product-packages/$productPackageId',

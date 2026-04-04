@@ -17,15 +17,6 @@ class InboundTransactionController extends GetxController with TErrorHandler {
 
   final RxList<TransactionDetailModel> cartItems =
       <TransactionDetailModel>[].obs;
-  final RxList<Map<String, dynamic>> suggestedProducts =
-      <Map<String, dynamic>>[].obs;
-  final RxBool isLoadingSuggestions = false.obs;
-
-  @override
-  void onInit() {
-    super.onInit();
-    fetchSuggestedProducts();
-  }
 
   double get totalFunds =>
       cartItems.fold(0, (sum, item) => sum + (item.quantity * item.unitPrice));
@@ -93,18 +84,6 @@ class InboundTransactionController extends GetxController with TErrorHandler {
         currentStock: item.currentStock,
         reorderThreshold: item.reorderThreshold,
       );
-    }
-  }
-
-  Future<void> fetchSuggestedProducts() async {
-    isLoadingSuggestions.value = true;
-    try {
-      final data = await _provider.getSuggestedPackagesForInbound();
-      suggestedProducts.assignAll(data);
-    } catch (e) {
-      handleError(e);
-    } finally {
-      isLoadingSuggestions.value = false;
     }
   }
 

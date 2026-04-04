@@ -45,8 +45,6 @@ final Map<String, String> enTransaction = {
   TTexts.errorNoPackageId: "Package ID not found or invalid",
   TTexts.item: "Item",
   TTexts.subtotal: "Subtotal",
-
-  // --- Mới thêm để khử hardcode ---
   TTexts.removeItem: "Remove Item",
   TTexts.confirmRemoveItemTransaction:
       "Are you sure you want to remove this item from the transaction?",
@@ -60,18 +58,19 @@ final Map<String, String> enTransaction = {
   TTexts.inactive: "Inactive",
   TTexts.product: "Product",
   TTexts.recentlyAddedSuggested: "Recently Added / Suggested",
-
   TTexts.checkoutDetails: 'Checkout Details',
   TTexts.transactionReason: 'Reason',
   TTexts.selectReason: 'Select a reason',
   TTexts.transactionNote: 'Note (Optional)',
   TTexts.noteHint: 'Enter any additional details...',
   TTexts.priceChangeDetected: 'Price Change Detected',
-  TTexts.priceChangeMessage: 'You have modified the prices for some items in this transaction. Do you want to permanently update their default prices in the catalog?',
+  TTexts.priceChangeMessage:
+      'You have modified the prices for some items in this transaction. Do you want to permanently update their default prices in the catalog?',
   TTexts.updatePricesAndCreate: 'Update Prices & Complete',
   TTexts.justCreateTransaction: 'No, Just Complete Transaction',
   TTexts.transactionSuccessTitle: 'Transaction success!!!',
-  TTexts.transactionSuccessSub: 'Your transaction is complete.\nPlease check your stock!',
+  TTexts.transactionSuccessSub:
+      'Your transaction is complete.\nPlease check your stock!',
   TTexts.transactionNumber: 'Transaction Number',
   TTexts.transactionDate: 'Transaction Date',
   TTexts.transactionType: 'Transaction Type',
@@ -82,4 +81,14 @@ final Map<String, String> enTransaction = {
   TTexts.reasonDamaged: 'Damaged / Expired',
   TTexts.reasonReturn: 'Returned to Supplier',
   TTexts.reasonOther: 'Other',
+  TTexts.selectBatchFIFO: 'Select batches',
+  TTexts.batchRemaining: 'left',
+  TTexts.expiresOn: 'Exp',
+  TTexts.batchExceedsStock: 'Quantity exceeds the selected batch stock!',
+  TTexts.quantityToExport: 'Quantity to export',
+  TTexts.importPriceLot: 'Import Price',
+  TTexts.sellingPriceLot: 'Selling Price',
+  TTexts.quantityToImport: 'Quantity to import',
+  TTexts.importedOn: "Imported",
+  TTexts.outOfStockBatch: "Out of stock",
 };

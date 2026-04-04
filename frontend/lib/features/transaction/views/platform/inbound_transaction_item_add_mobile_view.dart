@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:frontend/features/transaction/controllers/transaction_item_add_controller.dart';
+import 'package:frontend/features/transaction/controllers/inbound_transaction_item_add_controller.dart';
 import 'package:frontend/features/transaction/widgets/shared/transaction_header_widget.dart';
 import 'package:frontend/features/transaction/widgets/shared/transaction_quantity_selector_widget.dart';
-import 'package:frontend/features/transaction/widgets/shared/transaction_product_info_widget.dart'; // WIDGET MỚI
+import 'package:frontend/features/transaction/widgets/shared/transaction_product_info_widget.dart';
 import 'package:frontend/core/ui/widgets/t_primary_button_widget.dart';
 import 'package:frontend/core/ui/theme/app_colors.dart';
 import 'package:frontend/core/ui/theme/app_sizes.dart';
@@ -11,9 +11,9 @@ import 'package:frontend/core/ui/widgets/t_text_form_field_widget.dart';
 import 'package:frontend/core/infrastructure/constants/text_strings.dart';
 import 'package:iconsax_flutter/iconsax_flutter.dart';
 
-class TransactionItemAddMobileView
-    extends GetView<TransactionItemAddController> {
-  const TransactionItemAddMobileView({super.key});
+class InboundTransactionItemAddMobileView
+    extends GetView<InboundTransactionItemAddController> {
+  const InboundTransactionItemAddMobileView({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -22,10 +22,8 @@ class TransactionItemAddMobileView
       body: CustomScrollView(
         physics: const BouncingScrollPhysics(),
         slivers: [
-          // HEADER CÓ ẢNH
           TransactionHeaderWidget(
               imageUrl: controller.initialItem.product?.imageUrl),
-
           SliverToBoxAdapter(
             child: Container(
               decoration: const BoxDecoration(
@@ -35,10 +33,8 @@ class TransactionItemAddMobileView
               child: Column(
                 children: [
                   const SizedBox(height: AppSizes.p24),
-
-                  // 🟢 GỌI WIDGET MỚI ĐÃ TÁCH (Sạch sẽ!)
+                  // DÙNG CHUNG THÔNG TIN CƠ BẢN
                   const TransactionProductInfoWidget(),
-
                   const _Divider(),
 
                   _buildSectionTitle(TTexts.details.tr),
@@ -57,7 +53,8 @@ class TransactionItemAddMobileView
                     padding: const EdgeInsets.symmetric(
                         horizontal: AppSizes.p20, vertical: 16),
                     child: TTextFormFieldWidget(
-                      label: TTexts.labelImportPrice.tr,
+                      label:
+                          TTexts.importPriceLot.tr, // 🟢 HIỆN CHỮ IMPORT PRICE
                       hintText: '0.00',
                       controller: controller.priceController,
                       keyboardType:
@@ -90,7 +87,6 @@ class TransactionItemAddMobileView
                       ],
                     ),
                   ),
-
                   const SizedBox(height: 40),
                 ],
               ),
@@ -98,22 +94,7 @@ class TransactionItemAddMobileView
           ),
         ],
       ),
-      bottomNavigationBar: Container(
-        padding: const EdgeInsets.all(AppSizes.p20),
-        decoration: const BoxDecoration(
-          color: AppColors.white,
-          boxShadow: [
-            BoxShadow(
-                color: Color(0x0D000000), blurRadius: 15, offset: Offset(0, -5))
-          ],
-        ),
-        child: SafeArea(
-          child: TPrimaryButtonWidget(
-            text: TTexts.addToTransaction.tr,
-            onPressed: () => controller.confirmAndAddToCart(),
-          ),
-        ),
-      ),
+      bottomNavigationBar: _buildBottomButton(),
     );
   }
 
@@ -128,6 +109,25 @@ class TransactionItemAddMobileView
                 fontSize: 16,
                 fontWeight: FontWeight.bold,
                 color: AppColors.primaryText)),
+      ),
+    );
+  }
+
+  Widget _buildBottomButton() {
+    return Container(
+      padding: const EdgeInsets.all(AppSizes.p20),
+      decoration: const BoxDecoration(
+        color: AppColors.white,
+        boxShadow: [
+          BoxShadow(
+              color: Color(0x0D000000), blurRadius: 15, offset: Offset(0, -5))
+        ],
+      ),
+      child: SafeArea(
+        child: TPrimaryButtonWidget(
+          text: TTexts.addToTransaction.tr,
+          onPressed: () => controller.confirmAndAddToCart(),
+        ),
       ),
     );
   }

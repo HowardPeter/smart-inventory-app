@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:frontend/features/transaction/providers/transaction_provider.dart';
 import 'package:frontend/features/transaction/controllers/inbound_transaction_controller.dart';
-import 'package:frontend/features/transaction/controllers/outbound_transaction_controller.dart'; // 🟢 ĐÃ IMPORT OUTBOUND
 import 'package:frontend/features/inventory/controllers/inventory_controller.dart';
 import 'package:frontend/core/ui/widgets/t_snackbars_widget.dart';
 import 'package:frontend/core/infrastructure/models/inventory_model.dart';
@@ -13,7 +12,8 @@ import 'package:frontend/core/infrastructure/constants/text_strings.dart';
 import 'package:frontend/core/ui/theme/app_colors.dart';
 import 'package:frontend/routes/app_routes.dart';
 
-class TransactionItemAddController extends GetxController with TErrorHandler {
+class InboundTransactionItemAddController extends GetxController
+    with TErrorHandler {
   final TransactionProvider _provider = TransactionProvider();
 
   late final InventoryInsightDisplayModel initialItem;
@@ -32,18 +32,10 @@ class TransactionItemAddController extends GetxController with TErrorHandler {
     super.onInit();
     if (Get.arguments is InventoryInsightDisplayModel) {
       initialItem = Get.arguments;
-
-      // Mặc định nạp giá tuỳ thuộc vào việc đang ở Nhập kho hay Xuất kho
-      if (Get.isRegistered<OutboundTransactionController>()) {
-        priceController.text = initialItem
-                .inventory.productPackage?.sellingPrice
-                .toStringAsFixed(2) ??
-            '0.00';
-      } else {
-        priceController.text = initialItem.inventory.productPackage?.importPrice
-                .toStringAsFixed(2) ??
-            '0.00';
-      }
+      // INBOUND: MẶC ĐỊNH LẤY IMPORT PRICE
+      priceController.text = initialItem.inventory.productPackage?.importPrice
+              .toStringAsFixed(2) ??
+          '0.00';
 
       _calculateSubtotal();
       fetchFreshData(initialItem.inventory.productPackageId);
@@ -59,14 +51,14 @@ class TransactionItemAddController extends GetxController with TErrorHandler {
 
   InventoryModel get _activeInventory =>
       freshInventoryData.value ?? initialItem.inventory;
-
   String get displayName =>
       _activeInventory.productPackage?.displayName ??
       initialItem.product?.name ??
       TTexts.productNameUnknown.tr;
-
   String get barcode =>
       _activeInventory.productPackage?.barcodeValue ?? TTexts.labelNoBarcode.tr;
+  int get currentStock => _activeInventory.quantity;
+  int get threshold => _activeInventory.reorderThreshold;
 
   String get brandName {
     final brand = initialItem.product?.brand;
@@ -83,13 +75,11 @@ class TransactionItemAddController extends GetxController with TErrorHandler {
     return TTexts.uncategorized.tr;
   }
 
-  int get currentStock => _activeInventory.quantity;
-  int get threshold => _activeInventory.reorderThreshold;
-
+  // 🟢 CÁC HÀM UI CỦA PRODUCT INFO BỊ THIẾU ĐÃ ĐƯỢC BỔ SUNG
   String get healthStatusText {
-    if (currentStock <= 0) return TTexts.tabOutStock.tr;
-    if (currentStock <= threshold) return TTexts.tabLowStock.tr;
-    return TTexts.tabHealthy.tr;
+    if (currentStock <= 0) return TTexts.statusOut.tr;
+    if (currentStock <= threshold) return TTexts.statusLow.tr;
+    return TTexts.statusHealthy.tr;
   }
 
   Color get healthStatusColor {
@@ -109,7 +99,6 @@ class TransactionItemAddController extends GetxController with TErrorHandler {
 
   Future<void> fetchFreshData(String packageId) async {
     if (packageId.isEmpty || packageId == 'null') return;
-
     try {
       isLoadingFreshData.value = true;
       final data = await _provider.getInventoryDetailByPackageId(packageId);
@@ -140,21 +129,13 @@ class TransactionItemAddController extends GetxController with TErrorHandler {
 
       final package = _activeInventory.productPackage ??
           initialItem.inventory.productPackage;
-
-      final String activeId = _activeInventory.productPackageId;
-      final String packageInfoId = package?.productPackageId ?? '';
-      final String initialId = initialItem.inventory.productPackageId;
-
-      String realPkgId = '';
-      if (activeId.isNotEmpty && activeId != 'null') {
-        realPkgId = activeId;
-      } else if (packageInfoId.isNotEmpty && packageInfoId != 'null') {
-        realPkgId = packageInfoId;
-      } else if (initialId.isNotEmpty && initialId != 'null') {
-        realPkgId = initialId;
+      String realPkgId = _activeInventory.productPackageId;
+      if (realPkgId.isEmpty || realPkgId == 'null') {
+        realPkgId =
+            package?.productPackageId ?? initialItem.inventory.productPackageId;
       }
 
-      if (realPkgId.isEmpty) {
+      if (realPkgId.isEmpty || realPkgId == 'null') {
         FullScreenLoaderUtils.stopLoading();
         TSnackbarsWidget.error(
             title: TTexts.errorTitle.tr,
@@ -162,7 +143,6 @@ class TransactionItemAddController extends GetxController with TErrorHandler {
         return;
       }
 
-      // Đóng gói data chung
       final Map<String, dynamic> cartData = {
         'productPackageId': realPkgId,
         'displayName': displayName,
@@ -173,26 +153,14 @@ class TransactionItemAddController extends GetxController with TErrorHandler {
         'reorderThreshold': threshold,
       };
 
-      // CHIA NHÁNH: XEM ĐANG MỞ TỪ INBOUND HAY OUTBOUND
-      if (Get.isRegistered<InboundTransactionController>()) {
-        Get.find<InboundTransactionController>().addToCart(
-          cartData,
-          quantity: int.tryParse(quantityController.text) ?? 1,
-          customPrice: double.tryParse(priceController.text),
-        );
-        FullScreenLoaderUtils.stopLoading();
-        Get.until(
-            (route) => route.settings.name == AppRoutes.inboundTransaction);
-      } else if (Get.isRegistered<OutboundTransactionController>()) {
-        // Get.find<OutboundTransactionController>().addToCart(
-        //   cartData,
-        //   quantity: int.tryParse(quantityController.text) ?? 1,
-        //   customPrice: double.tryParse(priceController.text),
-        // );
-        FullScreenLoaderUtils.stopLoading();
-        Get.until(
-            (route) => route.settings.name == AppRoutes.outboundTransaction);
-      }
+      Get.find<InboundTransactionController>().addToCart(
+        cartData,
+        quantity: int.tryParse(quantityController.text) ?? 1,
+        customPrice: double.tryParse(priceController.text),
+      );
+
+      FullScreenLoaderUtils.stopLoading();
+      Get.until((route) => route.settings.name == AppRoutes.inboundTransaction);
     } catch (e) {
       FullScreenLoaderUtils.stopLoading();
       handleError(e);

@@ -623,14 +623,14 @@ class TTexts {
   static const String backToHome = "back_to_home";
   static const String scanProductBarcode = "scan_product_barcode";
 
-  // --- Outbound --- 
+  // --- Outbound ---
   static const String outboundTransactionTitle = "outbound_transaction_title";
   static const String searchDot = "search_dot";
   static const String confirmExport = "confirm_export";
   static const String stocksLabel = "stocks_label";
   static const String outOfStockAlert = "out_of_stock_alert";
 
-  // --- Transaction Item Add ---
+  // --- Inbound/Outbound Transaction Item Add ---
   static const String loadingAddingToCart = "loading_adding_to_cart";
   static const String productNameUnknown = "product_name_unknown";
   static const String labelNoBarcode = "label_no_barcode";
@@ -655,7 +655,6 @@ class TTexts {
   static const String inactive = "inactive";
   static const String product = "product";
   static const String recentlyAddedSuggested = "recently_added_suggested";
-  
   static const String checkoutDetails = "checkout_details";
   static const String transactionReason = "transaction_reason";
   static const String selectReason = "select_reason";
@@ -677,7 +676,14 @@ class TTexts {
   static const String reasonDamaged = "reason_damaged";
   static const String reasonReturn = "reason_return";
   static const String reasonOther = "reason_other";
-
+  static const String selectBatchFIFO = "select_batch_fifo";
+  static const String batchRemaining = "batch_remaining";
+  static const String expiresOn = "expires_on";
+  static const String batchExceedsStock = "batch_exceeds_stock";
+  static const String quantityToExport = "quantity_to_export";
+  static const String sellingPriceLot = "selling_price_lot";
+  static const String importedOn = "imported_on";
+  static const String outOfStockBatch = "out_of_stock_batch";
 
   //--Profile
   static const String profileTitle = 'profile_title';
