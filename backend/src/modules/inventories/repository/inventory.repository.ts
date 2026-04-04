@@ -13,6 +13,7 @@ import type {
   InventoryResponseDto,
   ListInventoriesQueryDto,
   UpdateInventoryDto,
+  AdjustInventoryForTransactionDto,
 } from '../dto/inventory.dto.js';
 import type { InventoryStatus } from '../inventory.type.js';
 
@@ -397,52 +398,57 @@ export class InventoryRepository {
     });
   }
 
-  async increaseManyForImport(
-    storeId: string,
-    userId: string,
-    items: {
-      inventoryId: string;
-      productPackageId: string;
-      currentQuantity: number;
-      importQuantity: number;
-      unitPrice: number;
-      transactionId: string;
-    }[],
+  async increaseManyForTransaction(
+    items: AdjustInventoryForTransactionDto[],
   ): Promise<void> {
-    for (const item of items) {
-      const nextQuantity = item.currentQuantity + item.importQuantity;
+    await Promise.all(
+      items.map((item) =>
+        this.prisma.inventory.update({
+          where: {
+            inventoryId: item.inventoryId,
+          },
+          data: {
+            // Dùng atomic increment để cộng tồn trực tiếp ở DB
+            quantity: {
+              increment: item.transactionQuantity,
+            },
+          },
+        }),
+      ),
+    );
+  }
 
-      await this.prisma.inventory.update({
+  async decreaseManyForTransaction(
+    items: AdjustInventoryForTransactionDto[],
+  ): Promise<Set<string>> {
+    const failedProductPackageIds = new Set<string>();
+
+    for (const item of items) {
+      const result = await this.prisma.inventory.updateMany({
         where: {
           inventoryId: item.inventoryId,
+
+          // DB-level check: chỉ update khi quantity hiện tại vẫn đủ để xuất
+          quantity: {
+            gte: item.transactionQuantity,
+          },
         },
         data: {
-          quantity: nextQuantity,
+          quantity: {
+            decrement: item.transactionQuantity,
+          },
         },
       });
 
-      await this.prisma.auditLog.create({
-        data: {
-          actionType: 'update',
-          entityType: 'Inventory',
-          userId,
-          storeId,
-          note: `Import transaction ${item.transactionId}`,
-          oldValue: {
-            quantity: item.currentQuantity,
-          },
-          newValue: {
-            quantity: nextQuantity,
-            changedQuantity: item.importQuantity,
-            adjustmentType: 'increase',
-            reason: 'import transaction',
-            productPackageId: item.productPackageId,
-            transactionId: item.transactionId,
-            unitPrice: item.unitPrice,
-          },
-        },
-      });
+      // count = 0 nghĩa là update không xảy ra:
+      // - hoặc inventory không tồn tại
+      // - hoặc quantity không đủ tại thời điểm update
+      if (result.count === 0) {
+        failedProductPackageIds.add(item.productPackageId);
+      }
     }
+
+    return failedProductPackageIds;
   }
 
   async delete(

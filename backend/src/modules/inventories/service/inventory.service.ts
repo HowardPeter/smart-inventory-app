@@ -6,6 +6,7 @@ import {
   normalizePagination,
 } from '../../../common/utils/index.js';
 import { prisma } from '../../../db/prismaClient.js';
+import { TransactionType } from '../../../generated/prisma/enums.js';
 import { InventoryRepository } from '../repository/inventory.repository.js';
 
 import type { DbClient } from '../../../common/types/index.js';
@@ -20,6 +21,7 @@ import type {
   ListInventoriesResponseDto,
   LowStockInventoriesResponseDto,
   UpdateInventoryDto,
+  InventoryForTransactionData,
 } from '../dto/inventory.dto.js';
 
 /* Service xử lý business logic cho module Inventory.
@@ -274,15 +276,10 @@ export class InventoryService {
     });
   }
 
-  async increaseInventoriesForImport(
+  async adjustInventoriesForTransaction(
+    transactionType: TransactionType,
     storeId: string,
-    userId: string,
-    items: {
-      productPackageId: string;
-      quantity: number;
-      unitPrice: number;
-      transactionId: string;
-    }[],
+    items: InventoryForTransactionData[],
     db: DbClient,
   ): Promise<void> {
     // NOTE: Truyền db (TransactionClient) từ ngoài vào
@@ -305,7 +302,7 @@ export class InventoryService {
       ]),
     );
 
-    // Transform items về data shape của hàm increaseManyForImport
+    // Transform items về data shape của hàm adjustManyForTransaction
     const inventoryItems = items.map((item) => {
       // Lấy inventory hiện tại từ Map
       const inventory = inventoryMap.get(item.productPackageId);
@@ -318,22 +315,59 @@ export class InventoryService {
         });
       }
 
-      // Trả về data shape làm tham số hàm increaseManyForImport
+      // Nếu là export transaction, check `current quantity - new quantity < 0`
+      if (transactionType === 'export') {
+        if (inventory.quantity < item.quantity) {
+          throw new CustomError({
+            message: 'Insufficient inventory quantity',
+            status: StatusCodes.BAD_REQUEST,
+          });
+        }
+      }
+
+      // Trả về data shape của tham số items hàm repository
       return {
         inventoryId: inventory.inventoryId,
         productPackageId: item.productPackageId,
-        currentQuantity: inventory.quantity, // quantity hiện tại trong DB
-        importQuantity: item.quantity, // số lượng nhập thêm
-        unitPrice: item.unitPrice, // giá nhập (audit log/valuation nếu cần)
-        transactionId: item.transactionId, // liên kết transaction để trace
+        quantity: inventory.quantity, // quantity hiện tại
+        transactionQuantity: item.quantity, // quantity trong transaction
+        unitPrice: item.unitPrice,
+        transactionId: item.transactionId,
       };
     });
 
-    await inventoryRepository.increaseManyForImport(
-      storeId,
-      userId,
-      inventoryItems,
-    );
+    switch (transactionType) {
+      case 'import':
+        await this.inventoryRepository.increaseManyForTransaction(
+          inventoryItems,
+        );
+
+        return;
+      case 'export': {
+        const failedProductPackageIds =
+          await inventoryRepository.decreaseManyForTransaction(
+            inventoryItems,
+          );
+
+        // nếu có inventory bị lỗi khi trừ, return lỗi + packageId tương ứng
+        if (failedProductPackageIds.size > 0) {
+          throw new CustomError({
+            message: 'Insufficient inventory quantity',
+            status: StatusCodes.BAD_REQUEST,
+            details: {
+              productPackageIds: failedProductPackageIds,
+            },
+          });
+        }
+
+        return;
+      }
+      default:
+        throw new CustomError({
+          message: `Unsupported transaction type: ${transactionType}`,
+          status: StatusCodes.BAD_REQUEST,
+        });
+    }
   }
 
   async deleteInventory(

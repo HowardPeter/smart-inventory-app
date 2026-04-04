@@ -178,9 +178,9 @@ export class TransactionService {
       });
 
       // Cập nhật tồn kho
-      await this.inventoryService.increaseInventoriesForImport(
+      await this.inventoryService.adjustInventoriesForTransaction(
+        'import',
         storeId,
-        userId,
         data.items.map((item) => ({
           productPackageId: item.productPackageId,
           quantity: item.quantity,
