@@ -619,7 +619,6 @@ class TTexts {
   static const String confirmImportTitle = "confirm_import_title";
   static const String confirmImportDescription = "confirm_import_description";
   static const String proceedImport = "proceed_import";
-  
 
   // --- Outbound ---
   static const String outboundTransactionTitle = "outbound_transaction_title";
@@ -707,6 +706,9 @@ class TTexts {
   static const String total = "total";
   static const String totalQuantity = "total_quantity";
   static const String specifyBatchQuantity = "specify_batch_quantity";
+
+  // -- Transaction Summary
+  static const String qty = "qty";
 
   //--Profile
   static const String profileTitle = 'profile_title';

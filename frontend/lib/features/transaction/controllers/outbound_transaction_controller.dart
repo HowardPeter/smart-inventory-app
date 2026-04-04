@@ -9,6 +9,7 @@ import 'package:frontend/core/ui/widgets/t_snackbars_widget.dart';
 import 'package:frontend/core/ui/widgets/t_custom_dialog_widget.dart';
 import 'package:frontend/core/ui/theme/app_colors.dart';
 import 'package:frontend/features/transaction/providers/transaction_provider.dart';
+import 'package:frontend/routes/app_routes.dart';
 import 'package:get/get.dart';
 
 class OutboundTransactionController extends GetxController with TErrorHandler {
@@ -235,6 +236,8 @@ class OutboundTransactionController extends GetxController with TErrorHandler {
       cartItems.clear();
       noteController.clear();
       selectedReason.value = TTexts.reasonRetailSale;
+
+      Get.offNamed(AppRoutes.transactionSummary, arguments: transaction);
 
       TSnackbarsWidget.success(
           title: TTexts.successTitle.tr,

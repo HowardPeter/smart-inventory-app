@@ -32,6 +32,7 @@ class AppRoutes {
   static const inboundTransactionItemAdd = '/inbound_transaction_item_add';
   static const outboundTransaction = '/outbound_transaction';
   static const outboundTransactionItemAdd = '/outbound_transaction_item_add';
+  static const transactionSummary = '/transaction_summary';
 
   static const profile = '/profile';
   static const editProfile = '/edit_profile';

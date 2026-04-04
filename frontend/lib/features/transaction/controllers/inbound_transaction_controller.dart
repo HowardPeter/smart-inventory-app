@@ -5,6 +5,7 @@ import 'package:frontend/core/infrastructure/models/transaction_model.dart';
 import 'package:frontend/core/infrastructure/utils/error_handler_utils.dart';
 import 'package:frontend/core/ui/layouts/t_barcode_scanner_layout.dart';
 import 'package:frontend/features/transaction/providers/transaction_provider.dart';
+import 'package:frontend/routes/app_routes.dart';
 import 'package:get/get.dart';
 import 'package:frontend/core/infrastructure/utils/full_screen_loader_utils.dart';
 import 'package:frontend/core/ui/widgets/t_snackbars_widget.dart';
@@ -230,7 +231,8 @@ class InboundTransactionController extends GetxController with TErrorHandler {
       cartItems.clear();
       noteController.clear();
 
-      Get.back();
+      Get.offNamed(AppRoutes.transactionSummary, arguments: transaction);
+
       TSnackbarsWidget.success(
           title: TTexts.successTitle.tr,
           message: TTexts.importTicketCreated.tr);

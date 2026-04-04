@@ -40,10 +40,12 @@ import 'package:frontend/features/transaction/bindings/inbound_transaction_bindi
 import 'package:frontend/features/transaction/bindings/outbound_transaction_binding.dart';
 import 'package:frontend/features/transaction/bindings/inbound_transaction_item_add_binding.dart';
 import 'package:frontend/features/transaction/bindings/outbound_transaction_item_add_binding.dart';
+import 'package:frontend/features/transaction/bindings/transaction_summary_binding.dart';
 import 'package:frontend/features/transaction/views/inbound_transaction_view.dart';
 import 'package:frontend/features/transaction/views/outbound_transaction_item_add_view.dart';
 import 'package:frontend/features/transaction/views/outbound_transaction_view.dart';
 import 'package:frontend/features/transaction/views/inbound_transaction_item_add_view.dart';
+import 'package:frontend/features/transaction/views/transaction_summary_view.dart';
 import 'package:frontend/features/workspace/bindings/add_members_binding.dart';
 import 'package:frontend/features/workspace/bindings/create_store_binding.dart';
 import 'package:frontend/features/workspace/bindings/join_store_binding.dart';
@@ -280,6 +282,14 @@ class AppPages {
       name: AppRoutes.outboundTransactionItemAdd,
       page: () => const OutboundTransactionItemAddView(),
       binding: OutboundTransactionItemAddBinding(),
+      transition: Transition.cupertino,
+    ),
+
+    // -- Transaction Summary
+    GetPage(
+      name: AppRoutes.transactionSummary,
+      page: () => const TransactionSummaryView(),
+      binding: TransactionSummaryBinding(),
       transition: Transition.cupertino,
     ),
 

@@ -27,7 +27,8 @@ final Map<String, String> enTransaction = {
   TTexts.backToHome: "Back to Home",
   TTexts.scanProductBarcode: "Scan Product Barcode",
   TTexts.confirmImportTitle: "Confirm Import",
-  TTexts.confirmImportDescription: "Are you sure you want to complete this inbound transaction? This action will add stock to your inventory.",
+  TTexts.confirmImportDescription:
+      "Are you sure you want to complete this inbound transaction? This action will add stock to your inventory.",
   TTexts.proceedImport: "Confirm & Import",
 
   // -- Outbound
@@ -120,4 +121,7 @@ final Map<String, String> enTransaction = {
   TTexts.totalQuantity: "Total Quantity",
   TTexts.specifyBatchQuantity:
       "Please specify the quantity from the batches above.",
+
+  // -- Transaction Summary
+  TTexts.qty: "Qty",
 };
