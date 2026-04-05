@@ -1,10 +1,10 @@
 import type { Transaction, TransactionDetail } from './transaction.type.js';
 import type { Prisma } from '../../generated/prisma/client.js';
+import type { ProductPackageResponseForTransaction } from '../product-packages/index.js';
 
-export type ImportTransactionResponseDto = Omit<
-  Transaction,
-  'userId' | 'storeId'
->;
+export type ProductPackageData = ProductPackageResponseForTransaction;
+
+export type TransactionResponseDto = Omit<Transaction, 'userId' | 'storeId'>;
 
 export type TransactionDetailResponseDto = TransactionDetail;
 
@@ -17,21 +17,19 @@ export type CreateTransactionDetailData = {
   }[];
 };
 
-export type CreateImportTransactionData = {
+export type CreateTransactionData = {
+  type: 'import' | 'export';
   note?: string | null;
   totalPrice: number;
   userId: string;
   storeId: string;
 };
 
-export type CreateImportTransactionItemDto = Omit<
-  TransactionDetail,
-  'transactionId'
->;
+export type CreateTransactionItemDto = Omit<TransactionDetail, 'transactionId'>;
 
-export type CreateImportTransactionDto = {
+export type CreateTransactionDto = {
   note?: string | null;
-  items: CreateImportTransactionItemDto[];
+  items: CreateTransactionItemDto[];
 };
 
 // Thay đổi về giá package để hỏi user xác nhận cập nhật price cho package
@@ -41,14 +39,12 @@ export type PriceUpdateSuggestionDto = {
   latestImportUnitPrice: number;
 };
 
-export type CreateImportTransactionResultDto = Omit<
-  Transaction,
-  'userId' | 'storeId'
-> & {
-  items: CreateImportTransactionItemDto[];
+type CreateTransactionResultDto = Omit<Transaction, 'userId' | 'storeId'> & {
+  items: CreateTransactionItemDto[];
 };
 
-export type CreateImportTransactionResponseDto =
-  CreateImportTransactionResultDto & {
-    priceUpdateSuggestions: PriceUpdateSuggestionDto[];
-  };
+export type CreateImportTransactionResponseDto = CreateTransactionResultDto & {
+  priceUpdateSuggestions: PriceUpdateSuggestionDto[];
+};
+
+export type CreateExportTransactionResponseDto = CreateTransactionResultDto;

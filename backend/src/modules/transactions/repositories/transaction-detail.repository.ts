@@ -34,10 +34,6 @@ export class TransactionDetailRepository {
   }
 
   async createMany(data: CreateTransactionDetailData): Promise<void> {
-    if (data.items.length === 0) {
-      return;
-    }
-
     await this.db.transactionDetail.createMany({
       data: data.items.map((item) => ({
         transactionId: data.transactionId,

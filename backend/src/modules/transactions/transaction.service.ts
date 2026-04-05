@@ -9,9 +9,12 @@ import { InventoryService } from '../inventories/index.js';
 import { ProductPackageService } from '../product-packages/index.js';
 
 import type {
-  CreateImportTransactionDto,
+  CreateTransactionDto,
   CreateImportTransactionResponseDto,
   PriceUpdateSuggestionDto,
+  CreateExportTransactionResponseDto,
+  CreateTransactionItemDto,
+  ProductPackageData,
 } from './transaction.dto.js';
 
 export class TransactionService {
@@ -20,9 +23,7 @@ export class TransactionService {
     private readonly inventoryService: InventoryService,
   ) {}
 
-  private ensureNoDuplicateProductPackageIds(
-    data: CreateImportTransactionDto,
-  ): void {
+  private ensureNoDuplicateProductPackageIds(data: CreateTransactionDto): void {
     // INFO: Sử dụng Set giúp kiểm tra và loại bỏ phần tử trùng
     const productPackageIds = new Set<string>();
 
@@ -42,9 +43,7 @@ export class TransactionService {
     }
   }
 
-  private calculateTotalPrice(
-    data: CreateImportTransactionDto,
-  ): Prisma.Decimal {
+  private calculateTotalPrice(data: CreateTransactionDto): Prisma.Decimal {
     return data.items.reduce(
       (totalPrice, item) =>
         totalPrice.plus(new Prisma.Decimal(item.unitPrice).mul(item.quantity)),
@@ -53,16 +52,8 @@ export class TransactionService {
   }
 
   private buildPriceUpdateSuggestions(
-    data: CreateImportTransactionDto,
-    productPackageMap: Map<
-      string,
-      {
-        productPackageId: string;
-        productId: string;
-        displayName: string | null;
-        importPrice: number | null;
-      }
-    >,
+    data: CreateTransactionDto,
+    productPackageMap: Map<string, ProductPackageData>,
   ): PriceUpdateSuggestionDto[] {
     const priceUpdateSuggestions: PriceUpdateSuggestionDto[] = [];
 
@@ -97,21 +88,10 @@ export class TransactionService {
     return priceUpdateSuggestions;
   }
 
-  async createImportTransaction(
+  private async getProductPackageMap(
     storeId: string,
-    userId: string,
-    data: CreateImportTransactionDto,
-  ): Promise<CreateImportTransactionResponseDto> {
-    if (data.items.length === 0) {
-      throw new CustomError({
-        message: 'Items cannot be empty',
-        code: 'PACKAGE_ITEM_IS_EMPTY',
-        status: StatusCodes.BAD_REQUEST,
-      });
-    }
-
-    this.ensureNoDuplicateProductPackageIds(data);
-
+    data: CreateTransactionDto,
+  ): Promise<Map<string, ProductPackageData>> {
     // Lấy danh sách productPackageId unique
     const productPackageIds = Array.from(
       new Set(data.items.map((item) => item.productPackageId)),
@@ -133,17 +113,66 @@ export class TransactionService {
       ]),
     );
 
-    for (const item of data.items) {
-      const productPackage = productPackageMap.get(item.productPackageId);
+    return productPackageMap;
+  }
 
-      // Package không tồn tại
-      // Tránh trường hợp frontend load lỗi, data chưa sync, race condition
-      if (!productPackage) {
-        throw new CustomError({
-          message: 'Product package not found',
-          status: StatusCodes.NOT_FOUND,
-        });
-      }
+  private ensureProductPackageExists(
+    productPackageId: string,
+    productPackageMap: Map<string, ProductPackageData>,
+  ): void {
+    if (!productPackageMap.has(productPackageId)) {
+      throw new CustomError({
+        message: 'Product package not found',
+        status: StatusCodes.NOT_FOUND,
+      });
+    }
+  }
+
+  private validateItemValues(item: CreateTransactionItemDto): void {
+    // quantity phải > 0, số hữu hạn, số nguyên
+    if (
+      item.quantity < 0 ||
+      !Number.isFinite(item.quantity) ||
+      !Number.isInteger(item.quantity)
+    ) {
+      throw new CustomError({
+        message: 'Invalid quantity',
+        status: StatusCodes.BAD_REQUEST,
+      });
+    }
+
+    // quantity phải > 0, số hữu hạn
+    if (item.unitPrice <= 0 || !Number.isFinite(item.unitPrice)) {
+      throw new CustomError({
+        message: 'Invalid unitPrice',
+        status: StatusCodes.BAD_REQUEST,
+      });
+    }
+  }
+
+  async createImportTransaction(
+    storeId: string,
+    userId: string,
+    data: CreateTransactionDto,
+  ): Promise<CreateImportTransactionResponseDto> {
+    if (data.items.length === 0) {
+      throw new CustomError({
+        message: 'Items cannot be empty',
+        code: 'PACKAGE_ITEM_IS_EMPTY',
+        status: StatusCodes.BAD_REQUEST,
+      });
+    }
+
+    this.ensureNoDuplicateProductPackageIds(data);
+
+    // Lấy productPackage dạng Map để tối ưu lookup
+    const productPackageMap = await this.getProductPackageMap(storeId, data);
+
+    // Validate items
+    // phòng khi service được gọi bởi service khác mà không qua API
+    for (const item of data.items) {
+      this.ensureProductPackageExists(item.productPackageId, productPackageMap);
+      this.validateItemValues(item);
     }
 
     const totalPrice = this.calculateTotalPrice(data).toNumber();
@@ -159,14 +188,13 @@ export class TransactionService {
       const transactionRepositoryTx = new TransactionRepository(tx);
       const transactionDetailRepositoryTx = new TransactionDetailRepository(tx);
 
-      const transaction = await transactionRepositoryTx.createImportTransaction(
-        {
-          note: data.note ?? null,
-          totalPrice,
-          userId,
-          storeId,
-        },
-      );
+      const transaction = await transactionRepositoryTx.createOne({
+        type: 'import',
+        note: data.note ?? null,
+        totalPrice,
+        userId,
+        storeId,
+      });
 
       await transactionDetailRepositoryTx.createMany({
         transactionId: transaction.transactionId,
@@ -194,6 +222,74 @@ export class TransactionService {
         ...transaction,
         items: data.items,
         priceUpdateSuggestions,
+      };
+    });
+  }
+
+  async createExportTransaction(
+    storeId: string,
+    userId: string,
+    data: CreateTransactionDto,
+  ): Promise<CreateExportTransactionResponseDto> {
+    if (data.items.length === 0) {
+      throw new CustomError({
+        message: 'Items cannot be empty',
+        code: 'PACKAGE_ITEM_IS_EMPTY',
+        status: StatusCodes.BAD_REQUEST,
+      });
+    }
+
+    this.ensureNoDuplicateProductPackageIds(data);
+
+    // Lấy productPackage dạng Map để tối ưu lookup
+    const productPackageMap = await this.getProductPackageMap(storeId, data);
+
+    // Validate items
+    // phòng khi service được gọi bởi service khác mà không qua API
+    for (const item of data.items) {
+      this.ensureProductPackageExists(item.productPackageId, productPackageMap);
+      this.validateItemValues(item);
+    }
+
+    const totalPrice = this.calculateTotalPrice(data).toNumber();
+
+    return await prisma.$transaction(async (tx) => {
+      const transactionRepositoryTx = new TransactionRepository(tx);
+      const transactionDetailRepositoryTx = new TransactionDetailRepository(tx);
+
+      const transaction = await transactionRepositoryTx.createOne({
+        type: 'export',
+        note: data.note ?? null,
+        totalPrice,
+        userId,
+        storeId,
+      });
+
+      await transactionDetailRepositoryTx.createMany({
+        transactionId: transaction.transactionId,
+        items: data.items.map((item) => ({
+          productPackageId: item.productPackageId,
+          quantity: item.quantity,
+          unitPrice: new Prisma.Decimal(item.unitPrice),
+        })),
+      });
+
+      // Cập nhật tồn kho
+      await this.inventoryService.adjustInventoriesForTransaction(
+        'export',
+        storeId,
+        data.items.map((item) => ({
+          productPackageId: item.productPackageId,
+          quantity: item.quantity,
+          unitPrice: item.unitPrice,
+          transactionId: transaction.transactionId,
+        })),
+        tx,
+      );
+
+      return {
+        ...transaction,
+        items: data.items,
       };
     });
   }

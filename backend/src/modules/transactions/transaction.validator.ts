@@ -4,7 +4,7 @@ import { validateSchema } from '../../common/utils/index.js';
 
 import type { NextFunction, Request, Response } from 'express';
 
-const createImportTransactionBodySchema = z
+const createTransactionBodySchema = z
   .object({
     note: z.string().trim().max(1000).nullable().optional(),
     items: z
@@ -43,6 +43,15 @@ export const validateCreateImportTransaction = (
   _res: Response,
   next: NextFunction,
 ): void => {
-  req.body = validateSchema(createImportTransactionBodySchema, req.body);
+  req.body = validateSchema(createTransactionBodySchema, req.body);
+  next();
+};
+
+export const validateCreateExportTransaction = (
+  req: Request,
+  _res: Response,
+  next: NextFunction,
+): void => {
+  req.body = validateSchema(createTransactionBodySchema, req.body);
   next();
 };

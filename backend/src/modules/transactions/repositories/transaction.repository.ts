@@ -1,18 +1,18 @@
 import type { DbClient } from '../../../common/types/index.js';
 import type {
-  ImportTransactionResponseDto,
-  CreateImportTransactionData,
+  TransactionResponseDto,
+  CreateTransactionData,
 } from '../transaction.dto.js';
 
 export class TransactionRepository {
   constructor(private readonly db: DbClient) {}
 
-  async createImportTransaction(
-    data: CreateImportTransactionData,
-  ): Promise<ImportTransactionResponseDto> {
+  async createOne(
+    data: CreateTransactionData,
+  ): Promise<TransactionResponseDto> {
     const transaction = await this.db.transaction.create({
       data: {
-        type: 'import',
+        type: data.type,
         status: 'completed',
         note: data.note ?? null,
         totalPrice: data.totalPrice,
