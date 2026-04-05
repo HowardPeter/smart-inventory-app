@@ -45,7 +45,7 @@ class SearchProductModel {
       brand: json['brand'],
       categoryId: json['categoryId'] ?? '',
       categoryName: json['categoryName'] ?? '',
-      productPackageId: json['productPackageId'],
+      productPackageId: json['productPackageId'] ?? json['id'] ?? '',
       displayName: json['displayName'],
       barcodeValue: json['barcodeValue'],
       importPrice: json['importPrice']?.toDouble(),

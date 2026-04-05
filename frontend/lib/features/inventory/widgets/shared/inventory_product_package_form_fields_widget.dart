@@ -23,18 +23,24 @@ class InventoryProductPackageFormFieldsWidget
           const InventoryProductPackageUnitDropdownWidget(),
           const SizedBox(height: 24),
 
-          // 2. TÊN PHÂN LOẠI
+          // 2. TÊN PHÂN LOẠI (DỌC ĐỂ KHÔNG BỊ HẸP CHỮ)
+          TTextFormFieldWidget(
+            label: TTexts.displayNameLabel.tr,
+            hintText: TTexts.displayNameHint.tr,
+            isRequired: true,
+            readOnly:
+                true, // Không cho gõ vào ô này vì nó tự nhảy theo Listener
+            controller: controller.packageDisplayNameController,
+          ),
+          const SizedBox(height: 16),
+
           TTextFormFieldWidget(
             label: TTexts.variantNameLabel.tr,
             hintText: TTexts.variantNameHint.tr,
-            isRequired: true,
-            controller: controller.packageDisplayNameController,
-            validator: (v) => (v == null || v.trim().isEmpty)
-                ? TTexts.fieldRequired.tr
-                : null,
+            controller: controller.packageVariantNameController,
           ),
 
-          // --- DANH SÁCH CHIPS CUỘN NGANG ---
+          // 🟢 THANH GỢI Ý CHIPS
           Obx(() {
             final suggestions = controller.variantNameSuggestions;
             if (suggestions.isEmpty) return const SizedBox.shrink();
@@ -42,7 +48,7 @@ class InventoryProductPackageFormFieldsWidget
             return Padding(
               padding: const EdgeInsets.only(top: 12.0),
               child: SingleChildScrollView(
-                scrollDirection: Axis.horizontal, // Cuộn ngang
+                scrollDirection: Axis.horizontal,
                 physics: const BouncingScrollPhysics(),
                 child: Row(
                   children: suggestions
@@ -74,63 +80,31 @@ class InventoryProductPackageFormFieldsWidget
             children: [
               Expanded(
                 child: TTextFormFieldWidget(
-                  label: TTexts.importCost.tr,
-                  hintText: TTexts.zeroPointZero.tr,
+                  label: TTexts.importPriceLabel.tr,
+                  hintText: '0.0',
                   keyboardType: TextInputType.number,
-                  isRequired: true,
                   controller: controller.importPriceController,
-                  validator: (v) {
-                    // 1. Không được để trống
-                    if (v == null || v.trim().isEmpty) {
-                      return TTexts.fieldRequired.tr;
-                    }
-
-                    // 2. Phải là số hợp lệ
-                    final price = double.tryParse(v.trim());
-                    if (price == null) return TTexts.invalidNumber.tr;
-
-                    // 3. Phải lớn hơn 0
-                    if (price < 0) return TTexts.priceGreaterThanZero.tr;
-
-                    return null; // Hợp lệ
-                  },
                 ),
               ),
               const SizedBox(width: 16),
               Expanded(
                 child: TTextFormFieldWidget(
-                  label: TTexts.salePrice.tr,
-                  hintText: TTexts.zeroPointZero.tr,
+                  label: TTexts.sellingPriceLabel.tr,
+                  hintText: '0.0',
                   keyboardType: TextInputType.number,
-                  isRequired: true,
                   controller: controller.salePriceController,
-                  validator: (v) {
-                    // 1. Không được để trống
-                    if (v == null || v.trim().isEmpty) {
-                      return TTexts.fieldRequired.tr;
-                    }
-
-                    // 2. Phải là số hợp lệ
-                    final price = double.tryParse(v.trim());
-                    if (price == null) return TTexts.invalidNumber.tr;
-
-                    // 3. Phải lớn hơn 0
-                    if (price < 0) return TTexts.priceGreaterThanZero.tr;
-
-                    return null;
-                  },
                 ),
               ),
             ],
           ),
           const SizedBox(height: 24),
 
-          // 4. MỨC CẢNH BÁO
+          // 4. NGƯỠNG CẢNH BÁO TỒN KHO
           Row(
             crossAxisAlignment: CrossAxisAlignment.center,
             children: [
               Expanded(
-                flex: 1,
+                flex: 2,
                 child: TTextFormFieldWidget(
                   label: TTexts.reorderThresholdLabel.tr,
                   hintText: TTexts.zero.tr,
@@ -144,9 +118,9 @@ class InventoryProductPackageFormFieldsWidget
                   },
                 ),
               ),
-              const SizedBox(width: 12),
+              const SizedBox(width: 8),
               Padding(
-                padding: const EdgeInsets.only(top: 24.0),
+                padding: const EdgeInsets.only(top: 24),
                 child: Tooltip(
                   message: TTexts.zeroMeansNoLimit.tr,
                   triggerMode: TooltipTriggerMode.tap,

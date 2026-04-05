@@ -31,7 +31,6 @@ class _InventoryProductPackageUnitDropdownWidgetState
     super.initState();
     _animationController = AnimationController(
         vsync: this, duration: const Duration(milliseconds: 250));
-    // Hiệu ứng xổ xuống (SizeTransition)
     _animation = CurvedAnimation(
         parent: _animationController, curve: Curves.easeOutCubic);
   }
@@ -42,7 +41,6 @@ class _InventoryProductPackageUnitDropdownWidgetState
       _overlayEntry!.remove();
       _overlayEntry = null;
     }
-
     _animationController.dispose();
     super.dispose();
   }
@@ -64,7 +62,6 @@ class _InventoryProductPackageUnitDropdownWidgetState
 
   void _closeDropdown() {
     _animationController.reverse().then((_) {
-      // ĐÃ FIX: Chỉ xóa overlay và gọi setState nếu Widget CÒN SỐNG
       if (mounted) {
         _removeOverlay();
       }
@@ -85,41 +82,33 @@ class _InventoryProductPackageUnitDropdownWidgetState
     return OverlayEntry(
       builder: (context) => Stack(
         children: [
-          // Lớp nền vô hình để bấm ra ngoài thì đóng menu
           GestureDetector(
             onTap: _closeDropdown,
             behavior: HitTestBehavior.translucent,
             child: Container(color: Colors.transparent),
           ),
-
-          // Dính chặt menu vào ô input
           CompositedTransformFollower(
             link: _layerLink,
             showWhenUnlinked: false,
-            offset: Offset(0, size.height + 8), // Cách ô input 8px xuống dưới
+            offset: Offset(0, size.height + 8),
             child: Material(
               color: Colors.transparent,
               child: SizeTransition(
                 sizeFactor: _animation,
-                axisAlignment: -1, // Mở từ trên xuống
+                axisAlignment: -1,
                 child: Container(
                   width: size.width,
-                  constraints: const BoxConstraints(
-                      maxHeight: 250), // Chiều cao tối đa của menu
+                  constraints: const BoxConstraints(maxHeight: 250),
                   child: ClipRRect(
                     borderRadius: BorderRadius.circular(AppSizes.radius16),
                     child: BackdropFilter(
-                      filter: ImageFilter.blur(
-                          sigmaX: 20, sigmaY: 20), // Tăng độ mờ
+                      filter: ImageFilter.blur(sigmaX: 20, sigmaY: 20),
                       child: Container(
                         decoration: BoxDecoration(
-                          // ĐÃ SỬA: DÙNG GRADIENT TRONG SUỐT ĐỂ TẠO KÍNH MỜ CHUẨN
                           gradient: LinearGradient(
                             colors: [
-                              Colors.white
-                                  .withOpacity(0.6), // Sáng bóng ở góc trên
-                              Colors.white
-                                  .withOpacity(0.15), // Trong suốt ở góc dưới
+                              Colors.white.withOpacity(0.6),
+                              Colors.white.withOpacity(0.15),
                             ],
                             begin: Alignment.topLeft,
                             end: Alignment.bottomRight,
@@ -135,44 +124,50 @@ class _InventoryProductPackageUnitDropdownWidgetState
                                 offset: const Offset(0, 10))
                           ],
                         ),
-                        child: ListView.separated(
-                          padding: EdgeInsets.zero,
-                          shrinkWrap: true,
-                          itemCount: controller.mockUnits.length,
-                          separatorBuilder: (_, __) => Divider(
-                              height: 1, color: Colors.white.withOpacity(0.3)),
-                          itemBuilder: (context, index) {
-                            final unit = controller.mockUnits[index];
-                            return InkWell(
-                              onTap: () {
-                                controller.selectedUnitId.value = unit['id']!;
-                                _closeDropdown();
+                        child: Obx(() => ListView.separated(
+                              padding: EdgeInsets.zero,
+                              shrinkWrap: true,
+                              itemCount: controller.allUnits.length,
+                              separatorBuilder: (_, __) => Divider(
+                                  height: 1,
+                                  color: Colors.white.withOpacity(0.3)),
+                              itemBuilder: (context, index) {
+                                final unit = controller.allUnits[index];
+                                return InkWell(
+                                  onTap: () {
+                                    controller.selectedUnitId.value =
+                                        unit.unitId;
+                                    // 🟢 CHỈ CẦN GÁN TEXT LÀ XONG, LISTENER SẼ LÀM VIỆC CÒN LẠI
+                                    controller.unitNameController.text =
+                                        unit.name;
+                                    _closeDropdown();
+                                  },
+                                  child: Padding(
+                                    padding: const EdgeInsets.symmetric(
+                                        horizontal: 16, vertical: 14),
+                                    child: Row(
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.spaceBetween,
+                                      children: [
+                                        Text(unit.name,
+                                            style: const TextStyle(
+                                                fontFamily: 'Poppins',
+                                                fontSize: 14,
+                                                color: AppColors.primaryText,
+                                                fontWeight: FontWeight.w600)),
+                                        Text(unit.code,
+                                            style: const TextStyle(
+                                                fontFamily: 'Poppins',
+                                                fontSize: 12,
+                                                color: AppColors
+                                                    .subText, // 🟢 ĐỔI SANG MÀU XÁM THEO Ý BẠN
+                                                fontWeight: FontWeight.w500)),
+                                      ],
+                                    ),
+                                  ),
+                                );
                               },
-                              child: Padding(
-                                padding: const EdgeInsets.symmetric(
-                                    horizontal: 16, vertical: 14),
-                                child: Row(
-                                  mainAxisAlignment:
-                                      MainAxisAlignment.spaceBetween,
-                                  children: [
-                                    Text(unit['name']!,
-                                        style: const TextStyle(
-                                            fontFamily: 'Poppins',
-                                            fontSize: 14,
-                                            color: AppColors.primaryText,
-                                            fontWeight: FontWeight.w600)),
-                                    Text(unit['code']!,
-                                        style: const TextStyle(
-                                            fontFamily: 'Poppins',
-                                            fontSize: 12,
-                                            color: AppColors.primary,
-                                            fontWeight: FontWeight.bold)),
-                                  ],
-                                ),
-                              ),
-                            );
-                          },
-                        ),
+                            )),
                       ),
                     ),
                   ),
@@ -194,22 +189,18 @@ class _InventoryProductPackageUnitDropdownWidgetState
       child: GestureDetector(
         onTap: _toggleDropdown,
         child: AbsorbPointer(
-          child: Obx(() {
-            final selectedUnit = controller.mockUnits.firstWhereOrNull(
-                (u) => u['id'] == controller.selectedUnitId.value);
-            return TTextFormFieldWidget(
-              label: TTexts.unitLabel.tr,
-              hintText: TTexts.selectUnit.tr,
-              controller:
-                  TextEditingController(text: selectedUnit?['name'] ?? ''),
-              suffixIcon: AnimatedRotation(
-                turns: _isOpen ? 0.5 : 0.0,
-                duration: const Duration(milliseconds: 200),
-                child: const Icon(Iconsax.arrow_down_1_copy,
-                    size: 20, color: AppColors.primary),
-              ),
-            );
-          }),
+          child: TTextFormFieldWidget(
+            label: TTexts.unitLabel.tr,
+            hintText: TTexts.selectUnit.tr,
+            controller: controller.unitNameController,
+            readOnly: true,
+            suffixIcon: AnimatedRotation(
+              turns: _isOpen ? 0.5 : 0.0,
+              duration: const Duration(milliseconds: 200),
+              child: const Icon(Iconsax.arrow_down_1_copy,
+                  size: 20, color: AppColors.primaryText),
+            ),
+          ),
         ),
       ),
     );

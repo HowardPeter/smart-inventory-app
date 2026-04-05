@@ -14,6 +14,7 @@ import 'package:get_storage/get_storage.dart';
 import 'package:frontend/features/search/models/search_product_model.dart';
 import 'package:frontend/features/search/providers/search_provider.dart';
 import 'package:frontend/core/infrastructure/constants/text_strings.dart';
+import 'package:frontend/features/transaction/controllers/outbound_transaction_controller.dart';
 
 enum SearchTarget { global, inventory, transactions, users }
 
@@ -139,8 +140,6 @@ class TSearchController extends GetxController with TErrorHandler {
 
       // --- LOGIC: DID YOU MEAN ---
       if (mappedItems.isEmpty && query.trim().isNotEmpty) {
-        // Thuật toán "Lùi một bước": Bỏ ký tự cuối cùng của từ khóa để tìm gợi ý
-        // Ví dụ: "c3" -> "c". Hoặc "pepsa" -> "peps"
         String fallbackPrefix =
             query.length > 1 ? query.substring(0, query.length - 1) : query;
 
@@ -148,10 +147,8 @@ class TSearchController extends GetxController with TErrorHandler {
             await _provider.searchProductsByPrefix(fallbackPrefix);
 
         if (prefixResults.isNotEmpty) {
-          // Lấy tên sản phẩm đầu tiên
           final String firstSuggestion = prefixResults.first['name'] ?? '';
 
-          // Chỉ hiện gợi ý nếu từ khóa gợi ý thực sự khác với từ khóa đang gõ sai
           if (firstSuggestion.isNotEmpty &&
               firstSuggestion.toLowerCase() != query.toLowerCase()) {
             suggestion.value = firstSuggestion;
@@ -181,12 +178,10 @@ class TSearchController extends GetxController with TErrorHandler {
     }
   }
 
-  // --- HÀM KHI BẤM VÀO GỢI Ý ---
   void applySuggestion() {
     if (suggestion.isNotEmpty) {
       final newQuery = suggestion.value;
       textController.text = newQuery;
-      // Đưa con trỏ văn bản về cuối dòng
       textController.selection =
           TextSelection.collapsed(offset: newQuery.length);
       onSearchChanged(newQuery);
@@ -235,11 +230,28 @@ class TSearchController extends GetxController with TErrorHandler {
 
   void handleItemTap(InventoryInsightDisplayModel item) {
     saveRecentSearch(currentSearchQuery.value);
-    Get.toNamed(
-      AppRoutes.inventoryDetail,
-      arguments:
-          item.product?.productId ?? item.inventory.productPackage?.productId,
-    );
+    final target =
+        Get.arguments?['target'] as SearchTarget? ?? SearchTarget.inventory;
+
+    if (target == SearchTarget.transactions) {
+      if (Get.isRegistered<OutboundTransactionController>()) {
+        Get.toNamed(
+          AppRoutes.outboundTransactionItemAdd,
+          arguments: item,
+        );
+      } else {
+        Get.toNamed(
+          AppRoutes.inboundTransactionItemAdd,
+          arguments: item,
+        );
+      }
+    } else {
+      Get.toNamed(
+        AppRoutes.inventoryDetail,
+        arguments:
+            item.product?.productId ?? item.inventory.productPackage?.productId,
+      );
+    }
   }
 
   void _loadRecentSearches() {

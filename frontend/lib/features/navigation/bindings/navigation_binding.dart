@@ -15,9 +15,9 @@ class NavigationBinding extends Bindings {
 
     // 2. Các Controller của Tab con thì dùng lazyPut.
     // Chúng sẽ chỉ được khởi tạo trên RAM khi View tương ứng gọi Get.find()
-    Get.lazyPut(() => HomeController());
-    Get.lazyPut(() => InventoryController());
-    Get.lazyPut(() => ProfileController());
+    Get.lazyPut(() => HomeController(), fenix: true);
+    Get.lazyPut(() => InventoryController(), fenix: true);
+    Get.lazyPut(() => ProfileController(), fenix: true);
     // Get.lazyPut(() => ReportsController());
   }
 }

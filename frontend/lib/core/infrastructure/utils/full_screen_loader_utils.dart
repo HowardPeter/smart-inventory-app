@@ -66,6 +66,8 @@ class FullScreenLoaderUtils {
 
   /// Đóng hộp thoại Loading
   static void stopLoading() {
-    Navigator.of(Get.overlayContext!).pop();
+    if (Get.isDialogOpen ?? false) {
+      Get.back();
+    }
   }
 }

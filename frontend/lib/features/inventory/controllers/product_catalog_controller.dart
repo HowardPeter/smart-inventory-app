@@ -11,7 +11,6 @@ import 'package:frontend/features/inventory/providers/inventory_provider.dart';
 class ProductCatalogController extends GetxController with TErrorHandler {
   // 1. TỰ QUẢN LÝ PROVIDER VÀ STATE NỘI BỘ
   final InventoryProvider _provider = InventoryProvider();
-
   final RxList<CategoryModel> categories = <CategoryModel>[].obs;
   final RxBool _isLoading = true.obs;
 
@@ -101,11 +100,25 @@ class ProductCatalogController extends GetxController with TErrorHandler {
       }).toList();
     }
 
-    list.sort(
+    // 🟢 TÁCH NHÓM MẶC ĐỊNH VÀ NHÓM THƯỜNG
+    List<CategoryModel> defaultCats = list.where((c) => c.isDefault).toList();
+    List<CategoryModel> normalCats = list.where((c) => !c.isDefault).toList();
+
+    // 🟢 Sắp xếp A-Z cho từng cụm
+    defaultCats.sort(
+        (a, b) => (a.name).toLowerCase().compareTo((b.name).toLowerCase()));
+    normalCats.sort(
         (a, b) => (a.name).toLowerCase().compareTo((b.name).toLowerCase()));
 
     Map<String, List<CategoryModel>> grouped = {};
-    for (var cat in list) {
+
+    // 🟢 ĐẨY NHÓM MẶC ĐỊNH LÊN ĐẦU VỚI KEY LÀ ⭐
+    if (defaultCats.isNotEmpty) {
+      grouped['⭐'] = defaultCats;
+    }
+
+    // Xử lý nhóm chữ cái cho các danh mục còn lại
+    for (var cat in normalCats) {
       final String firstLetter =
           (cat.name.isNotEmpty) ? cat.name[0].toUpperCase() : '#';
 

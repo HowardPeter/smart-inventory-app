@@ -1,0 +1,199 @@
+import 'package:frontend/core/infrastructure/constants/text_strings.dart';
+
+final Map<String, String> enTransaction = {
+  TTexts.createNewTransaction: "Create New Transaction",
+  TTexts.manageInventory: "Manage Inventory",
+  TTexts.manageInventoryDesc:
+      "Record incoming items, outbound shipments, or adjust your current stock.",
+  TTexts.inbound: "Inbound",
+  TTexts.outbound: "Outbound",
+  TTexts.stockAdjustment: "Stock Adjustment",
+  TTexts.exit: "Exit",
+
+  // -- Inbound
+  TTexts.inboundTransaction: "Inbound Transaction",
+  TTexts.emptyInboundCartTitle: "No items yet",
+  TTexts.emptyInboundCartSub:
+      "Scan a barcode or tap the search bar to add products to this transaction.",
+  TTexts.completeImport: "Complete Import",
+  TTexts.totalFunds: "Total funds",
+  TTexts.searchProductToAdd: "Search product to add...",
+  TTexts.emptyTransactionTitle: "No items yet",
+  TTexts.emptyTransactionSubtitle:
+      "Scan a barcode or tap the search bar to add products to this transaction.",
+  TTexts.transactionCompletedTitle: "Transaction Completed!",
+  TTexts.transactionCompletedSubtitle:
+      "Your transaction has been processed and saved successfully.",
+  TTexts.backToHome: "Back to Home",
+  TTexts.scanProductBarcode: "Scan Product Barcode",
+  TTexts.confirmImportTitle: "Confirm Import",
+  TTexts.confirmImportDescription:
+      "Are you sure you want to complete this inbound transaction? This action will add stock to your inventory.",
+  TTexts.proceedImport: "Confirm & Import",
+
+  // -- Outbound
+  TTexts.outboundTransactionTitle: 'Outbound Transaction',
+  TTexts.searchDot: 'Search ...',
+  TTexts.completeExport: 'Complete Export',
+  TTexts.stocksLabel: 'Stocks:',
+  TTexts.outOfStockAlert: 'Not enough stock available!',
+
+  // --- Transaction Item Add ---
+  TTexts.loadingAddingToCart: "Adding to transaction...",
+  TTexts.productNameUnknown: "Unknown Product",
+  TTexts.labelNoBarcode: "N/A",
+  TTexts.labelStock: "Stock",
+  TTexts.labelImportPrice: "Import Price (\$)",
+  TTexts.labelQuantity: "Quantity",
+  TTexts.labelTicket: "Ticket",
+  TTexts.errorNoPackageId: "Package ID not found or invalid",
+  TTexts.item: "Item",
+  TTexts.subtotal: "Subtotal",
+  TTexts.removeItem: "Remove Item",
+  TTexts.confirmRemoveItemTransaction:
+      "Are you sure you want to remove this item from the transaction?",
+  TTexts.remove: "Remove",
+  TTexts.creatingImportTicket: "Creating import ticket...",
+  TTexts.manualImport: "Manual Import",
+  TTexts.importTicketCreated: "Import ticket has been created successfully!",
+  TTexts.errorCreatingImportTicket: "Failed to create import ticket.",
+  TTexts.uncategorized: "Uncategorized",
+  TTexts.noBrand: "No Brand",
+  TTexts.inactive: "Inactive",
+  TTexts.product: "Product",
+  TTexts.recentlyAddedSuggested: "Recently Added / Suggested",
+  TTexts.checkoutDetails: 'Checkout Details',
+  TTexts.transactionReason: 'Reason',
+  TTexts.selectReason: 'Select a reason',
+  TTexts.transactionNote: 'Note (Optional)',
+  TTexts.noteHint: 'Enter any additional details...',
+  TTexts.priceChangeDetected: 'Price Change Detected',
+  TTexts.priceChangeMessage:
+      'You have modified the prices for some items in this transaction. Do you want to permanently update their default prices in the catalog?',
+  TTexts.updatePricesAndCreate: 'Update Prices & Complete',
+  TTexts.justCreateTransaction: 'No, Just Complete Transaction',
+  TTexts.transactionSuccessTitle: 'Transaction success!!!',
+  TTexts.transactionSuccessSub:
+      'Your transaction is complete.\nPlease check your stock!',
+  TTexts.transactionNumber: 'Transaction Number',
+  TTexts.transactionDate: 'Transaction Date',
+  TTexts.transactionType: 'Transaction Type',
+  TTexts.totalItemsTransaction: 'Total Items / Transaction',
+  TTexts.checkDetails: 'Check Details',
+  TTexts.transactionDetails: 'Transaction Details',
+  TTexts.selectExportType: "Select Export Types:",
+
+  // Specific Reasons
+  TTexts.reasonRetailSale: 'Retail Sale',
+  TTexts.reasonWholesale: 'Wholesale',
+  TTexts.reasonDamaged: 'Damaged / Expired',
+  TTexts.reasonInternalTransfer: 'Internal Transfer',
+  TTexts.reasonReturn: 'Returned to Supplier',
+  TTexts.reasonOther: 'Other',
+  TTexts.reasonIncome: 'Income (+)',
+  TTexts.reasonNeutral: 'No Revenue (0)',
+  TTexts.reasonExpense: 'Expense / Loss (-)',
+
+  TTexts.selectBatchFIFO: 'Select batches',
+  TTexts.batchRemaining: 'left',
+  TTexts.expiresOn: 'Exp',
+  TTexts.batchExceedsStock: 'Quantity exceeds the selected batch stock!',
+  TTexts.quantityToExport: 'Quantity to export',
+  TTexts.importPriceLot: 'Import Price',
+  TTexts.sellingPriceLot: 'Selling Price',
+  TTexts.quantityToImport: 'Quantity to import',
+  TTexts.importedOn: "Imported",
+  TTexts.outOfStockBatch: "Out of stock",
+  TTexts.confirmExportTitle: "Confirm Export",
+  TTexts.confirmExportDescription:
+      "Are you sure you want to complete this outbound transaction? This action will update your inventory levels.",
+  TTexts.processingExport: "Processing Export...",
+  TTexts.exportSuccessMessage: "Export transaction completed successfully!",
+  TTexts.noteLabel: "Note",
+  TTexts.emptyCartWarning:
+      "Your cart is empty. Please add products before exporting.",
+  TTexts.priceChangeDetectedTitle: "Price Change Detected",
+  TTexts.priceChangeDetectedDesc:
+      "The following items have modified selling prices:",
+  TTexts.proceedExport: "Confirm & Export",
+  TTexts.reasonForExport: "Reason for Export",
+  TTexts.total: "Total",
+  TTexts.totalQuantity: "Total Quantity",
+  TTexts.specifyBatchQuantity:
+      "Please specify the quantity from the batches above.",
+
+  // -- Stock Adjustment
+  TTexts.confirmAdjustmentTitle: "Start Inventory Check?",
+  TTexts.confirmAdjustmentDesc:
+      "Are you sure you want to start a new stock adjustment session? This will allow you to update actual stock levels.",
+  TTexts.proceedAdjustment: "Start Checking",
+  TTexts.listItems: "List items",
+  TTexts.system: "System",
+  TTexts.actual: "Actual",
+  TTexts.spread: "Spread",
+  TTexts.status: "Status",
+  TTexts.checked: "Checked",
+  TTexts.unchecked: "Unchecked",
+  TTexts.checkedItems: "Checked items",
+  TTexts.saveAll: "Save all",
+  TTexts.updateActualQty: "Update Actual Quantity",
+  TTexts.mismatched: "Mismatched",
+  TTexts.reason: "Reason",
+  TTexts.damage: "Damage",
+  TTexts.expired: "Expired",
+  TTexts.loss: "Loss",
+  TTexts.itemFound: "Item Found",
+  TTexts.inputError: "Input error",
+  TTexts.additionalNote: "Additional Note",
+  TTexts.stockOutput: "STOCK OUTPUT:",
+  TTexts.checkComplete: "Check complete",
+  TTexts.mismatchedReasonLabel: "Mismatched reason (Or note if have):",
+  TTexts.productInformation: "Product Information",
+  TTexts.stockCount: "Stock Count:",
+  TTexts.otherReason: "Other Reason",
+  TTexts.notEnoughStockWarning:
+      "You can not set actual quantity lower than current stock.",
+  TTexts.quantityToAdjust: "Quantity to Adjust:",
+  TTexts.automatedNote: "Automated Note:",
+  TTexts.currentStock: "Current Stock",
+  TTexts.barcode: "Barcode",
+  TTexts.checkAll: "Check All",
+  TTexts.uncheckAll: "Uncheck All",
+  TTexts.confirmCheckAllTitle: "Check All Items?",
+  TTexts.confirmCheckAllDesc:
+      "All unchecked items will be marked as checked with their system quantity (Spread: 0). Do you want to proceed?",
+  TTexts.confirmUncheckAllTitle: "Uncheck All Items?",
+  TTexts.confirmUncheckAllDesc:
+      "This will reset all items to unchecked status and clear all inputted actual quantities and notes. Proceed?",
+  TTexts.incompleteSaveTitle: "Incomplete Check!",
+  TTexts.incompleteSaveDesc:
+      "You haven't checked all items in the inventory yet. Unchecked items will NOT be updated. Are you sure you want to save now?",
+  TTexts.confirmSaveTitle: "Save Stock Adjustment?",
+  TTexts.confirmSaveDesc:
+      "This action will update the inventory and create an adjustment transaction record. Proceed?",
+  TTexts.combinedNotesTitle: "Adjustment Notes Summary:",
+  TTexts.errorLoadingData: "Error loading data. Please try again.",
+  TTexts.verifyingData: "Verifying current stock data...",
+  TTexts.syncDataWarningTitle: "Stock Data Changed!",
+  TTexts.syncDataWarningDesc:
+      "Some items were modified by another process while you were counting. We have updated the System Quantity. Please review the highlighted items again.",
+  TTexts.unsavedChangesTitle: "Discard Changes?",
+  TTexts.unsavedChangesDesc:
+      "You have unchecked items. If you exit now, your counting progress will be lost. Do you want to exit anyway?",
+  TTexts.exitAnyway: "Exit Anyway",
+  TTexts.inventoryUpdatedSuccess: "Inventory successfully updated.",
+  TTexts.noReasonNeededWarning:
+      "You don't need to select a reason when there's no mismatch.",
+  TTexts.defaultAdjustmentNote: "Stock Adjustment (No mismatch/notes)",
+  TTexts.itemFoundText: "Found",
+  TTexts.defaultUnit: "Unit",
+  TTexts.specificNoteHint: "Enter specific note (e.g. Damage 1 pack by John)",
+  TTexts.noItemsFound: "No items found",
+  TTexts.noItemsFoundDesc:
+      "We couldn't find any items matching your search. Please try a different keyword or scan again.",
+
+  // -- Transaction Summary
+  TTexts.qty: "Qty",
+  TTexts.adjustmentSummaryBrief:
+      "This is a brief summary of the stock adjustment. To view the detailed list of adjusted items, please check the Transaction History.",
+};

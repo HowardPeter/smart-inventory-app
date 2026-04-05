@@ -53,7 +53,6 @@ class InventoryController extends GetxController with TErrorHandler {
 
   Future<void> fetchDashboardData({bool isRefresh = false}) async {
     try {
-      // 1. XÓA ĐIỀU KIỆN `if (!isRefresh)` -> SHIMMER SẼ CHẠY KHI PULL-TO-REFRESH
       isLoading.value = true;
 
       if (isRefresh) {
@@ -82,7 +81,6 @@ class InventoryController extends GetxController with TErrorHandler {
         final pkg = inv.productPackage;
         if (pkg == null) return false;
 
-        // 2. CHUẨN HOÁ toLowerCase() ĐỂ CHỐNG LỖI LỆCH HOA/THƯỜNG ('Active' vs 'active')
         if ((pkg.activeStatus).toLowerCase() != 'active') return false;
         if ((inv.activeStatus).toLowerCase() == 'inactive') return false;
 
@@ -113,7 +111,6 @@ class InventoryController extends GetxController with TErrorHandler {
     }
   }
 
-  // CẬP NHẬT HÀM GHI
   void saveCustomOrder(List<String> newOrder) {
     customCategoryOrder.assignAll(newOrder);
     _box.write(_customOrderKey, newOrder);
@@ -126,15 +123,12 @@ class InventoryController extends GetxController with TErrorHandler {
       final userService = Get.find<UserService>();
 
       final storeId = storeService.currentStoreId.value;
-      // Trích xuất ID user (Tùy thuộc vào model UserProfileModel của bạn dùng biến gì, ví dụ id hoặc userId)
       final userId = userService.currentUser.value?.userId ?? 'unknown_user';
 
       if (storeId.isEmpty) return 'custom_category_order_default';
 
-      // Ghép lại thành 1 key duy nhất không đụng hàng: Ví dụ: custom_category_order_storeA_userB
       return 'custom_category_order_${storeId}_$userId';
     } catch (e) {
-      // Fallback an toàn nếu chưa load được service
       return 'custom_category_order_default';
     }
   }
@@ -149,12 +143,10 @@ class InventoryController extends GetxController with TErrorHandler {
     int oCount = 0;
 
     for (var inv in inventories) {
-      // Tính tổng giá trị kho
       if (inv.productPackage != null) {
         tempValue += (inv.quantity * inv.productPackage!.importPrice);
       }
 
-      // Đếm sức khỏe tồn kho
       if (inv.quantity == 0) {
         oCount++;
       } else if (inv.quantity <= inv.reorderThreshold) {
@@ -181,11 +173,9 @@ class InventoryController extends GetxController with TErrorHandler {
     int maxDistValue = 0;
 
     for (var cat in categories) {
-      // 1. Đếm số lượng Product cho từng Category
       int pCount = products.where((p) => p.categoryId == cat.categoryId).length;
       tempCatStats.add(CategoryStatModel(name: cat.name, count: pCount));
 
-      // 2. Tính tổng số lượng Tồn kho (Quantity) cho từng Category để vẽ Distribution
       int totalQty = 0;
       final catProductIds = products
           .where((p) => p.categoryId == cat.categoryId)
@@ -204,23 +194,30 @@ class InventoryController extends GetxController with TErrorHandler {
     }
 
     // =========================================================
-    // ĐOẠN CẬP NHẬT: SẮP XẾP DANH MỤC THEO CUSTOM ORDER
+    // 🟢 ĐOẠN CẬP NHẬT: SẮP XẾP DANH MỤC THÔNG MINH
     // =========================================================
     tempCatStats.sort((a, b) {
-      // Tìm vị trí của Category trong mảng customOrder (nếu có)
+      // 1. Tìm thông tin gốc từ danh sách `categories` để xem nó có phải là Mặc định (isDefault) không
+      final catA = categories.firstWhereOrNull((c) => c.name == a.name);
+      final catB = categories.firstWhereOrNull((c) => c.name == b.name);
+
+      final isDefaultA = catA?.isDefault ?? false;
+      final isDefaultB = catB?.isDefault ?? false;
+
+      // Ưu tiên 1: Đẩy những thằng Mặc định (Uncategorized) lên Top đầu tiên
+      if (isDefaultA && !isDefaultB) return -1;
+      if (!isDefaultA && isDefaultB) return 1;
+
+      // 2. Tìm vị trí của Category trong mảng customOrder (nếu có)
       int indexA = customCategoryOrder.indexOf(a.name);
       int indexB = customCategoryOrder.indexOf(b.name);
 
-      // Nếu cả 2 đều nằm trong danh sách custom -> Xếp ưu tiên theo thứ tự custom
+      // Ưu tiên 2: Xếp theo thứ tự Custom kéo thả
       if (indexA != -1 && indexB != -1) return indexA.compareTo(indexB);
-
-      // Nếu A nằm trong custom, B thì không -> Ưu tiên A đứng trước
       if (indexA != -1) return -1;
-
-      // Nếu B nằm trong custom, A thì không -> Ưu tiên B đứng trước
       if (indexB != -1) return 1;
 
-      // Nếu cả 2 KHÔNG nằm trong custom -> XẮP XẾP THEO BẢNG CHỮ CÁI (Default)
+      // Ưu tiên 3: Xắp xếp theo Bảng chữ cái (Default)
       return a.name.compareTo(b.name);
     });
 
@@ -247,26 +244,19 @@ class InventoryController extends GetxController with TErrorHandler {
   }
 
   void onCategorySelected(String categoryName) {
-    // Tìm data gốc xịn từ danh sách categories bằng tên
     final match = categories.where((c) => c.name == categoryName);
 
     if (match.isNotEmpty) {
-      // Có data gốc -> Truyền thẳng nguyên cục CategoryModel sang trang sau
       Get.toNamed(AppRoutes.categoryDetail, arguments: match.first);
     } else {
-      // Không có -> Báo lỗi, tuyệt đối không chuyển trang gây Crash
       TSnackbarsWidget.error(
-          title: TTexts
-              .errorUnknownTitle.tr, // Nên dùng .tr cho đa ngôn ngữ nếu có
+          title: TTexts.errorUnknownTitle.tr,
           message: TTexts.errorUnknownMessage.tr);
     }
   }
 
   void goToAddCategory() {
-    // LƯU Ý: Nếu trang tạo danh mục của bạn tên là AppRoutes.addCategory thì đổi lại nhé.
-    // Ở đây tôi dùng tạm AppRoutes.categoryCatalog theo danh sách file của bạn.
     Get.toNamed(AppRoutes.categoryForm)?.then((_) {
-      // Khi người dùng tắt trang Tạo Danh Mục quay về, lập tức fetch lại data
       fetchDashboardData(isRefresh: true);
     });
   }

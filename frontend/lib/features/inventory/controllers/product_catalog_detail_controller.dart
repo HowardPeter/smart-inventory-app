@@ -2,6 +2,7 @@ import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:frontend/core/infrastructure/utils/full_screen_loader_utils.dart';
 import 'package:frontend/features/inventory/controllers/category_detail_controller.dart';
+import 'package:frontend/features/inventory/controllers/product_catalog_controller.dart';
 import 'package:get/get.dart';
 import 'package:frontend/core/infrastructure/utils/error_handler_utils.dart';
 import 'package:frontend/core/infrastructure/models/product_model.dart';
@@ -98,6 +99,42 @@ class ProductCatalogDetailController extends GetxController with TErrorHandler {
     }
   }
 
+  Future<void> refreshProductData() async {
+    try {
+      // 1. Lấy thông tin mới nhất từ Server
+      final data = await _provider.getProductDetail(product.productId);
+      final updatedProduct = ProductModel.fromJson(data);
+
+      // 2. Cập nhật tên và hãng
+      rxName.value = updatedProduct.name;
+      rxBrand.value = updatedProduct.brand ?? '';
+
+      // 3. CHIÊU "LỪA" ĐIỆN THOẠI TẢI ẢNH MỚI NẰM Ở ĐÂY
+      if (updatedProduct.imageUrl != null &&
+          updatedProduct.imageUrl!.isNotEmpty) {
+        // Lấy thời gian hiện tại
+        final thoiGian = DateTime.now().millisecondsSinceEpoch;
+        final linkGoc = updatedProduct.imageUrl!;
+
+        // Nối thời gian vào đuôi link
+        if (linkGoc.contains('?')) {
+          rxImageUrl.value = "$linkGoc&v=$thoiGian";
+        } else {
+          rxImageUrl.value = "$linkGoc?v=$thoiGian";
+        }
+      } else {
+        rxImageUrl.value = '';
+      }
+
+      // 4. Báo cho trang danh sách bên ngoài cập nhật theo
+      if (Get.isRegistered<ProductCatalogController>()) {
+        Get.find<ProductCatalogController>().fetchCategories();
+      }
+    } catch (e) {
+      debugPrint("Lỗi khi làm mới: $e");
+    }
+  }
+
   void updateLocalInfo({String? name, String? brand, String? imageUrl}) {
     if (name != null) rxName.value = name;
     if (brand != null) rxBrand.value = brand;
@@ -119,14 +156,25 @@ class ProductCatalogDetailController extends GetxController with TErrorHandler {
   // ==========================================
   // ACTIONS CHO PRODUCT GỐC
   // ==========================================
-  void editProductInfo() {
-    Get.toNamed(AppRoutes.productForm,
-        arguments: {'product': product, 'mode': 'info'});
+  void editProductImage() {
+    Get.toNamed(AppRoutes.productForm, arguments: {
+      'mode': 'image',
+      'product': product,
+      'freshImageUrl': rxImageUrl.value,
+    })?.then((_) {
+      refreshProductData();
+    });
   }
 
-  void editProductImage() {
-    Get.toNamed(AppRoutes.productForm,
-        arguments: {'product': product, 'mode': 'image'});
+  void editProductInfo() {
+    Get.toNamed(AppRoutes.productForm, arguments: {
+      'mode': 'info',
+      'product': product,
+      'freshName': rxName.value,
+      'freshBrand': rxBrand.value,
+    })?.then((_) {
+      refreshProductData();
+    });
   }
 
   void deleteProduct() {
@@ -218,8 +266,8 @@ class ProductCatalogDetailController extends GetxController with TErrorHandler {
     try {
       FullScreenLoaderUtils.openLoadingDialog(TTexts.saving.tr);
 
-      final int currentQuantity =
-          await _provider.getPackageQuantity(package.productPackageId);
+      final inv = await _provider.getInventoryDetail(package.productPackageId);
+      final int currentQuantity = inv.quantity;
 
       FullScreenLoaderUtils.stopLoading();
 

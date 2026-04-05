@@ -3,40 +3,60 @@ import 'package:frontend/core/infrastructure/network/app_client.dart';
 import 'package:frontend/core/infrastructure/models/category_model.dart';
 import 'package:frontend/core/infrastructure/models/product_model.dart';
 import 'package:frontend/core/infrastructure/models/inventory_model.dart';
+import 'package:frontend/core/infrastructure/models/unit_model.dart'; // 🟢 IMPORT THÊM UNIT MODEL
 
 class InventoryProvider {
   final _apiClient = ApiClient();
 
-  // 1. Lấy danh sách danh mục
+  // ==========================================
+  // UNITS
+  // ==========================================
+  Future<List<UnitModel>> getUnits() async {
+    final listData = await _apiClient.getList('/api/units');
+    return listData.map((json) => UnitModel.fromJson(json)).toList();
+  }
+
+  // ==========================================
+  // CATEGORIES
+  // ==========================================
   Future<List<CategoryModel>> getCategories() async {
     final listData = await _apiClient
         .getList('/api/categories', queryParameters: {'limit': 100});
     return listData.map((json) => CategoryModel.fromJson(json)).toList();
   }
 
-  // 2. Lấy danh sách sản phẩm
+  Future<CategoryModel> createCategory(Map<String, dynamic> data) async {
+    final response = await _apiClient.post('/api/categories', data: data);
+    return CategoryModel.fromJson(response.data['data'] ?? response.data);
+  }
+
+  Future<void> updateCategory(
+      String categoryId, Map<String, dynamic> data) async {
+    await _apiClient.patch('/api/categories/$categoryId', data: data);
+  }
+
+  Future<void> deleteCategory(String categoryId,
+      {bool canReassignToUncategorized = false}) async {
+    await _apiClient.delete('/api/categories/$categoryId',
+        data: {'canReassignToUncategorized': canReassignToUncategorized});
+  }
+
+  Future<void> hideDefaultCategory(String categoryId) async {
+    await _apiClient.patch('/api/categories/$categoryId/hide');
+  }
+
+  // ==========================================
+  // PRODUCTS
+  // ==========================================
   Future<List<ProductModel>> getProducts() async {
     final listData = await _apiClient
         .getList('/api/products', queryParameters: {'limit': 100});
     return listData.map((json) => ProductModel.fromJson(json)).toList();
   }
 
-  // 3. Lấy danh sách tồn kho
-  Future<List<InventoryModel>> getInventories() async {
-    final listData = await _apiClient
-        .getList('/api/inventories', queryParameters: {'limit': 100});
-    return listData.map((json) => InventoryModel.fromJson(json)).toList();
-  }
-
   Future<Map<String, dynamic>> getProductDetail(String productId) async {
     final response = await _apiClient.get('/api/products/$productId');
-
-    // Bóc lớp "data" theo chuẩn API của bạn
-    if (response.data != null && response.data['data'] != null) {
-      return response.data['data'] as Map<String, dynamic>;
-    }
-
-    throw Exception('No data found');
+    return response.data['data'] ?? response.data;
   }
 
   Future<List<ProductModel>> getProductsByCategory(String categoryId) async {
@@ -45,6 +65,23 @@ class InventoryProvider {
     return listData.map((json) => ProductModel.fromJson(json)).toList();
   }
 
+  Future<ProductModel> createProduct(Map<String, dynamic> data) async {
+    final response = await _apiClient.post('/api/products', data: data);
+    return ProductModel.fromJson(response.data['data'] ?? response.data);
+  }
+
+  Future<void> updateProduct(
+      String productId, Map<String, dynamic> data) async {
+    await _apiClient.patch('/api/products/$productId', data: data);
+  }
+
+  Future<void> deleteProduct(String productId) async {
+    await _apiClient.delete('/api/products/$productId');
+  }
+
+  // ==========================================
+  // PRODUCT PACKAGES
+  // ==========================================
   Future<List<ProductPackageModel>> getPackagesByProduct(
       String productId) async {
     final listData = await _apiClient.getList(
@@ -53,37 +90,11 @@ class InventoryProvider {
     return listData.map((json) => ProductPackageModel.fromJson(json)).toList();
   }
 
-  Future<CategoryModel> createCategory(Map<String, dynamic> data) async {
-    final response = await _apiClient.post('/api/categories', data: data);
-
-    if (response.data != null && response.data['data'] != null) {
-      return CategoryModel.fromJson(response.data['data']);
-    } else if (response.data != null) {
-      return CategoryModel.fromJson(response.data);
-    }
-
-    throw Exception('Failed to create category');
+  Future<Map<String, dynamic>> getProductPackageDetail(String packageId) async {
+    final response = await _apiClient.get('/api/product-packages/$packageId');
+    return response.data['data'] ?? response.data;
   }
 
-  // Cập nhật danh mục
-  Future<void> updateCategory(
-      String categoryId, Map<String, dynamic> data) async {
-    await _apiClient.patch('/api/categories/$categoryId', data: data);
-  }
-
-  // 1. Tạo Sản phẩm gốc
-  Future<ProductModel> createProduct(Map<String, dynamic> data) async {
-    final response = await _apiClient.post('/api/products', data: data);
-    return ProductModel.fromJson(response.data['data'] ?? response.data);
-  }
-
-  // 2. Cập nhật Sản phẩm gốc
-  Future<void> updateProduct(
-      String productId, Map<String, dynamic> data) async {
-    await _apiClient.patch('/api/products/$productId', data: data);
-  }
-
-  // 3. Tạo Package cho Sản phẩm
   Future<Map<String, dynamic>> createProductPackage(
       String productId, Map<String, dynamic> data) async {
     final response =
@@ -91,64 +102,73 @@ class InventoryProvider {
     return response.data['data'] ?? response.data;
   }
 
-  // 4. Cập nhật Package
   Future<void> updateProductPackage(
       String productPackageId, Map<String, dynamic> data) async {
-    // Gọi API update dựa theo route .patch('/:productPackageId') của backend
     await _apiClient.patch('/api/product-packages/$productPackageId',
         data: data);
   }
 
-  // 5. Tạo Inventory
-  Future<void> createInventory(Map<String, dynamic> data) async {
-    await _apiClient.post('/api/inventories', data: data);
-  }
-
-  // 6. Cập nhật Inventory
-  Future<void> updateInventoryByPackage(
-      String packageId, Map<String, dynamic> data) async {
-    await _apiClient.patch('/api/inventories/product-packages/$packageId',
-        data: data);
-  }
-
-  // 7. Lấy chi tiết Inventory (chứa Threshold) của một Package
-  Future<int> getInventoryThresholdByPackage(String packageId) async {
-    try {
-      final response =
-          await _apiClient.get('/api/inventories/product-packages/$packageId');
-      final data = response.data['data'] ?? response.data;
-      // Trả về threshold (hỗ trợ cả 2 chuẩn chữ để tránh lỗi backend map)
-      return data['reorderThreshold'] ?? data['reorder_threshold'] ?? 0;
-    } catch (e) {
-      return 0; // Nếu chưa có kho thì mặc định là 0
-    }
-  }
-
-  // 7. Lấy chi tiết Quantity của một Package
-  Future<int> getPackageQuantity(String packageId) async {
-    try {
-      final response =
-          await _apiClient.get('/api/inventories/product-packages/$packageId');
-      final data = response.data['data'] ?? response.data;
-      // Trả về cột quantity từ database
-      return data['quantity'] ?? 0;
-    } catch (e) {
-      return 0;
-    }
-  }
-
-  // Xóa danh mục (Soft Delete phía Backend)
-  Future<void> deleteCategory(String categoryId) async {
-    await _apiClient.delete('/api/categories/$categoryId');
-  }
-
-  // Xóa Product (Soft Delete phía Backend)
-  Future<void> deleteProduct(String productId) async {
-    await _apiClient.delete('/api/products/$productId');
-  }
-
-  // Xóa Package (Soft Delete phía Backend)
   Future<void> deleteProductPackage(String packageId) async {
     await _apiClient.delete('/api/product-packages/$packageId');
+  }
+
+  // ==========================================
+  // INVENTORIES & TRANSACTIONS
+  // ==========================================
+  Future<List<InventoryModel>> getInventories(
+      {Map<String, dynamic>? queryParams}) async {
+    final listData = await _apiClient.getList('/api/inventories',
+        queryParameters: queryParams ?? {'limit': 100});
+    return listData.map((json) => InventoryModel.fromJson(json)).toList();
+  }
+
+  Future<List<InventoryModel>> getLowStockInventories(
+      {Map<String, dynamic>? queryParams}) async {
+    final listData = await _apiClient.getList('/api/inventories/low-stock',
+        queryParameters: queryParams ?? {'limit': 100});
+    return listData.map((json) => InventoryModel.fromJson(json)).toList();
+  }
+
+  Future<void> createInventory(String packageId,
+      {int quantity = 0, int? reorderThreshold}) async {
+    await _apiClient.post('/api/inventories', data: {
+      'productPackageId': packageId,
+      'quantity': quantity,
+      if (reorderThreshold != null) 'reorderThreshold': reorderThreshold,
+    });
+  }
+
+  Future<InventoryModel> getInventoryDetail(String packageId) async {
+    final response =
+        await _apiClient.get('/api/inventories/product-packages/$packageId');
+    return InventoryModel.fromJson(response.data['data'] ?? response.data);
+  }
+
+  Future<void> updateInventorySettings(String packageId,
+      {int? reorderThreshold, int? lastCount}) async {
+    await _apiClient
+        .patch('/api/inventories/product-packages/$packageId', data: {
+      if (reorderThreshold != null) 'reorderThreshold': reorderThreshold,
+      if (lastCount != null) 'lastCount': lastCount,
+    });
+  }
+
+  Future<void> adjustInventory(String packageId,
+      {required String type,
+      required int quantity,
+      String? reason,
+      String? note}) async {
+    await _apiClient.post(
+        '/api/inventories/product-packages/$packageId/adjustments',
+        data: {
+          'type': type,
+          'quantity': quantity,
+          if (reason != null) 'reason': reason,
+          if (note != null) 'note': note,
+        });
+  }
+
+  Future<void> deleteInventory(String packageId) async {
+    await _apiClient.delete('/api/inventories/product-packages/$packageId');
   }
 }

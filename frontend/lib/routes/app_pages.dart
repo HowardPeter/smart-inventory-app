@@ -37,6 +37,20 @@ import 'package:frontend/features/profile/views/profile_edit_view.dart';
 import 'package:frontend/features/profile/views/profile_view.dart';
 import 'package:frontend/features/search/bindings/search_binding.dart';
 import 'package:frontend/features/search/views/search_view.dart';
+import 'package:frontend/features/transaction/bindings/inbound_transaction_binding.dart';
+import 'package:frontend/features/transaction/bindings/outbound_transaction_binding.dart';
+import 'package:frontend/features/transaction/bindings/inbound_transaction_item_add_binding.dart';
+import 'package:frontend/features/transaction/bindings/outbound_transaction_item_add_binding.dart';
+import 'package:frontend/features/transaction/bindings/stock_adjustment_binding.dart';
+import 'package:frontend/features/transaction/bindings/stock_adjustment_item_binding.dart';
+import 'package:frontend/features/transaction/bindings/transaction_summary_binding.dart';
+import 'package:frontend/features/transaction/views/inbound_transaction_view.dart';
+import 'package:frontend/features/transaction/views/outbound_transaction_item_add_view.dart';
+import 'package:frontend/features/transaction/views/outbound_transaction_view.dart';
+import 'package:frontend/features/transaction/views/inbound_transaction_item_add_view.dart';
+import 'package:frontend/features/transaction/views/stock_adjustment_item_view.dart';
+import 'package:frontend/features/transaction/views/stock_adjustment_view.dart';
+import 'package:frontend/features/transaction/views/transaction_summary_view.dart';
 import 'package:frontend/features/workspace/bindings/add_members_binding.dart';
 import 'package:frontend/features/workspace/bindings/create_store_binding.dart';
 import 'package:frontend/features/workspace/bindings/join_store_binding.dart';
@@ -241,6 +255,62 @@ class AppPages {
       name: AppRoutes.customizeCatalog,
       page: () => const CustomizeCatalogView(),
       binding: CustomizeCatalogBinding(),
+      transition: Transition.cupertino,
+    ),
+
+    // -- Inbound Transaction Item Add
+    GetPage(
+      name: AppRoutes.inboundTransaction,
+      page: () => const InboundTransactionView(),
+      binding: InboundTransactionBinding(),
+      transition: Transition.cupertino,
+    ),
+
+    // -- Inbound Transaction Item Add
+    GetPage(
+      name: AppRoutes.inboundTransactionItemAdd,
+      page: () => const InboundTransactionItemAddView(),
+      binding: InboundTransactionItemAddBinding(),
+      transition: Transition.cupertino,
+    ),
+
+    // -- Outbound Transaction
+    GetPage(
+      name: AppRoutes.outboundTransaction,
+      page: () => const OutboundTransactionView(),
+      binding: OutboundTransactionBinding(),
+      transition: Transition.cupertino,
+    ),
+
+    // -- Outbound Transaction Item Add
+    GetPage(
+      name: AppRoutes.outboundTransactionItemAdd,
+      page: () => const OutboundTransactionItemAddView(),
+      binding: OutboundTransactionItemAddBinding(),
+      transition: Transition.cupertino,
+    ),
+
+    // -- Stock Adjustment
+    GetPage(
+      name: AppRoutes.stockAdjustment,
+      page: () => const StockAdjustmentView(),
+      binding: StockAdjustmentBinding(),
+      transition: Transition.cupertino,
+    ),
+
+    // -- Stock Adjustment
+    GetPage(
+      name: AppRoutes.stockAdjustmentItem,
+      page: () => const StockAdjustmentItemView(),
+      binding: StockAdjustmentItemBinding(),
+      transition: Transition.cupertino,
+    ),
+
+    // -- Transaction Summary
+    GetPage(
+      name: AppRoutes.transactionSummary,
+      page: () => const TransactionSummaryView(),
+      binding: TransactionSummaryBinding(),
       transition: Transition.cupertino,
     ),
 
