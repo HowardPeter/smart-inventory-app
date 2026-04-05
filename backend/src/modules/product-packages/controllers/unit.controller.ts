@@ -1,10 +1,10 @@
 import { StatusCodes } from 'http-status-codes';
 
-import { sendResponse } from '../../common/utils/api-response.util.js';
+import { sendResponse } from '../../../common/utils/index.js';
 
-import type { UnitResponseDto } from './product-package.dto.js';
-import type { UnitService } from './unit.service.js';
-import type { ApiResponse } from '../../common/types/api-response.type.js';
+import type { ApiResponse } from '../../../common/types/index.js';
+import type { UnitResponseDto } from '../product-package.dto.js';
+import type { UnitService } from '../services/unit.service.js';
 import type { Request, Response } from 'express';
 
 export class UnitController {

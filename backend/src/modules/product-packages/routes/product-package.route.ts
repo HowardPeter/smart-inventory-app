@@ -1,6 +1,10 @@
 import { Router } from 'express';
 
-import { productPackageController } from './product-package.module.js';
+import { asyncWrapper } from '../../../common/middlewares/index.js';
+import { PERMISSION, requirePermission } from '../../access-control/index.js';
+import { authenticate } from '../../auth/index.js';
+import { requireStoreContext } from '../../stores/index.js';
+import { productPackageController } from '../modules/product-package.module.js';
 import {
   validateCreateProductPackage,
   validateDeleteProductPackage,
@@ -8,11 +12,7 @@ import {
   validateGetProductPackagesByProductId,
   validateUpdateProductPackage,
   validateGetPackagesByStore,
-} from './product-package.validator.js';
-import { asyncWrapper } from '../../common/middlewares/index.js';
-import { PERMISSION, requirePermission } from '../access-control/index.js';
-import { authenticate } from '../auth/index.js';
-import { requireStoreContext } from '../stores/index.js';
+} from '../product-package.validator.js';
 
 const productPackageRouter = Router();
 const productPackageProductRouter = Router();

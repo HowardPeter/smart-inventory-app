@@ -11,6 +11,7 @@ class NavigationBinding extends Bindings {
   void dependencies() {
     // 1. Controller của Nav thì put ngay để dùng
     Get.put(NavigationController());
+    Get.put(NotificationController());
 
     // 2. Các Controller của Tab con thì dùng lazyPut.
     // Chúng sẽ chỉ được khởi tạo trên RAM khi View tương ứng gọi Get.find()
@@ -18,6 +19,5 @@ class NavigationBinding extends Bindings {
     Get.lazyPut(() => InventoryController(), fenix: true);
     Get.lazyPut(() => ProfileController(), fenix: true);
     // Get.lazyPut(() => ReportsController());
-    Get.lazyPut(() => NotificationController(), fenix: true);
   }
 }

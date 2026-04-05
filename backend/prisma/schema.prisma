@@ -19,6 +19,7 @@ enum ActiveStatus {
 }
 
 enum StoreRole {
+  owner
   manager
   staff
 }

@@ -37,6 +37,7 @@ class AppRoutes {
   static const transactionSummary = '/transaction_summary';
 
   static const profile = '/profile';
+  static const notification = '/notification';
   static const editProfile = '/edit_profile';
   static const changePassword = '/change_password';
 }

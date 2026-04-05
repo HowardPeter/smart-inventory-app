@@ -5,11 +5,16 @@ Các module hoặc route khác sẽ import
 controller/service từ file này để sử dụng. */
 
 import { prisma } from '../../db/prismaClient.js';
+import { AuditLogRepository } from '../audit-log/repository/audit-log.repository.js';
 import { InventoryController } from '../inventories/controller/inventory.controller.js';
 import { InventoryRepository } from '../inventories/repository/inventory.repository.js';
 import { InventoryService } from '../inventories/service/inventory.service.js';
 
+const auditLogRepository = new AuditLogRepository();
 const inventoryRepository = new InventoryRepository(prisma);
-const inventoryService = new InventoryService(inventoryRepository);
+const inventoryService = new InventoryService(
+  inventoryRepository,
+  auditLogRepository,
+);
 
 export const inventoryController = new InventoryController(inventoryService);

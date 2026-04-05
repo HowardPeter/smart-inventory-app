@@ -39,14 +39,30 @@ export class NotificationRepository {
     });
   }
 
-  async getUserNotifications(userId: string, storeId: string) {
+  async getUserNotifications(
+    userId: string,
+    storeId: string,
+    page: number,
+    size: number,
+    type?: string, // 👉 Bổ sung param type
+  ) {
+    const skip = (page - 1) * size;
+
     return await prisma.notification.findMany({
+      // Đưa trực tiếp object vào bên trong where
       where: {
-        userId: userId,
-        storeId: storeId, // Đã có lọc theo storeId
+        userId,
+        storeId,
         activeStatus: 'active',
+        // Dùng đúng 1 dòng này để nội suy biến type
+        ...(type && type !== 'ALL' ? { type } : {}),
       },
       orderBy: { createdAt: 'desc' },
+      skip: skip,
+      take: size,
+      include: {
+        store: { select: { name: true } },
+      },
     });
   }
 
@@ -71,5 +87,22 @@ export class NotificationRepository {
         token: { in: tokens },
       },
     });
+  }
+
+  async markAllAsRead(userId: string, storeId: string) {
+    return await prisma.notification.updateMany({
+      where: { userId, storeId, activeStatus: 'active', isRead: false },
+      data: { isRead: true },
+    });
+  }
+
+  async getStoreNameById(storeId: string): Promise<string> {
+    const store = await prisma.store.findUnique({
+      where: { storeId: storeId },
+      select: { name: true }, // Chỉ lấy mỗi cột name cho nhẹ DB
+    });
+
+    // Nếu có store thì trả về tên, nếu không có (null) thì trả về 'Cửa hàng'
+    return store?.name ?? 'Cửa hàng';
   }
 }

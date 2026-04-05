@@ -1,12 +1,15 @@
 import { StatusCodes } from 'http-status-codes';
 
-import { ProductPackageRepository } from './repositories/product-package.repository.js';
-import { UnitRepository } from './repositories/unit.repository.js';
-import { CustomError } from '../../common/errors/index.js';
-import { buildPaginatedResponse, normalizePagination } from '../../common/utils/index.js';
-import { prisma } from '../../db/prismaClient.js'; // gọi prisma để dùng cơ chế $transaction
-import { InventoryRepository } from '../inventories/index.js';
-import { productService } from '../products/index.js';
+import { CustomError } from '../../../common/errors/index.js';
+import {
+  buildPaginatedResponse,
+  normalizePagination,
+} from '../../../common/utils/index.js';
+import { prisma } from '../../../db/prismaClient.js'; // gọi prisma để dùng cơ chế $transaction
+import { InventoryRepository } from '../../inventories/index.js';
+import { productService } from '../../products/index.js';
+import { ProductPackageRepository } from '../repositories/product-package.repository.js';
+import { UnitRepository } from '../repositories/unit.repository.js';
 
 import type {
   CreateProductPackageData,
@@ -15,7 +18,7 @@ import type {
   PackageQueryDto,
   ProductPackageResponseDto,
   UpdateProductPackageDto,
-} from './product-package.dto.js';
+} from '../product-package.dto.js';
 
 export class ProductPackageService {
   constructor(
@@ -54,11 +57,7 @@ export class ProductPackageService {
         ...normalizedPagination,
       });
 
-    return buildPaginatedResponse(
-      items,
-      totalItems,
-      normalizedPagination,
-    );
+    return buildPaginatedResponse(items, totalItems, normalizedPagination);
   }
 
   async getProductPackagesByProductId(

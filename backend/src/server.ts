@@ -11,9 +11,10 @@ import {
   productPackageRouter,
   productPackageProductRouter,
 } from './modules/product-packages/index.js';
-import { unitRouter } from './modules/product-packages/unit.route.js';
+import { unitRouter } from './modules/product-packages/routes/unit.route.js';
 import { productRouter } from './modules/products/index.js';
 import { searchRouter } from './modules/search/index.js';
+import { storeMemberRouter } from './modules/store-member/store-member.route.js';
 import { storeRouter } from './modules/stores/index.js';
 import { userProfileRouter } from './modules/user-profile/index.js';
 
@@ -44,6 +45,7 @@ app.use('/api/audit-logs', auditLogRouter);
 app.use('/api/notification', notificationRouter);
 app.use('/api/search', searchRouter);
 app.use('/api/units', unitRouter);
+app.use('/api/store-members', storeMemberRouter);
 
 app.use(errorHandler);
 

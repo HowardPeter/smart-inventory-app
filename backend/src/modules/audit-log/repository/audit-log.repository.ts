@@ -3,12 +3,22 @@ import {
   normalizePagination,
 } from '../../../common/utils/index.js';
 import { prisma } from '../../../db/prismaClient.js';
+import { Prisma } from '../../../generated/prisma/client.js';
 
-import type { Prisma } from '../../../generated/prisma/client.js';
 import type {
   AuditLogListItemDto,
   ListAuditLogsQueryDto,
 } from '../dto/audit-log.dto.js';
+
+export type CreateAuditLogPayload = {
+  actionType: 'create' | 'update' | 'delete';
+  entityType: string;
+  userId: string;
+  storeId: string;
+  oldValue: Prisma.InputJsonValue | null; // Sử dụng kiểu JSON Input của Prisma
+  newValue: Prisma.InputJsonValue | null;
+  note?: string | null;
+};
 
 /* Lớp Repository chịu trách nhiệm tương tác trực tiếp với
 cơ sở dữ liệu (Prisma) cho module Audit Log.
@@ -65,5 +75,26 @@ export class AuditLogRepository {
       items,
       totalItems,
     };
+  }
+
+  // NOTE: Hàm này nhận vào tx (Prisma.TransactionClient)
+  // để chạy chung giao dịch với module khác
+  async createLog(
+    tx: Prisma.TransactionClient,
+    data: CreateAuditLogPayload,
+  ): Promise<void> {
+    await tx.auditLog.create({
+      data: {
+        actionType: data.actionType,
+        entityType: data.entityType,
+        userId: data.userId,
+        storeId: data.storeId,
+        // Dùng Nullish Coalescing (??)
+        // để tự động map null/undefined thành Prisma.DbNull
+        oldValue: data.oldValue ?? Prisma.DbNull,
+        newValue: data.newValue ?? Prisma.DbNull,
+        note: data.note ?? null,
+      },
+    });
   }
 }

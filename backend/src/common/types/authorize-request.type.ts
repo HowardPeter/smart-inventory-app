@@ -1,3 +1,4 @@
+import type { StoreRole } from '../../generated/prisma/enums.js';
 import type { Request } from 'express';
 
 export type CurrentUser = {
@@ -8,7 +9,7 @@ export type CurrentUser = {
 
 export type StoreContext = {
   storeId: string;
-  role: 'manager' | 'staff';
+  role: StoreRole;
 };
 
 export type AuthenticatedRequest = Request & {
