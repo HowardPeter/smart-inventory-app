@@ -12,12 +12,10 @@ class TransactionSummaryDetailsBottomSheetWidget
 
   @override
   Widget build(BuildContext context) {
-    // 🟢 KHÔNG CẦN SafeArea, Container bo góc, hay Drag handle nữa
     return Column(
       mainAxisSize: MainAxisSize.min,
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        // Thông tin chung (Đã bỏ Padding horizontal vì Widget chung lo rồi)
         _buildInfoRow(TTexts.transactionNumber.tr,
             controller.transaction.transactionId ?? TTexts.na.tr),
         const SizedBox(height: 8),
@@ -25,51 +23,84 @@ class TransactionSummaryDetailsBottomSheetWidget
 
         const SizedBox(height: 16),
 
-        // Danh sách sản phẩm (Bỏ Flexible, chuyển physics thành NeverScrollable)
-        ListView.separated(
-          shrinkWrap: true,
-          physics: const NeverScrollableScrollPhysics(), // 🟢 Để cha tự cuộn
-          padding: EdgeInsets.zero,
-          itemCount: controller.transaction.items.length,
-          separatorBuilder: (_, __) => const SizedBox(height: 12),
-          itemBuilder: (context, index) {
-            final item = controller.transaction.items[index];
-            return Row(
+        // ==========================================
+        // 🟢 NẾU LÀ ADJUSTMENT -> HIỂN THỊ VẮN TẮT
+        // ==========================================
+        if (controller.isAdjustment)
+          Container(
+            padding: const EdgeInsets.all(16),
+            decoration: BoxDecoration(
+              color: Colors.orange.withOpacity(0.1),
+              borderRadius: BorderRadius.circular(12),
+              border: Border.all(color: Colors.orange.withOpacity(0.3)),
+            ),
+            child: Row(
+              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Container(
-                  width: 44,
-                  height: 44,
-                  decoration: BoxDecoration(
-                      color: AppColors.surface,
-                      borderRadius: BorderRadius.circular(10)),
-                  child: const Icon(Iconsax.box_1_copy,
-                      size: 20, color: AppColors.subText),
-                ),
+                const Icon(Icons.info_outline_rounded,
+                    color: Colors.orange, size: 20),
                 const SizedBox(width: 12),
                 Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(item.packageInfo?.displayName ?? TTexts.product.tr,
-                          style: const TextStyle(
-                              fontSize: 13,
-                              fontWeight: FontWeight.w500,
-                              color: AppColors.primaryText)),
-                      Text('${TTexts.qty.tr}: ${item.quantity}',
-                          style: const TextStyle(
-                              fontSize: 12, color: AppColors.subText)),
-                    ],
+                  child: Text(
+                    TTexts.adjustmentSummaryBrief.tr,
+                    style: const TextStyle(
+                        fontSize: 13,
+                        color: AppColors.primaryText,
+                        height: 1.5),
                   ),
                 ),
-                Text('\$${(item.quantity * item.unitPrice).toStringAsFixed(2)}',
-                    style: const TextStyle(
-                        fontWeight: FontWeight.w500, fontSize: 13)),
               ],
-            );
-          },
-        ),
+            ),
+          )
+        else
+          // ==========================================
+          // 🟢 INBOUND/OUTBOUND -> HIỂN THỊ LIST CHI TIẾT
+          // ==========================================
+          ListView.separated(
+            shrinkWrap: true,
+            physics: const NeverScrollableScrollPhysics(),
+            padding: EdgeInsets.zero,
+            itemCount: controller.transaction.items.length,
+            separatorBuilder: (_, __) => const SizedBox(height: 12),
+            itemBuilder: (context, index) {
+              final item = controller.transaction.items[index];
+              return Row(
+                children: [
+                  Container(
+                    width: 44,
+                    height: 44,
+                    decoration: BoxDecoration(
+                        color: AppColors.surface,
+                        borderRadius: BorderRadius.circular(10)),
+                    child: const Icon(Iconsax.box_1_copy,
+                        size: 20, color: AppColors.subText),
+                  ),
+                  const SizedBox(width: 12),
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(item.packageInfo?.displayName ?? TTexts.product.tr,
+                            style: const TextStyle(
+                                fontSize: 13,
+                                fontWeight: FontWeight.w500,
+                                color: AppColors.primaryText)),
+                        Text('${TTexts.qty.tr}: ${item.quantity}',
+                            style: const TextStyle(
+                                fontSize: 12, color: AppColors.subText)),
+                      ],
+                    ),
+                  ),
+                  Text(
+                      '\$${(item.quantity * item.unitPrice).abs().toStringAsFixed(2)}',
+                      style: const TextStyle(
+                          fontWeight: FontWeight.w500, fontSize: 13)),
+                ],
+              );
+            },
+          ),
 
-        // PHẦN HIỂN THỊ NOTE
+        // PHẦN HIỂN THỊ NOTE TỔNG (Vẫn giữ cho Adjustment)
         if (controller.transaction.note != null &&
             controller.transaction.note!.isNotEmpty) ...[
           const Padding(
@@ -91,14 +122,22 @@ class TransactionSummaryDetailsBottomSheetWidget
                           color: AppColors.subText)),
                 ],
               ),
-              const SizedBox(height: 4),
-              Text(
-                controller.transaction.note!,
-                style: const TextStyle(
-                    fontSize: 13,
-                    fontWeight: FontWeight.w400,
-                    color: AppColors.primaryText,
-                    height: 1.4),
+              const SizedBox(height: 8),
+              Container(
+                width: double.infinity,
+                padding: const EdgeInsets.all(12),
+                decoration: BoxDecoration(
+                  color: AppColors.surface,
+                  borderRadius: BorderRadius.circular(8),
+                ),
+                child: Text(
+                  controller.transaction.note!,
+                  style: const TextStyle(
+                      fontSize: 13,
+                      fontWeight: FontWeight.w400,
+                      color: AppColors.primaryText,
+                      height: 1.4),
+                ),
               ),
             ],
           ),
@@ -109,7 +148,7 @@ class TransactionSummaryDetailsBottomSheetWidget
           child: Divider(height: 1),
         ),
 
-        // Tổng tiền
+        // Tổng tiền (Lệch)
         Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [

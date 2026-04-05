@@ -10,8 +10,6 @@ class TransactionProvider {
     return true;
   }
 
- 
-
   // 🟢 MOCK: LẤY CÁC GIAO DỊCH NHẬP KHO (INBOUND) CŨ LÀM LÔ HÀNG (FIFO)
   Future<List<TransactionModel>> getInboundTransactionsForPackage(
       String packageId) async {
@@ -101,5 +99,21 @@ class TransactionProvider {
       String productPackageId, Map<String, dynamic> data) async {
     await _apiClient.patch('/api/product-packages/$productPackageId',
         data: data);
+  }
+
+  Future<List<dynamic>> getInventoriesForAdjustment() async {
+    try {
+      // Gọi API lấy danh sách tồn kho (limit cao để kiểm kê)
+      final response = await _apiClient.get('/api/inventories?limit=100');
+
+      // Tùy thuộc vào cấu trúc trả về của Backend (thường là response.data['data']['items'])
+      final data = response.data['data']?['items'] ??
+          response.data['data'] ??
+          response.data;
+      if (data is List) return data;
+      return [];
+    } catch (e) {
+      throw Exception('Lỗi khi fetch danh sách tồn kho: $e');
+    }
   }
 }

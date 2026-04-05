@@ -1,0 +1,167 @@
+import 'package:flutter/material.dart';
+import 'package:frontend/core/infrastructure/constants/text_strings.dart';
+import 'package:frontend/core/ui/theme/app_colors.dart';
+import 'package:frontend/features/transaction/controllers/stock_adjustment_controller.dart';
+import 'package:frontend/features/transaction/models/adjustment_item_model.dart';
+import 'package:get/get.dart';
+import 'package:iconsax_flutter/iconsax_flutter.dart';
+
+class StockAdjustmentItemCardWidget extends GetView<StockAdjustmentController> {
+  final AdjustmentItemRx item;
+  final int index;
+
+  const StockAdjustmentItemCardWidget({
+    super.key,
+    required this.item,
+    required this.index,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Obx(() {
+      final isChecked = item.isChecked.value;
+      final isMismatched = item.isMismatched;
+
+      final statusText = isChecked
+          ? (isMismatched ? TTexts.mismatched.tr : TTexts.checked.tr)
+          : TTexts.unchecked.tr;
+      final statusColor = isChecked
+          ? (isMismatched ? AppColors.stockOut : AppColors.stockIn)
+          : Colors.orange;
+
+      const Gradient checkedGradient =
+          LinearGradient(colors: [Color(0xFF48CA93), Color(0xFF48BACA)]);
+      const Gradient mismatchedGradient =
+          LinearGradient(colors: [Color(0xFFE88B76), Color(0xFFCA5048)]);
+
+      return Container(
+        padding: const EdgeInsets.all(16),
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(16),
+          boxShadow: [
+            BoxShadow(
+                color: Colors.black.withOpacity(0.02),
+                blurRadius: 8,
+                offset: const Offset(0, 2))
+          ],
+        ),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text("$index. ${item.name}",
+                style: const TextStyle(
+                    fontWeight: FontWeight.w600,
+                    fontSize: 13,
+                    color: AppColors.primaryText)),
+            const SizedBox(height: 12),
+            Row(
+              children: [
+                Container(
+                  width: 48,
+                  height: 48,
+                  decoration: BoxDecoration(
+                      color: AppColors.surface,
+                      borderRadius: BorderRadius.circular(8)),
+                  child:
+                      const Icon(Iconsax.box_1_copy, color: AppColors.subText),
+                ),
+                const SizedBox(width: 16),
+                Expanded(
+                  child: Column(
+                    children: [
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Text("${TTexts.system.tr}: ${item.systemQty}",
+                              style: const TextStyle(
+                                  fontSize: 12, fontWeight: FontWeight.w500)),
+                          Text("${TTexts.actual.tr}: ${item.actualQty.value}",
+                              style: const TextStyle(
+                                  fontSize: 12, fontWeight: FontWeight.w500)),
+                        ],
+                      ),
+                      const SizedBox(height: 4),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Text(
+                              "${TTexts.spread.tr}: ${item.spread > 0 ? '+' : ''}${item.spread}",
+                              style: TextStyle(
+                                  fontSize: 12,
+                                  color: item.spread == 0
+                                      ? AppColors.subText
+                                      : (item.spread > 0
+                                          ? AppColors.stockIn
+                                          : AppColors.stockOut))),
+                        ],
+                      ),
+                      const SizedBox(height: 4),
+                      Row(
+                        children: [
+                          Text("${TTexts.status.tr}: ",
+                              style: const TextStyle(
+                                  fontSize: 12, color: AppColors.subText)),
+                          Text(statusText,
+                              style: TextStyle(
+                                  fontSize: 12,
+                                  fontWeight: FontWeight.w500,
+                                  color: statusColor)),
+                        ],
+                      ),
+                    ],
+                  ),
+                ),
+                const SizedBox(width: 16),
+                Row(
+                  children: [
+                    if (isChecked)
+                      Container(
+                        padding: const EdgeInsets.all(6),
+                        decoration: BoxDecoration(
+                            shape: BoxShape.circle,
+                            gradient: isMismatched
+                                ? mismatchedGradient
+                                : checkedGradient),
+                        child: Icon(
+                            isMismatched ? Icons.priority_high : Icons.check,
+                            color: Colors.white,
+                            size: 16),
+                      ),
+                    const SizedBox(width: 8),
+                    GestureDetector(
+                      onTap: () => controller.goToItemAdjustmentPage(item),
+                      child: Container(
+                        padding: const EdgeInsets.all(4),
+                        decoration: BoxDecoration(
+                            shape: BoxShape.circle,
+                            border:
+                                Border.all(color: Colors.orange, width: 1.5)),
+                        child: const Icon(Icons.more_horiz,
+                            color: Colors.orange, size: 16),
+                      ),
+                    ),
+                  ],
+                ),
+              ],
+            ),
+            if (isMismatched &&
+                (item.selectedReason.value.isNotEmpty ||
+                    item.note.value.isNotEmpty)) ...[
+              const Padding(
+                  padding: EdgeInsets.symmetric(vertical: 12),
+                  child: Divider(height: 1, color: AppColors.divider)),
+              Text(
+                item.note.value.isNotEmpty
+                    ? item.note.value
+                    : "Reason: ${item.selectedReason.value.tr}",
+                style:
+                    const TextStyle(fontSize: 12, color: AppColors.primaryText),
+              ),
+            ]
+          ],
+        ),
+      );
+    });
+  }
+}

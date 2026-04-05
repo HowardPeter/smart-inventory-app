@@ -122,6 +122,78 @@ final Map<String, String> enTransaction = {
   TTexts.specifyBatchQuantity:
       "Please specify the quantity from the batches above.",
 
+  // -- Stock Adjustment
+  TTexts.confirmAdjustmentTitle: "Start Inventory Check?",
+  TTexts.confirmAdjustmentDesc:
+      "Are you sure you want to start a new stock adjustment session? This will allow you to update actual stock levels.",
+  TTexts.proceedAdjustment: "Start Checking",
+  TTexts.listItems: "List items",
+  TTexts.system: "System",
+  TTexts.actual: "Actual",
+  TTexts.spread: "Spread",
+  TTexts.status: "Status",
+  TTexts.checked: "Checked",
+  TTexts.unchecked: "Unchecked",
+  TTexts.checkedItems: "Checked items",
+  TTexts.saveAll: "Save all",
+  TTexts.updateActualQty: "Update Actual Quantity",
+  TTexts.mismatched: "Mismatched",
+  TTexts.reason: "Reason",
+  TTexts.damage: "Damage",
+  TTexts.expired: "Expired",
+  TTexts.loss: "Loss",
+  TTexts.itemFound: "Item Found",
+  TTexts.inputError: "Input error",
+  TTexts.additionalNote: "Additional Note",
+  TTexts.stockOutput: "STOCK OUTPUT:",
+  TTexts.checkComplete: "Check complete",
+  TTexts.mismatchedReasonLabel: "Mismatched reason (Or note if have):",
+  TTexts.productInformation: "Product Information",
+  TTexts.stockCount: "Stock Count:",
+  TTexts.otherReason: "Other Reason",
+  TTexts.notEnoughStockWarning:
+      "You can not set actual quantity lower than current stock.",
+  TTexts.quantityToAdjust: "Quantity to Adjust:",
+  TTexts.automatedNote: "Automated Note:",
+  TTexts.currentStock: "Current Stock",
+  TTexts.barcode: "Barcode",
+  TTexts.checkAll: "Check All",
+  TTexts.uncheckAll: "Uncheck All",
+  TTexts.confirmCheckAllTitle: "Check All Items?",
+  TTexts.confirmCheckAllDesc:
+      "All unchecked items will be marked as checked with their system quantity (Spread: 0). Do you want to proceed?",
+  TTexts.confirmUncheckAllTitle: "Uncheck All Items?",
+  TTexts.confirmUncheckAllDesc:
+      "This will reset all items to unchecked status and clear all inputted actual quantities and notes. Proceed?",
+  TTexts.incompleteSaveTitle: "Incomplete Check!",
+  TTexts.incompleteSaveDesc:
+      "You haven't checked all items in the inventory yet. Unchecked items will NOT be updated. Are you sure you want to save now?",
+  TTexts.confirmSaveTitle: "Save Stock Adjustment?",
+  TTexts.confirmSaveDesc:
+      "This action will update the inventory and create an adjustment transaction record. Proceed?",
+  TTexts.combinedNotesTitle: "Adjustment Notes Summary:",
+  TTexts.errorLoadingData: "Error loading data. Please try again.",
+  TTexts.verifyingData: "Verifying current stock data...",
+  TTexts.syncDataWarningTitle: "Stock Data Changed!",
+  TTexts.syncDataWarningDesc:
+      "Some items were modified by another process while you were counting. We have updated the System Quantity. Please review the highlighted items again.",
+  TTexts.unsavedChangesTitle: "Discard Changes?",
+  TTexts.unsavedChangesDesc:
+      "You have unchecked items. If you exit now, your counting progress will be lost. Do you want to exit anyway?",
+  TTexts.exitAnyway: "Exit Anyway",
+  TTexts.inventoryUpdatedSuccess: "Inventory successfully updated.",
+  TTexts.noReasonNeededWarning:
+      "You don't need to select a reason when there's no mismatch.",
+  TTexts.defaultAdjustmentNote: "Stock Adjustment (No mismatch/notes)",
+  TTexts.itemFoundText: "Found",
+  TTexts.defaultUnit: "Unit",
+  TTexts.specificNoteHint: "Enter specific note (e.g. Damage 1 pack by John)",
+  TTexts.noItemsFound: "No items found",
+  TTexts.noItemsFoundDesc:
+      "We couldn't find any items matching your search. Please try a different keyword or scan again.",
+
   // -- Transaction Summary
   TTexts.qty: "Qty",
+  TTexts.adjustmentSummaryBrief:
+      "This is a brief summary of the stock adjustment. To view the detailed list of adjusted items, please check the Transaction History.",
 };

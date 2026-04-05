@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:frontend/core/ui/widgets/t_custom_dialog_widget.dart';
 import 'package:frontend/routes/app_routes.dart';
 import 'package:get/get.dart';
 import 'package:iconsax_flutter/iconsax_flutter.dart';
@@ -77,7 +78,21 @@ class TransactionBottomSheetWidget extends StatelessWidget {
           icon: Iconsax.layer_copy,
           fontSize: 16,
           onPressed: () {
-            Get.back();
+            Get.back(); // 1. Đóng Bottom Sheet hiện tại
+            // 2. Mở Hộp thoại xác nhận
+            Get.dialog(
+              TCustomDialogWidget(
+                title: TTexts.confirmAdjustmentTitle.tr,
+                description: TTexts.confirmAdjustmentDesc.tr,
+                icon: const Text('📋', style: TextStyle(fontSize: 40)),
+                primaryButtonText: TTexts.proceedAdjustment.tr,
+                onPrimaryPressed: () {
+                  Get.back();
+                  Get.toNamed(AppRoutes.stockAdjustment);
+                },
+                secondaryButtonText: TTexts.cancel.tr,
+              ),
+            );
           },
         ),
         const SizedBox(height: AppSizes.p16),

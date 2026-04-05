@@ -707,8 +707,56 @@ class TTexts {
   static const String totalQuantity = "total_quantity";
   static const String specifyBatchQuantity = "specify_batch_quantity";
 
+  // -- Stock Adjustment
+  static const String confirmAdjustmentTitle = "confirm_adjustment_title";
+  static const String confirmAdjustmentDesc = "confirm_adjustment_desc";
+  static const String proceedAdjustment = "proceed_adjustment";
+  static const String listItems = "list_items";
+  static const String system = "system";
+  static const String actual = "actual";
+  static const String spread = "spread";
+  static const String status = "status";
+  static const String checked = "checked";
+  static const String unchecked = "unchecked";
+  static const String checkedItems = "checked_items";
+  static const String saveAll = "save_all";
+  static const String updateActualQty = "update_actual_qty";
+  static const String mismatched = "mismatched";
+  static const String reason = "reason";
+  static const String damage = "damage";
+  static const String expired = "expired";
+  static const String loss = "loss";
+  static const String itemFound = "item_found";
+  static const String inputError = "input_error";
+  static const String additionalNote = "additional_note";
+  static const String stockOutput = "stock_output";
+  static const String checkComplete = "check_complete";
+  static const String mismatchedReasonLabel = "mismatched_reason_label";
+  static const String productInformation = "product_information";
+  static const String stockCount = "stock_count";
+  static const String otherReason = "other_reason";
+  static const String notEnoughStockWarning = "not_enough_stock_warning";
+  static const String quantityToAdjust = "quantity_to_adjust";
+  static const String automatedNote = "automated_note";
+  static const String currentStock = "current_stock";
+  static const String barcode = "barcode";
+  static const String checkAll = "check_all";
+  static const String uncheckAll = "uncheck_all";
+  static const String confirmCheckAllTitle = "confirm_check_all_title";
+  static const String confirmCheckAllDesc = "confirm_check_all_desc";
+  static const String confirmUncheckAllTitle = "confirm_uncheck_all_title";
+  static const String confirmUncheckAllDesc = "confirm_uncheck_all_desc";
+  static const String incompleteSaveTitle = "incomplete_save_title";
+  static const String incompleteSaveDesc = "incomplete_save_desc";
+  static const String confirmSaveTitle = "confirm_save_title";
+  static const String confirmSaveDesc = "confirm_save_desc";
+  static const String combinedNotesTitle = "combined_notes_title";
+  static const String noItemsFound = "no_items_found";
+  static const String noItemsFoundDesc = "no_items_found_desc";
+
   // -- Transaction Summary
   static const String qty = "qty";
+  static const String adjustmentSummaryBrief = "adjustment_summary_brief";
 
   //--Profile
   static const String profileTitle = 'profile_title';
@@ -726,6 +774,19 @@ class TTexts {
   static const String profileDialogDescriptionLogout =
       'profile_dialog_description_logout';
   static const String profileDialogBtnLogout = 'profile_dialog_btn_logout';
+  static const String errorLoadingData = "error_loading_data";
+  static const String verifyingData = "verifying_data";
+  static const String syncDataWarningTitle = "sync_data_warning_title";
+  static const String syncDataWarningDesc = "sync_data_warning_desc";
+  static const String unsavedChangesTitle = "unsaved_changes_title";
+  static const String unsavedChangesDesc = "unsaved_changes_desc";
+  static const String exitAnyway = "exit_anyway";
+  static const String inventoryUpdatedSuccess = "inventory_updated_success";
+  static const String noReasonNeededWarning = "no_reason_needed_warning";
+  static const String defaultAdjustmentNote = "default_adjustment_note";
+  static const String itemFoundText = "item_found_text";
+  static const String defaultUnit = "default_unit";
+  static const String specificNoteHint = "specific_note_hint";
 
   //--Edit profile
   static const String editTitle = 'edit_title';
