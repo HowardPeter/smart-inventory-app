@@ -17,6 +17,11 @@ export type ProductPackageResponseDto = Omit<
   product: Pick<Product, 'productId' | 'name' | 'storeId'>;
 };
 
+export type ProductPackageResponseForTransaction = Pick<
+  ProductPackage,
+  'productPackageId' | 'displayName' | 'importPrice' | 'sellingPrice'
+>;
+
 export type CreateProductPackageDto = Pick<ProductPackage, 'unitId'> &
   Partial<
     Pick<

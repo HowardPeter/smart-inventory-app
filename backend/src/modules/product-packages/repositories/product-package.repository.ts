@@ -10,6 +10,7 @@ import type {
   PackageQueryDto,
   ProductPackageResponseDto,
   UpdateProductPackageDto,
+  ProductPackageResponseForTransaction,
 } from '../product-package.dto.js';
 
 const productPackageResponseSelect = {
@@ -161,14 +162,7 @@ export class ProductPackageRepository {
   async findManyActiveByIds(
     storeId: string,
     productPackageIds: string[],
-  ): Promise<
-    Array<{
-      productPackageId: string;
-      productId: string;
-      displayName: string | null;
-      importPrice: number | null;
-    }>
-  > {
+  ): Promise<ProductPackageResponseForTransaction[]> {
     if (productPackageIds.length === 0) {
       return [];
     }
@@ -186,17 +180,17 @@ export class ProductPackageRepository {
       },
       select: {
         productPackageId: true,
-        productId: true,
         displayName: true,
         importPrice: true,
+        sellingPrice: true,
       },
     });
 
     return productPackages.map((productPackage) => ({
       productPackageId: productPackage.productPackageId,
-      productId: productPackage.productId,
       displayName: productPackage.displayName,
       importPrice: productPackage.importPrice?.toNumber() ?? null,
+      sellingPrice: productPackage.sellingPrice?.toNumber() ?? null,
     }));
   }
 

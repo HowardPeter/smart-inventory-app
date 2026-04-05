@@ -18,6 +18,7 @@ import type {
   PackageQueryDto,
   ProductPackageResponseDto,
   UpdateProductPackageDto,
+  ProductPackageResponseForTransaction,
 } from '../product-package.dto.js';
 
 export class ProductPackageService {
@@ -82,14 +83,7 @@ export class ProductPackageService {
   async getProductPackagesByIds(
     storeId: string,
     productPackageIds: string[],
-  ): Promise<
-    Array<{
-      productPackageId: string;
-      productId: string;
-      displayName: string | null;
-      importPrice: number | null;
-    }>
-  > {
+  ): Promise<ProductPackageResponseForTransaction[]> {
     return await this.productPackageRepository.findManyActiveByIds(
       storeId,
       productPackageIds,
@@ -100,8 +94,11 @@ export class ProductPackageService {
     storeId: string,
     productIds: string[],
   ): Promise<string[]> {
-    return await this.productPackageRepository
-      .findProductIdsHavingActivePackages(storeId, productIds);
+    return await
+      this.productPackageRepository.findProductIdsHavingActivePackages(
+        storeId,
+        productIds,
+      );
   }
 
   async createProductPackage(
