@@ -217,6 +217,29 @@ export class ProductRepository {
     };
   }
 
+  async findManyActiveByIds(
+    storeId: string,
+    productIds: string[],
+  ): Promise<Array<{ productId: string; name: string }>> {
+    if (productIds.length === 0) {
+      return [];
+    }
+
+    return await this.db.product.findMany({
+      where: {
+        productId: {
+          in: productIds,
+        },
+        storeId,
+        activeStatus: 'active',
+      },
+      select: {
+        productId: true,
+        name: true,
+      },
+    });
+  }
+
   async uncategorizeMany(
     storeId: string,
     oldCategoryId: string,

@@ -10,6 +10,7 @@ import type {
   PackageQueryDto,
   ProductPackageResponseDto,
   UpdateProductPackageDto,
+  ProductPackageResponseForTransaction,
 } from '../product-package.dto.js';
 
 const productPackageResponseSelect = {
@@ -156,6 +157,69 @@ export class ProductPackageRepository {
     });
 
     return productPackage ? this.toResponseDto(productPackage) : null;
+  }
+
+  async findManyActiveByIds(
+    storeId: string,
+    productPackageIds: string[],
+  ): Promise<ProductPackageResponseForTransaction[]> {
+    if (productPackageIds.length === 0) {
+      return [];
+    }
+
+    const productPackages = await this.db.productPackage.findMany({
+      where: {
+        productPackageId: {
+          in: productPackageIds,
+        },
+        activeStatus: 'active',
+        product: {
+          storeId,
+          activeStatus: 'active',
+        },
+      },
+      select: {
+        productPackageId: true,
+        displayName: true,
+        importPrice: true,
+        sellingPrice: true,
+      },
+    });
+
+    return productPackages.map((productPackage) => ({
+      productPackageId: productPackage.productPackageId,
+      displayName: productPackage.displayName,
+      importPrice: productPackage.importPrice?.toNumber() ?? null,
+      sellingPrice: productPackage.sellingPrice?.toNumber() ?? null,
+    }));
+  }
+
+  async findProductIdsHavingActivePackages(
+    storeId: string,
+    productIds: string[],
+  ): Promise<string[]> {
+    if (productIds.length === 0) {
+      return [];
+    }
+
+    const productPackages = await this.db.productPackage.findMany({
+      where: {
+        productId: {
+          in: productIds,
+        },
+        activeStatus: 'active',
+        product: {
+          storeId,
+          activeStatus: 'active',
+        },
+      },
+      distinct: ['productId'],
+      select: {
+        productId: true,
+      },
+    });
+
+    return productPackages.map((productPackage) => productPackage.productId);
   }
 
   async findActiveByProductIdAndUnitId(

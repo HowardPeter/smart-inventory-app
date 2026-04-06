@@ -22,7 +22,20 @@ export const errorHandler = (
   );
 
   if (err instanceof CustomError) {
-    return sendResponse.error(res, err.status, err.message);
+    const options: {
+      code?: string;
+      data?: unknown;
+    } = {};
+
+    if (err.code !== undefined) {
+      options.code = err.code;
+    }
+
+    if (err.details !== undefined) {
+      options.data = err.details;
+    }
+
+    return sendResponse.error(res, err.status, err.message, options);
   }
 
   if (err instanceof Error) {

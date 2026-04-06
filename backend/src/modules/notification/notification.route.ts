@@ -9,8 +9,7 @@ import {
   registerTokenSchema,
   removeTokenSchema,
 } from './validators/notification.validator.js';
-import { validate } from '../notification/validators/validate.middleware.js';
-
+import { validator } from '../../common/middlewares/index.js';
 
 const notificationRouter = Router();
 const repository = new NotificationRepository();
@@ -21,14 +20,14 @@ const controller = new NotificationController(service);
 notificationRouter.post(
   '/register-token',
   authenticate,
-  validate(registerTokenSchema),
+  validator(registerTokenSchema),
   asyncWrapper(controller.registerToken),
 );
 
 notificationRouter.post(
   '/remove-token',
   authenticate,
-  validate(removeTokenSchema),
+  validator(removeTokenSchema),
   asyncWrapper(controller.removeToken),
 );
 

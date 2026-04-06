@@ -18,6 +18,7 @@ import type {
   PackageQueryDto,
   ProductPackageResponseDto,
   UpdateProductPackageDto,
+  ProductPackageResponseForTransaction,
 } from '../product-package.dto.js';
 
 export class ProductPackageService {
@@ -77,6 +78,27 @@ export class ProductPackageService {
     productPackageId: string,
   ): Promise<ProductPackageResponseDto> {
     return await this.checkProductPackageExisted(storeId, productPackageId);
+  }
+
+  async getProductPackagesByIds(
+    storeId: string,
+    productPackageIds: string[],
+  ): Promise<ProductPackageResponseForTransaction[]> {
+    return await this.productPackageRepository.findManyActiveByIds(
+      storeId,
+      productPackageIds,
+    );
+  }
+
+  async getProductIdsHavingPackages(
+    storeId: string,
+    productIds: string[],
+  ): Promise<string[]> {
+    return await
+      this.productPackageRepository.findProductIdsHavingActivePackages(
+        storeId,
+        productIds,
+      );
   }
 
   async createProductPackage(

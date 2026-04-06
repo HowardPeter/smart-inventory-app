@@ -6,10 +6,12 @@ import {
   normalizePagination,
 } from '../../../common/utils/index.js';
 import { prisma } from '../../../db/prismaClient.js';
+import { TransactionType } from '../../../generated/prisma/enums.js';
+import { AuditLogRepository } from '../../audit-log/index.js';
 import { InventoryRepository } from '../repository/inventory.repository.js';
 
+import type { DbClient } from '../../../common/types/index.js';
 import type { Prisma } from '../../../generated/prisma/client.js';
-import type { AuditLogRepository } from '../../audit-log/repository/audit-log.repository.js';
 import type {
   CreateInventoryDto,
   InventoryAdjustmentDto,
@@ -19,6 +21,7 @@ import type {
   ListInventoriesResponseDto,
   LowStockInventoriesResponseDto,
   UpdateInventoryDto,
+  InventoryForTransactionData,
 } from '../dto/inventory.dto.js';
 
 /* Service xử lý business logic cho module Inventory.
@@ -30,6 +33,11 @@ export class InventoryService {
     private readonly inventoryRepository: InventoryRepository,
     private readonly auditLogRepository: AuditLogRepository,
   ) {}
+
+  createTxRepositories = (db: DbClient) => ({
+    inventoryRepositoryTx: new InventoryRepository(db),
+    auditLogRepositoryTx: new AuditLogRepository(db),
+  });
 
   // Hàm helper dùng chung để kiểm tra sự tồn tại của kho hàng,
   // ném lỗi 404 nếu không tìm thấy
@@ -102,13 +110,15 @@ export class InventoryService {
 
     // MỞ TRANSACTION TẠI SERVICE
     return await prisma.$transaction(async (tx) => {
-      const updated = await this.inventoryRepository.updateOne(
-        tx,
+      const { inventoryRepositoryTx, auditLogRepositoryTx } =
+        this.createTxRepositories(tx);
+
+      const updated = await inventoryRepositoryTx.updateOne(
         existingInventory.inventoryId,
         data,
       );
 
-      await this.auditLogRepository.createLog(tx, {
+      await auditLogRepositoryTx.createLog({
         actionType: 'update',
         entityType: 'Inventory',
         userId,
@@ -159,13 +169,15 @@ export class InventoryService {
     const changedQty = nextQuantity - existingInventory.quantity;
 
     return await prisma.$transaction(async (tx) => {
-      const updated = await this.inventoryRepository.adjustQuantity(
-        tx,
+      const { inventoryRepositoryTx, auditLogRepositoryTx } =
+        this.createTxRepositories(tx);
+
+      const updated = await inventoryRepositoryTx.adjustQuantity(
         existingInventory.inventoryId,
         nextQuantity,
       );
 
-      await this.auditLogRepository.createLog(tx, {
+      await auditLogRepositoryTx.createLog({
         actionType: 'update',
         entityType: 'Inventory',
         userId,
@@ -220,6 +232,9 @@ export class InventoryService {
       );
 
     return await prisma.$transaction(async (tx) => {
+      const { inventoryRepositoryTx, auditLogRepositoryTx } =
+        this.createTxRepositories(tx);
+
       if (existingInventory) {
         if (existingInventory.activeStatus === 'active') {
           throw new CustomError({
@@ -228,13 +243,12 @@ export class InventoryService {
             status: StatusCodes.CONFLICT,
           });
         } else {
-          const restored = await this.inventoryRepository.restoreInventory(
-            tx,
+          const restored = await inventoryRepositoryTx.restoreInventory(
             existingInventory.inventoryId,
             data,
           );
 
-          await this.auditLogRepository.createLog(tx, {
+          await auditLogRepositoryTx.createLog({
             actionType: 'create',
             entityType: 'Inventory',
             userId,
@@ -253,9 +267,9 @@ export class InventoryService {
         }
       }
 
-      const created = await this.inventoryRepository.create(tx, data);
+      const created = await this.inventoryRepository.create(data);
 
-      await this.auditLogRepository.createLog(tx, {
+      await auditLogRepositoryTx.createLog({
         actionType: 'create',
         entityType: 'Inventory',
         userId,
@@ -273,6 +287,152 @@ export class InventoryService {
     });
   }
 
+  async adjustInventoriesForTransaction(
+    transactionId: string, // transactionId để ghi log
+    transactionType: TransactionType,
+    userId: string,
+    storeId: string,
+    items: InventoryForTransactionData[],
+    db: DbClient,
+  ): Promise<void> {
+    // NOTE: Truyền db (TransactionClient) từ ngoài vào
+    // NOTE: để đảm bảo tất cả query chạy trong cùng transaction
+    const inventoryRepository = new InventoryRepository(db);
+
+    // Lấy tất cả inventory đang active theo danh sách productPackageId
+    const inventoryRecords =
+      await inventoryRepository.findManyActiveByProductPackageIds(
+        storeId,
+        // map để lấy list productPackageId từ items
+        items.map((item) => item.productPackageId),
+      );
+
+    // Tạo Map để lookup inventory theo productPackageId (O(1))
+    const inventoryMap = new Map(
+      inventoryRecords.map((inventory) => [
+        inventory.productPackageId,
+        inventory,
+      ]),
+    );
+
+    // Transform items về data shape của hàm adjustManyForTransaction
+    const inventoryItems = items.map((item) => {
+      // Lấy inventory hiện tại từ Map
+      const inventory = inventoryMap.get(item.productPackageId);
+
+      // Defensive check (trên lý thuyết không xảy ra vì đã filter)
+      if (!inventory) {
+        throw new CustomError({
+          message: 'Inventory not found for product package',
+          status: StatusCodes.NOT_FOUND,
+        });
+      }
+
+      // Nếu là export transaction, check `current quantity - new quantity < 0`
+      if (transactionType === 'export') {
+        if (inventory.quantity < item.quantity) {
+          throw new CustomError({
+            message: 'Insufficient inventory quantity',
+            code: 'INSUFFICIENT_INVENTORY',
+            status: StatusCodes.BAD_REQUEST,
+          });
+        }
+      }
+
+      // Trả về data shape của tham số items hàm repository
+      return {
+        inventoryId: inventory.inventoryId,
+        productPackageId: item.productPackageId,
+        quantity: inventory.quantity, // quantity hiện tại
+        transactionQuantity: item.quantity, // quantity trong transaction
+        unitPrice: item.unitPrice,
+        transactionId: item.transactionId,
+      };
+    });
+
+    await prisma.$transaction(async (tx) => {
+      const { inventoryRepositoryTx, auditLogRepositoryTx } =
+        this.createTxRepositories(tx);
+
+      switch (transactionType) {
+        case 'import': {
+          await inventoryRepositoryTx.increaseManyForTransaction(
+            inventoryItems,
+          );
+
+          for (const item of inventoryItems) {
+            await auditLogRepositoryTx.createLog({
+              actionType: 'update',
+              entityType: 'Inventory',
+              userId,
+              storeId,
+              note: null,
+              oldValue: {
+                quantity: item.quantity,
+              } as Prisma.InputJsonObject,
+              newValue: {
+                quantity: item.quantity + item.transactionQuantity,
+                changedQuantity: item.transactionQuantity,
+                adjustmentType: transactionType,
+                reason: 'import transaction',
+                productPackageId: item.productPackageId,
+                transactionId,
+              } as Prisma.InputJsonObject,
+            });
+          }
+
+          return;
+        }
+        case 'export': {
+          const failedProductPackageIds =
+            await inventoryRepositoryTx.decreaseManyForTransaction(
+              inventoryItems,
+            );
+
+          // nếu có inventory bị lỗi khi trừ, return lỗi + packageId tương ứng
+          if (failedProductPackageIds.size > 0) {
+            throw new CustomError({
+              message: 'Insufficient inventory quantity',
+              code: 'INSUFFICIENT_INVENTORY',
+              status: StatusCodes.BAD_REQUEST,
+              details: {
+                productPackageIds: failedProductPackageIds,
+              },
+            });
+          }
+
+          for (const item of inventoryItems) {
+            await auditLogRepositoryTx.createLog({
+              actionType: 'update',
+              entityType: 'Inventory',
+              userId,
+              storeId,
+              note: 'export transaction',
+              oldValue: {
+                quantity: item.quantity,
+              } as Prisma.InputJsonObject,
+              newValue: {
+                quantity: item.quantity - item.transactionQuantity,
+                changedQuantity: item.transactionQuantity,
+                adjustmentType: transactionType,
+                reason: null,
+                productPackageId: item.productPackageId,
+                transactionId,
+              } as Prisma.InputJsonObject,
+            });
+          }
+
+          return;
+        }
+        default:
+          throw new CustomError({
+            message: `Unsupported transaction type: ${transactionType}`,
+            status: StatusCodes.BAD_REQUEST,
+          });
+      }
+    });
+  }
+
   async deleteInventory(
     storeId: string,
     productPackageId: string,
@@ -284,9 +444,12 @@ export class InventoryService {
     );
 
     await prisma.$transaction(async (tx) => {
-      await this.inventoryRepository.delete(tx, existingInventory.inventoryId);
+      const { inventoryRepositoryTx, auditLogRepositoryTx } =
+        this.createTxRepositories(tx);
 
-      await this.auditLogRepository.createLog(tx, {
+      await inventoryRepositoryTx.delete(existingInventory.inventoryId);
+
+      await auditLogRepositoryTx.createLog({
         actionType: 'delete',
         entityType: 'Inventory',
         userId,

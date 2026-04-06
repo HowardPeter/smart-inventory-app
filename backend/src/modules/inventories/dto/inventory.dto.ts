@@ -87,3 +87,20 @@ export type CreateInventoryDto = {
   reorderThreshold?: number | null;
   lastCount?: number | null;
 };
+
+export type AdjustInventoryForTransactionDto = Pick<
+  Inventory,
+  'inventoryId' | 'productPackageId' | 'quantity'
+> & {
+  transactionQuantity: number;
+  unitPrice: number;
+  transactionId: string;
+};
+
+export type InventoryForTransactionData = Pick<
+  Inventory,
+  'productPackageId' | 'quantity'
+> & {
+  transactionId: string;
+  unitPrice: number;
+};

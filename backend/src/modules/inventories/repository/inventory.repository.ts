@@ -2,7 +2,6 @@ import {
   getPaginationSkip,
   normalizePagination,
 } from '../../../common/utils/index.js';
-import { prisma as globalPrisma } from '../../../db/prismaClient.js';
 import { Prisma } from '../../../generated/prisma/client.js';
 
 import type { DbClient } from '../../../common/types/index.js';
@@ -10,8 +9,10 @@ import type {
   CreateInventoryDto,
   InventoryDetailResponseDto,
   InventoryListItemDto,
+  InventoryResponseDto,
   ListInventoriesQueryDto,
   UpdateInventoryDto,
+  AdjustInventoryForTransactionDto,
 } from '../dto/inventory.dto.js';
 import type { InventoryStatus } from '../inventory.type.js';
 
@@ -56,7 +57,7 @@ const inventorySelect = {
 } satisfies Prisma.InventorySelect;
 
 export class InventoryRepository {
-  constructor(private readonly prisma: DbClient = globalPrisma) {}
+  constructor(private readonly prisma: DbClient) {}
 
   private mapInventoryStatus(
     quantity: number,
@@ -272,12 +273,46 @@ export class InventoryRepository {
     return this.toInventoryListItem(inventory);
   }
 
+  async findManyActiveByProductPackageIds(
+    storeId: string,
+    productPackageIds: string[],
+  ): Promise<
+    Pick<
+      InventoryResponseDto,
+      'inventoryId' | 'quantity' | 'productPackageId'
+    >[]
+  > {
+    if (productPackageIds.length === 0) {
+      return [];
+    }
+
+    return await this.prisma.inventory.findMany({
+      where: {
+        productPackageId: {
+          in: productPackageIds,
+        },
+        activeStatus: 'active',
+        productPackage: {
+          activeStatus: 'active',
+          product: {
+            storeId,
+            activeStatus: 'active',
+          },
+        },
+      },
+      select: {
+        inventoryId: true,
+        productPackageId: true,
+        quantity: true,
+      },
+    });
+  }
+
   async updateOne(
-    tx: Prisma.TransactionClient,
     inventoryId: string,
     data: UpdateInventoryDto,
   ): Promise<InventoryDetailResponseDto> {
-    const inventory = await tx.inventory.update({
+    const inventory = await this.prisma.inventory.update({
       where: { inventoryId },
       data,
       select: inventorySelect,
@@ -287,11 +322,10 @@ export class InventoryRepository {
   }
 
   async adjustQuantity(
-    tx: Prisma.TransactionClient,
     inventoryId: string,
     nextQuantity: number,
   ): Promise<InventoryDetailResponseDto> {
-    const inventory = await tx.inventory.update({
+    const inventory = await this.prisma.inventory.update({
       where: { inventoryId },
       data: { quantity: nextQuantity },
       select: inventorySelect,
@@ -314,16 +348,19 @@ export class InventoryRepository {
   async getInventoryStatusByProductPackageId(productPackageId: string) {
     return await this.prisma.inventory.findUnique({
       where: { productPackageId },
-      select: { inventoryId: true, activeStatus: true },
+      select: {
+        inventoryId: true,
+        activeStatus: true,
+        quantity: true,
+      },
     });
   }
 
   async restoreInventory(
-    tx: Prisma.TransactionClient,
     inventoryId: string,
     data: CreateInventoryDto,
   ): Promise<InventoryDetailResponseDto> {
-    const inventory = await tx.inventory.update({
+    const inventory = await this.prisma.inventory.update({
       where: { inventoryId },
       data: {
         quantity: data.quantity,
@@ -337,11 +374,8 @@ export class InventoryRepository {
     return this.toInventoryListItem(inventory);
   }
 
-  async create(
-    tx: Prisma.TransactionClient,
-    data: CreateInventoryDto,
-  ): Promise<InventoryDetailResponseDto> {
-    const inventory = await tx.inventory.create({
+  async create(data: CreateInventoryDto): Promise<InventoryDetailResponseDto> {
+    const inventory = await this.prisma.inventory.create({
       data: {
         productPackageId: data.productPackageId,
         quantity: data.quantity,
@@ -361,11 +395,61 @@ export class InventoryRepository {
     });
   }
 
-  async delete(
-    tx: Prisma.TransactionClient,
-    inventoryId: string,
+  async increaseManyForTransaction(
+    items: AdjustInventoryForTransactionDto[],
   ): Promise<void> {
-    await tx.inventory.update({
+    await Promise.all(
+      items.map((item) =>
+        this.prisma.inventory.update({
+          where: {
+            inventoryId: item.inventoryId,
+          },
+          data: {
+            // Dùng atomic increment để cộng tồn trực tiếp ở DB
+            quantity: {
+              increment: item.transactionQuantity,
+            },
+          },
+        }),
+      ),
+    );
+  }
+
+  async decreaseManyForTransaction(
+    items: AdjustInventoryForTransactionDto[],
+  ): Promise<Set<string>> {
+    const failedProductPackageIds = new Set<string>();
+
+    for (const item of items) {
+      const result = await this.prisma.inventory.updateMany({
+        where: {
+          inventoryId: item.inventoryId,
+
+          // DB-level check: chỉ update khi quantity hiện tại vẫn đủ để xuất
+          quantity: {
+            gte: item.transactionQuantity,
+          },
+        },
+        data: {
+          quantity: {
+            decrement: item.transactionQuantity,
+          },
+        },
+      });
+
+      // count = 0 nghĩa là update không xảy ra:
+      // - hoặc inventory không tồn tại
+      // - hoặc quantity không đủ tại thời điểm update
+      if (result.count === 0) {
+        failedProductPackageIds.add(item.productPackageId);
+      }
+    }
+
+    return failedProductPackageIds;
+  }
+
+  async delete(inventoryId: string): Promise<void> {
+    await this.prisma.inventory.update({
       where: { inventoryId },
       data: { activeStatus: 'inactive' },
     });

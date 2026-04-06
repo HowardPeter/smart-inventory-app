@@ -130,6 +130,16 @@ export class ProductService {
     };
   }
 
+  async getActiveProductsByIds(
+    storeId: string,
+    productIds: string[],
+  ): Promise<Array<{ productId: string; name: string }>> {
+    return await this.productRepository.findManyActiveByIds(
+      storeId,
+      productIds,
+    );
+  }
+
   async createProduct(data: CreateProductData): Promise<ProductResponseDto> {
     await this.checkCategoryExisted(data.categoryId);
 

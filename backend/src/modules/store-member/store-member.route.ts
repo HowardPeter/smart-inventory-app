@@ -2,6 +2,7 @@ import { Router } from 'express';
 
 import { storeMemberController } from './store-member.module.js';
 import { asyncWrapper } from '../../common/middlewares/index.js';
+import { validator } from '../../common/middlewares/index.js';
 import { requirePermission } from '../access-control/require-permission.middleware.js';
 import { PERMISSION } from '../access-control/role-permission.constant.js';
 import { authenticate } from '../auth/index.js';
@@ -9,7 +10,6 @@ import {
   removeStoreMemberSchema,
   updateStoreMemberRoleSchema,
 } from './validator/store-member.validator.js';
-import { validate } from '../notification/validators/validate.middleware.js';
 import { requireStoreContext } from '../stores/index.js';
 
 const storeMemberRouter = Router();
@@ -30,7 +30,7 @@ storeMemberRouter.delete(
   authenticate,
   requireStoreContext,
   requirePermission(PERMISSION.STORE_MEMBER_DELETE),
-  validate(removeStoreMemberSchema),
+  validator(removeStoreMemberSchema),
   asyncWrapper(storeMemberController.removeUser),
 );
 
@@ -51,7 +51,7 @@ storeMemberRouter.patch(
   authenticate,
   requireStoreContext,
   requirePermission(PERMISSION.STORE_MEMBER_WRITE),
-  validate(updateStoreMemberRoleSchema),
+  validator(updateStoreMemberRoleSchema),
   asyncWrapper(storeMemberController.updateRole),
 );
 
