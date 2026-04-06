@@ -7,11 +7,11 @@ import {
 } from '../../../common/utils/index.js';
 import { prisma } from '../../../db/prismaClient.js';
 import { TransactionType } from '../../../generated/prisma/enums.js';
+import { AuditLogRepository } from '../../audit-log/index.js';
 import { InventoryRepository } from '../repository/inventory.repository.js';
 
 import type { DbClient } from '../../../common/types/index.js';
 import type { Prisma } from '../../../generated/prisma/client.js';
-import type { AuditLogRepository } from '../../audit-log/repository/audit-log.repository.js';
 import type {
   CreateInventoryDto,
   InventoryAdjustmentDto,
@@ -33,6 +33,11 @@ export class InventoryService {
     private readonly inventoryRepository: InventoryRepository,
     private readonly auditLogRepository: AuditLogRepository,
   ) {}
+
+  createTxRepositories = (db: DbClient) => ({
+    inventoryRepositoryTx: new InventoryRepository(db),
+    auditLogRepositoryTx: new AuditLogRepository(db),
+  });
 
   // Hàm helper dùng chung để kiểm tra sự tồn tại của kho hàng,
   // ném lỗi 404 nếu không tìm thấy
@@ -105,13 +110,15 @@ export class InventoryService {
 
     // MỞ TRANSACTION TẠI SERVICE
     return await prisma.$transaction(async (tx) => {
-      const updated = await this.inventoryRepository.updateOne(
-        tx,
+      const { inventoryRepositoryTx, auditLogRepositoryTx } =
+        this.createTxRepositories(tx);
+
+      const updated = await inventoryRepositoryTx.updateOne(
         existingInventory.inventoryId,
         data,
       );
 
-      await this.auditLogRepository.createLog(tx, {
+      await auditLogRepositoryTx.createLog({
         actionType: 'update',
         entityType: 'Inventory',
         userId,
@@ -162,13 +169,15 @@ export class InventoryService {
     const changedQty = nextQuantity - existingInventory.quantity;
 
     return await prisma.$transaction(async (tx) => {
-      const updated = await this.inventoryRepository.adjustQuantity(
-        tx,
+      const { inventoryRepositoryTx, auditLogRepositoryTx } =
+        this.createTxRepositories(tx);
+
+      const updated = await inventoryRepositoryTx.adjustQuantity(
         existingInventory.inventoryId,
         nextQuantity,
       );
 
-      await this.auditLogRepository.createLog(tx, {
+      await auditLogRepositoryTx.createLog({
         actionType: 'update',
         entityType: 'Inventory',
         userId,
@@ -223,6 +232,9 @@ export class InventoryService {
       );
 
     return await prisma.$transaction(async (tx) => {
+      const { inventoryRepositoryTx, auditLogRepositoryTx } =
+        this.createTxRepositories(tx);
+
       if (existingInventory) {
         if (existingInventory.activeStatus === 'active') {
           throw new CustomError({
@@ -231,13 +243,12 @@ export class InventoryService {
             status: StatusCodes.CONFLICT,
           });
         } else {
-          const restored = await this.inventoryRepository.restoreInventory(
-            tx,
+          const restored = await inventoryRepositoryTx.restoreInventory(
             existingInventory.inventoryId,
             data,
           );
 
-          await this.auditLogRepository.createLog(tx, {
+          await auditLogRepositoryTx.createLog({
             actionType: 'create',
             entityType: 'Inventory',
             userId,
@@ -256,9 +267,9 @@ export class InventoryService {
         }
       }
 
-      const created = await this.inventoryRepository.create(tx, data);
+      const created = await this.inventoryRepository.create(data);
 
-      await this.auditLogRepository.createLog(tx, {
+      await auditLogRepositoryTx.createLog({
         actionType: 'create',
         entityType: 'Inventory',
         userId,
@@ -277,7 +288,9 @@ export class InventoryService {
   }
 
   async adjustInventoriesForTransaction(
+    transactionId: string, // transactionId để ghi log
     transactionType: TransactionType,
+    userId: string,
     storeId: string,
     items: InventoryForTransactionData[],
     db: DbClient,
@@ -337,39 +350,87 @@ export class InventoryService {
       };
     });
 
-    switch (transactionType) {
-      case 'import':
-        await this.inventoryRepository.increaseManyForTransaction(
-          inventoryItems,
-        );
+    await prisma.$transaction(async (tx) => {
+      const { inventoryRepositoryTx, auditLogRepositoryTx } =
+        this.createTxRepositories(tx);
 
-        return;
-      case 'export': {
-        const failedProductPackageIds =
-          await inventoryRepository.decreaseManyForTransaction(
+      switch (transactionType) {
+        case 'import': {
+          await inventoryRepositoryTx.increaseManyForTransaction(
             inventoryItems,
           );
 
-        // nếu có inventory bị lỗi khi trừ, return lỗi + packageId tương ứng
-        if (failedProductPackageIds.size > 0) {
-          throw new CustomError({
-            message: 'Insufficient inventory quantity',
-            code: 'INSUFFICIENT_INVENTORY',
-            status: StatusCodes.BAD_REQUEST,
-            details: {
-              productPackageIds: failedProductPackageIds,
-            },
-          });
-        }
+          for (const item of inventoryItems) {
+            await auditLogRepositoryTx.createLog({
+              actionType: 'update',
+              entityType: 'Inventory',
+              userId,
+              storeId,
+              note: null,
+              oldValue: {
+                quantity: item.quantity,
+              } as Prisma.InputJsonObject,
+              newValue: {
+                quantity: item.quantity + item.transactionQuantity,
+                changedQuantity: item.transactionQuantity,
+                adjustmentType: transactionType,
+                reason: 'import transaction',
+                productPackageId: item.productPackageId,
+                transactionId,
+              } as Prisma.InputJsonObject,
+            });
+          }
 
-        return;
+          return;
+        }
+        case 'export': {
+          const failedProductPackageIds =
+            await inventoryRepositoryTx.decreaseManyForTransaction(
+              inventoryItems,
+            );
+
+          // nếu có inventory bị lỗi khi trừ, return lỗi + packageId tương ứng
+          if (failedProductPackageIds.size > 0) {
+            throw new CustomError({
+              message: 'Insufficient inventory quantity',
+              code: 'INSUFFICIENT_INVENTORY',
+              status: StatusCodes.BAD_REQUEST,
+              details: {
+                productPackageIds: failedProductPackageIds,
+              },
+            });
+          }
+
+          for (const item of inventoryItems) {
+            await auditLogRepositoryTx.createLog({
+              actionType: 'update',
+              entityType: 'Inventory',
+              userId,
+              storeId,
+              note: 'export transaction',
+              oldValue: {
+                quantity: item.quantity,
+              } as Prisma.InputJsonObject,
+              newValue: {
+                quantity: item.quantity - item.transactionQuantity,
+                changedQuantity: item.transactionQuantity,
+                adjustmentType: transactionType,
+                reason: null,
+                productPackageId: item.productPackageId,
+                transactionId,
+              } as Prisma.InputJsonObject,
+            });
+          }
+
+          return;
+        }
+        default:
+          throw new CustomError({
+            message: `Unsupported transaction type: ${transactionType}`,
+            status: StatusCodes.BAD_REQUEST,
+          });
       }
-      default:
-        throw new CustomError({
-          message: `Unsupported transaction type: ${transactionType}`,
-          status: StatusCodes.BAD_REQUEST,
-        });
-    }
+    });
   }
 
   async deleteInventory(
@@ -383,9 +444,12 @@ export class InventoryService {
     );
 
     await prisma.$transaction(async (tx) => {
-      await this.inventoryRepository.delete(tx, existingInventory.inventoryId);
+      const { inventoryRepositoryTx, auditLogRepositoryTx } =
+        this.createTxRepositories(tx);
 
-      await this.auditLogRepository.createLog(tx, {
+      await inventoryRepositoryTx.delete(existingInventory.inventoryId);
+
+      await auditLogRepositoryTx.createLog({
         actionType: 'delete',
         entityType: 'Inventory',
         userId,

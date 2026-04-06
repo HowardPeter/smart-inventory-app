@@ -2,7 +2,6 @@ import {
   getPaginationSkip,
   normalizePagination,
 } from '../../../common/utils/index.js';
-import { prisma as globalPrisma } from '../../../db/prismaClient.js';
 import { Prisma } from '../../../generated/prisma/client.js';
 
 import type { DbClient } from '../../../common/types/index.js';
@@ -58,7 +57,7 @@ const inventorySelect = {
 } satisfies Prisma.InventorySelect;
 
 export class InventoryRepository {
-  constructor(private readonly prisma: DbClient = globalPrisma) {}
+  constructor(private readonly prisma: DbClient) {}
 
   private mapInventoryStatus(
     quantity: number,
@@ -310,11 +309,10 @@ export class InventoryRepository {
   }
 
   async updateOne(
-    tx: Prisma.TransactionClient,
     inventoryId: string,
     data: UpdateInventoryDto,
   ): Promise<InventoryDetailResponseDto> {
-    const inventory = await tx.inventory.update({
+    const inventory = await this.prisma.inventory.update({
       where: { inventoryId },
       data,
       select: inventorySelect,
@@ -324,11 +322,10 @@ export class InventoryRepository {
   }
 
   async adjustQuantity(
-    tx: Prisma.TransactionClient,
     inventoryId: string,
     nextQuantity: number,
   ): Promise<InventoryDetailResponseDto> {
-    const inventory = await tx.inventory.update({
+    const inventory = await this.prisma.inventory.update({
       where: { inventoryId },
       data: { quantity: nextQuantity },
       select: inventorySelect,
@@ -351,16 +348,19 @@ export class InventoryRepository {
   async getInventoryStatusByProductPackageId(productPackageId: string) {
     return await this.prisma.inventory.findUnique({
       where: { productPackageId },
-      select: { inventoryId: true, activeStatus: true, quantity: true },
+      select: {
+        inventoryId: true,
+        activeStatus: true,
+        quantity: true,
+      },
     });
   }
 
   async restoreInventory(
-    tx: Prisma.TransactionClient,
     inventoryId: string,
     data: CreateInventoryDto,
   ): Promise<InventoryDetailResponseDto> {
-    const inventory = await tx.inventory.update({
+    const inventory = await this.prisma.inventory.update({
       where: { inventoryId },
       data: {
         quantity: data.quantity,
@@ -374,11 +374,8 @@ export class InventoryRepository {
     return this.toInventoryListItem(inventory);
   }
 
-  async create(
-    tx: Prisma.TransactionClient,
-    data: CreateInventoryDto,
-  ): Promise<InventoryDetailResponseDto> {
-    const inventory = await tx.inventory.create({
+  async create(data: CreateInventoryDto): Promise<InventoryDetailResponseDto> {
+    const inventory = await this.prisma.inventory.create({
       data: {
         productPackageId: data.productPackageId,
         quantity: data.quantity,
@@ -451,11 +448,8 @@ export class InventoryRepository {
     return failedProductPackageIds;
   }
 
-  async delete(
-    tx: Prisma.TransactionClient,
-    inventoryId: string,
-  ): Promise<void> {
-    await tx.inventory.update({
+  async delete(inventoryId: string): Promise<void> {
+    await this.prisma.inventory.update({
       where: { inventoryId },
       data: { activeStatus: 'inactive' },
     });

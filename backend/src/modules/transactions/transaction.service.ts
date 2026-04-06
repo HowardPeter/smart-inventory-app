@@ -5,6 +5,7 @@ import { TransactionRepository } from './repositories/transaction.repository.js'
 import { CustomError } from '../../common/errors/index.js';
 import { prisma } from '../../db/prismaClient.js';
 import { Prisma } from '../../generated/prisma/client.js';
+import { AuditLogRepository } from '../audit-log/index.js';
 import { InventoryService } from '../inventories/index.js';
 import { ProductPackageService } from '../product-packages/index.js';
 
@@ -16,12 +17,19 @@ import type {
   CreateTransactionItemDto,
   ProductPackageData,
 } from './transaction.dto.js';
+import type { DbClient } from '../../common/types/db.type.js';
 
 export class TransactionService {
   constructor(
     private readonly productPackageService: ProductPackageService,
     private readonly inventoryService: InventoryService,
   ) {}
+
+  createTxRepository = (db: DbClient) => ({
+    transactionRepositoryTx: new TransactionRepository(db),
+    transactionDetailRepositoryTx: new TransactionDetailRepository(db),
+    auditLogRepositoryTx: new AuditLogRepository(db),
+  });
 
   private ensureNoDuplicateProductPackageIds(data: CreateTransactionDto): void {
     // INFO: Sử dụng Set giúp kiểm tra và loại bỏ phần tử trùng
@@ -185,8 +193,11 @@ export class TransactionService {
     );
 
     return await prisma.$transaction(async (tx) => {
-      const transactionRepositoryTx = new TransactionRepository(tx);
-      const transactionDetailRepositoryTx = new TransactionDetailRepository(tx);
+      const {
+        transactionRepositoryTx,
+        transactionDetailRepositoryTx,
+        auditLogRepositoryTx,
+      } = this.createTxRepository(tx);
 
       const transaction = await transactionRepositoryTx.createOne({
         type: 'import',
@@ -207,7 +218,9 @@ export class TransactionService {
 
       // Cập nhật tồn kho
       await this.inventoryService.adjustInventoriesForTransaction(
+        transaction.transactionId,
         'import',
+        userId,
         storeId,
         data.items.map((item) => ({
           productPackageId: item.productPackageId,
@@ -217,6 +230,29 @@ export class TransactionService {
         })),
         tx,
       );
+
+      await auditLogRepositoryTx.createLog({
+        actionType: 'create',
+        entityType: 'Transaction',
+        userId,
+        storeId,
+        note: null,
+        oldValue: null,
+        newValue: {
+          transactionId: transaction.transactionId,
+          type: transaction.type,
+          status: transaction.status,
+          note: transaction.note,
+          totalPrice: transaction.totalPrice,
+          createdAt: transaction.createdAt.toISOString(),
+          itemCount: data.items.length,
+          items: data.items.map((item) => ({
+            productPackageId: item.productPackageId,
+            quantity: item.quantity,
+            unitPrice: item.unitPrice,
+          })),
+        } as Prisma.InputJsonObject,
+      });
 
       return {
         ...transaction,
@@ -254,8 +290,11 @@ export class TransactionService {
     const totalPrice = this.calculateTotalPrice(data).toNumber();
 
     return await prisma.$transaction(async (tx) => {
-      const transactionRepositoryTx = new TransactionRepository(tx);
-      const transactionDetailRepositoryTx = new TransactionDetailRepository(tx);
+      const {
+        transactionRepositoryTx,
+        transactionDetailRepositoryTx,
+        auditLogRepositoryTx,
+      } = this.createTxRepository(tx);
 
       const transaction = await transactionRepositoryTx.createOne({
         type: 'export',
@@ -275,8 +314,11 @@ export class TransactionService {
       });
 
       // Cập nhật tồn kho
+      // Gọi service vì còn các business rule cần InventoryService xử lý
       await this.inventoryService.adjustInventoriesForTransaction(
+        transaction.transactionId,
         'export',
+        userId,
         storeId,
         data.items.map((item) => ({
           productPackageId: item.productPackageId,
@@ -286,6 +328,29 @@ export class TransactionService {
         })),
         tx,
       );
+
+      await auditLogRepositoryTx.createLog({
+        actionType: 'create',
+        entityType: 'Transaction',
+        userId,
+        storeId,
+        note: null,
+        oldValue: null,
+        newValue: {
+          transactionId: transaction.transactionId,
+          type: transaction.type,
+          status: transaction.status,
+          note: transaction.note,
+          totalPrice: transaction.totalPrice,
+          createdAt: transaction.createdAt.toISOString(),
+          itemCount: data.items.length,
+          items: data.items.map((item) => ({
+            productPackageId: item.productPackageId,
+            quantity: item.quantity,
+            unitPrice: item.unitPrice,
+          })),
+        } as Prisma.InputJsonObject,
+      });
 
       return {
         ...transaction,

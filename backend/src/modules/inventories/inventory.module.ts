@@ -10,7 +10,7 @@ import { InventoryController } from '../inventories/controller/inventory.control
 import { InventoryRepository } from '../inventories/repository/inventory.repository.js';
 import { InventoryService } from '../inventories/service/inventory.service.js';
 
-const auditLogRepository = new AuditLogRepository();
+const auditLogRepository = new AuditLogRepository(prisma);
 const inventoryRepository = new InventoryRepository(prisma);
 const inventoryService = new InventoryService(
   inventoryRepository,
