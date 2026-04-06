@@ -38,8 +38,9 @@ class OutboundTransactionController extends GetxController with TErrorHandler {
 
   double get amountMultiplier {
     if (selectedReason.value == TTexts.reasonDamaged) return 0.0;
-    if (selectedReason.value == TTexts.reasonOther)
+    if (selectedReason.value == TTexts.reasonOther) {
       return otherFinancialEffect.value.toDouble();
+    }
     return 1.0;
   }
 
