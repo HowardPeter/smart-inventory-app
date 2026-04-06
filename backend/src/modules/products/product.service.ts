@@ -1,3 +1,4 @@
+import 'dotenv/config';
 import { StatusCodes } from 'http-status-codes';
 
 import { ProductRepository } from './product.repository.js';
