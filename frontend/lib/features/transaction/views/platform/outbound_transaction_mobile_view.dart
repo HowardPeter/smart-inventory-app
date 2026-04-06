@@ -20,61 +20,68 @@ class OutboundTransactionMobileView
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: AppColors.background,
-      appBar: TAppBarWidget(
-        title: TTexts.outboundTransactionTitle.tr,
-        showBackArrow: true,
-        centerTitle: true,
-      ),
-      body: Column(
-        children: [
-          Padding(
-            padding: const EdgeInsets.all(AppSizes.p20),
-            child: TSearchBarWidget(
-              hintText: TTexts.searchProductToAdd.tr,
-              onTap: () => Get.toNamed(AppRoutes.search,
-                  arguments: {'target': SearchTarget.transactions}),
-              onScanTap: () => controller.openScanner(),
-            ),
+    return PopScope(
+        canPop: false,
+        onPopInvoked: (didPop) {
+          if (didPop) return;
+          controller.handleExit();
+        },
+        child: Scaffold(
+          backgroundColor: AppColors.background,
+          appBar: TAppBarWidget(
+            title: TTexts.outboundTransactionTitle.tr,
+            showBackArrow: true,
+            centerTitle: true,
+            onBackPress: controller.handleExit,
           ),
-          Expanded(
-            child: Obx(() {
-              if (controller.cartItems.isEmpty) {
-                return const TransactionEmptyWidget();
-              }
+          body: Column(
+            children: [
+              Padding(
+                padding: const EdgeInsets.all(AppSizes.p20),
+                child: TSearchBarWidget(
+                  hintText: TTexts.searchProductToAdd.tr,
+                  onTap: () => Get.toNamed(AppRoutes.search,
+                      arguments: {'target': SearchTarget.transactions}),
+                  onScanTap: () => controller.openScanner(),
+                ),
+              ),
+              Expanded(
+                child: Obx(() {
+                  if (controller.cartItems.isEmpty) {
+                    return const TransactionEmptyWidget();
+                  }
 
-              return ListView(
-                physics: const BouncingScrollPhysics(),
-                padding: const EdgeInsets.only(bottom: 100),
-                children: [
-                  ListView.separated(
-                    shrinkWrap: true,
-                    physics: const NeverScrollableScrollPhysics(),
-                    padding:
-                        const EdgeInsets.symmetric(horizontal: AppSizes.p20),
-                    itemCount: controller.cartItems.length,
-                    separatorBuilder: (_, __) => const SizedBox(height: 12),
-                    itemBuilder: (context, index) {
-                      final item = controller.cartItems[index];
-                      return TransactionCartItemWidget(
-                        item: item,
-                        onIncrease: () =>
-                            controller.updateQuantity(index, item.quantity + 1),
-                        onDecrease: () =>
-                            controller.updateQuantity(index, item.quantity - 1),
-                      );
-                    },
-                  ),
-                  _buildReasonAndNoteSection(),
-                ],
-              );
-            }),
+                  return ListView(
+                    physics: const BouncingScrollPhysics(),
+                    padding: const EdgeInsets.only(bottom: 100),
+                    children: [
+                      ListView.separated(
+                        shrinkWrap: true,
+                        physics: const NeverScrollableScrollPhysics(),
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: AppSizes.p20),
+                        itemCount: controller.cartItems.length,
+                        separatorBuilder: (_, __) => const SizedBox(height: 12),
+                        itemBuilder: (context, index) {
+                          final item = controller.cartItems[index];
+                          return TransactionCartItemWidget(
+                            item: item,
+                            onIncrease: () => controller.updateQuantity(
+                                index, item.quantity + 1),
+                            onDecrease: () => controller.updateQuantity(
+                                index, item.quantity - 1),
+                          );
+                        },
+                      ),
+                      _buildReasonAndNoteSection(),
+                    ],
+                  );
+                }),
+              ),
+            ],
           ),
-        ],
-      ),
-      bottomNavigationBar: const OutboundTransactionBottomBarWidget(),
-    );
+          bottomNavigationBar: const OutboundTransactionBottomBarWidget(),
+        ));
   }
 
   Widget _buildReasonAndNoteSection() {

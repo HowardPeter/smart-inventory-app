@@ -753,6 +753,8 @@ class TTexts {
   static const String combinedNotesTitle = "combined_notes_title";
   static const String noItemsFound = "no_items_found";
   static const String noItemsFoundDesc = "no_items_found_desc";
+  static const String discardTransactionTitle = "discard_transaction_title";
+  static const String discardTransactionDesc = "discard_transaction_desc";
 
   // -- Transaction Summary
   static const String qty = "qty";

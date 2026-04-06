@@ -191,6 +191,9 @@ final Map<String, String> enTransaction = {
   TTexts.noItemsFound: "No items found",
   TTexts.noItemsFoundDesc:
       "We couldn't find any items matching your search. Please try a different keyword or scan again.",
+  TTexts.discardTransactionTitle: "Discard Transaction?",
+  TTexts.discardTransactionDesc:
+      "You have items in your ticket. If you exit now, this transaction will be lost. Do you want to exit anyway?",
 
   // -- Transaction Summary
   TTexts.qty: "Qty",
