@@ -238,7 +238,30 @@ class InboundTransactionController extends GetxController with TErrorHandler {
           message: TTexts.importTicketCreated.tr);
     } catch (e) {
       FullScreenLoaderUtils.stopLoading();
-      handleError(e); // 🟢 Bẫy lỗi an toàn
+      handleError(e);
+    }
+  }
+
+  // ==========================================
+  // BẪY LỖI THOÁT TRANG
+  // ==========================================
+  void handleExit() {
+    if (cartItems.isNotEmpty) {
+      Get.dialog(
+        TCustomDialogWidget(
+          title: TTexts.discardTransactionTitle.tr,
+          description: TTexts.discardTransactionDesc.tr,
+          icon: const Text('🚨', style: TextStyle(fontSize: 40)),
+          primaryButtonText: TTexts.exitAnyway.tr,
+          onPrimaryPressed: () {
+            Get.back();
+            Get.back();
+          },
+          secondaryButtonText: TTexts.cancel.tr,
+        ),
+      );
+    } else {
+      Get.back(); // Nếu giỏ hàng trống thì cho thoát luôn
     }
   }
 
