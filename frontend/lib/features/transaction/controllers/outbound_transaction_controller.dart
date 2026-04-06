@@ -11,6 +11,7 @@ import 'package:frontend/core/ui/theme/app_colors.dart';
 import 'package:frontend/features/transaction/providers/transaction_provider.dart';
 import 'package:frontend/routes/app_routes.dart';
 import 'package:get/get.dart';
+import 'package:dio/dio.dart'; // 🟢 Bổ sung Dio để bắt lỗi HTTP
 
 class OutboundTransactionController extends GetxController with TErrorHandler {
   final TransactionProvider _provider = TransactionProvider();
@@ -19,7 +20,7 @@ class OutboundTransactionController extends GetxController with TErrorHandler {
 
   final TextEditingController noteController = TextEditingController();
 
-  // BIẾN TÀI CHÍNH MỚI (1: Cộng tiền, 0: Không thu tiền, -1: Trừ tiền)
+  // BIẾN TÀI CHÍNH
   final RxString selectedReason = TTexts.reasonRetailSale.obs;
   final RxInt otherFinancialEffect = 1.obs;
 
@@ -35,16 +36,11 @@ class OutboundTransactionController extends GetxController with TErrorHandler {
   double get rawTotalAmount =>
       cartItems.fold(0, (sum, item) => sum + (item.quantity * item.unitPrice));
 
-  // Xác định hệ số nhân dựa trên lý do
   double get amountMultiplier {
-    if (selectedReason.value == TTexts.reasonDamaged) {
-      return 0.0; // Hủy hàng -> Doanh thu = 0
-    }
-    if (selectedReason.value == TTexts.reasonOther) {
-      return otherFinancialEffect.value
-          .toDouble(); // Trả về 1.0, 0.0, hoặc -1.0
-    }
-    return 1.0; // Sale, Return -> Doanh thu dương (+)
+    if (selectedReason.value == TTexts.reasonDamaged) return 0.0;
+    if (selectedReason.value == TTexts.reasonOther)
+      return otherFinancialEffect.value.toDouble();
+    return 1.0;
   }
 
   double get totalAmount => rawTotalAmount * amountMultiplier;
@@ -82,7 +78,6 @@ class OutboundTransactionController extends GetxController with TErrorHandler {
     }
   }
 
-  // 🟢 LOGIC TỰ ĐỘNG HỎI XÓA KHI BẤM VỀ 0
   void updateQuantity(int index, int newQuantity) {
     if (newQuantity <= 0) {
       removeItem(index);
@@ -104,7 +99,7 @@ class OutboundTransactionController extends GetxController with TErrorHandler {
       TCustomDialogWidget(
         title: TTexts.removeItem.tr,
         description: TTexts.confirmRemoveItemTransaction.tr,
-        icon: const Text('🗑️', style: TextStyle(fontSize: 40)), // Emoji chuẩn
+        icon: const Text('🗑️', style: TextStyle(fontSize: 40)),
         primaryButtonText: TTexts.remove.tr,
         onPrimaryPressed: () {
           cartItems.removeAt(index);
@@ -116,7 +111,27 @@ class OutboundTransactionController extends GetxController with TErrorHandler {
     );
   }
 
-  // 🟢 1. KIỂM TRA THAY ĐỔI GIÁ (SELLING PRICE) - ĐỒNG BỘ VỚI INBOUND
+  // 🟢 1. BẪY LỖI THOÁT TRANG
+  void handleExit() {
+    if (cartItems.isNotEmpty) {
+      Get.dialog(
+        TCustomDialogWidget(
+          title: TTexts.discardTransactionTitle.tr,
+          description: TTexts.discardTransactionDesc.tr,
+          icon: const Text('🚨', style: TextStyle(fontSize: 40)),
+          primaryButtonText: TTexts.exitAnyway.tr,
+          onPrimaryPressed: () {
+            Get.back();
+            Get.back();
+          },
+          secondaryButtonText: TTexts.cancel.tr,
+        ),
+      );
+    } else {
+      Get.back();
+    }
+  }
+
   Future<void> handleExportWithPriceCheck() async {
     if (cartItems.isEmpty) {
       TSnackbarsWidget.warning(
@@ -132,9 +147,8 @@ class OutboundTransactionController extends GetxController with TErrorHandler {
     if (changedPriceItems.isNotEmpty) {
       Get.dialog(
         TCustomDialogWidget(
-          title: TTexts.priceChangeDetected.tr, // Tiêu đề chung
-          description: TTexts
-              .priceChangeMessage.tr, // Hỏi có muốn update giá master không
+          title: TTexts.priceChangeDetected.tr,
+          description: TTexts.priceChangeMessage.tr,
           icon: const Text('💵', style: TextStyle(fontSize: 40)),
           content: Column(
             mainAxisSize: MainAxisSize.min,
@@ -153,14 +167,12 @@ class OutboundTransactionController extends GetxController with TErrorHandler {
           primaryButtonText: TTexts.updatePricesAndCreate.tr,
           onPrimaryPressed: () {
             Get.back();
-            _showConfirmExportDialog(
-                updatePrice: true); // Xác nhận & update giá
+            _showConfirmExportDialog(updatePrice: true);
           },
           secondaryButtonText: TTexts.justCreateTransaction.tr,
           onSecondaryPressed: () {
             Get.back();
-            _showConfirmExportDialog(
-                updatePrice: false); // Chỉ xuất kho, không update
+            _showConfirmExportDialog(updatePrice: false);
           },
         ),
       );
@@ -169,7 +181,6 @@ class OutboundTransactionController extends GetxController with TErrorHandler {
     }
   }
 
-  // 🟢 2. XÁC NHẬN XUẤT KHO CHÍNH THỨC
   void _showConfirmExportDialog({required bool updatePrice}) {
     Get.dialog(
       TCustomDialogWidget(
@@ -187,12 +198,11 @@ class OutboundTransactionController extends GetxController with TErrorHandler {
     );
   }
 
-  // 🟢 3. THỰC THI API (CÓ XỬ LÝ UPDATE SELLING PRICE)
+  // 🟢 THỰC THI API CÓ BẪY LỖI CONCURRENCY (HẾT HÀNG ĐỘT NGỘT)
   Future<void> completeExport({required bool updatePrice}) async {
     try {
       FullScreenLoaderUtils.openLoadingDialog(TTexts.processingExport.tr);
 
-      // Gắn hậu tố hiệu ứng tài chính vào Note nếu chọn Other
       String effectStr = "";
       if (selectedReason.value == TTexts.reasonOther) {
         if (otherFinancialEffect.value == 1) effectStr = " (+)";
@@ -213,9 +223,20 @@ class OutboundTransactionController extends GetxController with TErrorHandler {
         items: cartItems.toList(),
       );
 
+      // =========================================================================
+      // 🚧 TODO (BACKEND INTEGRATION - OUTBOUND CONCURRENCY CHECK):
+      // Khi Frontend gọi API tạo Transaction (Outbound / Bán hàng):
+      // 1. Backend BẮT BUỘC dùng Database Transaction để khóa các row liên quan.
+      // 2. Loop qua mảng `items` gửi lên, query `quantity` hiện tại trong bảng `Inventory`.
+      // 3. SO SÁNH: Nếu `inventory.quantity < item.quantity` (Số lượng tồn < Số lượng muốn xuất):
+      //    -> Lập tức ROLLBACK Transaction!
+      //    -> Trả về mã lỗi HTTP 409 Conflict.
+      //    -> Payload lỗi: { "conflicts": [ { "productPackageId": "uuid", "currentStock": 0, "requested": 2 } ] }
+      // 4. Nếu đủ hàng -> Tiến hành trừ kho và lưu Transaction như bình thường.
+      // =========================================================================
+
       await _provider.createTransaction(transaction);
 
-      // 🟢 NẾU NGƯỜI DÙNG CHỌN CẬP NHẬT GIÁ BÁN -> BẮN API UPDATE
       if (updatePrice) {
         final validItems = cartItems.where((item) =>
             item.productPackageId != null && item.productPackageId!.isNotEmpty);
@@ -244,30 +265,44 @@ class OutboundTransactionController extends GetxController with TErrorHandler {
           message: TTexts.exportSuccessMessage.tr);
     } catch (e) {
       FullScreenLoaderUtils.stopLoading();
-      handleError(e);
-    }
-  }
 
-  // ==========================================
-  // BẪY LỖI THOÁT TRANG
-  // ==========================================
-  void handleExit() {
-    if (cartItems.isNotEmpty) {
-      Get.dialog(
-        TCustomDialogWidget(
-          title: TTexts.discardTransactionTitle.tr,
-          description: TTexts.discardTransactionDesc.tr,
-          icon: const Text('🚨', style: TextStyle(fontSize: 40)),
-          primaryButtonText: TTexts.exitAnyway.tr,
-          onPrimaryPressed: () {
-            Get.back();
-            Get.back();
-          },
-          secondaryButtonText: TTexts.cancel.tr,
-        ),
-      );
-    } else {
-      Get.back(); // Nếu giỏ hàng trống thì cho thoát luôn
+      if (e is DioException && e.response?.statusCode == 409) {
+        final List<dynamic> conflicts = e.response?.data['conflicts'] ?? [];
+        List<String> conflictedNames = [];
+
+        for (var conflict in conflicts) {
+          final String pkgId = conflict['productPackageId'];
+          final int newStock = conflict['currentStock'] ?? 0;
+
+          final index =
+              cartItems.indexWhere((i) => i.productPackageId == pkgId);
+          if (index != -1) {
+            final item = cartItems[index];
+            final productName =
+                item.packageInfo?.displayName ?? TTexts.unknownProduct.tr;
+
+            final stockText = "${TTexts.actualStock.tr}: $newStock";
+            final actionText = TTexts.autoRemovedFromCart.tr;
+
+            conflictedNames.add("$productName ($stockText) ➔ $actionText");
+
+            cartItems.removeAt(index);
+          }
+        }
+
+        Get.dialog(
+          TCustomDialogWidget(
+            title: TTexts.outOfStockTitle.tr,
+            description:
+                "${TTexts.outOfStockDesc.tr}\n\n${TTexts.updatedListLabel.tr}\n${conflictedNames.map((e) => "• $e").join("\n")}",
+            icon: const Text('🛒', style: TextStyle(fontSize: 40)),
+            primaryButtonText: TTexts.confirm.tr,
+            onPrimaryPressed: () => Get.back(),
+          ),
+        );
+      } else {
+        handleError(e);
+      }
     }
   }
 

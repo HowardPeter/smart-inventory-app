@@ -626,6 +626,11 @@ class TTexts {
   static const String confirmExport = "confirm_export";
   static const String stocksLabel = "stocks_label";
   static const String outOfStockAlert = "out_of_stock_alert";
+  static const String outOfStockTitle = "out_of_stock_title";
+  static const String outOfStockDesc = "out_of_stock_desc";
+  static const String actualStock = "actual_stock";
+  static const String autoRemovedFromCart = "auto_removed_from_cart";
+  static const String updatedListLabel = "updated_list_label";
 
   // --- Inbound/Outbound Transaction Item Add ---
   static const String loadingAddingToCart = "loading_adding_to_cart";

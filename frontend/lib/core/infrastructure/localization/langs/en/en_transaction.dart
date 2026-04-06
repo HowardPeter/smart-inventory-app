@@ -37,6 +37,12 @@ final Map<String, String> enTransaction = {
   TTexts.completeExport: 'Complete Export',
   TTexts.stocksLabel: 'Stocks:',
   TTexts.outOfStockAlert: 'Not enough stock available!',
+  TTexts.outOfStockTitle: "Out of Stock!",
+  TTexts.outOfStockDesc:
+      "Some items in your cart are no longer available in the requested quantity due to recent changes in inventory. They have been removed or updated. Please review your cart.",
+  TTexts.actualStock: "Actual stock",
+  TTexts.autoRemovedFromCart: "Automatically removed from cart",
+  TTexts.updatedListLabel: "Updated list:",
 
   // --- Transaction Item Add ---
   TTexts.loadingAddingToCart: "Adding to transaction...",
