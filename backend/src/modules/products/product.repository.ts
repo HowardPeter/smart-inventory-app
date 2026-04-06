@@ -197,10 +197,7 @@ export class ProductRepository {
     categoryId: string,
   ): Promise<ProductsByCategoryDto> {
     const products = await this.db.product.findMany({
-      where: {
-        categoryId,
-        activeStatus: 'active',
-      },
+      where: { categoryId },
       select: {
         productId: true,
         name: true,
@@ -220,7 +217,7 @@ export class ProductRepository {
   async findManyActiveByIds(
     storeId: string,
     productIds: string[],
-  ): Promise<Array<{ productId: string; name: string }>> {
+  ): Promise<{ productId: string; name: string }[]> {
     if (productIds.length === 0) {
       return [];
     }
