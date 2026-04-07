@@ -36,6 +36,8 @@ class AppRoutes {
   static const stockAdjustmentItem = '/stock_adjustment_item';
   static const transactionSummary = '/transaction_summary';
 
+  static const report = '/report';
+
   static const profile = '/profile';
   static const notification = '/notification';
   static const editProfile = '/edit_profile';
