@@ -99,11 +99,13 @@ export class ProductPackageController {
     res: Response<ApiResponse<ProductPackageResponseDto>>,
   ): Promise<void> => {
     const storeId = requireReqStoreContext(req).storeId;
+    const userId = requireReqUser(req).userId;
     const { productPackageId } = req.params;
 
     const productPackage =
       await this.productPackageService.updateProductPackage(
         storeId,
+        userId,
         productPackageId as string,
         req.body as UpdateProductPackageDto,
       );
@@ -118,10 +120,12 @@ export class ProductPackageController {
     res: Response<ApiResponse<null>>,
   ): Promise<void> => {
     const storeId = requireReqStoreContext(req).storeId;
+    const userId = requireReqUser(req).userId;
     const { productPackageId } = req.params;
 
     await this.productPackageService.softDeleteProductPackage(
       storeId,
+      userId,
       productPackageId as string,
     );
 

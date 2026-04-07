@@ -125,11 +125,9 @@ export class InventoryService {
         storeId,
         oldValue: {
           reorderThreshold: existingInventory.reorderThreshold,
-          lastCount: existingInventory.lastCount,
         } as Prisma.InputJsonObject,
         newValue: {
           reorderThreshold: updated.reorderThreshold,
-          lastCount: updated.lastCount,
           productPackageId: updated.productPackage.productPackageId,
         } as Prisma.InputJsonObject,
       });

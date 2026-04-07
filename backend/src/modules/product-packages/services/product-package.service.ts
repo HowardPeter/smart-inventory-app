@@ -2,6 +2,7 @@ import { StatusCodes } from 'http-status-codes';
 
 import { CustomError } from '../../../common/errors/index.js';
 import {
+  buildAuditDiff,
   buildPaginatedResponse,
   normalizePagination,
 } from '../../../common/utils/index.js';
@@ -12,10 +13,10 @@ import { productService } from '../../products/index.js';
 import { ProductPackageRepository } from '../repositories/product-package.repository.js';
 import { UnitRepository } from '../repositories/unit.repository.js';
 
+import type { DbClient } from '../../../common/types/db.type.js';
 import type { Prisma } from '../../../generated/prisma/client.js';
 import type {
   CreateProductPackageData,
-  CreateInventoryData,
   CreateProductPackageAndInventoryDto,
   ListProductPackagesResponseDto,
   PackageQueryDto,
@@ -29,6 +30,12 @@ export class ProductPackageService {
     private readonly productPackageRepository: ProductPackageRepository,
     private readonly unitRepository: UnitRepository,
   ) {}
+
+  createTxRepositories = (db: DbClient) => ({
+    productPackageRepositoryTx: new ProductPackageRepository(db),
+    auditLogRepositoryTx: new AuditLogRepository(db),
+    inventoryRepositoryTx: new InventoryRepository(db),
+  });
 
   private async checkProductPackageExisted(
     storeId: string,
@@ -97,11 +104,10 @@ export class ProductPackageService {
     storeId: string,
     productIds: string[],
   ): Promise<string[]> {
-    return await this.productPackageRepository
-      .findProductIdsHavingActivePackages(
-        storeId,
-        productIds,
-      );
+    return await this.productPackageRepository.findProductIdsHavingActivePackages(
+      storeId,
+      productIds,
+    );
   }
 
   async createProductPackage(
@@ -142,18 +148,15 @@ export class ProductPackageService {
       displayName: `${product.name} ${unit.name}`.trim(),
     };
 
-    const createInventoryData: CreateInventoryData = {
-      ...data.inventory,
-    };
-
     return await prisma.$transaction(async (tx) => {
-      const productPackageRepositoryTx = new ProductPackageRepository(tx);
-      const auditLogRepositoryTx = new AuditLogRepository(tx);
+      const { productPackageRepositoryTx, auditLogRepositoryTx } =
+        this.createTxRepositories(tx);
 
-      const createdProductPackage = await productPackageRepositoryTx.createOne(
-        createPackageData,
-        createInventoryData,
-      );
+      const createdProductPackage =
+        await productPackageRepositoryTx.createOneAndInventory(
+          createPackageData,
+          data.inventory,
+        );
 
       await auditLogRepositoryTx.createLog({
         actionType: 'create',
@@ -193,6 +196,7 @@ export class ProductPackageService {
 
   async updateProductPackage(
     storeId: string,
+    userId: string,
     productPackageId: string,
     data: UpdateProductPackageDto,
   ): Promise<ProductPackageResponseDto> {
@@ -242,26 +246,99 @@ export class ProductPackageService {
       data.displayName = data.displayName?.trim() || null;
     }
 
-    return await this.productPackageRepository.updateOne(
-      productPackageId,
+    // detect các trường được update trước khi ghi vào log
+    // tránh ghi log data không cần thiết
+    const { oldValue, newValue } = buildAuditDiff(
+      {
+        displayName: existingProductPackage.displayName,
+        importPrice: existingProductPackage.importPrice,
+        sellingPrice: existingProductPackage.sellingPrice,
+        barcodeValue: existingProductPackage.barcodeValue,
+        barcodeType: existingProductPackage.barcodeType,
+      },
       data,
     );
+
+    return await prisma.$transaction(async (tx) => {
+      const { productPackageRepositoryTx, auditLogRepositoryTx } =
+        this.createTxRepositories(tx);
+
+      const updatedPackage = await productPackageRepositoryTx.updateOne(
+        productPackageId,
+        data,
+      );
+
+      // chỉ log khi có thay đổi thực sự
+      if (Object.keys(newValue).length > 0) {
+        await auditLogRepositoryTx.createLog({
+          actionType: 'update',
+          entityType: 'ProductPackage',
+          userId,
+          storeId,
+          note: null,
+          oldValue: oldValue as Prisma.InputJsonObject,
+          newValue: newValue as Prisma.InputJsonObject,
+        });
+      }
+
+      return updatedPackage;
+    });
   }
 
   async softDeleteProductPackage(
     storeId: string,
+    userId: string,
     productPackageId: string,
   ): Promise<void> {
     await this.checkProductPackageExisted(storeId, productPackageId);
 
     // xóa inventory tương ứng khi xóa product package
     await prisma.$transaction(async (tx) => {
-      const productPackageRepositoryTx = new ProductPackageRepository(tx);
-      const inventoryRepositoryTx = new InventoryRepository(tx);
+      const {
+        productPackageRepositoryTx,
+        inventoryRepositoryTx,
+        auditLogRepositoryTx,
+      } = this.createTxRepositories(tx);
 
-      await productPackageRepositoryTx.softDeleteOne(productPackageId);
+      const softDeletedPackage =
+        await productPackageRepositoryTx.softDeleteOne(productPackageId);
 
-      await inventoryRepositoryTx.softDeleteOneByPackageId(productPackageId);
+      await auditLogRepositoryTx.createLog({
+        actionType: 'delete',
+        entityType: 'ProductPackage',
+        userId,
+        storeId,
+        note: null,
+        oldValue: {
+          productPackageId: softDeletedPackage.productPackageId,
+          activeStatus: 'active',
+        } as Prisma.InputJsonObject,
+        newValue: {
+          productPackageId: softDeletedPackage.productPackageId,
+          activeStatus: 'inactive',
+        } as Prisma.InputJsonObject,
+      });
+
+      const softDeletedInventory =
+        await inventoryRepositoryTx.softDeleteOneByPackageId(productPackageId);
+
+      await auditLogRepositoryTx.createLog({
+        actionType: 'delete',
+        entityType: 'Inventory',
+        userId,
+        storeId,
+        note: null,
+        oldValue: {
+          productPackageId: softDeletedPackage.productPackageId,
+          inventoryId: softDeletedInventory.inventoryId,
+          activeStatus: 'active',
+        } as Prisma.InputJsonObject,
+        newValue: {
+          productPackageId: softDeletedPackage.productPackageId,
+          inventoryId: softDeletedInventory.inventoryId,
+          activeStatus: 'inactive',
+        } as Prisma.InputJsonObject,
+      });
     });
   }
 }

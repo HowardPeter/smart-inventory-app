@@ -81,8 +81,7 @@ export class InventoryController {
     const userId = requireReqUser(req).userId;
     const { productPackageId } = req.params;
 
-    // Chỉ cập nhật thông số cấu hình kho
-    // (reorderThreshold, lastCount), không can thiệp số lượng
+    // Chỉ cập nhật reorderThreshold
     const inventory = await this.inventoryService.updateInventory(
       storeId,
       productPackageId as string,

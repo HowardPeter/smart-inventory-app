@@ -266,7 +266,7 @@ export class ProductPackageRepository {
     });
   }
 
-  async createOne(
+  async createOneAndInventory(
     packageData: CreateProductPackageData,
     inventoryData: CreateInventoryData,
   ): Promise<ProductPackageResponseDto> {
@@ -312,16 +312,21 @@ export class ProductPackageRepository {
     return this.toResponseDto(productPackage);
   }
 
-  async softDeleteOne(productPackageId: string): Promise<void> {
-    await this.db.productPackage.update({
+  async softDeleteOne(
+    productPackageId: string,
+  ): Promise<{ productPackageId: string }> {
+    return await this.db.productPackage.update({
       where: { productPackageId },
       data: {
         activeStatus: 'inactive',
       },
+      select: {
+        productPackageId: true,
+      },
     });
   }
 
-  async softDeleteMany(productId: string): Promise<void> {
+  async softDeleteManyByProductId(productId: string): Promise<void> {
     await this.db.productPackage.updateMany({
       where: { productId },
       data: {

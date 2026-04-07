@@ -56,7 +56,7 @@ export type LowStockInventoriesResponseDto =
 // Tuyệt đối không chứa field 'quantity'
 // ở đây để tránh việc sửa số lượng mà không ghi log.
 export type UpdateInventoryDto = Partial<
-  Pick<Inventory, 'reorderThreshold' | 'lastCount'>
+  Pick<Inventory, 'reorderThreshold'>
 >;
 
 // DTO dành riêng cho nghiệp vụ

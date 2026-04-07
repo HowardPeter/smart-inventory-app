@@ -255,13 +255,16 @@ export class ProductRepository {
     return uncategorized.count;
   }
 
-  async softDeleteOne(productId: string): Promise<void> {
-    await this.db.product.update({
+  async softDeleteOne(productId: string): Promise<{ productId: string }> {
+    return await this.db.product.update({
       where: {
         productId,
       },
       data: {
         activeStatus: 'inactive',
+      },
+      select: {
+        productId: true,
       },
     });
   }
