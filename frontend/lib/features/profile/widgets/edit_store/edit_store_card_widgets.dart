@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:frontend/core/infrastructure/constants/text_strings.dart';
 import 'package:frontend/core/ui/theme/app_colors.dart';
 import 'package:frontend/core/ui/theme/app_sizes.dart';
+import 'package:get/get.dart';
 import 'package:iconsax_flutter/iconsax_flutter.dart';
 
 class EditStoreCardWidgets extends StatelessWidget {
@@ -9,7 +11,7 @@ class EditStoreCardWidgets extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: AppSizes.p24),
+      padding: const EdgeInsets.symmetric(horizontal: AppSizes.p4),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -27,7 +29,7 @@ class EditStoreCardWidgets extends StatelessWidget {
               color: const Color(0xFFFFF3E8),
               borderRadius: BorderRadius.circular(16),
               border: Border.all(color: AppColors.primary),
-            ),
+            ), //
             child: Row(
               children: [
                 const CircleAvatar(
@@ -59,9 +61,9 @@ class EditStoreCardWidgets extends StatelessWidget {
                     color: const Color(0xFFFFE0C2),
                     borderRadius: BorderRadius.circular(20),
                   ),
-                  child: const Text(
-                    "Using",
-                    style: TextStyle(color: AppColors.primary),
+                  child: Text(
+                    TTexts.editStoreBtnEdit.tr,
+                    style: const TextStyle(color: AppColors.primary),
                   ),
                 )
               ],

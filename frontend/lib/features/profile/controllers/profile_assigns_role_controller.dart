@@ -1,10 +1,13 @@
+import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
 class ProfileAssignsRoleController extends GetxController {
+  final searchController = TextEditingController();
+
   var selectedIndex = 0.obs;
   var isLoading = true.obs;
+  var searchQuery = "".obs;
 
-  // Sử dụng Map<String, dynamic> để dễ quản lý dữ liệu hơn dynamic lẻ
   var allUsers = <Map<String, dynamic>>[].obs;
   var filteredUsers = <Map<String, dynamic>>[].obs;
 
@@ -16,12 +19,51 @@ class ProfileAssignsRoleController extends GetxController {
     fetchUsersFromApi();
   }
 
+  // 2. Hàm xử lý khi người dùng gõ chữ
+  void onSearchChanged(String value) {
+    searchQuery.value = value;
+    applyFilter();
+  }
+
+  // 3. Hàm Clear Search dùng cho cả nút X và nút Clear ở trang trống
+  void clearSearch() {
+    searchController.clear();
+    searchQuery.value = "";
+    applyFilter();
+  }
+
+  void applyFilter() {
+    List<Map<String, dynamic>> results = [];
+
+    // Bước 1: Lọc theo Tab (Role)
+    if (selectedIndex.value == 0) {
+      results = List.from(allUsers);
+    } else {
+      String roleTarget = "";
+      if (selectedIndex.value == 1) roleTarget = "Owner";
+      if (selectedIndex.value == 2) roleTarget = "Manager";
+      if (selectedIndex.value == 3) roleTarget = "Staff";
+
+      results = allUsers.where((user) => user['role'] == roleTarget).toList();
+    }
+
+    // Bước 2: Lọc tiếp theo Tên (Search Query)
+    if (searchQuery.value.isNotEmpty) {
+      results = results.where((user) {
+        final name = user['name'].toString().toLowerCase();
+        final query = searchQuery.value.toLowerCase();
+        return name.contains(query);
+      }).toList();
+    }
+
+    filteredUsers.assignAll(results);
+  }
+
   Future<void> fetchUsersFromApi() async {
     try {
       isLoading.value = true;
       await Future.delayed(const Duration(seconds: 1));
 
-      // Thêm ID để định danh user chính xác khi update
       List<Map<String, dynamic>> mockData = [
         {'id': '1', 'name': 'Tran Hoa Tuyet Lap', 'role': 'Owner'},
         {'id': '2', 'name': 'Nam Nguyen', 'role': 'Manager'},
@@ -41,38 +83,18 @@ class ProfileAssignsRoleController extends GetxController {
     applyFilter();
   }
 
-  // --- HÀM UPDATE ROLE ---
   void updateRole(String userId, String newRole) {
-    // 1. Tìm vị trí user trong danh sách gốc
-    int index = allUsers.indexWhere((user) => user['id'] == userId);
-
-    if (index != -1) {
-      // 2. Cập nhật giá trị mới
-      allUsers[index]['role'] = newRole;
-
-      // 3. Refresh danh sách để GetX nhận diện sự thay đổi bên trong mảng Map
+    final userIndex = allUsers.indexWhere((user) => user['id'] == userId);
+    if (userIndex != -1) {
+      allUsers[userIndex]['role'] = newRole;
       allUsers.refresh();
-
-      // 4. Lọc lại để UI cập nhật ngay lập tức (nếu đang ở tab lọc theo role đó)
       applyFilter();
-
-      // TODO: Gọi API update lên server tại đây
-      // await repository.updateUserRole(userId, newRole);
     }
   }
 
-  void applyFilter() {
-    if (selectedIndex.value == 0) {
-      filteredUsers.assignAll(allUsers);
-    } else {
-      String roleTarget = "";
-      if (selectedIndex.value == 1) roleTarget = "Owner";
-      if (selectedIndex.value == 2) roleTarget = "Manager";
-      if (selectedIndex.value == 3) roleTarget = "Staff";
-
-      filteredUsers.assignAll(
-        allUsers.where((user) => user['role'] == roleTarget).toList(),
-      );
-    }
+  @override
+  void onClose() {
+    searchController.dispose();
+    super.onClose();
   }
 }

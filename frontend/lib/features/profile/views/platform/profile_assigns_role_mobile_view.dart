@@ -3,7 +3,6 @@ import 'package:frontend/core/infrastructure/constants/text_strings.dart';
 import 'package:frontend/core/ui/theme/app_colors.dart';
 import 'package:frontend/core/ui/theme/app_sizes.dart';
 import 'package:frontend/core/ui/widgets/t_blur_app_bar_widget.dart';
-import 'package:frontend/core/ui/widgets/t_bottom_nav_spacer_widget.dart';
 import 'package:frontend/features/profile/controllers/profile_assigns_role_controller.dart';
 import 'package:frontend/features/profile/widgets/assigns_role/assigns_role_list_widgets.dart';
 import 'package:frontend/features/profile/widgets/assigns_role/assigns_role_search_widgets.dart';
@@ -52,6 +51,8 @@ class AssignsRoleMobileView extends StatelessWidget {
               // 2. SEARCH BAR
               AssignsRoleSearchWidget(
                 hintText: TTexts.assignsRoleSearchHint.tr,
+                onChanged: (value) => controller
+                    .onSearchChanged(value), // Truyền giá trị vào controller
                 onTap: () {},
               ),
 
@@ -82,7 +83,6 @@ class AssignsRoleMobileView extends StatelessWidget {
               const AssignsRoleListWidget(),
 
               const SizedBox(height: 40),
-              const TBottomNavSpacerWidget(),
             ],
           ),
         ),
