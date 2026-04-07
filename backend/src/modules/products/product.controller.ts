@@ -3,6 +3,7 @@ import { StatusCodes } from 'http-status-codes';
 import { ProductService } from './product.service.js';
 import {
   requireReqStoreContext,
+  requireReqUser,
   sendResponse,
 } from '../../common/utils/index.js';
 
@@ -54,12 +55,17 @@ export class ProductController {
     res: Response<ApiResponse<ProductResponseDto>>,
   ): Promise<void> => {
     const storeId = requireReqStoreContext(req).storeId;
+    const userId = requireReqUser(req).userId;
     const newProductData: CreateProductData = {
       ...(req.body as CreateProductDto),
       storeId,
     };
 
-    const product = await this.productService.createProduct(newProductData);
+    const product = await this.productService.createProduct(
+      storeId,
+      userId,
+      newProductData,
+    );
 
     sendResponse.success(res, product, { status: StatusCodes.CREATED });
   };
@@ -69,10 +75,12 @@ export class ProductController {
     res: Response<ApiResponse<ProductResponseDto>>,
   ): Promise<void> => {
     const storeId = requireReqStoreContext(req).storeId;
+    const userId = requireReqUser(req).userId;
     const { productId } = req.params;
 
     const product = await this.productService.updateProduct(
       storeId,
+      userId,
       productId as string,
       req.body as UpdateProductDto,
     );
@@ -85,9 +93,14 @@ export class ProductController {
     res: Response<ApiResponse<null>>,
   ): Promise<void> => {
     const storeId = requireReqStoreContext(req).storeId;
+    const userId = requireReqUser(req).userId;
     const { productId } = req.params;
 
-    await this.productService.softDeleteProduct(storeId, productId as string);
+    await this.productService.softDeleteProduct(
+      storeId,
+      userId,
+      productId as string,
+    );
 
     sendResponse.success(res, null, { status: StatusCodes.OK });
   };

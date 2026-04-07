@@ -2,18 +2,22 @@ import { StatusCodes } from 'http-status-codes';
 
 import { CustomError } from '../../../common/errors/index.js';
 import {
+  buildAuditDiff,
   buildPaginatedResponse,
   normalizePagination,
 } from '../../../common/utils/index.js';
 import { prisma } from '../../../db/prismaClient.js'; // gọi prisma để dùng cơ chế $transaction
+import { AuditLogRepository } from '../../audit-log/index.js';
 import { InventoryRepository } from '../../inventories/index.js';
 import { productService } from '../../products/index.js';
 import { ProductPackageRepository } from '../repositories/product-package.repository.js';
 import { UnitRepository } from '../repositories/unit.repository.js';
 
+import type { DbClient } from '../../../common/types/db.type.js';
+import type { Prisma } from '../../../generated/prisma/client.js';
 import type {
   CreateProductPackageData,
-  CreateProductPackageDto,
+  CreateProductPackageAndInventoryDto,
   ListProductPackagesResponseDto,
   PackageQueryDto,
   ProductPackageResponseDto,
@@ -26,6 +30,12 @@ export class ProductPackageService {
     private readonly productPackageRepository: ProductPackageRepository,
     private readonly unitRepository: UnitRepository,
   ) {}
+
+  createTxRepositories = (db: DbClient) => ({
+    productPackageRepositoryTx: new ProductPackageRepository(db),
+    auditLogRepositoryTx: new AuditLogRepository(db),
+    inventoryRepositoryTx: new InventoryRepository(db),
+  });
 
   private async checkProductPackageExisted(
     storeId: string,
@@ -94,20 +104,20 @@ export class ProductPackageService {
     storeId: string,
     productIds: string[],
   ): Promise<string[]> {
-    return await
-      this.productPackageRepository.findProductIdsHavingActivePackages(
-        storeId,
-        productIds,
-      );
+    return await this.productPackageRepository.findProductIdsHavingActivePackages(
+      storeId,
+      productIds,
+    );
   }
 
   async createProductPackage(
     storeId: string,
+    userId: string,
     productId: string,
-    data: CreateProductPackageDto,
+    data: CreateProductPackageAndInventoryDto,
   ): Promise<ProductPackageResponseDto> {
     const product = await productService.getProductById(storeId, productId);
-    const unit = await this.unitRepository.findUnitById(data.unitId);
+    const unit = await this.unitRepository.findUnitById(data.package.unitId);
 
     if (!unit) {
       throw new CustomError({
@@ -116,25 +126,11 @@ export class ProductPackageService {
       });
     }
 
-    const existingPackageSameUnit =
-      await this.productPackageRepository.findActiveByProductIdAndUnitId(
-        productId,
-        data.unitId,
-      );
-
-    if (existingPackageSameUnit) {
-      throw new CustomError({
-        message:
-          'This product already has an active package with the same unit',
-        status: StatusCodes.CONFLICT,
-      });
-    }
-
-    if (data.barcodeValue) {
+    if (data.package.barcodeValue) {
       const existingPackageSameBarcode =
         await this.productPackageRepository.findActiveByBarcodeValueInStore(
           storeId,
-          data.barcodeValue,
+          data.package.barcodeValue,
         );
 
       if (existingPackageSameBarcode) {
@@ -146,17 +142,61 @@ export class ProductPackageService {
     }
 
     // tạo tên package tự động, vd: Coca Cola Zero Sugar thùng
-    const createData: CreateProductPackageData = {
-      ...data,
+    const createPackageData: CreateProductPackageData = {
+      ...data.package,
       productId,
       displayName: `${product.name} ${unit.name}`.trim(),
     };
 
-    return await this.productPackageRepository.createOne(createData);
+    return await prisma.$transaction(async (tx) => {
+      const { productPackageRepositoryTx, auditLogRepositoryTx } =
+        this.createTxRepositories(tx);
+
+      const createdProductPackage =
+        await productPackageRepositoryTx.createOneAndInventory(
+          createPackageData,
+          data.inventory,
+        );
+
+      await auditLogRepositoryTx.createLog({
+        actionType: 'create',
+        entityType: 'ProductPackage',
+        userId,
+        storeId,
+        oldValue: null,
+        newValue: {
+          productPackageId: createdProductPackage.productPackageId,
+          productId: createdProductPackage.product.productId,
+          displayName: createdProductPackage.displayName,
+          unitId: createdProductPackage.unit.unitId,
+          importPrice: createdProductPackage.importPrice,
+          sellingPrice: createdProductPackage.sellingPrice,
+          barcodeValue: createdProductPackage.barcodeValue,
+          barcodeType: createdProductPackage.barcodeType,
+        } as Prisma.InputJsonObject,
+      });
+
+      await auditLogRepositoryTx.createLog({
+        actionType: 'create',
+        entityType: 'Inventory',
+        userId,
+        storeId,
+        oldValue: null,
+        newValue: {
+          inventoryId: createdProductPackage.inventory?.inventoryId,
+          quantity: createdProductPackage.inventory?.quantity,
+          reorderThreshold: createdProductPackage.inventory?.reorderThreshold,
+          productPackageId: createdProductPackage.productPackageId,
+        } as Prisma.InputJsonObject,
+      });
+
+      return createdProductPackage;
+    });
   }
 
   async updateProductPackage(
     storeId: string,
+    userId: string,
     productPackageId: string,
     data: UpdateProductPackageDto,
   ): Promise<ProductPackageResponseDto> {
@@ -206,26 +246,99 @@ export class ProductPackageService {
       data.displayName = data.displayName?.trim() || null;
     }
 
-    return await this.productPackageRepository.updateOne(
-      productPackageId,
+    // detect các trường được update trước khi ghi vào log
+    // tránh ghi log data không cần thiết
+    const { oldValue, newValue } = buildAuditDiff(
+      {
+        displayName: existingProductPackage.displayName,
+        importPrice: existingProductPackage.importPrice,
+        sellingPrice: existingProductPackage.sellingPrice,
+        barcodeValue: existingProductPackage.barcodeValue,
+        barcodeType: existingProductPackage.barcodeType,
+      },
       data,
     );
+
+    return await prisma.$transaction(async (tx) => {
+      const { productPackageRepositoryTx, auditLogRepositoryTx } =
+        this.createTxRepositories(tx);
+
+      const updatedPackage = await productPackageRepositoryTx.updateOne(
+        productPackageId,
+        data,
+      );
+
+      // chỉ log khi có thay đổi thực sự
+      if (Object.keys(newValue).length > 0) {
+        await auditLogRepositoryTx.createLog({
+          actionType: 'update',
+          entityType: 'ProductPackage',
+          userId,
+          storeId,
+          note: null,
+          oldValue: oldValue as Prisma.InputJsonObject,
+          newValue: newValue as Prisma.InputJsonObject,
+        });
+      }
+
+      return updatedPackage;
+    });
   }
 
   async softDeleteProductPackage(
     storeId: string,
+    userId: string,
     productPackageId: string,
   ): Promise<void> {
     await this.checkProductPackageExisted(storeId, productPackageId);
 
     // xóa inventory tương ứng khi xóa product package
     await prisma.$transaction(async (tx) => {
-      const productPackageRepositoryTx = new ProductPackageRepository(tx);
-      const inventoryRepositoryTx = new InventoryRepository(tx);
+      const {
+        productPackageRepositoryTx,
+        inventoryRepositoryTx,
+        auditLogRepositoryTx,
+      } = this.createTxRepositories(tx);
 
-      await productPackageRepositoryTx.softDeleteOne(productPackageId);
+      const softDeletedPackage =
+        await productPackageRepositoryTx.softDeleteOne(productPackageId);
 
-      await inventoryRepositoryTx.softDeleteOneByPackageId(productPackageId);
+      await auditLogRepositoryTx.createLog({
+        actionType: 'delete',
+        entityType: 'ProductPackage',
+        userId,
+        storeId,
+        note: null,
+        oldValue: {
+          productPackageId: softDeletedPackage.productPackageId,
+          activeStatus: 'active',
+        } as Prisma.InputJsonObject,
+        newValue: {
+          productPackageId: softDeletedPackage.productPackageId,
+          activeStatus: 'inactive',
+        } as Prisma.InputJsonObject,
+      });
+
+      const softDeletedInventory =
+        await inventoryRepositoryTx.softDeleteOneByPackageId(productPackageId);
+
+      await auditLogRepositoryTx.createLog({
+        actionType: 'delete',
+        entityType: 'Inventory',
+        userId,
+        storeId,
+        note: null,
+        oldValue: {
+          productPackageId: softDeletedPackage.productPackageId,
+          inventoryId: softDeletedInventory.inventoryId,
+          activeStatus: 'active',
+        } as Prisma.InputJsonObject,
+        newValue: {
+          productPackageId: softDeletedPackage.productPackageId,
+          inventoryId: softDeletedInventory.inventoryId,
+          activeStatus: 'inactive',
+        } as Prisma.InputJsonObject,
+      });
     });
   }
 }

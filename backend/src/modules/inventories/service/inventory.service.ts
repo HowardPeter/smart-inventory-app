@@ -125,11 +125,9 @@ export class InventoryService {
         storeId,
         oldValue: {
           reorderThreshold: existingInventory.reorderThreshold,
-          lastCount: existingInventory.lastCount,
         } as Prisma.InputJsonObject,
         newValue: {
           reorderThreshold: updated.reorderThreshold,
-          lastCount: updated.lastCount,
           productPackageId: updated.productPackage.productPackageId,
         } as Prisma.InputJsonObject,
       });
@@ -212,9 +210,14 @@ export class InventoryService {
     storeId: string,
     data: CreateInventoryDto,
     userId: string,
+    db?: DbClient,
   ): Promise<InventoryDetailResponseDto> {
+    const inventoryRepository = db
+      ? new InventoryRepository(db)
+      : this.inventoryRepository;
+
     const isBelongsToStore =
-      await this.inventoryRepository.checkProductPackageBelongsToStore(
+      await inventoryRepository.checkProductPackageBelongsToStore(
         storeId,
         data.productPackageId,
       );
@@ -227,7 +230,7 @@ export class InventoryService {
     }
 
     const existingInventory =
-      await this.inventoryRepository.getInventoryStatusByProductPackageId(
+      await inventoryRepository.getInventoryStatusByProductPackageId(
         data.productPackageId,
       );
 
@@ -267,7 +270,7 @@ export class InventoryService {
         }
       }
 
-      const created = await this.inventoryRepository.create(data);
+      const created = await inventoryRepository.create(data);
 
       await auditLogRepositoryTx.createLog({
         actionType: 'create',

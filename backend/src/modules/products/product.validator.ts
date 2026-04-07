@@ -39,7 +39,7 @@ const updateProductBodySchema = z
       .max(255, 'Brand name cannot be exeeded 255 characters')
       .nullable()
       .optional(),
-    categoryId: z.uuid('categoryId').optional(),
+    categoryId: z.uuid('Invalid categoryId').optional(),
   })
   .refine(
     (data) => Object.keys(data).length > 0,

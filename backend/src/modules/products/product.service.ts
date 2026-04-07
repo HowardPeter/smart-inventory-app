@@ -7,8 +7,10 @@ import { StorageService } from '../../common/services/storage.service.js';
 import {
   normalizePagination,
   buildPaginatedResponse,
+  buildAuditDiff,
 } from '../../common/utils/index.js';
 import { prisma } from '../../db/prismaClient.js'; // gọi prisma để dùng cơ chế $transaction
+import { AuditLogRepository } from '../audit-log/index.js';
 import { categoryRepository } from '../categories/index.js';
 import { ProductPackageRepository } from '../product-packages/index.js';
 
@@ -16,11 +18,14 @@ import type {
   CreateProductData,
   ProductResponseDto,
   DetailProductResponseDto,
+  ProductSimpleResponseDto,
   UpdateProductDto,
   ListProductsQueryDto,
   ListProductsResponseDto,
   ProductsByCategoryDto,
 } from './product.dto.js';
+import type { DbClient } from '../../common/types/db.type.js';
+import type { Prisma } from '../../generated/prisma/client.js';
 
 // Khai báo tên bucket dạng hằng số để dễ quản lý và tái sử dụng
 const STORAGE_BUCKET = 'images';
@@ -28,10 +33,16 @@ const STORAGE_BUCKET = 'images';
 export class ProductService {
   constructor(private readonly productRepository: ProductRepository) {}
 
+  createTxRepositories = (db: DbClient) => ({
+    productRepositoryTx: new ProductRepository(db),
+    productPackageRepositoryTx: new ProductPackageRepository(db),
+    auditLogRepositoryTx: new AuditLogRepository(db),
+  });
+
   private async checkProductExisted(
     storeId: string,
     productId: string,
-  ): Promise<void> {
+  ): Promise<ProductSimpleResponseDto | null> {
     const existingProduct = await this.productRepository.findOne(
       storeId,
       productId,
@@ -43,6 +54,15 @@ export class ProductService {
         status: StatusCodes.NOT_FOUND,
       });
     }
+
+    return {
+      categoryId: existingProduct.productId,
+      productId: existingProduct.productId,
+      name: existingProduct.name,
+      imageUrl: existingProduct.imageUrl,
+      brand: existingProduct.brand,
+      storeId: existingProduct.storeId,
+    };
   }
 
   private async checkCategoryExisted(categoryId: string): Promise<void> {
@@ -141,10 +161,35 @@ export class ProductService {
     );
   }
 
-  async createProduct(data: CreateProductData): Promise<ProductResponseDto> {
+  async createProduct(
+    storeId: string,
+    userId: string,
+    data: CreateProductData,
+  ): Promise<ProductResponseDto> {
     await this.checkCategoryExisted(data.categoryId);
 
-    const newProduct = await this.productRepository.createOne(data);
+    const newProduct = await prisma.$transaction(async (tx) => {
+      const { productRepositoryTx, auditLogRepositoryTx } =
+        this.createTxRepositories(tx);
+
+      const newProduct = await productRepositoryTx.createOne(data);
+
+      await auditLogRepositoryTx.createLog({
+        actionType: 'create',
+        entityType: 'Product',
+        userId,
+        storeId,
+        oldValue: null,
+        newValue: {
+          productId: newProduct.productId,
+          productName: newProduct.name,
+          brand: newProduct.brand,
+          category: newProduct.category,
+        } as Prisma.InputJsonObject,
+      });
+
+      return newProduct;
+    });
 
     // Trả về kèm Signed URL ngay sau khi tạo thành công để UI hiển thị luôn
     newProduct.imageUrl = await StorageService.getSignedUrl(
@@ -157,19 +202,47 @@ export class ProductService {
 
   async updateProduct(
     storeId: string,
+    userId: string,
     productId: string,
     data: UpdateProductDto,
   ): Promise<ProductResponseDto> {
-    await this.checkProductExisted(storeId, productId);
+    const existingProduct = await this.checkProductExisted(storeId, productId);
 
     if (data.categoryId) {
       await this.checkCategoryExisted(data.categoryId);
     }
 
-    const updatedProduct = await this.productRepository.updateOne(
-      productId,
+    const { oldValue, newValue } = buildAuditDiff(
+      {
+        categoryId: existingProduct?.categoryId,
+        name: existingProduct?.name,
+        imageUrl: existingProduct?.imageUrl,
+        brand: existingProduct?.brand,
+      },
       data,
     );
+
+    const updatedProduct = await prisma.$transaction(async (tx) => {
+      const { productRepositoryTx, auditLogRepositoryTx } =
+        this.createTxRepositories(tx);
+
+      const product = await productRepositoryTx.updateOne(productId, data);
+
+      // chỉ log khi có thay đổi thực sự
+      if (Object.keys(newValue).length > 0) {
+        await auditLogRepositoryTx.createLog({
+          actionType: 'update',
+          entityType: 'Product',
+          userId,
+          storeId,
+          note: null,
+          oldValue: oldValue as Prisma.InputJsonObject,
+          newValue: newValue as Prisma.InputJsonObject,
+        });
+      }
+
+      return product;
+    });
 
     // Trả về kèm Signed URL sau khi update
     updatedProduct.imageUrl = await StorageService.getSignedUrl(
@@ -180,16 +253,40 @@ export class ProductService {
     return updatedProduct;
   }
 
-  async softDeleteProduct(storeId: string, productId: string): Promise<void> {
+  async softDeleteProduct(
+    storeId: string,
+    userId: string,
+    productId: string,
+  ): Promise<void> {
     await this.checkProductExisted(storeId, productId);
 
     await prisma.$transaction(async (tx) => {
-      const productRepositoryTx = new ProductRepository(tx);
-      const productPackageRepositoryTx = new ProductPackageRepository(tx);
+      const {
+        productRepositoryTx,
+        auditLogRepositoryTx,
+        productPackageRepositoryTx,
+      } = this.createTxRepositories(tx);
 
-      await productRepositoryTx.softDeleteOne(productId);
+      const softDeletedProduct =
+        await productRepositoryTx.softDeleteOne(productId);
 
-      await productPackageRepositoryTx.softDeleteMany(productId);
+      await auditLogRepositoryTx.createLog({
+        actionType: 'delete',
+        entityType: 'Product',
+        userId,
+        storeId,
+        note: null,
+        oldValue: {
+          productId: softDeletedProduct.productId,
+          activeStatus: 'active',
+        } as Prisma.InputJsonObject,
+        newValue: {
+          productId: softDeletedProduct.productId,
+          activeStatus: 'inactive',
+        } as Prisma.InputJsonObject,
+      });
+
+      await productPackageRepositoryTx.softDeleteManyByProductId(productId);
     });
   }
 }

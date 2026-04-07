@@ -16,6 +16,6 @@ const inventoryService = new InventoryService(
   inventoryRepository,
   auditLogRepository,
 );
+const inventoryController = new InventoryController(inventoryService);
 
-export { inventoryService };
-export const inventoryController = new InventoryController(inventoryService);
+export { inventoryService, inventoryController };

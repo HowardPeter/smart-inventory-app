@@ -388,10 +388,15 @@ export class InventoryRepository {
     return this.toInventoryListItem(inventory);
   }
 
-  async softDeleteOneByPackageId(productPackageId: string): Promise<void> {
-    await this.prisma.inventory.update({
+  async softDeleteOneByPackageId(
+    productPackageId: string,
+  ): Promise<{ inventoryId: string }> {
+    return await this.prisma.inventory.update({
       where: { productPackageId },
       data: { activeStatus: 'inactive' },
+      select: {
+        inventoryId: true,
+      },
     });
   }
 
