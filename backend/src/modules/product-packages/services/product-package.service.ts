@@ -6,14 +6,17 @@ import {
   normalizePagination,
 } from '../../../common/utils/index.js';
 import { prisma } from '../../../db/prismaClient.js'; // gọi prisma để dùng cơ chế $transaction
+import { AuditLogRepository } from '../../audit-log/index.js';
 import { InventoryRepository } from '../../inventories/index.js';
 import { productService } from '../../products/index.js';
 import { ProductPackageRepository } from '../repositories/product-package.repository.js';
 import { UnitRepository } from '../repositories/unit.repository.js';
 
+import type { Prisma } from '../../../generated/prisma/client.js';
 import type {
   CreateProductPackageData,
-  CreateProductPackageDto,
+  CreateInventoryData,
+  CreateProductPackageAndInventoryDto,
   ListProductPackagesResponseDto,
   PackageQueryDto,
   ProductPackageResponseDto,
@@ -94,8 +97,8 @@ export class ProductPackageService {
     storeId: string,
     productIds: string[],
   ): Promise<string[]> {
-    return await
-      this.productPackageRepository.findProductIdsHavingActivePackages(
+    return await this.productPackageRepository
+      .findProductIdsHavingActivePackages(
         storeId,
         productIds,
       );
@@ -103,11 +106,12 @@ export class ProductPackageService {
 
   async createProductPackage(
     storeId: string,
+    userId: string,
     productId: string,
-    data: CreateProductPackageDto,
+    data: CreateProductPackageAndInventoryDto,
   ): Promise<ProductPackageResponseDto> {
     const product = await productService.getProductById(storeId, productId);
-    const unit = await this.unitRepository.findUnitById(data.unitId);
+    const unit = await this.unitRepository.findUnitById(data.package.unitId);
 
     if (!unit) {
       throw new CustomError({
@@ -116,25 +120,11 @@ export class ProductPackageService {
       });
     }
 
-    const existingPackageSameUnit =
-      await this.productPackageRepository.findActiveByProductIdAndUnitId(
-        productId,
-        data.unitId,
-      );
-
-    if (existingPackageSameUnit) {
-      throw new CustomError({
-        message:
-          'This product already has an active package with the same unit',
-        status: StatusCodes.CONFLICT,
-      });
-    }
-
-    if (data.barcodeValue) {
+    if (data.package.barcodeValue) {
       const existingPackageSameBarcode =
         await this.productPackageRepository.findActiveByBarcodeValueInStore(
           storeId,
-          data.barcodeValue,
+          data.package.barcodeValue,
         );
 
       if (existingPackageSameBarcode) {
@@ -146,13 +136,59 @@ export class ProductPackageService {
     }
 
     // tạo tên package tự động, vd: Coca Cola Zero Sugar thùng
-    const createData: CreateProductPackageData = {
-      ...data,
+    const createPackageData: CreateProductPackageData = {
+      ...data.package,
       productId,
       displayName: `${product.name} ${unit.name}`.trim(),
     };
 
-    return await this.productPackageRepository.createOne(createData);
+    const createInventoryData: CreateInventoryData = {
+      ...data.inventory,
+    };
+
+    return await prisma.$transaction(async (tx) => {
+      const productPackageRepositoryTx = new ProductPackageRepository(tx);
+      const auditLogRepositoryTx = new AuditLogRepository(tx);
+
+      const createdProductPackage = await productPackageRepositoryTx.createOne(
+        createPackageData,
+        createInventoryData,
+      );
+
+      await auditLogRepositoryTx.createLog({
+        actionType: 'create',
+        entityType: 'ProductPackage',
+        userId,
+        storeId,
+        oldValue: null,
+        newValue: {
+          productPackageId: createdProductPackage.productPackageId,
+          productId: createdProductPackage.product.productId,
+          displayName: createdProductPackage.displayName,
+          unitId: createdProductPackage.unit.unitId,
+          importPrice: createdProductPackage.importPrice,
+          sellingPrice: createdProductPackage.sellingPrice,
+          barcodeValue: createdProductPackage.barcodeValue,
+          barcodeType: createdProductPackage.barcodeType,
+        } as Prisma.InputJsonObject,
+      });
+
+      await auditLogRepositoryTx.createLog({
+        actionType: 'create',
+        entityType: 'Inventory',
+        userId,
+        storeId,
+        oldValue: null,
+        newValue: {
+          inventoryId: createdProductPackage.inventory?.inventoryId,
+          quantity: createdProductPackage.inventory?.quantity,
+          reorderThreshold: createdProductPackage.inventory?.reorderThreshold,
+          productPackageId: createdProductPackage.productPackageId,
+        } as Prisma.InputJsonObject,
+      });
+
+      return createdProductPackage;
+    });
   }
 
   async updateProductPackage(

@@ -2,13 +2,14 @@ import { StatusCodes } from 'http-status-codes';
 
 import {
   requireReqStoreContext,
+  requireReqUser,
   sendResponse,
 } from '../../../common/utils/index.js';
 import { ProductPackageService } from '../services/product-package.service.js';
 
 import type { ApiResponse } from '../../../common/types/index.js';
 import type {
-  CreateProductPackageDto,
+  CreateProductPackageAndInventoryDto,
   ListProductPackagesResponseDto,
   PackageQueryDto,
   ProductPackageResponseDto,
@@ -77,13 +78,15 @@ export class ProductPackageController {
     res: Response<ApiResponse<ProductPackageResponseDto>>,
   ): Promise<void> => {
     const storeId = requireReqStoreContext(req).storeId;
+    const userId = requireReqUser(req).userId;
     const { productId } = req.params;
 
     const productPackage =
       await this.productPackageService.createProductPackage(
         storeId,
+        userId,
         productId as string,
-        req.body as CreateProductPackageDto,
+        req.body as CreateProductPackageAndInventoryDto,
       );
 
     sendResponse.success(res, productPackage, {

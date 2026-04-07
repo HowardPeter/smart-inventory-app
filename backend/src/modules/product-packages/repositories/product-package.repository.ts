@@ -11,6 +11,7 @@ import type {
   ProductPackageResponseDto,
   UpdateProductPackageDto,
   ProductPackageResponseForTransaction,
+  CreateInventoryData,
 } from '../product-package.dto.js';
 
 const productPackageResponseSelect = {
@@ -43,6 +44,13 @@ const productPackageResponseSelect = {
       },
     },
   },
+  inventory: {
+    select: {
+      inventoryId: true,
+      quantity: true,
+      reorderThreshold: true,
+    },
+  },
 } satisfies Prisma.ProductPackageSelect;
 
 type ProductPackageRecord = Prisma.ProductPackageGetPayload<{
@@ -73,6 +81,7 @@ export class ProductPackageRepository {
         name: productPackage.product.name,
         storeId: productPackage.product.storeId,
       },
+      inventory: productPackage.inventory,
     };
   }
 
@@ -258,10 +267,16 @@ export class ProductPackageRepository {
   }
 
   async createOne(
-    data: CreateProductPackageData,
+    packageData: CreateProductPackageData,
+    inventoryData: CreateInventoryData,
   ): Promise<ProductPackageResponseDto> {
     const productPackage = await this.db.productPackage.create({
-      data,
+      data: {
+        ...packageData,
+        inventory: {
+          create: inventoryData,
+        },
+      },
       select: productPackageResponseSelect,
     });
 
