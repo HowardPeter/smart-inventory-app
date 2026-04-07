@@ -59,6 +59,8 @@ class AuthProvider {
     required String email,
     required String password,
   }) async {
+    debugPrint(
+        'Đang đăng ký với email: $email và mật khẩu: ${'*' * password.length}');
     return await supabase.auth.signUp(
       email: email,
       password: password,

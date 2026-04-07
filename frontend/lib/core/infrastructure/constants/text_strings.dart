@@ -635,4 +635,19 @@ class TTexts {
       "change_password_hint_new_password";
   static const String changePasswordHintConfirmPassword =
       "change_password_hint_confirm";
+
+  //--Edit store
+  static const String editStoreTitle = 'edit_store_title';
+  static const String editStoreSubtitle = 'edit_store_subtitle';
+
+  // --Assigns role
+  static const String assignsRoleTitle = 'assigns_role_title';
+  static const String assignsRoleSubtitle = 'assigns_role_subtitle';
+  static const String assignsRoleBtnSave = 'assigns_role_btn_save';
+  static const String assignsRoleBtnCancel = 'assigns_role_btn_cancel';
+  static const String assignsRoleManager = 'assigns_role_manager';
+  static const String assignsRoleStaff = 'assigns_role_staff';
+  static const String assignsRoleAll = 'assigns_role_all';
+  static const String assignsRoleOwner = 'assigns_role_owner';
+  static const String assignsRoleSearchHint = 'assigns_role_search_hint';
 }

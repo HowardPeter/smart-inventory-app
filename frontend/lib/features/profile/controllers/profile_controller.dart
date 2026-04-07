@@ -66,4 +66,16 @@ class ProfileController extends GetxController {
       AppRoutes.changePassword,
     );
   }
+
+  void goToEditStoreProfile() {
+    Get.toNamed(
+      AppRoutes.editStore,
+    );
+  }
+
+  void goToAssignsRoleProfile() {
+    Get.toNamed(
+      AppRoutes.assignsRole,
+    );
+  }
 }

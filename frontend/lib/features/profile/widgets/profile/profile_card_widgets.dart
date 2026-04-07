@@ -8,11 +8,9 @@ import 'package:frontend/features/profile/controllers/profile_controller.dart';
 
 class ProfileStoreCardWidget extends StatelessWidget {
   const ProfileStoreCardWidget({super.key});
-
   @override
   Widget build(BuildContext context) {
     final controller = Get.find<ProfileController>();
-
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: AppSizes.p16),
       child: Container(
@@ -33,11 +31,16 @@ class ProfileStoreCardWidget extends StatelessWidget {
             const Icon(Iconsax.shop_copy, color: AppColors.primary, size: 26),
             const SizedBox(width: AppSizes.p12),
             Expanded(
-              child: Text(
-                TTexts.profileNameStore.tr,
-                style: const TextStyle(
-                  fontWeight: FontWeight.w600,
-                  fontSize: 16,
+              child: GestureDetector(
+                onTap: () {
+                  controller.goToEditStoreProfile();
+                },
+                child: Text(
+                  TTexts.profileNameStore.tr,
+                  style: const TextStyle(
+                    fontWeight: FontWeight.w600,
+                    fontSize: 16,
+                  ),
                 ),
               ),
             ),

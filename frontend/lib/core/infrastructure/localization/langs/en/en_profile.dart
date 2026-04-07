@@ -6,7 +6,7 @@ final Map<String, String> enProfile = {
   //--Uer
   TTexts.profileNameUser: "Tran Hoa Tuyet Lap",
   TTexts.profileEmaiUser: "yumiie02032@gmail.com",
-  TTexts.profileNameStore: 'My store',
+  TTexts.profileNameStore: 'Yumiee Cake',
   //--Section
   TTexts.profileAccount: "Account",
   TTexts.profileSecurity: "security",
@@ -42,4 +42,18 @@ final Map<String, String> enProfile = {
   TTexts.changePasswordHintOldPassword: 'Enter Old Password',
   TTexts.changePasswordHintNewPassword: 'Enter New Password',
   TTexts.changePasswordHintConfirmPassword: 'Enter Confirm Password',
+
+  //Edit Store\
+  TTexts.editStoreTitle: 'My Stores',
+  TTexts.editStoreSubtitle: 'Manage and Edit your stores',
+
+  //Assign Role
+  TTexts.assignsRoleTitle: 'Assigns Role',
+  TTexts.assignsRoleSubtitle: 'Manage user roles and permissions',
+  TTexts.assignsRoleBtnSave: 'Save',
+  TTexts.assignsRoleSearchHint: 'Search by name',
+  TTexts.assignsRoleAll: 'All',
+  TTexts.assignsRoleOwner: 'Owner',
+  TTexts.assignsRoleManager: 'Manager',
+  TTexts.assignsRoleStaff: 'Staff',
 };

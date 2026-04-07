@@ -30,9 +30,13 @@ import 'package:frontend/features/navigation/bindings/navigation_binding.dart';
 import 'package:frontend/features/navigation/views/navigation_view.dart';
 import 'package:frontend/features/notification/view/platform/notification_mobile_screen.dart';
 import 'package:frontend/features/onboarding/bindings/onboarding_binding.dart';
+import 'package:frontend/features/profile/bindings/profile_assigns_role_binding.dart';
 import 'package:frontend/features/profile/bindings/profile_binding.dart';
 import 'package:frontend/features/profile/bindings/profile_edit_profile_binding.dart';
+import 'package:frontend/features/profile/bindings/profile_edit_store_binding.dart';
+import 'package:frontend/features/profile/views/profile_assigns_role_view.dart';
 import 'package:frontend/features/profile/views/profile_change_password_view.dart';
+import 'package:frontend/features/profile/views/profile_edit_store_view.dart';
 import 'package:frontend/features/profile/views/profile_edit_view.dart';
 import 'package:frontend/features/profile/views/profile_view.dart';
 import 'package:frontend/features/search/bindings/search_binding.dart';
@@ -249,7 +253,7 @@ class AppPages {
       name: AppRoutes.notification,
       page: () => const NotificationMobileScreen(),
     ),
-    
+
     // -- Profile
     GetPage(
       name: AppRoutes.profile,
@@ -269,6 +273,22 @@ class AppPages {
       name: AppRoutes.changePassword,
       page: () => const ProfileChangePasswordView(),
       binding: ProfileBinding(),
+      transition: Transition.cupertino,
+    ),
+
+    //-- Edit Store
+    GetPage(
+      name: AppRoutes.editStore,
+      page: () => const ProfileEditStoreView(),
+      binding: ProfileEditStoreBinding(),
+      transition: Transition.cupertino,
+    ),
+
+    // -- Assign Role
+    GetPage(
+      name: AppRoutes.assignsRole,
+      page: () => const ProfileAssignsRoleView(),
+      binding: ProfileAssignsRoleBinding(),
       transition: Transition.cupertino,
     ),
   ];
