@@ -653,6 +653,10 @@ class TTexts {
   static const String profileUpdateSuccess = 'profile_update_success';
   static const String loadingTitle = 'loading_title';
   static const String editStoreCurrentStore = 'edit_store_current_store';
+  static const String profileNoStoreSelected = 'profile_no_store_selected';
+  static const String profileUpdateErrorTitle = 'profile_update_error_title';
+  static const String loggingOut = 'logging_out';
+  static const String logoutErrorTitle = 'logout_error_title';
 
   // --Assigns role
   static const String assignsRoleTitle = 'assigns_role_title';

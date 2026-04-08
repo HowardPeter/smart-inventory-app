@@ -4,6 +4,7 @@ import 'package:frontend/core/ui/theme/app_colors.dart';
 import 'package:frontend/core/ui/theme/app_sizes.dart';
 import 'package:frontend/core/ui/widgets/t_blur_app_bar_widget.dart';
 import 'package:frontend/features/profile/controllers/profile_assigns_role_controller.dart';
+import 'package:frontend/features/profile/widgets/assigns_role/assigns_role_header_widgets.dart';
 import 'package:frontend/features/profile/widgets/assigns_role/assigns_role_list_widgets.dart';
 import 'package:frontend/features/profile/widgets/assigns_role/assigns_role_search_widgets.dart';
 import 'package:frontend/features/profile/widgets/assigns_role/assigns_role_tab_widgets.dart';
@@ -14,7 +15,6 @@ class AssignsRoleMobileView extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    // Khởi tạo controller tại đây
     final controller = Get.put(ProfileAssignsRoleController());
 
     return Scaffold(
@@ -35,35 +35,21 @@ class AssignsRoleMobileView extends StatelessWidget {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              // 1. HEADER
-              Text(TTexts.assignsRoleTitle.tr,
-                  style: const TextStyle(
-                      color: AppColors.primaryText,
-                      fontSize: 28,
-                      fontWeight: FontWeight.w900)),
-              const SizedBox(height: AppSizes.p4),
-              Text(TTexts.assignsRoleSubtitle.tr,
-                  style:
-                      const TextStyle(color: AppColors.subText, fontSize: 16)),
-
+              const AssignsRoleHeaderWidget(),
               const SizedBox(height: AppSizes.p24),
 
-              // 2. SEARCH BAR
               AssignsRoleSearchWidget(
                 hintText: TTexts.assignsRoleSearchHint.tr,
-                onChanged: (value) => controller
-                    .onSearchChanged(value), // Truyền giá trị vào controller
+                onChanged: (value) => controller.onSearchChanged(value),
                 onTap: () {},
               ),
 
               const SizedBox(height: AppSizes.p20),
 
-              // 3. TABS
               const AssignsRoleTabWidget(),
-
               const SizedBox(height: AppSizes.p20),
 
-              // 4. HIỂN THỊ SỐ LƯỢNG
+              // HIỂN THỊ SỐ LƯỢNG
               Obx(() => Row(
                     children: [
                       Text("${controller.totalCount} ",
@@ -79,7 +65,6 @@ class AssignsRoleMobileView extends StatelessWidget {
 
               const SizedBox(height: AppSizes.p12),
 
-              // 5. DANH SÁCH ROLE
               const AssignsRoleListWidget(),
 
               const SizedBox(height: 40),

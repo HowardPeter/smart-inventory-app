@@ -28,7 +28,7 @@ class StoreItemWidget extends StatelessWidget {
         child: Row(
           children: [
             const CircleAvatar(
-              backgroundColor: Color(0xFFF2F2F2),
+              backgroundColor: AppColors.surface,
               child: Icon(Iconsax.shop_copy),
             ),
             const SizedBox(width: 12),

@@ -38,7 +38,7 @@ class AssignsRoleMembersView extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        // --- TIÊU ĐỀ MEMBERS ---
+        // --- MEMBERS ---
         Padding(
           padding: const EdgeInsets.symmetric(
               horizontal: AppSizes.p16, vertical: AppSizes.p12),
@@ -67,16 +67,16 @@ class AssignsRoleMembersView extends StatelessWidget {
             Color roleColor;
             switch (role.toLowerCase()) {
               case 'owner':
-                roleIcon = Icons.workspace_premium; // Icon vương miện/huy hiệu
-                roleColor = AppColors.primary; // Cam
+                roleIcon = Icons.workspace_premium; 
+                roleColor = AppColors.primary; 
                 break;
               case 'manager':
-                roleIcon = Icons.stars; // Icon ngôi sao
-                roleColor = AppColors.primary; // Cam
+                roleIcon = Icons.stars;
+                roleColor = AppColors.primary; 
                 break;
               default:
-                roleIcon = Icons.person_outline; // Icon user
-                roleColor = AppColors.subText; // Xám
+                roleIcon = Icons.person_outline; 
+                roleColor = AppColors.subText; 
             }
 
             return Container(
@@ -96,7 +96,6 @@ class AssignsRoleMembersView extends StatelessWidget {
               ),
               child: Row(
                 children: [
-                  // Avatar với Border nhẹ bao quanh
                   Container(
                     padding: const EdgeInsets.all(2),
                     decoration: BoxDecoration(

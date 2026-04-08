@@ -61,6 +61,11 @@ final Map<String, String> enProfile = {
   TTexts.profileUpdateSuccess: 'Profile updated successfully',
   TTexts.loadingTitle: 'Loading',
   TTexts.editStoreCurrentStore: 'Current Store',
+  TTexts.profileNoStoreSelected: 'No store selected',
+  TTexts.profileUpdateErrorTitle: 'Profile Update Failed',
+  TTexts.loggingOut: 'Logging out...',
+  TTexts.logoutErrorTitle: 'Logout Failed',
+
   //Assign Role
   TTexts.assignsRoleTitle: 'Assigns Role',
   TTexts.assignsRoleSubtitle: 'Manage user roles and permissions',

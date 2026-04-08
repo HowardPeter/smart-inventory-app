@@ -29,7 +29,7 @@ class EditStoreCardWidgets extends StatelessWidget {
           Container(
             padding: const EdgeInsets.all(AppSizes.p16),
             decoration: BoxDecoration(
-              color: const Color(0xFFFFF3E8),
+              color: AppColors.primary.withOpacity(0.05),
               borderRadius: BorderRadius.circular(16),
               border: Border.all(color: AppColors.primary),
             ),

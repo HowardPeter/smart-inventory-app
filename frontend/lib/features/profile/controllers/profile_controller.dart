@@ -9,6 +9,7 @@ import 'package:frontend/features/auth/providers/auth_provider.dart';
 import 'package:frontend/features/profile/providers/profile_provider.dart';
 import 'package:get/get.dart';
 import 'package:frontend/routes/app_routes.dart';
+import 'package:frontend/core/infrastructure/constants/text_strings.dart';
 
 class ProfileController extends GetxController {
   // Services
@@ -36,7 +37,6 @@ class ProfileController extends GetxController {
     ever(storeService.currentStoreName, (_) => _loadStoreInfo());
   }
 
-  /// Nạp toàn bộ dữ liệu từ RAM lên biến local
   void _loadAllData() {
     _loadUserProfile();
     _loadStoreInfo();
@@ -53,7 +53,7 @@ class ProfileController extends GetxController {
   void _loadStoreInfo() {
     storeName.value = storeService.currentStoreName.value.isNotEmpty
         ? storeService.currentStoreName.value
-        : "Chưa chọn cửa hàng";
+        : TTexts.profileNoStoreSelected.tr;
   }
 
   /// Làm mới dữ liệu từ Server
@@ -72,18 +72,22 @@ class ProfileController extends GetxController {
         storeService.currentStoreName.value = newName;
       }
 
+      // Thông báo thành công
       TSnackbarsWidget.success(
-          title: 'Thành công', message: 'Dữ liệu đã được cập nhật');
+          title: TTexts.successTitle.tr,
+          message: TTexts.profileUpdateSuccess.tr);
     } catch (e) {
+      // Thêm catch để bắt lỗi và hiển thị thông báo lỗi
       TSnackbarsWidget.error(
-          title: 'Lỗi', message: 'Không thể làm mới dữ liệu');
+          title: TTexts.errorTitle.tr,
+          message: TTexts.profileUpdateErrorTitle.tr);
     }
   }
 
-  /// Đăng xuất và dọn dẹp sạch sẽ
+  /// Đăng xuất
   Future<void> executeLogout() async {
     try {
-      FullScreenLoaderUtils.openLoadingDialog('Đang đăng xuất...');
+      FullScreenLoaderUtils.openLoadingDialog(TTexts.loggingOut.tr);
 
       await AuthProvider(apiClient: apiClient).logout();
       await Get.find<AuthService>().clearAuthData();
@@ -94,7 +98,8 @@ class ProfileController extends GetxController {
       Get.offAllNamed(AppRoutes.login);
     } catch (e) {
       FullScreenLoaderUtils.stopLoading();
-      TSnackbarsWidget.error(title: 'Lỗi đăng xuất', message: e.toString());
+      TSnackbarsWidget.error(
+          title: TTexts.logoutErrorTitle.tr, message: e.toString());
     }
   }
 

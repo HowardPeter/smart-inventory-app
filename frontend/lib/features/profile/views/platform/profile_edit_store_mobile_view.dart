@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
-import 'package:frontend/core/infrastructure/constants/text_strings.dart';
 import 'package:frontend/core/ui/theme/app_colors.dart';
 import 'package:frontend/core/ui/theme/app_sizes.dart';
 import 'package:frontend/core/ui/widgets/t_blur_app_bar_widget.dart';
 import 'package:frontend/features/profile/controllers/profile_edit_store_controller.dart';
 import 'package:frontend/features/profile/widgets/edit_store/edit_store_card_widgets.dart';
+import 'package:frontend/features/profile/widgets/edit_store/edit_store_header_widgets.dart';
 import 'package:frontend/features/profile/widgets/edit_store/edit_store_list_widgets.dart';
 import 'package:get/get.dart';
 
@@ -28,32 +28,14 @@ class EditStoreMobileView extends GetView<ProfileEditStoreController> {
             right: AppSizes.p24,
             bottom: AppSizes.p48,
           ),
-          child: Column(
+          child: const Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              // 1. HEADER
-              Text(
-                TTexts.editStoreTitle.tr,
-                style: const TextStyle(
-                  fontSize: 28,
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
-              const SizedBox(height: AppSizes.p8),
-              Text(
-                TTexts.editStoreSubtitle.tr,
-                style: const TextStyle(
-                  fontSize: 16,
-                  color: AppColors.subText,
-                ),
-              ),
-
-              const SizedBox(height: AppSizes.p24),
-              const EditStoreCardWidgets(),
-              const SizedBox(height: AppSizes.p24),
-              const AssignsRoleMembersView(),
-              // const EditStoreListWidgets(),
-              // const SizedBox(height: AppSizes.p24),
+              EditStoreHeaderWidget(),
+              SizedBox(height: AppSizes.p24),
+              EditStoreCardWidgets(),
+              SizedBox(height: AppSizes.p24),
+              AssignsRoleMembersView(),
             ],
           ),
         ),
