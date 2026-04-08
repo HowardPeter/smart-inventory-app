@@ -5,6 +5,7 @@ import { UserProfileRepository } from '../repositories/user-profile.repository.j
 
 import type {
   CreateUserProfileDto,
+  UpdateUserProfileDto,
   UserProfileResponseDto,
 } from '../dtos/user-profile.dto.js';
 
@@ -41,5 +42,21 @@ export class UserProfileService {
     }
 
     return profile;
+  }
+
+  public async updateUserProfile(
+    userId: string,
+    payload: UpdateUserProfileDto,
+  ): Promise<UserProfileResponseDto> {
+    const userProfile = await this.userProfileRepository.findById(userId);
+
+    if (!userProfile) {
+      throw new CustomError({
+        message: 'User profile not found',
+        status: StatusCodes.NOT_FOUND,
+      });
+    }
+
+    return await this.userProfileRepository.updateOne(userId, payload);
   }
 }
