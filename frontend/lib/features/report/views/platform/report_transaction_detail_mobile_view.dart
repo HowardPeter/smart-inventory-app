@@ -3,14 +3,15 @@ import 'package:flutter/material.dart';
 import 'package:frontend/core/ui/theme/app_colors.dart';
 import 'package:frontend/core/ui/theme/app_sizes.dart';
 import 'package:frontend/core/ui/widgets/t_app_bar_widget.dart';
+import 'package:frontend/core/ui/widgets/t_bottom_sheet_widget.dart';
 import 'package:frontend/core/ui/widgets/t_refresh_indicator_widget.dart';
-import 'package:frontend/core/ui/widgets/t_snackbars_widget.dart'; // 🟢 Thêm import Snackbar
 import 'package:frontend/features/report/controllers/report_transaction_detail_controller.dart';
+import 'package:frontend/features/report/widgets/report_transaction_detail/report_transaction_detail_export_bottom_sheet_widget.dart';
 import 'package:frontend/features/report/widgets/report_transaction_detail/report_transaction_detail_info_card_widget.dart';
 import 'package:frontend/features/report/widgets/report_transaction_detail/report_transaction_detail_item_card_widget.dart';
 import 'package:frontend/features/report/widgets/report_transaction_detail/report_transaction_detail_shimmer_widget.dart';
 import 'package:get/get.dart';
-import 'package:iconsax_flutter/iconsax_flutter.dart'; // 🟢 Thêm import Icon
+import 'package:iconsax_flutter/iconsax_flutter.dart';
 import 'package:intl/intl.dart';
 
 class ReportTransactionDetailView
@@ -40,28 +41,19 @@ class ReportTransactionDetailView
                 child: TAppBarWidget(
                   title: 'Transaction Detail',
                   showBackArrow: true,
-                  // 🟢 BỔ SUNG NÚT EXPORT Ở GÓC PHẢI
                   actions: [
                     IconButton(
                       onPressed: () {
-                        // Logic xuất dữ liệu của riêng giao dịch này
                         if (controller.transaction.value != null) {
-                          final txId =
-                              controller.transaction.value!.transactionId;
-                          // Tạm thời show Snackbar thông báo, sau này ráp API Export vào đây
-                          TSnackbarsWidget.success(
-                            title: 'Export Successful',
-                            message:
-                                'Transaction $txId data has been exported.',
+                          TBottomSheetWidget.show(
+                            child: ReportTransactionExportBottomSheetWidget(
+                              transaction: controller.transaction.value!,
+                            ),
                           );
                         }
                       },
-                      icon: const Icon(
-                        Iconsax.document_download_copy,
-                        color: AppColors
-                            .primaryText, // Cùng màu với Title cho đồng bộ
-                        size: 22,
-                      ),
+                      icon: const Icon(Iconsax.document_download_copy,
+                          color: AppColors.primaryText, size: 22),
                     ),
                   ],
                 ),
@@ -123,8 +115,10 @@ class ReportTransactionDetailView
 
       // --- PANEL TỔNG TIỀN DƯỚI ĐÁY ---
       bottomNavigationBar: Obx(() {
-        if (controller.isLoading.value || controller.transaction.value == null)
+        if (controller.isLoading.value ||
+            controller.transaction.value == null) {
           return const SizedBox.shrink();
+        }
 
         final tx = controller.transaction.value!;
         final moneyFormatted =

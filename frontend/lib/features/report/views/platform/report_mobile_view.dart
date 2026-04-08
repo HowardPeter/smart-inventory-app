@@ -45,6 +45,13 @@ class ReportMobileView extends GetView<ReportController> {
                     alignment: Alignment.topCenter,
                     child: AnimatedSwitcher(
                       duration: const Duration(milliseconds: 300),
+                      transitionBuilder:
+                          (Widget child, Animation<double> animation) {
+                        return FadeTransition(
+                          opacity: animation,
+                          child: child,
+                        );
+                      },
                       layoutBuilder: (Widget? currentChild,
                           List<Widget> previousChildren) {
                         return Stack(

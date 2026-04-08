@@ -1,4 +1,5 @@
 import 'package:frontend/features/report/controllers/report_transaction_detail_controller.dart';
+import 'package:frontend/features/report/controllers/report_transaction_export_controller.dart';
 import 'package:get/get.dart';
 
 class ReportTransactionDetailBinding extends Bindings {
@@ -6,5 +7,7 @@ class ReportTransactionDetailBinding extends Bindings {
   void dependencies() {
     Get.lazyPut<ReportTransactionDetailController>(
         () => ReportTransactionDetailController());
+    Get.lazyPut<ReportTransactionExportController>(
+        () => ReportTransactionExportController());
   }
 }
