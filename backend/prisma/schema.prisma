@@ -27,7 +27,6 @@ enum StoreRole {
 enum TransactionType {
   import
   export
-  adjustment
 }
 
 enum TransactionStatus {
@@ -60,6 +59,8 @@ model UserProfile {
   authUserId   String?      @unique @map("auth_user_id")
   email        String?
   fullName     String?      @map("full_name")
+  phone        String?
+  address      String?
   createdAt    DateTime     @default(now()) @map("created_at")
   updatedAt    DateTime     @updatedAt @map("updated_at")
   activeStatus ActiveStatus @default(active) @map("active_status")
@@ -213,6 +214,7 @@ model AuditLog {
   eventId     String           @id @default(uuid()) @map("event_id")
   actionType  AuditActionType? @map("action_type")
   entityType  String?          @map("entity_type")
+  entityId    String?          @map("entity_id")
   oldValue    Json?            @map("old_value")
   newValue    Json?            @map("new_value")
   performedAt DateTime         @default(now()) @map("performed_at")
@@ -241,8 +243,6 @@ model FcmToken {
   userId String      @map("user_id")
 
   user   UserProfile @relation(fields: [userId], references: [userId], onDelete: Cascade)
-
-  @@map("fcm_token")
 }
 
 model Notification {
@@ -259,6 +259,4 @@ model Notification {
 
   user  UserProfile @relation(fields: [userId], references: [userId], onDelete: Cascade)
   store Store?      @relation(fields: [storeId], references: [storeId], onDelete: Cascade)
-
-  @@map("notification")
 }

@@ -1,7 +1,10 @@
 import { prisma } from '../../../db/prismaClient.js';
 
 import type { StoreRole } from '../../../generated/prisma/enums.js';
-import type { StoreMemberResponseDto } from '../dto/store-member.dto.js';
+import type {
+  RawStoreMemberDto,
+  StoreMemberResponseDto,
+} from '../dto/store-member.dto.js';
 
 export class StoreMemberRepository {
   async findByIdsWithStore(
@@ -53,5 +56,34 @@ export class StoreMemberRepository {
         role: newRole,
       },
     });
+  }
+
+  async findManyByStoreId(storeId: string): Promise<RawStoreMemberDto[]> {
+    return (await prisma.storeMember.findMany({
+      where: {
+        storeId,
+        activeStatus: 'active',
+        user: {
+          activeStatus: 'active',
+        },
+      },
+      select: {
+        role: true,
+        joinedAt: true,
+        user: {
+          select: {
+            userId: true,
+            email: true,
+            fullName: true,
+            phone: true,
+            address: true,
+            activeStatus: true,
+            createdAt: true,
+            updatedAt: true,
+            authUserId: true,
+          },
+        },
+      },
+    })) as unknown as RawStoreMemberDto[];
   }
 }

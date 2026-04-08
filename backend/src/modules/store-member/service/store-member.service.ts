@@ -4,7 +4,10 @@ import { CustomError } from '../../../common/errors/custom-error.js';
 import { ROLE } from '../../access-control/role-permission.constant.js'; // IMPORT CONSTANT MỚI Ở ĐÂY
 
 import type { StoreRole } from '../../../generated/prisma/enums.js';
-import type { StoreMemberResponseDto } from '../dto/store-member.dto.js';
+import type {
+  StoreMemberResponseDto,
+  StoreMemberUserResponseDto,
+} from '../dto/store-member.dto.js';
 import type { StoreMemberRepository } from '../repository/store-member.repository.js';
 
 export class StoreMemberService {
@@ -120,5 +123,22 @@ export class StoreMemberService {
       storeId,
       newRole,
     );
+  }
+
+  public async getMembersByStoreId(
+    storeId: string,
+  ): Promise<StoreMemberUserResponseDto[]> {
+    const members = await this.storeMemberRepository.findManyByStoreId(storeId);
+
+    return members.map((item) => ({
+      userId: item.user.userId,
+      email: item.user.email,
+      fullName: item.user.fullName,
+      phone: item.user.phone,
+      address: item.user.address,
+      activeStatus: item.user.activeStatus,
+      role: item.role,
+      joinedAt: item.joinedAt,
+    }));
   }
 }
