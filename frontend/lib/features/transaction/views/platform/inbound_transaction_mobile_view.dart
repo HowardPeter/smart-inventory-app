@@ -42,7 +42,7 @@ class InboundTransactionMobileView
                 child: TSearchBarWidget(
                   hintText: TTexts.searchProductToAdd.tr,
                   onTap: () => Get.toNamed(AppRoutes.search,
-                      arguments: {'target': SearchTarget.transactions}),
+                      arguments: {'target': SearchTarget.inventory}),
                   onScanTap: () => controller.openScanner(),
                 ),
               ),

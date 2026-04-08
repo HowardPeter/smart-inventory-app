@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
+import 'package:frontend/core/infrastructure/models/category_model.dart'; // 🟢 Import thêm CategoryModel
 import 'package:frontend/core/infrastructure/models/transaction_model.dart';
 import 'package:frontend/core/infrastructure/models/transaction_detail_model.dart';
 import 'package:frontend/core/infrastructure/models/unit_model.dart';
@@ -13,6 +14,8 @@ import 'package:frontend/core/infrastructure/models/inventory_model.dart';
 import 'package:frontend/core/infrastructure/models/product_model.dart';
 import 'package:frontend/core/infrastructure/models/product_package_model.dart';
 import 'package:frontend/features/search/widgets/search_filter_bottom_sheet_widget.dart';
+import 'package:frontend/features/transaction/controllers/inbound_transaction_controller.dart';
+import 'package:frontend/features/transaction/controllers/outbound_transaction_controller.dart';
 import 'package:frontend/routes/app_routes.dart';
 import 'package:get/get.dart';
 import 'package:get_storage/get_storage.dart';
@@ -22,7 +25,6 @@ import 'package:frontend/core/infrastructure/constants/text_strings.dart';
 
 enum SearchTarget { global, inventory, transactions, users }
 
-//  MODEL CHỨA DATA CHO AVATAR CHIP
 class SearchFilterUserModel {
   final String id;
   final String name;
@@ -49,12 +51,14 @@ class TSearchController extends GetxController with TErrorHandler {
   late final SearchTarget target;
   bool get isTransactionSearch => target == SearchTarget.transactions;
 
-  // --- FILTERS STATE ---
+  bool get isAddingToCart =>
+      Get.isRegistered<OutboundTransactionController>() ||
+      Get.isRegistered<InboundTransactionController>();
+
   final RxString filterType = TTexts.filterAll.obs;
   final RxString filterStatus = TTexts.filterAll.obs;
   final Rx<DateTimeRange?> filterDateRange = Rx<DateTimeRange?>(null);
 
-  //  TÁCH LÀM ID VÀ NAME CHO FILTER USER
   final RxString filterUserId = ''.obs;
   final RxString filterUserName = ''.obs;
   final RxList<SearchFilterUserModel> availableUsers =
@@ -80,7 +84,7 @@ class TSearchController extends GetxController with TErrorHandler {
             : TTexts.searchEverything.tr);
 
     if (isTransactionSearch) {
-      _loadFilterUsers(); // Load danh sách User cho Bottom Sheet
+      _loadFilterUsers();
     } else {
       _loadRecentSearches();
     }
@@ -101,7 +105,6 @@ class TSearchController extends GetxController with TErrorHandler {
         .addPostFrameCallback((_) => focusNode.requestFocus());
   }
 
-  // HÀM MOCK DATA USER
   void _loadFilterUsers() {
     try {
       final currentUser = Get.find<UserService>().currentUser.value;
@@ -123,7 +126,6 @@ class TSearchController extends GetxController with TErrorHandler {
             avatarUrl: 'https://i.pravatar.cc/150?u=USER-John'),
       ]);
     } catch (e) {
-      // Fallback
       availableUsers.assignAll([
         SearchFilterUserModel(
             id: 'USER-Admin',
@@ -192,10 +194,8 @@ class TSearchController extends GetxController with TErrorHandler {
   Future<void> _executeTransactionSearch(String query) async {
     isSearching.value = true;
     hasMore.value = false;
-
     try {
       await Future.delayed(const Duration(milliseconds: 600));
-
       final currentUser = Get.find<UserService>().currentUser.value;
       final myId = currentUser?.userId ?? 'USER-Admin';
 
@@ -253,7 +253,7 @@ class TSearchController extends GetxController with TErrorHandler {
             createdAt: DateTime.now().subtract(const Duration(days: 5)),
             userId: myId,
             note: 'Monthly audit',
-            items: []), // Đây là giao dịch của "Me"
+            items: []),
       ];
 
       if (filterType.value != TTexts.filterAll) {
@@ -291,7 +291,6 @@ class TSearchController extends GetxController with TErrorHandler {
             .toList();
       }
 
-      //  So sánh UserId chính xác
       if (filterUserId.value.isNotEmpty) {
         mockData =
             mockData.where((tx) => tx.userId == filterUserId.value).toList();
@@ -316,7 +315,6 @@ class TSearchController extends GetxController with TErrorHandler {
     }
   }
 
-  // --- HÀM TÌM KIẾM SẢN PHẨM & CÁC HÀM CÒN LẠI (GIỮ NGUYÊN) ---
   Future<void> _executeProductSearch(String query) async {
     isSearching.value = true;
     _currentPage = 1;
@@ -326,10 +324,20 @@ class TSearchController extends GetxController with TErrorHandler {
       final response =
           await _provider.searchProductsByKeyword(query, page: _currentPage);
       final List<SearchProductModel> rawItems = response['items'];
+
+      // Nếu đang thêm vào giỏ hàng: CHỈ TRẢ VỀ PACKAGES.
+      // Nếu đang search global: TRẢ VỀ TẤT CẢ (Categories, Products, Packages).
       final mappedItems = rawItems
-          .where((i) => i.productPackageId != null)
+          .where((i) {
+            if (isAddingToCart) {
+              return i.productPackageId != null &&
+                  i.productPackageId!.isNotEmpty;
+            }
+            return true;
+          })
           .map((i) => _mapToDisplayModel(i))
           .toList();
+
       searchResults.assignAll(mappedItems);
 
       if (mappedItems.isEmpty && query.trim().isNotEmpty) {
@@ -355,23 +363,6 @@ class TSearchController extends GetxController with TErrorHandler {
     }
   }
 
-  void applySuggestion() {
-    if (suggestion.isNotEmpty) {
-      final newQuery = suggestion.value;
-      textController.text = newQuery;
-      textController.selection =
-          TextSelection.collapsed(offset: newQuery.length);
-      onSearchChanged(newQuery);
-    }
-  }
-
-  void _onScroll() {
-    if (scrollController.position.pixels >=
-        scrollController.position.maxScrollExtent - 200) {
-      _loadMore();
-    }
-  }
-
   Future<void> _loadMore() async {
     if (isLoadingMore.value ||
         !hasMore.value ||
@@ -387,9 +378,16 @@ class TSearchController extends GetxController with TErrorHandler {
           page: _currentPage);
       final List<SearchProductModel> rawItems = response['items'];
       final mappedNewItems = rawItems
-          .where((i) => i.productPackageId != null)
+          .where((i) {
+            if (isAddingToCart) {
+              return i.productPackageId != null &&
+                  i.productPackageId!.isNotEmpty;
+            }
+            return true;
+          })
           .map((i) => _mapToDisplayModel(i))
           .toList();
+
       if (mappedNewItems.isEmpty &&
           _currentPage >= (response['totalPages'] as int)) {
         hasMore.value = false;
@@ -404,16 +402,114 @@ class TSearchController extends GetxController with TErrorHandler {
     }
   }
 
+  // Điều hướng:
+  // Transaction: Chỉ cho search Product-package
+  // Report: Chỉ cho search Transaction
+  // Inventory: Cho search Category, Product-package và Product
   void handleItemTap(dynamic item) {
     if (!isTransactionSearch) saveRecentSearch(currentSearchQuery.value);
 
+    // 1. Dành cho kết quả Giao dịch
     if (isTransactionSearch && item is TransactionModel) {
       Get.toNamed(AppRoutes.transactionDetail,
           arguments: {'id': item.transactionId});
-    } else if (!isTransactionSearch && item is InventoryInsightDisplayModel) {
-      Get.toNamed(AppRoutes.inventoryDetail,
-          arguments: item.product?.productId ??
-              item.inventory.productPackage?.productId);
+      return;
+    }
+
+    // 2. Dành cho kết quả Hàng hóa
+    if (!isTransactionSearch && item is InventoryInsightDisplayModel) {
+      final pkg = item.inventory.productPackage;
+      final prod = item.product;
+
+      // TRƯỜNG HỢP A: ĐANG TẠO GIAO DỊCH (Chỉ click được vào Package)
+      if (isAddingToCart) {
+        if (pkg != null) {
+          if (Get.isRegistered<OutboundTransactionController>()) {
+            Get.toNamed(AppRoutes.outboundTransactionItemAdd, arguments: item);
+          } else {
+            Get.toNamed(AppRoutes.inboundTransactionItemAdd, arguments: item);
+          }
+        }
+        return;
+      }
+
+      // TRƯỜNG HỢP B: SEARCH CHUNG BÌNH THƯỜNG
+      if (pkg != null) {
+        // Có Package -> Tới trang Inventory Detail
+        Get.toNamed(AppRoutes.inventoryDetail,
+            arguments: prod?.productId ?? pkg.productId);
+      } else if (prod != null && prod.productId.isNotEmpty) {
+        // Có Product nhưng chưa có Package -> Tới Product Catalog
+        Get.toNamed(AppRoutes.productCatalogDetail, arguments: prod);
+      } else if (prod != null && prod.categoryId.isNotEmpty) {
+        // Chỉ có Category ID -> Tới Category Detail
+        final catModel = CategoryModel(
+            categoryId: prod.categoryId,
+            name: prod.name, // Tên danh mục đã gán tạm vào prod.name ở hàm map
+            storeId: '',
+            isDefault: false);
+        Get.toNamed(AppRoutes.categoryDetail, arguments: catModel);
+      }
+    }
+  }
+
+  // 🟢 SMART MAPPING: Map linh hoạt dữ liệu null
+  InventoryInsightDisplayModel _mapToDisplayModel(SearchProductModel s) {
+    bool isCategoryOnly = s.productId.isEmpty && s.categoryId.isNotEmpty;
+    bool hasPackage =
+        s.productPackageId != null && s.productPackageId!.isNotEmpty;
+
+    return InventoryInsightDisplayModel(
+      inventory: InventoryModel(
+          inventoryId: '',
+          quantity: s.quantity,
+          reorderThreshold: s.reorderThreshold,
+          lastCount: 0,
+          updatedAt: DateTime.now(),
+          productPackageId: s.productPackageId ?? '',
+          activeStatus: 'active',
+          productPackage: hasPackage
+              ? ProductPackageModel(
+                  productPackageId: s.productPackageId!,
+                  displayName: s.displayName ?? s.productName,
+                  importPrice: s.importPrice ?? 0,
+                  sellingPrice: s.sellingPrice ?? 0,
+                  unitId: s.unitId ?? 'u-default',
+                  productId: s.productId,
+                  activeStatus: 'active',
+                  barcodeValue: s.barcodeValue,
+                  unit: UnitModel(
+                      unitId: s.unitId ?? 'u-default',
+                      code: s.unitCode ?? '---',
+                      name: s.unitName ?? 'Unknown Unit'))
+              : null),
+      product: ProductModel(
+          productId: s.productId,
+          name: isCategoryOnly ? s.categoryName : s.productName,
+          imageUrl: UrlHelper.normalizeImageUrl(s.imageUrl),
+          brand: s.brand,
+          categoryId: s.categoryId,
+          storeId: '',
+          activeStatus: 'active',
+          createdAt: DateTime.now(),
+          updatedAt: DateTime.now()),
+    );
+  }
+
+  void applySuggestion() {
+    if (suggestion.isNotEmpty) {
+      final newQuery = suggestion.value;
+      textController.text = newQuery;
+      textController.selection =
+          TextSelection.collapsed(offset: newQuery.length);
+      onSearchChanged(newQuery);
+    }
+  }
+
+  void _onScroll() {
+    if (scrollController.position.pixels >=
+        scrollController.position.maxScrollExtent - 200) {
+      _loadMore();
     }
   }
 
@@ -460,42 +556,6 @@ class TSearchController extends GetxController with TErrorHandler {
     searchTransactionResults.clear();
     suggestion.value = '';
     if (isTransactionSearch) _executeTransactionSearch('');
-  }
-
-  InventoryInsightDisplayModel _mapToDisplayModel(SearchProductModel s) {
-    return InventoryInsightDisplayModel(
-      inventory: InventoryModel(
-          inventoryId: '',
-          quantity: s.quantity,
-          reorderThreshold: s.reorderThreshold,
-          lastCount: 0,
-          updatedAt: DateTime.now(),
-          productPackageId: s.productPackageId ?? '',
-          activeStatus: 'active',
-          productPackage: ProductPackageModel(
-              productPackageId: s.productPackageId ?? '',
-              displayName: s.displayName ?? s.productName,
-              importPrice: s.importPrice ?? 0,
-              sellingPrice: s.sellingPrice ?? 0,
-              unitId: s.unitId ?? 'u-default',
-              productId: s.productId,
-              activeStatus: 'active',
-              barcodeValue: s.barcodeValue,
-              unit: UnitModel(
-                  unitId: s.unitId ?? 'u-default',
-                  code: s.unitCode ?? '---',
-                  name: s.unitName ?? 'Unknown Unit'))),
-      product: ProductModel(
-          productId: s.productId,
-          name: s.productName,
-          imageUrl: UrlHelper.normalizeImageUrl(s.imageUrl),
-          brand: s.brand,
-          categoryId: s.categoryId,
-          storeId: '',
-          activeStatus: 'active',
-          createdAt: DateTime.now(),
-          updatedAt: DateTime.now()),
-    );
   }
 
   @override
