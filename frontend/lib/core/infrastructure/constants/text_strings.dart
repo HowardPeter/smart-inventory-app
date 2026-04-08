@@ -635,6 +635,13 @@ class TTexts {
       "change_password_hint_new_password";
   static const String changePasswordHintConfirmPassword =
       "change_password_hint_confirm";
+  static const String passwordNotMatch = "password_not_match";
+  static const String passwordSameAsOld = "password_same_as_old";
+  static const String passwordChangedSuccess = "password_changed_success";
+  static const String oldPasswordIncorrect = "old_password_incorrect";
+  static const String authSessionExpired = "auth_session_expired";
+  static const String systemError = "system_error";
+  static const String authError = "auth_error";
 
   //--Edit store
   static const String editStoreTitle = 'edit_store_title';

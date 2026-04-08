@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:frontend/core/infrastructure/constants/text_strings.dart';
 import 'package:frontend/features/profile/controllers/profile_change_password_controller.dart';
 import 'package:get/get.dart';
 
@@ -17,7 +18,7 @@ class ChangePasswordButtonWidget
       child: SizedBox(
         width: double.infinity,
         child: ElevatedButton(
-          onPressed: controller.handleChangePassword,
+          onPressed: controller.updatePassword,
           style: ElevatedButton.styleFrom(
             backgroundColor: AppColors.primary,
             padding: const EdgeInsets.symmetric(vertical: AppSizes.p16),
@@ -25,9 +26,9 @@ class ChangePasswordButtonWidget
               borderRadius: BorderRadius.circular(AppSizes.radius16),
             ),
           ),
-          child: const Text(
-            "Change Password",
-            style: TextStyle(
+          child: Text(
+            TTexts.changePasswordConfirm.tr,
+            style: const TextStyle(
               fontWeight: FontWeight.bold,
               fontSize: 16,
               color: Colors.white,

@@ -37,11 +37,19 @@ final Map<String, String> enProfile = {
   TTexts.changePasswordTitle: 'Change Password',
   TTexts.changePasswordOldPassword: 'Old Password',
   TTexts.changePasswordNewPassword: 'New Password',
-  TTexts.changePasswordConfirm: 'Confirm Password',
+  TTexts.changePasswordConfirm: 'Confirm',
   TTexts.changePasswordBtnConfirm: "Confirm",
   TTexts.changePasswordHintOldPassword: 'Enter Old Password',
   TTexts.changePasswordHintNewPassword: 'Enter New Password',
   TTexts.changePasswordHintConfirmPassword: 'Enter Confirm Password',
+  TTexts.passwordNotMatch: 'New password and confirmation do not match.',
+  TTexts.passwordSameAsOld:
+      'New password cannot be the same as your current password.',
+  TTexts.passwordChangedSuccess: 'Your password has been updated successfully.',
+  TTexts.oldPasswordIncorrect: 'The current password you entered is incorrect.',
+  TTexts.authSessionExpired: 'Session expired. Please log in again.',
+  TTexts.systemError: 'A system error occurred. Please try again later.',
+  TTexts.authError: 'Authentication failed',
 
   //Edit Store\
   TTexts.editStoreTitle: 'My Stores',
