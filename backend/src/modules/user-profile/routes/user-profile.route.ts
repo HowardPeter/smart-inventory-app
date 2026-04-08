@@ -24,6 +24,20 @@ router.get(
   asyncWrapper(userProfileController.getMyProfile),
 );
 
+/**
+ * @api {PATCH} /api/auth/:userId Cập nhật thông tin người dùng
+ * @description Cho phép người dùng cập nhật thông tin cá nhân của chính mình.
+ * Hệ thống đã có bẫy lỗi 403 để chặn việc lấy
+ * ID của người khác cập nhật trái phép.
+ * * @headers
+ * - Authorization: Bearer <access_token> (Bắt buộc: Token đăng nhập)
+ * * @path_params
+ * - userId: string (Bắt buộc: UUID của người dùng cần cập nhật thông tin)
+ * * @body
+ * - fullName: string (Không bắt buộc: Tên đầy đủ mới, tối đa 255 ký tự)
+ * - address: string (Không bắt buộc: Địa chỉ mới, tối đa 255 ký tự)
+ * - phone: string (Không bắt buộc: Số điện thoại mới, tối đa 20 ký tự)
+ */
 userProfileRouter.patch(
   '/:userId',
   validator(updateUserProfileSchema),

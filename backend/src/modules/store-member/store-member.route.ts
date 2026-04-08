@@ -7,6 +7,7 @@ import { requirePermission } from '../access-control/require-permission.middlewa
 import { PERMISSION } from '../access-control/role-permission.constant.js';
 import { authenticate } from '../auth/index.js';
 import {
+  getStoreMembersSchema,
   removeStoreMemberSchema,
   updateStoreMemberRoleSchema,
 } from './validator/store-member.validator.js';
@@ -53,6 +54,29 @@ storeMemberRouter.patch(
   requirePermission(PERMISSION.STORE_MEMBER_WRITE),
   validator(updateStoreMemberRoleSchema),
   asyncWrapper(storeMemberController.updateRole),
+);
+
+/**
+ * @api {GET} /api/store-members/:storeId/members
+ * Lấy danh sách thành viên cửa hàng
+ * @description Trả về danh sách thông tin cá nhân (profile) và vai trò (role)
+ * của các thành viên đang hoạt động (active) trong một cửa hàng cụ thể.
+ * Yêu cầu người gọi request phải có quyền truy cập vào cửa hàng này.
+ * * @headers
+ * - Authorization: Bearer <access_token> (Bắt buộc: Token đăng nhập)
+ * - x-store-id: <store_uuid> (Bắt buộc:
+ * ID của cửa hàng đang thao tác để verify storeContext)
+ * * @path_params
+ * - storeId: string (Bắt buộc: UUID của cửa hàng cần lấy danh sách thành viên)
+ * * @body
+ * (Không yêu cầu Body)
+ */
+storeMemberRouter.get(
+  '/:storeId/members',
+  authenticate,
+  requireStoreContext,
+  validator(getStoreMembersSchema),
+  asyncWrapper(storeMemberController.getStoreMembers),
 );
 
 export { storeMemberRouter };

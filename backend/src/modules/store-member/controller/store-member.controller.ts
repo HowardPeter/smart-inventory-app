@@ -10,6 +10,7 @@ import {
 import type { ApiResponse } from '../../../common/types/api-response.type.js';
 import type {
   StoreMemberResponseDto,
+  StoreMemberUserResponseDto,
   UpdateStoreMemberRoleDto,
 } from '../dto/store-member.dto.js';
 import type { StoreMemberService } from '../service/store-member.service.js';
@@ -61,5 +62,19 @@ export class StoreMemberController {
     );
 
     sendResponse.success(res, updatedMember, { status: StatusCodes.OK });
+  };
+
+  getStoreMembers = async (
+    req: Request,
+    res: Response<ApiResponse<StoreMemberUserResponseDto[]>>,
+  ): Promise<void> => {
+    // Lấy store context để đảm bảo user có quyền truy cập store này
+    const storeContext = requireReqStoreContext(req);
+
+    const members = await this.storeMemberService.getMembersByStoreId(
+      storeContext.storeId,
+    );
+
+    sendResponse.success(res, members, { status: StatusCodes.OK });
   };
 }
