@@ -28,6 +28,9 @@ class TTexts {
   static const String errorUnknownMessage = "error_unknown_message";
   static const String fabScanBarcode = "fab_scan_barcode";
   static const String fabAddManual = "fab_add_manual";
+  static const String loading = "loading";
+  static const String saving = "saving";
+  static const String deleting = "deleting";
 
   // -- Search
   static const String searchHint = "search_hint";
@@ -36,8 +39,6 @@ class TTexts {
   static const String noResultsTitle = "no_results_title";
   static const String noResultsMessage = "no_results_message";
   static const String searchItemsPackages = "search_items_packages";
-
-  // -- Search Module
   static const String searchEverything = "search_everything";
   static const String noResultsFound = "no_results_found";
   static const String didYouMean = "didYouMean";
@@ -51,10 +52,9 @@ class TTexts {
   static const String netChecking = "net_checking";
   static const String netErrorRetryFailedMessage =
       "net_error_retry_failed_message";
-
   static const String barCodeScan = "bar_code_scan";
 
-// -- Error / Restricted Access
+  // -- Error / Restricted Access
   static const String errorTitle = "error_title";
   static const String errorAccessRestrictedTitle =
       "error_access_restricted_title";
@@ -68,6 +68,8 @@ class TTexts {
       "error_too_many_requests_message";
   static const String exit = "exit";
   static const String done = "done";
+  static const String next = "next";
+  static const String confirm = "confirm";
 
   // -- Splash Screen
   static const String splashSlogan = "splash_slogan";
@@ -231,7 +233,6 @@ class TTexts {
   static const String inviteCodeSubtitle = "invite_code_subtitle";
   static const String inviteCodeCopiedTitle = "invite_code_copied_title";
   static const String inviteCodeCopiedMessage = "invite_code_copied_message";
-
   static const String joinWorkspaceTitle = "join_workspace_title";
   static const String joinWorkspaceSubtitle = "join_workspace_subtitle";
   static const String enterInviteCodeLabel = "enter_invite_code_label";
@@ -239,7 +240,6 @@ class TTexts {
   static const String joinBtn = "join_btn";
   static const String joiningBtn = "joining_btn";
   static const String checkingInviteCode = "checking_invite_code";
-
   static const String joinMissingCodeTitle = "join_missing_code_title";
   static const String joinMissingCodeMessage = "join_missing_code_message";
   static const String joinInvalidCodeTitle = "join_invalid_code_title";
@@ -256,7 +256,6 @@ class TTexts {
   static const String roleManager = "role_manager";
   static const String roleStaff = "role_staff";
   static const String youBadge = "you_badge";
-
   static const String generateInviteCodeBtn = "generate_invite_code_btn";
   static const String generateCodeDialogTitle = "generate_code_dialog_title";
   static const String generateCodeDialogMessage =
@@ -309,7 +308,7 @@ class TTexts {
   static const String inventoryInsights = "inventory_insights";
   static const String manageData = "manage_data";
   static const String productCatalog = "product_catalog";
-  static const String totalItems = "total_items";
+  static const String totalItemsValue = "total_items_value"; // updated
   static const String stockValue = "stock_value";
   static const String stockHealth = "stock_health";
   static const String statusHealthy = "status_healthy";
@@ -365,7 +364,6 @@ class TTexts {
   static const String totalValue = "total_value";
   static const String editItem = "edit_item";
   static const String deleteItem = "delete_item";
-  static const String addToTransaction = "add_to_transaction";
   static const String deleteConfirmation = "delete_confirmation";
   static const String confirmDeleteText =
       "are_you_sure_you_want_to_delete_this_item";
@@ -401,7 +399,14 @@ class TTexts {
   static const String loadingProduct = "loading_product";
   static const String viewProductInfo = 'view_product_info';
 
-  // --- Product Catalog & Categories ---
+  // --- Transaction Bottom Sheet
+  static const String addToTransaction = "add_to_transaction";
+  static const String enterQuantityToAdd = "enter_quantity_to_add";
+  static const String quantityToImport = "quantity_to_import";
+  static const String importPriceLot = "import_price_lot";
+  static const String confirmAndAdd = "confirm_and_add";
+
+  // --- Product Catalog & Categories
   static const String categoryCatalog = 'category_catalog';
   static const String searchCategories = 'search_categories';
   static const String totalCategories = 'total_categories';
@@ -412,11 +417,11 @@ class TTexts {
   static const String noCategoryDescription = 'no_description';
   static const String emptyCategoryMessage = 'empty_category_message';
 
-  // --- View All Products ---
+  // --- View All Products
   static const String viewAllProducts = 'view_all_products';
   static const String viewAllProductsSub = 'view_all_products_sub';
 
-  // --- Category Detail ---
+  // --- Category Detail
   static const String addNewProduct = 'add_new_product';
   static const String addNewProductSub = 'add_new_product_sub';
   static const String editCategory = 'editCategory';
@@ -424,9 +429,8 @@ class TTexts {
   static const String noProductsFound = 'no_products_found';
   static const String noProductsAssigned = 'no_products_assigned';
   static const String deleteCategoryConfirm = 'delete_category_confirm';
-  static const String deleting = 'deleting';
 
-  // --- Product Catalog Deatail ---
+  // --- Product Catalog Detail
   static const String brand = 'brand';
   static const String packagesOrVariants = 'packages_or_variants';
   static const String add = 'add';
@@ -437,6 +441,11 @@ class TTexts {
   static const String addNewPackage = 'add_new_package';
   static const String editPackage = 'edit_package';
   static const String noPackagesFound = 'no_packages_found';
+  static const String deleteCategoryTitle = "delete_category_title";
+  static const String deleteCategoryWarning = "delete_category_warning";
+  static const String deleteCategoryConfirmBtn = "delete_category_confirm_btn";
+  static const String deleteCategorySuccess = "delete_category_success";
+  static const String productDataRefreshing = "product_data_refreshing";
 
   // -- Add Category
   static const String categoryNameLabel = 'category_name_label';
@@ -450,7 +459,6 @@ class TTexts {
   static const String categoryCreatedSuccessMessage =
       'category_created_success_message';
   static const String categoryNameExists = 'category_name_exists';
-  static const String saving = 'saving';
   static const String savingCategory = 'saving_category';
 
   // -- Edit Category
@@ -520,6 +528,25 @@ class TTexts {
   static const String invalidNumber = 'invalid_number';
   static const String suggestedNames = 'suggested_names';
   static const String priceGreaterThanZero = 'price_greater_than_zero';
+  static const String displayNameLabel = "display_name_label";
+  static const String displayNameHint = "display_name_hint";
+  static const String instructionTitle = "instruction_title";
+  static const String instructionBaseInfo = "instruction_base_info";
+  static const String instructionImage = "instruction_image";
+  static const String instructionPackage = "instruction_package";
+  static const String fillRequiredFields = "fill_required_fields";
+  static const String confirmCreateTitle = "confirm_create_title";
+  static const String confirmCreateMessage = "confirm_create_message";
+  static const String confirmUpdateTitle = "confirm_update_title";
+  static const String confirmUpdateMessage = "confirm_update_message";
+  static const String confirmDeleteTitle = "confirm_delete_title";
+  static const String confirmDeleteMessage = "confirm_delete_message";
+  static const String confirmSkipPackageTitle = "confirm_skip_package_title";
+  static const String confirmSkipPackageMessage =
+      "confirm_skip_package_message";
+  static const String createOnlyProduct = "create_only_product";
+  static const String createFullProduct = "create_full_product";
+  static const String skipAndCreate = "skip_and_create";
 
   // -- Edit Product
   static const String editProductImageTitle = 'edit_product_image_title';
@@ -559,8 +586,6 @@ class TTexts {
   static const String sellingPrice = 'selling_price';
 
   // Empty State
-  static const String emptyTransactionTitle = "empty_transaction_title";
-  static const String emptyTransactionSubtitle = "empty_transaction_subtitle";
   static const String homeQuickActions = "home_quick_actions";
   static const String homeLowStockAlerts = "home_low_stock_alerts";
   static const String homeItems = "home_items";
@@ -568,6 +593,177 @@ class TTexts {
   static const String homeTapToViewAll = "home_tap_to_view_all";
   static const String homeInStock = "home_in_stock";
   static const String homeOutOfStock = "home_out_of_stock";
+
+  // --- Transaction ---
+  static const String createNewTransaction = "createNewTransaction";
+  static const String manageInventory = "manageInventory";
+  static const String manageInventoryDesc = "manageInventoryDesc";
+  static const String inbound = "inbound";
+  static const String outbound = "outbound";
+  static const String stockAdjustment = "stockAdjustment";
+
+  // --- Inbound ---
+  static const String inboundTransaction = "inbound_transaction";
+  static const String emptyInboundCartTitle = "empty_inbound_cart_title";
+  static const String emptyInboundCartSub = "empty_inbound_cart_sub";
+  static const String completeImport = "complete_import";
+  static const String totalFunds = "total_funds";
+  static const String searchProductToAdd = "search_product_to_add";
+  static const String emptyTransactionTitle = "empty_transaction_title";
+  static const String emptyTransactionSubtitle = "empty_transaction_subtitle";
+  static const String transactionCompletedTitle = "transaction_completed_title";
+  static const String transactionCompletedSubtitle =
+      "transaction_completed_subtitle";
+  static const String backToHome = "back_to_home";
+  static const String scanProductBarcode = "scan_product_barcode";
+  static const String confirmImportTitle = "confirm_import_title";
+  static const String confirmImportDescription = "confirm_import_description";
+  static const String proceedImport = "proceed_import";
+
+  // --- Outbound ---
+  static const String outboundTransactionTitle = "outbound_transaction_title";
+  static const String searchDot = "search_dot";
+  static const String confirmExport = "confirm_export";
+  static const String stocksLabel = "stocks_label";
+  static const String outOfStockAlert = "out_of_stock_alert";
+  static const String outOfStockTitle = "out_of_stock_title";
+  static const String outOfStockDesc = "out_of_stock_desc";
+  static const String actualStock = "actual_stock";
+  static const String autoRemovedFromCart = "auto_removed_from_cart";
+  static const String updatedListLabel = "updated_list_label";
+
+  // --- Inbound/Outbound Transaction Item Add ---
+  static const String loadingAddingToCart = "loading_adding_to_cart";
+  static const String productNameUnknown = "product_name_unknown";
+  static const String completeExport = "complete_export";
+  static const String labelNoBarcode = "label_no_barcode";
+  static const String labelStock = "label_stock";
+  static const String labelImportPrice = "label_import_price";
+  static const String labelQuantity = "label_quantity";
+  static const String labelTicket = "label_ticket";
+  static const String errorNoPackageId = "error_no_package_id";
+  static const String subtotal = "subtotal";
+  static const String item = "item";
+  static const String removeItem = "remove_item";
+  static const String confirmRemoveItemTransaction =
+      "confirm_remove_item_transaction";
+  static const String remove = "remove";
+  static const String creatingImportTicket = "creating_import_ticket";
+  static const String manualImport = "manual_import";
+  static const String importTicketCreated = "import_ticket_created";
+  static const String errorCreatingImportTicket =
+      "error_creating_import_ticket";
+  static const String uncategorized = "uncategorized";
+  static const String noBrand = "no_brand";
+  static const String inactive = "inactive";
+  static const String product = "product";
+  static const String recentlyAddedSuggested = "recently_added_suggested";
+  static const String checkoutDetails = "checkout_details";
+  static const String transactionReason = "transaction_reason";
+  static const String selectReason = "select_reason";
+  static const String transactionNote = "transaction_note";
+  static const String noteHint = "note_hint";
+  static const String priceChangeDetected = "price_change_detected";
+  static const String priceChangeMessage = "price_change_message";
+  static const String updatePricesAndCreate = "update_prices_and_create";
+  static const String justCreateTransaction = "just_create_transaction";
+  static const String transactionSuccessTitle = "transaction_success_title";
+  static const String transactionSuccessSub = "transaction_success_sub";
+  static const String transactionNumber = "transaction_number";
+  static const String transactionDate = "transaction_date";
+  static const String transactionType = "transaction_type";
+  static const String totalItemsTransaction = "total_items_transaction";
+  static const String checkDetails = "check_details";
+  static const String transactionDetails = "transaction_details";
+  static const String selectExportType = "select_export_type";
+
+  // Specific Reasons
+  static const String reasonRetailSale = "reason_retail_sale";
+  static const String reasonWholesale = "reason_wholesale";
+  static const String reasonDamaged = "reason_damaged";
+  static const String reasonInternalTransfer = "reason_internal_transfer";
+  static const String reasonReturn = "reason_return";
+  static const String reasonOther = "reason_other";
+  static const String reasonIncome = "reason_income";
+  static const String reasonNeutral = "reason_neutral";
+  static const String reasonExpense = "reason_expense";
+
+  static const String selectBatchFIFO = "select_batch_fifo";
+  static const String batchRemaining = "batch_remaining";
+  static const String expiresOn = "expires_on";
+  static const String batchExceedsStock = "batch_exceeds_stock";
+  static const String quantityToExport = "quantity_to_export";
+  static const String sellingPriceLot = "selling_price_lot";
+  static const String importedOn = "imported_on";
+  static const String outOfStockBatch = "out_of_stock_batch";
+
+  // Export process
+  static const String confirmExportTitle = "confirm_export_title";
+  static const String confirmExportDescription = "confirm_export_description";
+  static const String processingExport = "processing_export";
+  static const String exportSuccessMessage = "export_success_message";
+  static const String noteLabel = "note_label";
+  static const String emptyCartWarning = "empty_cart_warning";
+  static const String priceChangeDetectedTitle = "price_change_detected_title";
+  static const String priceChangeDetectedDesc = "price_change_detected_desc";
+  static const String proceedExport = "proceed_export";
+  static const String reasonForExport = "reason_for_export";
+  static const String total = "total";
+  static const String totalQuantity = "total_quantity";
+  static const String specifyBatchQuantity = "specify_batch_quantity";
+
+  // -- Stock Adjustment
+  static const String confirmAdjustmentTitle = "confirm_adjustment_title";
+  static const String confirmAdjustmentDesc = "confirm_adjustment_desc";
+  static const String proceedAdjustment = "proceed_adjustment";
+  static const String listItems = "list_items";
+  static const String system = "system";
+  static const String actual = "actual";
+  static const String spread = "spread";
+  static const String status = "status";
+  static const String checked = "checked";
+  static const String unchecked = "unchecked";
+  static const String checkedItems = "checked_items";
+  static const String saveAll = "save_all";
+  static const String updateActualQty = "update_actual_qty";
+  static const String mismatched = "mismatched";
+  static const String reason = "reason";
+  static const String damage = "damage";
+  static const String expired = "expired";
+  static const String loss = "loss";
+  static const String itemFound = "item_found";
+  static const String inputError = "input_error";
+  static const String additionalNote = "additional_note";
+  static const String stockOutput = "stock_output";
+  static const String checkComplete = "check_complete";
+  static const String mismatchedReasonLabel = "mismatched_reason_label";
+  static const String productInformation = "product_information";
+  static const String stockCount = "stock_count";
+  static const String otherReason = "other_reason";
+  static const String notEnoughStockWarning = "not_enough_stock_warning";
+  static const String quantityToAdjust = "quantity_to_adjust";
+  static const String automatedNote = "automated_note";
+  static const String currentStock = "current_stock";
+  static const String barcode = "barcode";
+  static const String checkAll = "check_all";
+  static const String uncheckAll = "uncheck_all";
+  static const String confirmCheckAllTitle = "confirm_check_all_title";
+  static const String confirmCheckAllDesc = "confirm_check_all_desc";
+  static const String confirmUncheckAllTitle = "confirm_uncheck_all_title";
+  static const String confirmUncheckAllDesc = "confirm_uncheck_all_desc";
+  static const String incompleteSaveTitle = "incomplete_save_title";
+  static const String incompleteSaveDesc = "incomplete_save_desc";
+  static const String confirmSaveTitle = "confirm_save_title";
+  static const String confirmSaveDesc = "confirm_save_desc";
+  static const String combinedNotesTitle = "combined_notes_title";
+  static const String noItemsFound = "no_items_found";
+  static const String noItemsFoundDesc = "no_items_found_desc";
+  static const String discardTransactionTitle = "discard_transaction_title";
+  static const String discardTransactionDesc = "discard_transaction_desc";
+
+  // -- Transaction Summary
+  static const String qty = "qty";
+  static const String adjustmentSummaryBrief = "adjustment_summary_brief";
 
   // -- Notifications
   static const String notificationTitle = "notification_title";
@@ -610,6 +806,19 @@ class TTexts {
   static const String profileDialogDescriptionLogout =
       'profile_dialog_description_logout';
   static const String profileDialogBtnLogout = 'profile_dialog_btn_logout';
+  static const String errorLoadingData = "error_loading_data";
+  static const String verifyingData = "verifying_data";
+  static const String syncDataWarningTitle = "sync_data_warning_title";
+  static const String syncDataWarningDesc = "sync_data_warning_desc";
+  static const String unsavedChangesTitle = "unsaved_changes_title";
+  static const String unsavedChangesDesc = "unsaved_changes_desc";
+  static const String exitAnyway = "exit_anyway";
+  static const String inventoryUpdatedSuccess = "inventory_updated_success";
+  static const String noReasonNeededWarning = "no_reason_needed_warning";
+  static const String defaultAdjustmentNote = "default_adjustment_note";
+  static const String itemFoundText = "item_found_text";
+  static const String defaultUnit = "default_unit";
+  static const String specificNoteHint = "specific_note_hint";
 
   //--Edit profile
   static const String editTitle = 'edit_title';
@@ -668,4 +877,8 @@ class TTexts {
   static const String assignsRoleAll = 'assigns_role_all';
   static const String assignsRoleOwner = 'assigns_role_owner';
   static const String assignsRoleSearchHint = 'assigns_role_search_hint';
+
+  //-- System
+  static const String systemSnackbarTitle = "system_snackbar_title";
+  static const String systemSnackbar403Error = "system_snackbar_403_error";
 }

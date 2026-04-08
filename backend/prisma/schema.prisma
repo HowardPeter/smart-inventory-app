@@ -64,11 +64,11 @@ model UserProfile {
   updatedAt    DateTime     @updatedAt @map("updated_at")
   activeStatus ActiveStatus @default(active) @map("active_status")
 
-  storesOwned  Store[]
-  transactions Transaction[]
-  auditLogs    AuditLog[]
-  storeMembers StoreMember[]
-  fcmTokens    FcmToken[]
+  storesOwned   Store[]
+  transactions  Transaction[]
+  auditLogs     AuditLog[]
+  storeMembers  StoreMember[]
+  fcmTokens     FcmToken[]
   notifications Notification[]
 }
 
@@ -89,6 +89,7 @@ model Store {
   storeMembers  StoreMember[]
   hidedDefaults HidedDefault[]
   notifications Notification[]
+  transactions  Transaction[]
 }
 
 model StoreMember {
@@ -116,6 +117,16 @@ model Category {
   hidedDefaults HidedDefault[]
 }
 
+model HidedDefault {
+  storeId    String @map("store_id")
+  categoryId String @map("category_id")
+
+  store    Store    @relation(fields: [storeId], references: [storeId])
+  category Category @relation(fields: [categoryId], references: [categoryId])
+
+  @@id([storeId, categoryId])
+}
+
 model Product {
   productId    String       @id @default(uuid()) @map("product_id")
   name         String
@@ -130,19 +141,6 @@ model Product {
   store           Store            @relation(fields: [storeId], references: [storeId])
   category        Category         @relation(fields: [categoryId], references: [categoryId])
   productPackages ProductPackage[]
-}
-
-model Transaction {
-  transactionId String            @id @default(uuid()) @map("transaction_id")
-  type          TransactionType
-  note          String?
-  status        TransactionStatus
-  createdAt     DateTime          @default(now()) @map("created_at")
-  totalPrice    Decimal           @map("total_price") @db.Decimal(18, 2)
-  userId        String            @map("user_id")
-
-  user               UserProfile         @relation(fields: [userId], references: [userId])
-  transactionDetails TransactionDetail[]
 }
 
 model Unit {
@@ -184,6 +182,21 @@ model Inventory {
   productPackage ProductPackage @relation(fields: [productPackageId], references: [productPackageId])
 }
 
+model Transaction {
+  transactionId String            @id @default(uuid()) @map("transaction_id")
+  type          TransactionType
+  note          String?
+  status        TransactionStatus
+  createdAt     DateTime          @default(now()) @map("created_at")
+  totalPrice    Decimal           @map("total_price") @db.Decimal(18, 2)
+  userId        String            @map("user_id")
+  storeId       String            @map("store_id")
+
+  user               UserProfile         @relation(fields: [userId], references: [userId])
+  store              Store               @relation(fields: [storeId], references: [storeId])
+  transactionDetails TransactionDetail[]
+}
+
 model TransactionDetail {
   quantity         Int
   unitPrice        Decimal @map("unit_price") @db.Decimal(18, 2)
@@ -205,7 +218,7 @@ model AuditLog {
   performedAt DateTime         @default(now()) @map("performed_at")
   userId      String           @map("user_id")
   storeId     String           @map("store_id")
-  note        String?           
+  note        String?
 
   user  UserProfile @relation(fields: [userId], references: [userId])
   store Store       @relation(fields: [storeId], references: [storeId])
@@ -220,44 +233,31 @@ model BarcodeApiCache {
   fetchedAt DateTime      @default(now()) @map("fetched_at")
 }
 
-model HidedDefault {
-  storeId    String @map("store_id")
-  categoryId String @map("category_id")
-
-  store    Store    @relation(fields: [storeId], references: [storeId])
-  category Category @relation(fields: [categoryId], references: [categoryId])
-
-  @@id([storeId, categoryId])
-}
-
 model FcmToken {
   tokenId   String   @id @default(uuid()) @map("token_id")
   token     String   @unique
   createdAt DateTime @default(now()) @map("created_at")
   updatedAt DateTime @updatedAt @map("updated_at")
-  
-  userId    String   @map("user_id")
-  user      UserProfile @relation(fields: [userId], references: [userId], onDelete: Cascade)
+  userId String      @map("user_id")
+
+  user   UserProfile @relation(fields: [userId], references: [userId], onDelete: Cascade)
 
   @@map("fcm_token")
 }
 
 model Notification {
-  notificationId String   @id @default(uuid()) @map("notification_id")
+  notificationId String       @id @default(uuid()) @map("notification_id")
   title          String
   body           String
   type           String
-  referenceId    String?  @map("reference_id") 
-  isRead         Boolean  @default(false) @map("is_read")
-  
+  referenceId    String?      @map("reference_id")
+  isRead         Boolean      @default(false) @map("is_read")
   activeStatus   ActiveStatus @default(active) @map("active_status")
+  storeId        String?      @map("store_id")
+  createdAt      DateTime     @default(now()) @map("created_at")
+  userId         String       @map("user_id")
 
-  storeId        String?  @map("store_id")
-  
-  createdAt      DateTime @default(now()) @map("created_at")
-  userId         String   @map("user_id")
-
-  user UserProfile @relation(fields: [userId], references: [userId], onDelete: Cascade)
+  user  UserProfile @relation(fields: [userId], references: [userId], onDelete: Cascade)
   store Store?      @relation(fields: [storeId], references: [storeId], onDelete: Cascade)
 
   @@map("notification")

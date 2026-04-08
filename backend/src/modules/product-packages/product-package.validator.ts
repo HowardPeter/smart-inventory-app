@@ -16,28 +16,44 @@ const barcodeTypeSchema = z.enum(['upc', 'ean', 'code128', 'qr']);
 
 const createProductPackageBodySchema = z
   .object({
-    unitId: z.uuid('Invalid unitId'),
-    importPrice: z.coerce
-      .number()
-      .min(0, 'Import price must be greater than or equal to 0')
-      .nullable()
-      .optional(),
-    sellingPrice: z.coerce
-      .number()
-      .min(0, 'Selling price must be greater than or equal to 0')
-      .nullable()
-      .optional(),
-    barcodeValue: z
-      .string()
-      .trim()
-      .min(1, 'Barcode value cannot be empty')
-      .max(255, 'Barcode value cannot exceed 255 characters')
-      .nullable()
-      .optional(),
-    barcodeType: barcodeTypeSchema.nullable().optional(),
+    package: z.object({
+      unitId: z.uuid('Invalid unitId'),
+      importPrice: z.coerce
+        .number()
+        .min(0, 'Import price must be greater than or equal to 0')
+        .nullable()
+        .optional(),
+      sellingPrice: z.coerce
+        .number()
+        .min(0, 'Selling price must be greater than or equal to 0')
+        .nullable()
+        .optional(),
+      barcodeValue: z
+        .string()
+        .trim()
+        .min(1, 'Barcode value cannot be empty')
+        .max(255, 'Barcode value cannot exceed 255 characters')
+        .nullable()
+        .optional(),
+      barcodeType: barcodeTypeSchema.nullable().optional(),
+    }),
+    inventory: z.object({
+      quantity: z
+        .number()
+        .int()
+        .min(0, 'Import price must be greater than or equal to 0')
+        .default(0),
+      reorderThreshold: z
+        .number()
+        .int()
+        .min(0, 'Reorder threshold must be greater than or equal to 0')
+        .nullable()
+        .optional(),
+      lastCount: z.number().int().min(0).nullable().optional(),
+    }),
   })
   .superRefine((data, ctx) => {
-    if (data.barcodeType && !data.barcodeValue) {
+    if (data.package.barcodeType && !data.package.barcodeValue) {
       ctx.addIssue({
         code: z.ZodIssueCode.custom,
         message: 'barcodeType requires barcodeValue',

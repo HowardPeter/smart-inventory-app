@@ -21,16 +21,16 @@ class InventoryProductFormBaseInfoWidget
 
           // Ô CHỌN DANH MỤC
           GestureDetector(
-            // Logic KHÓA: Nếu isCategoryLocked = true thì onTap = null (không bấm được)
-            onTap: controller.isCategoryLocked
-                ? null
-                : () => controller.openCategoryPicker(),
+            onTap: () {
+              if (!controller.isCategoryLocked) {
+                controller.openCategoryPicker();
+              }
+            },
             child: AbsorbPointer(
               child: Obx(() => TTextFormFieldWidget(
                     label: TTexts.selectCategory.tr,
                     hintText: controller.selectedCategory.value?.name ??
                         TTexts.tapToSelect.tr,
-                    // Logic ĐỔI ICON: Khóa thì hiện ổ khóa, mở thì hiện mũi tên
                     suffixIcon: controller.isCategoryLocked
                         ? const Icon(Iconsax.lock_copy,
                             size: 18, color: AppColors.softGrey)

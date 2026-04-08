@@ -1,0 +1,131 @@
+import 'package:flutter/material.dart';
+import 'package:frontend/core/infrastructure/constants/text_strings.dart';
+import 'package:frontend/core/infrastructure/models/transaction_detail_model.dart';
+import 'package:frontend/core/ui/theme/app_colors.dart';
+import 'package:get/get.dart';
+import 'package:iconsax_flutter/iconsax_flutter.dart';
+
+class TransactionCartItemWidget extends StatelessWidget {
+  final TransactionDetailModel item;
+  final VoidCallback onIncrease;
+  final VoidCallback onDecrease;
+
+  const TransactionCartItemWidget({
+    super.key,
+    required this.item,
+    required this.onIncrease,
+    required this.onDecrease,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    // Nếu không có tên thì fallback về ID
+    final name = item.packageInfo?.displayName ??
+        '${TTexts.product.tr} #${item.productPackageId?.substring(0, 5) ?? TTexts.labelNoBarcode.tr}';
+
+    // Giá tiền (Đô la)
+    final price = item.unitPrice.toStringAsFixed(2);
+
+    return Container(
+      padding: const EdgeInsets.all(12),
+      margin: const EdgeInsets.only(bottom: 12), // Cách khoảng cho danh sách
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(16),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.03),
+            blurRadius: 10,
+            offset: const Offset(0, 4),
+          ),
+        ],
+      ),
+      child: Row(
+        children: [
+          // 1. ICON BOX ĐƠN GIẢN (THAY CHO ẢNH)
+          Container(
+            width: 60,
+            height: 60,
+            decoration: BoxDecoration(
+              color: AppColors.softGrey.withOpacity(0.2),
+              borderRadius: BorderRadius.circular(12),
+            ),
+            child: const Icon(Iconsax.box_1_copy, color: AppColors.subText),
+          ),
+          const SizedBox(width: 12),
+
+          // 2. THÔNG TIN (TÊN & GIÁ)
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  name,
+                  style: const TextStyle(
+                    fontFamily: 'Poppins',
+                    fontWeight: FontWeight.bold,
+                    fontSize: 14,
+                    color: AppColors.primaryText,
+                  ),
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                ),
+                const SizedBox(height: 4),
+                Text(
+                  '\$$price',
+                  style: const TextStyle(
+                    fontFamily: 'Poppins',
+                    fontSize: 13,
+                    color: AppColors.subText,
+                  ),
+                ),
+              ],
+            ),
+          ),
+
+          // 3. CỤM TĂNG / GIẢM SỐ LƯỢNG
+          Row(
+            children: [
+              GestureDetector(
+                onTap: onDecrease,
+                child: Container(
+                  padding: const EdgeInsets.all(6),
+                  decoration: BoxDecoration(
+                    color: AppColors.softGrey.withOpacity(0.2),
+                    shape: BoxShape.circle,
+                  ),
+                  child: const Icon(Iconsax.minus_copy,
+                      size: 16, color: AppColors.primaryText),
+                ),
+              ),
+              Container(
+                width: 36,
+                alignment: Alignment.center,
+                child: Text(
+                  '${item.quantity}',
+                  style: const TextStyle(
+                    fontFamily: 'Poppins',
+                    fontWeight: FontWeight.bold,
+                    fontSize: 14,
+                  ),
+                ),
+              ),
+              GestureDetector(
+                onTap: onIncrease,
+                child: Container(
+                  padding: const EdgeInsets.all(6),
+                  decoration: BoxDecoration(
+                    color: AppColors.primary.withOpacity(0.1),
+                    shape: BoxShape.circle,
+                  ),
+                  child: const Icon(Iconsax.add_copy,
+                      size: 16, color: AppColors.primary),
+                ),
+              ),
+            ],
+          ),
+        ],
+      ),
+    );
+  }
+}

@@ -28,6 +28,14 @@ class AppRoutes {
   static const productForm = '/product_form';
   static const customizeCatalog = '/customize-catalog';
 
+  static const inboundTransaction = '/inbound_transaction';
+  static const inboundTransactionItemAdd = '/inbound_transaction_item_add';
+  static const outboundTransaction = '/outbound_transaction';
+  static const outboundTransactionItemAdd = '/outbound_transaction_item_add';
+  static const stockAdjustment = '/stock_adjustment';
+  static const stockAdjustmentItem = '/stock_adjustment_item';
+  static const transactionSummary = '/transaction_summary';
+
   static const profile = '/profile';
   static const notification = '/notification';
   static const editProfile = '/edit_profile';

@@ -14,11 +14,13 @@ class TCustomDialogWidget extends StatelessWidget {
     required this.onPrimaryPressed,
     this.secondaryButtonText,
     this.onSecondaryPressed,
+    this.content, // Hỗ trợ widget tùy chỉnh (như danh sách thay đổi giá)
   });
 
   final String title;
   final String description;
   final Widget icon;
+  final Widget? content;
 
   final String primaryButtonText;
   final VoidCallback onPrimaryPressed;
@@ -29,115 +31,123 @@ class TCustomDialogWidget extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Dialog(
-      // Bo góc viền Dialog siêu mượt như thiết kế
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(AppSizes.radius24),
       ),
-      backgroundColor: AppColors.white, // Nền trắng toàn bộ
+      backgroundColor: AppColors.white,
       elevation: 0,
       child: Padding(
         padding: const EdgeInsets.all(AppSizes.p24),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            // ==========================================
-            // 1. KHUNG CHỨA ICON (Nền xám nhạt bo góc)
-            // ==========================================
-            Container(
-              padding: const EdgeInsets.all(AppSizes.p20),
-              decoration: BoxDecoration(
-                color: AppColors.surface, // Lấy chuẩn màu F8F9FA từ AppColors
-                borderRadius: BorderRadius.circular(AppSizes.radius16),
-              ),
-              child: icon,
-            ),
-            const SizedBox(height: AppSizes.p24),
-
-            // ==========================================
-            // 2. TIÊU ĐỀ & MÔ TẢ
-            // ==========================================
-            Text(
-              title,
-              style: const TextStyle(
-                fontFamily: 'Poppins',
-                fontSize: 18,
-                fontWeight: FontWeight.w700,
-                color: AppColors.primaryText,
-              ),
-              textAlign: TextAlign.center,
-            ),
-            const SizedBox(height: AppSizes.p12),
-
-            Text(
-              description,
-              style: const TextStyle(
-                fontFamily: 'Poppins',
-                fontSize: 14,
-                fontWeight: FontWeight.w400,
-                color: AppColors.subText, // Lấy màu xám chuẩn từ AppColors
-                height: 1.5, // Giãn dòng cho dễ đọc như hình
-              ),
-              textAlign: TextAlign.center,
-            ),
-            const SizedBox(height: AppSizes.p32),
-
-            // ==========================================
-            // 3. KHU VỰC NÚT BẤM (Xếp Dọc - Full Width)
-            // ==========================================
-
-            // NÚT CHÍNH (Màu Cam)
-            SizedBox(
-              width: double.infinity, // Kéo giãn hết chiều ngang
-              child: ElevatedButton(
-                onPressed: onPrimaryPressed,
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: AppColors.primary,
-                  padding: const EdgeInsets.symmetric(vertical: AppSizes.p16),
-                  elevation: 0,
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(AppSizes.radius12),
-                  ),
+        child: SingleChildScrollView(
+          physics: const BouncingScrollPhysics(),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              // ==========================================
+              // 1. KHUNG CHỨA ICON
+              // ==========================================
+              Container(
+                padding: const EdgeInsets.all(AppSizes.p20),
+                decoration: BoxDecoration(
+                  color: AppColors.surface,
+                  borderRadius: BorderRadius.circular(AppSizes.radius16),
                 ),
-                child: Text(
-                  primaryButtonText,
-                  style: const TextStyle(
-                    fontFamily: 'Poppins',
-                    fontSize: 16, // Chữ to và đậm hơn một chút
-                    fontWeight: FontWeight.w600,
-                    color: AppColors.white,
-                  ),
-                ),
+                child: icon,
               ),
-            ),
+              const SizedBox(height: AppSizes.p24),
 
-            // NÚT PHỤ (Chỉ hiển thị nếu có truyền text vào)
-            if (secondaryButtonText != null) ...[
-              const SizedBox(height: AppSizes.p12), // Khoảng cách giữa 2 nút
+              // ==========================================
+              // 2. TIÊU ĐỀ & MÔ TẢ
+              // ==========================================
+              Text(
+                title,
+                style: const TextStyle(
+                  fontFamily: 'Poppins',
+                  fontSize: 18,
+                  fontWeight: FontWeight.w700,
+                  color: AppColors.primaryText,
+                ),
+                textAlign: TextAlign.center,
+              ),
+              const SizedBox(height: AppSizes.p12),
 
+              Text(
+                description,
+                style: const TextStyle(
+                  fontFamily: 'Poppins',
+                  fontSize: 14,
+                  fontWeight: FontWeight.w400,
+                  color: AppColors.subText,
+                  height: 1.5,
+                ),
+                textAlign: TextAlign.center,
+              ),
+
+              // ==========================================
+              // 3. NỘI DUNG TÙY CHỈNH (Danh sách giá thay đổi)
+              // ==========================================
+              if (content != null) ...[
+                const SizedBox(height: AppSizes.p16),
+                content!,
+              ],
+
+              const SizedBox(height: AppSizes.p32),
+
+              // ==========================================
+              // 4. KHU VỰC NÚT BẤM
+              // ==========================================
               SizedBox(
                 width: double.infinity,
-                child: TextButton(
-                  onPressed: onSecondaryPressed ?? () => Get.back(),
-                  style: TextButton.styleFrom(
-                    backgroundColor: AppColors.surface, // Nền xám nhạt như hình
+                child: ElevatedButton(
+                  onPressed: onPrimaryPressed,
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: AppColors.primary,
                     padding: const EdgeInsets.symmetric(vertical: AppSizes.p16),
+                    elevation: 0,
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(AppSizes.radius12),
                     ),
                   ),
                   child: Text(
-                    secondaryButtonText!,
+                    primaryButtonText,
                     style: const TextStyle(
                       fontFamily: 'Poppins',
                       fontSize: 16,
                       fontWeight: FontWeight.w600,
-                      color: AppColors.primaryText, // Chữ màu đen đậm như hình
+                      color: AppColors.white,
                     ),
                   ),
                 ),
               ),
+
+              if (secondaryButtonText != null) ...[
+                const SizedBox(height: AppSizes.p12),
+                SizedBox(
+                  width: double.infinity,
+                  child: TextButton(
+                    onPressed: onSecondaryPressed ?? () => Get.back(),
+                    style: TextButton.styleFrom(
+                      backgroundColor: AppColors.surface,
+                      padding:
+                          const EdgeInsets.symmetric(vertical: AppSizes.p16),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(AppSizes.radius12),
+                      ),
+                    ),
+                    child: Text(
+                      secondaryButtonText!,
+                      style: const TextStyle(
+                        fontFamily: 'Poppins',
+                        fontSize: 16,
+                        fontWeight: FontWeight.w600,
+                        color: AppColors.primaryText,
+                      ),
+                    ),
+                  ),
+                ),
+              ],
             ],
-          ],
+          ),
         ),
       ),
     );

@@ -54,6 +54,11 @@ class CoreImages {
 
   final String successAdding = 'assets/images/core/success-adding.png';
 
+  final String noItem = 'assets/images/core/no-item.png';
+
+  final String successTransaction =
+      'assets/images/core/success-transaction.png';
+
   final String defaultAvatar = 'assets/images/core/default-avatar.jpg';
 }
 

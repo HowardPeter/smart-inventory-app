@@ -12,7 +12,6 @@ final Map<String, String> enInventory = {
   TTexts.productCatalog: 'Product Catalog',
 
   // -- Inventory Header & Health
-  TTexts.totalItems: 'Total Items',
   TTexts.stockValue: 'Stock Value',
   TTexts.stockHealth: 'Stock Health',
   TTexts.statusHealthy: 'Healthy',
@@ -66,7 +65,6 @@ final Map<String, String> enInventory = {
   TTexts.totalValue: 'Total Value',
   TTexts.editItem: 'Edit Item',
   TTexts.deleteItem: 'Delete Item',
-  TTexts.addToTransaction: 'Add to Transaction',
   TTexts.deleteConfirmation: 'Delete Confirmation',
   TTexts.confirmDeleteText: 'Are you sure you want to delete this item?',
   TTexts.delete: 'Delete',
@@ -102,6 +100,13 @@ final Map<String, String> enInventory = {
   TTexts.viewProductInfo: 'View Product Info',
   TTexts.productDataMissing: 'Product data is missing',
 
+  // --- Transaction Bottom Sheet ở trang Detail ---
+  TTexts.addToTransaction: 'Add to Transaction',
+  TTexts.enterQuantityToAdd: 'Enter Quantity',
+  TTexts.quantityToImport: 'Quantity to import',
+  TTexts.importPriceLot: 'Import Price (VND)',
+  TTexts.confirmAndAdd: 'Confirm & Add',
+
   // -- Product Catalog & Categories ---
   TTexts.categoryCatalog: 'Product Catalog',
   TTexts.searchCategories: 'Search categories...',
@@ -116,6 +121,14 @@ final Map<String, String> enInventory = {
       'We couldn\'t find any categories matching your search. Try a different keyword or add a new category.',
   TTexts.viewAllProducts: 'All Products',
   TTexts.viewAllProductsSub: 'View and manage all products in the store',
+  TTexts.deleteCategoryTitle: 'Delete Category',
+  TTexts.deleteCategoryWarning:
+      'This category contains products. Do you want to move all products to "Uncategorized" and proceed with deletion?',
+  TTexts.deleteCategoryConfirmBtn: 'Confirm Delete',
+  TTexts.deleteCategorySuccess: 'Category deleted successfully.',
+  TTexts.productDataRefreshing: 'Refreshing product data...',
+  TTexts.packageUpdatedSuccess: 'Package updated successfully.',
+  TTexts.packageCreatedSuccess: 'Package created successfully.',
 
   // -- Category Detail
   TTexts.addNewProduct: 'Add New Product',
@@ -224,7 +237,7 @@ final Map<String, String> enInventory = {
   TTexts.cropImage: 'Edit Photo',
   TTexts.reorderThresholdLabel: 'Low Stock Alert At',
   TTexts.reorderThresholdHint: 'e.g. 5',
-  TTexts.zeroMeansNoLimit: '0 means No Limit / No Threshold',
+
   TTexts.fieldRequired: 'This field is required',
   TTexts.invalidNumber: 'Invalid number format',
   TTexts.suggestedNames: 'Suggestions:',
@@ -244,8 +257,6 @@ final Map<String, String> enInventory = {
   TTexts.deletePackage: 'Delete Package',
   TTexts.addPackageBtn: 'Add Package',
   TTexts.imageUpdatedSuccess: 'Product image updated successfully.',
-  TTexts.packageUpdatedSuccess: 'Package updated successfully.',
-  TTexts.packageCreatedSuccess: 'New package created successfully.',
   TTexts.deletingProduct: 'Deleting product...',
   TTexts.productDeletedSuccess: 'Product has been moved to trash.',
   TTexts.deletingPackage: 'Deleting package...',
@@ -268,14 +279,35 @@ final Map<String, String> enInventory = {
   TTexts.stockQuantityLabel: 'Stock',
   TTexts.inventoryThreshold: 'Threshold',
   TTexts.sellingPrice: 'Sale Price',
+  TTexts.zeroMeansNoLimit: '0 means No Limit / No Threshold',
+  TTexts.displayNameLabel: 'Display Name',
+  TTexts.displayNameHint: 'Product + Unit + Variant (optional)',
+  TTexts.instructionTitle: 'How to fill data',
+  TTexts.instructionBaseInfo:
+      'General information about the product (Name, Brand, Category). This applies to all variants.',
+  TTexts.instructionImage:
+      'A clear, square photo representing the product. It will be shown in the catalog and POS.',
+  TTexts.instructionPackage:
+      'Details about the physical item you sell. Select a unit (Can, Box) and define its specific variant (e.g., 330ml). Price and Barcode belong to this variant.',
+  TTexts.fillRequiredFields: 'Please fill in all required fields.',
+  TTexts.confirmCreateTitle: 'Confirm Creation',
+  TTexts.confirmCreateMessage: 'Are you sure you want to create this item?',
+  TTexts.confirmUpdateTitle: 'Confirm Update',
+  TTexts.confirmUpdateMessage: 'Are you sure you want to save these changes?',
+  TTexts.confirmDeleteTitle: 'Confirm Deletion',
+  TTexts.confirmDeleteMessage:
+      'This action cannot be undone. Are you sure you want to delete?',
+  TTexts.confirmSkipPackageTitle: 'Skip Package Creation?',
+  TTexts.confirmSkipPackageMessage:
+      'The product will be created without any variants or units. You can add packages later.',
+  TTexts.createOnlyProduct: 'Create Product Only',
+  TTexts.createFullProduct: 'Create Full Product',
+  TTexts.skipAndCreate: 'Skip and create product only',
 
-  // -- Customize Catalog
   TTexts.customizeCatalog: 'Customize Catalog',
   TTexts.pinnedOnHome: 'Pinned on Home',
   TTexts.tapAndHoldToDrag: 'Tap and hold to drag',
   TTexts.save: 'Save',
-
-  // -- Empty States
   TTexts.noDataAvailable: 'No data available',
   TTexts.noCategoriesFound: 'No categories found',
 };

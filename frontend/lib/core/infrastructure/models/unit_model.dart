@@ -11,7 +11,7 @@ class UnitModel {
 
   factory UnitModel.fromJson(Map<String, dynamic> json) {
     return UnitModel(
-      unitId: json['unit_id'] ?? '',
+      unitId: json['unitId'] ?? json['unit_id'] ?? json['id'] ?? '',
       code: json['code'] ?? '',
       name: json['name'] ?? 'Unknown Unit',
     );

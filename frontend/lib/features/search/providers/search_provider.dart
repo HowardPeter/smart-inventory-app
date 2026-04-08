@@ -8,7 +8,7 @@ class SearchProvider {
   Future<Map<String, dynamic>> searchProductsByKeyword(String keyword,
       {int page = 1, int limit = 20}) async {
     final response = await _apiClient.get(
-      '/api/search/products',
+      '/api/search/product-packages',
       queryParameters: {
         'keyword': keyword,
         'page': page,

@@ -10,6 +10,8 @@ import type {
   PackageQueryDto,
   ProductPackageResponseDto,
   UpdateProductPackageDto,
+  ProductPackageResponseForTransaction,
+  CreateInventoryData,
 } from '../product-package.dto.js';
 
 const productPackageResponseSelect = {
@@ -42,6 +44,13 @@ const productPackageResponseSelect = {
       },
     },
   },
+  inventory: {
+    select: {
+      inventoryId: true,
+      quantity: true,
+      reorderThreshold: true,
+    },
+  },
 } satisfies Prisma.ProductPackageSelect;
 
 type ProductPackageRecord = Prisma.ProductPackageGetPayload<{
@@ -72,6 +81,7 @@ export class ProductPackageRepository {
         name: productPackage.product.name,
         storeId: productPackage.product.storeId,
       },
+      inventory: productPackage.inventory,
     };
   }
 
@@ -158,6 +168,69 @@ export class ProductPackageRepository {
     return productPackage ? this.toResponseDto(productPackage) : null;
   }
 
+  async findManyActiveByIds(
+    storeId: string,
+    productPackageIds: string[],
+  ): Promise<ProductPackageResponseForTransaction[]> {
+    if (productPackageIds.length === 0) {
+      return [];
+    }
+
+    const productPackages = await this.db.productPackage.findMany({
+      where: {
+        productPackageId: {
+          in: productPackageIds,
+        },
+        activeStatus: 'active',
+        product: {
+          storeId,
+          activeStatus: 'active',
+        },
+      },
+      select: {
+        productPackageId: true,
+        displayName: true,
+        importPrice: true,
+        sellingPrice: true,
+      },
+    });
+
+    return productPackages.map((productPackage) => ({
+      productPackageId: productPackage.productPackageId,
+      displayName: productPackage.displayName,
+      importPrice: productPackage.importPrice?.toNumber() ?? null,
+      sellingPrice: productPackage.sellingPrice?.toNumber() ?? null,
+    }));
+  }
+
+  async findProductIdsHavingActivePackages(
+    storeId: string,
+    productIds: string[],
+  ): Promise<string[]> {
+    if (productIds.length === 0) {
+      return [];
+    }
+
+    const productPackages = await this.db.productPackage.findMany({
+      where: {
+        productId: {
+          in: productIds,
+        },
+        activeStatus: 'active',
+        product: {
+          storeId,
+          activeStatus: 'active',
+        },
+      },
+      distinct: ['productId'],
+      select: {
+        productId: true,
+      },
+    });
+
+    return productPackages.map((productPackage) => productPackage.productId);
+  }
+
   async findActiveByProductIdAndUnitId(
     productId: string,
     unitId: string,
@@ -193,11 +266,17 @@ export class ProductPackageRepository {
     });
   }
 
-  async createOne(
-    data: CreateProductPackageData,
+  async createOneAndInventory(
+    packageData: CreateProductPackageData,
+    inventoryData: CreateInventoryData,
   ): Promise<ProductPackageResponseDto> {
     const productPackage = await this.db.productPackage.create({
-      data,
+      data: {
+        ...packageData,
+        inventory: {
+          create: inventoryData,
+        },
+      },
       select: productPackageResponseSelect,
     });
 
@@ -233,16 +312,21 @@ export class ProductPackageRepository {
     return this.toResponseDto(productPackage);
   }
 
-  async softDeleteOne(productPackageId: string): Promise<void> {
-    await this.db.productPackage.update({
+  async softDeleteOne(
+    productPackageId: string,
+  ): Promise<{ productPackageId: string }> {
+    return await this.db.productPackage.update({
       where: { productPackageId },
       data: {
         activeStatus: 'inactive',
       },
+      select: {
+        productPackageId: true,
+      },
     });
   }
 
-  async softDeleteMany(productId: string): Promise<void> {
+  async softDeleteManyByProductId(productId: string): Promise<void> {
     await this.db.productPackage.updateMany({
       where: { productId },
       data: {
