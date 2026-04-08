@@ -10,6 +10,7 @@ import 'package:frontend/features/report/widgets/report/report_filter_tabs_widge
 import 'package:frontend/features/report/widgets/report/report_history_header_widget.dart';
 import 'package:frontend/features/report/widgets/report/report_shimmer_widget.dart';
 import 'package:frontend/features/report/widgets/report/report_transaction_card_widget.dart';
+import 'package:frontend/routes/app_routes.dart';
 import 'package:get/get.dart';
 import 'package:iconsax_flutter/iconsax_flutter.dart';
 
@@ -38,23 +39,28 @@ class ReportMobileView extends GetView<ReportController> {
                   const SizedBox(height: 20),
                   const ReportFilterTabsWidget(),
                   const SizedBox(height: 24),
-                  AnimatedSwitcher(
+                  AnimatedSize(
                     duration: const Duration(milliseconds: 300),
-                    layoutBuilder:
-                        (Widget? currentChild, List<Widget> previousChildren) {
-                      return Stack(
-                        alignment: Alignment.topLeft,
-                        children: <Widget>[
-                          ...previousChildren,
-                          if (currentChild != null) currentChild,
-                        ],
-                      );
-                    },
-                    child: controller.activeTab.value == 'Today'
-                        ? const ReportDateHeaderWidget(
-                            key: ValueKey('date_header'))
-                        : const ReportCalendarWidget(
-                            key: ValueKey('calendar_widget')),
+                    curve: Curves.easeInOut,
+                    alignment: Alignment.topCenter,
+                    child: AnimatedSwitcher(
+                      duration: const Duration(milliseconds: 300),
+                      layoutBuilder: (Widget? currentChild,
+                          List<Widget> previousChildren) {
+                        return Stack(
+                          alignment: Alignment.topLeft,
+                          children: <Widget>[
+                            ...previousChildren,
+                            if (currentChild != null) currentChild,
+                          ],
+                        );
+                      },
+                      child: controller.activeTab.value == 'Today'
+                          ? const ReportDateHeaderWidget(
+                              key: ValueKey('date_header'))
+                          : const ReportCalendarWidget(
+                              key: ValueKey('calendar_widget')),
+                    ),
                   ),
                   const SizedBox(height: 24),
                   if (displayList.isEmpty)
@@ -94,20 +100,28 @@ class ReportMobileView extends GetView<ReportController> {
                             bottomLabel = 'Check Items / Stock Stats';
                           }
 
-                          return ReportTransactionCardWidget(
-                            transactionId: tx.transactionId ?? 'N/A',
-                            dateStr: tx.createdAt != null
-                                ? '${tx.createdAt!.day}/${tx.createdAt!.month}/${tx.createdAt!.year}'
-                                : 'N/A',
-                            typeDisplay: tx.type,
-                            typeColor: typeColor,
-                            leftBottomLabel: bottomLabel,
-                            itemsDisplay: '0', // Fake items count
-                            itemsColor: itemsColor,
-                            moneyDisplay: '${tx.totalPrice} đ',
-                            moneyColor: moneyColor,
-                            isInbound: tx.type == 'INBOUND',
-                            isOutbound: tx.type == 'OUTBOUND',
+                          return GestureDetector(
+                            onTap: () {
+                              Get.toNamed(
+                                AppRoutes.transactionDetail,
+                                arguments: {'id': tx.transactionId},
+                              );
+                            },
+                            child: ReportTransactionCardWidget(
+                              transactionId: tx.transactionId ?? 'N/A',
+                              dateStr: tx.createdAt != null
+                                  ? '${tx.createdAt!.day}/${tx.createdAt!.month}/${tx.createdAt!.year}'
+                                  : 'N/A',
+                              typeDisplay: tx.type,
+                              typeColor: typeColor,
+                              leftBottomLabel: bottomLabel,
+                              itemsDisplay: '0',
+                              itemsColor: itemsColor,
+                              moneyDisplay: '${tx.totalPrice} đ',
+                              moneyColor: moneyColor,
+                              isInbound: tx.type == 'INBOUND',
+                              isOutbound: tx.type == 'OUTBOUND',
+                            ),
                           );
                         }).toList(),
                       ),

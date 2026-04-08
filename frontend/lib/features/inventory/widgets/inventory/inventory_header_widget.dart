@@ -46,8 +46,7 @@ class InventoryHeaderWidget extends StatelessWidget {
           Obx(() {
             final storeService = Get.find<StoreService>();
             final role = storeService.currentRole.value.toLowerCase();
-            final isManager =
-                role == 'manager' || role == 'owner' || role == 'admin';
+            final isManager = role == 'manager';
 
             final String tooltipMessage = isManager
                 ? TTexts.homeRoleManagerTooltip.tr
