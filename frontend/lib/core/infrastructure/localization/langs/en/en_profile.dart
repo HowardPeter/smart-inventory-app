@@ -4,8 +4,8 @@ final Map<String, String> enProfile = {
   //--Profile
   TTexts.profileTitle: 'Profile',
   //--Uer
-  TTexts.profileNameUser: "Tran Hoa Tuyet Lap",
-  TTexts.profileEmaiUser: "yumiie02032@gmail.com",
+  TTexts.profileNameUser: "",
+  TTexts.profileEmaiUser: "",
   TTexts.profileNameStore: 'Yumiee Cake',
   //--Section
   TTexts.profileAccount: "Account",
