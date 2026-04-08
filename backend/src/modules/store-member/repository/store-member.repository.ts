@@ -1,5 +1,6 @@
 import { prisma } from '../../../db/prismaClient.js';
 
+import type { StoreRole } from '../../../generated/prisma/enums.js';
 import type { StoreMemberResponseDto } from '../dto/store-member.dto.js';
 
 export class StoreMemberRepository {
@@ -32,6 +33,24 @@ export class StoreMemberRepository {
       },
       data: {
         activeStatus: 'inactive', // Soft delete theo business rule của SIS
+      },
+    });
+  }
+
+  async updateRole(
+    userId: string,
+    storeId: string,
+    newRole: StoreRole,
+  ): Promise<StoreMemberResponseDto> {
+    return await prisma.storeMember.update({
+      where: {
+        userId_storeId: {
+          userId,
+          storeId,
+        },
+      },
+      data: {
+        role: newRole,
       },
     });
   }

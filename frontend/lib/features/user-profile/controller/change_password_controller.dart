@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:frontend/core/infrastructure/utils/error_handler_utils.dart';
 import 'package:get/get.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
-class ChangePasswordController extends GetxController {
+class ChangePasswordController extends GetxController with TErrorHandler {
   final formKey = GlobalKey<FormState>();
 
   // Thêm Controller cho mật khẩu cũ
@@ -53,7 +54,7 @@ class ChangePasswordController extends GetxController {
 
       Get.snackbar('Lỗi', errorMsg);
     } catch (e) {
-      Get.snackbar('Lỗi', 'Đã xảy ra lỗi, vui lòng thử lại.');
+      handleError(e);
     } finally {
       isLoading.value = false;
     }

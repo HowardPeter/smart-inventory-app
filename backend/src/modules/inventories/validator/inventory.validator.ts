@@ -32,7 +32,6 @@ const listInventoriesQuerySchema = z.object({
 const updateInventoryBodySchema = z
   .object({
     reorderThreshold: z.number().int().min(0).nullable().optional(),
-    lastCount: z.number().int().min(0).nullable().optional(),
   })
   // NOTE: Sử dụng hàm refine để đảm bảo người dùng gửi lên ít nhất 1 trường
   //  cần cập nhật, tránh payload rỗng

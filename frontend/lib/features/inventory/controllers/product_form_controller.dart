@@ -1,5 +1,4 @@
 import 'dart:io';
-import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:frontend/core/state/services/supabase_storage_service.dart';
 import 'package:get/get.dart';
@@ -10,6 +9,7 @@ import 'package:frontend/core/infrastructure/constants/text_strings.dart';
 import 'package:frontend/core/infrastructure/models/category_model.dart';
 import 'package:frontend/core/infrastructure/models/product_model.dart';
 import 'package:frontend/core/infrastructure/models/product_package_model.dart';
+import 'package:frontend/core/infrastructure/models/unit_model.dart';
 import 'package:frontend/core/infrastructure/utils/error_handler_utils.dart';
 import 'package:frontend/core/infrastructure/utils/full_screen_loader_utils.dart';
 import 'package:frontend/core/ui/theme/app_colors.dart';
@@ -26,9 +26,6 @@ class ProductFormController extends GetxController with TErrorHandler {
   final SupabaseStorageService _supabaseStorageService =
       SupabaseStorageService();
 
-  // ==========================================
-  // 1. STATE & FORM KEYS
-  // ==========================================
   final GlobalKey<FormState> baseFormKey = GlobalKey<FormState>();
   final GlobalKey<FormState> packageFormKey = GlobalKey<FormState>();
 
@@ -42,83 +39,132 @@ class ProductFormController extends GetxController with TErrorHandler {
   ProductModel? productToEdit;
   ProductPackageModel? packageToEdit;
 
-  // ==========================================
-  // 2. DATA FIELDS (INPUTS)
-  // ==========================================
-  // --- Ảnh ---
   final ImagePicker _picker = ImagePicker();
   final Rx<File?> selectedImage = Rx<File?>(null);
   final RxString existingImageUrl = ''.obs;
 
-  // --- Thông tin Base ---
   final TextEditingController nameController = TextEditingController();
   final TextEditingController brandController = TextEditingController();
+
   final Rx<CategoryModel?> selectedCategory = Rx<CategoryModel?>(null);
   List<CategoryModel> allCategories = [];
   bool isCategoryLocked = false;
 
-  // --- Thông tin Package ---
+  final TextEditingController unitNameController = TextEditingController();
   final TextEditingController packageDisplayNameController =
       TextEditingController();
+  final TextEditingController packageVariantNameController =
+      TextEditingController();
+
   final TextEditingController importPriceController = TextEditingController();
   final TextEditingController salePriceController = TextEditingController();
-
-  // Đã bỏ giá trị '0' mặc định, để input trống tự nhiên
   final TextEditingController thresholdController = TextEditingController();
   final TextEditingController barcodeController = TextEditingController();
 
-  final List<Map<String, String>> mockUnits = [
-    {
-      'id': '88888888-8888-4888-a888-888888888801',
-      'code': 'BOX',
-      'name': 'Box'
-    },
-    {
-      'id': '88888888-8888-4888-a888-888888888802',
-      'code': 'PCS',
-      'name': 'Piece'
-    },
-    {
-      'id': '88888888-8888-4888-a888-888888888803',
-      'code': 'CAN',
-      'name': 'Can'
-    },
-    {
-      'id': '88888888-8888-4888-a888-888888888804',
-      'code': 'CRT',
-      'name': 'Carton'
-    },
-    {
-      'id': '88888888-8888-4888-a888-888888888805',
-      'code': 'PKT',
-      'name': 'Packet'
-    },
-    {
-      'id': '88888888-8888-4888-a888-888888888806',
-      'code': 'BTL',
-      'name': 'Bottle'
-    },
-    {
-      'id': '88888888-8888-4888-a888-888888888807',
-      'code': 'BAG',
-      'name': 'Bag'
-    },
-    {
-      'id': '88888888-8888-4888-a888-888888888808',
-      'code': 'TUBE',
-      'name': 'Tube'
-    },
-  ];
+  final RxList<UnitModel> allUnits = <UnitModel>[].obs;
   final RxString selectedUnitId = ''.obs;
 
-  // ==========================================
-  // 3. LIFECYCLE (INIT & DISPOSE)
-  // ==========================================
   @override
   void onInit() {
     super.onInit();
     _loadCategories();
+    _loadUnits();
     _parseArguments();
+
+    nameController.addListener(_updateDynamicDisplayName);
+    unitNameController.addListener(_updateDynamicDisplayName);
+    packageVariantNameController.addListener(_updateDynamicDisplayName);
+  }
+
+  void _updateDynamicDisplayName() {
+    final baseName = nameController.text.isNotEmpty
+        ? nameController.text.trim()
+        : (productToEdit?.name ?? '');
+    final unitName = unitNameController.text.trim();
+    final variant = packageVariantNameController.text.trim();
+
+    final parts =
+        [baseName, unitName, variant].where((e) => e.isNotEmpty).join(' ');
+    packageDisplayNameController.text = parts;
+  }
+
+  List<String> get variantNameSuggestions {
+    final _ = allUnits.length;
+    final unitId = selectedUnitId.value;
+    if (unitId.isEmpty) return [];
+
+    final unit = allUnits.firstWhereOrNull((u) => u.unitId == unitId);
+    if (unit == null) return [];
+
+    final unitCode = unit.code.toUpperCase();
+    List<String> suggestions = [];
+
+    switch (unitCode) {
+      case 'CAN':
+      case 'BTL':
+        suggestions.addAll(['330ml', '500ml', '1.5L']);
+        break;
+      case 'BOX':
+      case 'CRT':
+        suggestions.addAll(['6-Pack', '12-Pack', '24-Pack']);
+        break;
+      case 'PKT':
+      case 'BAG':
+        suggestions.addAll(['Small', 'Large', '500g', '1kg']);
+        break;
+      case 'PCS':
+        suggestions.addAll(['Standard', 'Premium', 'Single']);
+        break;
+      case 'TUBE':
+        suggestions.addAll(['50g', '150ml']);
+        break;
+      default:
+        suggestions.addAll(['Standard', 'Premium']);
+    }
+    return suggestions;
+  }
+
+  void selectVariantSuggestion(String suggestion) {
+    packageVariantNameController.text = suggestion;
+  }
+
+  void showInstructionBottomSheet() {
+    TBottomSheetWidget.show(
+        title: TTexts.instructionTitle.tr,
+        child: Padding(
+          padding: const EdgeInsets.only(bottom: AppSizes.p24),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              _buildInstructionItem(
+                  TTexts.baseInfo.tr, TTexts.instructionBaseInfo.tr),
+              _buildInstructionItem(
+                  TTexts.productImage.tr, TTexts.instructionImage.tr),
+              _buildInstructionItem(
+                  TTexts.packageInfo.tr, TTexts.instructionPackage.tr),
+            ],
+          ),
+        ));
+  }
+
+  Widget _buildInstructionItem(String title, String desc) {
+    return Padding(
+        padding: const EdgeInsets.only(bottom: AppSizes.p16),
+        child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+          Text(title,
+              style: const TextStyle(
+                  fontWeight: FontWeight.bold,
+                  color: AppColors.primaryText,
+                  fontFamily: 'Poppins',
+                  fontSize: 14)),
+          const SizedBox(height: 4),
+          Text(desc,
+              style: const TextStyle(
+                  color: AppColors.subText,
+                  fontSize: 13,
+                  fontFamily: 'Poppins',
+                  height: 1.4)),
+        ]));
   }
 
   void _parseArguments() {
@@ -132,15 +178,19 @@ class ProductFormController extends GetxController with TErrorHandler {
         isEditMode = true;
         isCategoryLocked = true;
         productToEdit = args['product'] as ProductModel;
-        nameController.text = productToEdit!.name;
-        brandController.text = productToEdit!.brand ?? '';
-        existingImageUrl.value = productToEdit!.imageUrl ?? '';
+
+        final freshImageUrl = args['freshImageUrl'];
+        final freshName = args['freshName'];
+        final freshBrand = args['freshBrand'];
+
+        existingImageUrl.value = freshImageUrl ?? productToEdit!.imageUrl ?? '';
+        nameController.text = freshName ?? productToEdit!.name;
+        brandController.text = freshBrand ?? productToEdit!.brand ?? '';
       }
 
       if (args['package'] != null) {
         packageToEdit = args['package'] as ProductPackageModel;
 
-        packageDisplayNameController.text = packageToEdit!.displayName;
         importPriceController.text = packageToEdit!.importPrice.toString();
         salePriceController.text = packageToEdit!.sellingPrice.toString();
         barcodeController.text = packageToEdit!.barcodeValue ?? '';
@@ -165,118 +215,66 @@ class ProductFormController extends GetxController with TErrorHandler {
       if (isEditMode && productToEdit != null) {
         selectedCategory.value = allCategories
             .firstWhereOrNull((c) => c.categoryId == productToEdit!.categoryId);
+        final currentCat = selectedCategory.value;
+        if (currentCat != null &&
+            (currentCat.isDefault ||
+                currentCat.name.toLowerCase() == 'uncategorized')) {
+          isCategoryLocked = false;
+        }
       }
     } catch (e) {
       handleError(e);
     }
   }
 
+  Future<void> _loadUnits() async {
+    try {
+      final fetchedUnits = await _provider.getUnits();
+      allUnits.assignAll(fetchedUnits);
+
+      if (selectedUnitId.value.isNotEmpty && packageToEdit != null) {
+        final unit =
+            allUnits.firstWhereOrNull((u) => u.unitId == selectedUnitId.value);
+        final unitName = unit?.name ?? '';
+        unitNameController.text = unitName;
+
+        final fullName = packageToEdit!.displayName;
+        final baseName = productToEdit?.name ?? '';
+
+        String variant = fullName;
+        if (baseName.isNotEmpty) {
+          variant = variant.replaceAll(baseName, '').trim();
+        }
+        if (unitName.isNotEmpty) {
+          variant = variant.replaceAll(unitName, '').trim();
+        }
+
+        packageVariantNameController.text = variant;
+      }
+    } catch (e) {
+      debugPrint("Error loading units: $e");
+    }
+  }
+
   Future<void> _fetchAndSetThreshold(String packageId) async {
     try {
-      final threshold =
-          await _provider.getInventoryThresholdByPackage(packageId);
-      // Nếu threshold = 0 thì để trống cho UI đẹp, ngược lại thì hiện số
-      thresholdController.text = threshold == 0 ? '' : threshold.toString();
+      final inv = await _provider.getInventoryDetail(packageId);
+      thresholdController.text =
+          inv.reorderThreshold == 0 ? '' : inv.reorderThreshold.toString();
     } catch (e) {
-      thresholdController.text = '';
+      handleError(e);
     }
   }
 
   // ==========================================
-  // 4. SMART AUTO-FILL LOGIC
-  // ==========================================
-  // ==========================================
-  // 4. SMART AUTO-FILL LOGIC
-  // ==========================================
-  List<String> get variantNameSuggestions {
-    if (formMode.value == 'edit_package' || packageToEdit != null) {
-      return [];
-    }
-
-    final unitId = selectedUnitId.value;
-    if (unitId.isEmpty) return [];
-
-    final unit = mockUnits.firstWhereOrNull((u) => u['id'] == unitId);
-    if (unit == null) return [];
-
-    final unitName = unit['name']!;
-    final unitCode = unit['code']!; // Lấy Code (CAN, BOX, BTL...) để phân tích
-    final productName = nameController.text.trim();
-
-    if (productName.isEmpty) return [unitName, '1 $unitName'];
-
-    List<String> suggestions = [];
-
-    suggestions.add('$productName $unitName');
-
-    switch (unitCode) {
-      case 'CAN':
-      case 'BTL':
-        suggestions.addAll([
-          '330ml $productName $unitName',
-          '500ml $productName $unitName',
-          '1.5L $productName $unitName',
-        ]);
-        break;
-
-      case 'BOX':
-      case 'CRT':
-        suggestions.addAll([
-          '6-Pack $productName $unitName',
-          '12 $unitName of $productName',
-          '24 $productName $unitName',
-        ]);
-        break;
-
-      case 'PKT':
-      case 'BAG':
-        suggestions.addAll([
-          'Small $productName $unitName',
-          'XL $productName $unitName',
-          '500g $productName $unitName',
-        ]);
-        break;
-
-      case 'PCS':
-        suggestions.addAll([
-          'Standard $productName',
-          'Premium $productName',
-          'Single $productName $unitName',
-        ]);
-        break;
-
-      case 'TUBE':
-        suggestions.addAll([
-          '50g $productName $unitName',
-          '150ml $productName $unitName',
-        ]);
-        break;
-
-      default:
-        suggestions.addAll([
-          'Standard $productName $unitName',
-          'Premium $productName $unitName',
-        ]);
-    }
-
-    return suggestions;
-  }
-
-  // Hàm khi người dùng bấm vào Chip
-  void selectVariantSuggestion(String suggestion) {
-    packageDisplayNameController.text = suggestion;
-  }
-
-  // ==========================================
-  // 5. NAVIGATION (WIZARD STEPS)
+  // WIZARD NAVIGATION (NEXT / PREV)
   // ==========================================
   void nextStep() {
     if (currentStep.value == 1) {
-      if (baseFormKey.currentState?.validate() != true) return;
-      if (selectedCategory.value == null) {
+      if (baseFormKey.currentState?.validate() != true ||
+          selectedCategory.value == null) {
         TSnackbarsWidget.warning(
-            title: TTexts.errorTitle.tr,
-            message: TTexts.selectCategoryWarning.tr);
+            title: TTexts.errorTitle.tr, message: TTexts.fillRequiredFields.tr);
         return;
       }
       currentStep.value = 2;
@@ -286,7 +284,7 @@ class ProductFormController extends GetxController with TErrorHandler {
           TCustomDialogWidget(
             title: TTexts.confirmNoImageTitle.tr,
             description: TTexts.confirmNoImageMessage.tr,
-            icon: const Text('❓', style: TextStyle(fontSize: 40)),
+            icon: const Text('🖼️', style: TextStyle(fontSize: 40)),
             primaryButtonText: TTexts.yesContinue.tr,
             secondaryButtonText: TTexts.addPhoto.tr,
             onSecondaryPressed: () => Get.back(),
@@ -308,8 +306,324 @@ class ProductFormController extends GetxController with TErrorHandler {
   }
 
   // ==========================================
-  // 6. IMAGE HANDLING (PICK & CROP)
+  // PUBLIC ACTIONS VỚI DIALOG (Dùng cho Action Buttons)
   // ==========================================
+
+  // 1. SKIP & CREATE PRODUCT ONLY (Bỏ qua Package)
+  void confirmSkipAndCreateProductOnly() {
+    Get.dialog(TCustomDialogWidget(
+      title: TTexts.confirmSkipPackageTitle.tr,
+      description: TTexts.confirmSkipPackageMessage.tr,
+      icon: const Text('⏭️', style: TextStyle(fontSize: 40)),
+      primaryButtonText: TTexts.createOnlyProduct.tr,
+      secondaryButtonText: TTexts.cancel.tr,
+      onSecondaryPressed: () => Get.back(),
+      onPrimaryPressed: () {
+        Get.back();
+        _executeCreateProductOnly();
+      },
+    ));
+  }
+
+  // 2. CREATE FULL PRODUCT (Có cả Package)
+  void saveProduct() {
+    if (packageFormKey.currentState?.validate() != true ||
+        selectedUnitId.value.isEmpty) {
+      TSnackbarsWidget.warning(
+          title: TTexts.errorTitle.tr, message: TTexts.fillRequiredFields.tr);
+      return;
+    }
+    Get.dialog(TCustomDialogWidget(
+      title: TTexts.confirmCreateTitle.tr,
+      description: TTexts.confirmCreateMessage.tr,
+      icon: const Text('📦', style: TextStyle(fontSize: 40)),
+      primaryButtonText: TTexts.createFullProduct.tr,
+      secondaryButtonText: TTexts.cancel.tr,
+      onSecondaryPressed: () => Get.back(),
+      onPrimaryPressed: () {
+        Get.back();
+        _executeSaveFullProduct();
+      },
+    ));
+  }
+
+  // 3. SAVE PRODUCT INFO (Edit Base Info)
+  void saveProductInfo() {
+    if (baseFormKey.currentState?.validate() != true ||
+        selectedCategory.value == null) {
+      TSnackbarsWidget.warning(
+          title: TTexts.errorTitle.tr, message: TTexts.fillRequiredFields.tr);
+      return;
+    }
+    Get.dialog(TCustomDialogWidget(
+      title: TTexts.confirmUpdateTitle.tr,
+      description: TTexts.confirmUpdateMessage.tr,
+      icon: const Text('📝', style: TextStyle(fontSize: 40)),
+      primaryButtonText: TTexts.confirm.tr,
+      secondaryButtonText: TTexts.cancel.tr,
+      onSecondaryPressed: () => Get.back(),
+      onPrimaryPressed: () {
+        Get.back();
+        _executeSaveProductInfo();
+      },
+    ));
+  }
+
+  // 4. SAVE PRODUCT IMAGE (Edit Image)
+  void saveProductImage() {
+    if (selectedImage.value == null) {
+      TSnackbarsWidget.warning(
+          title: TTexts.errorTitle.tr, message: TTexts.requirePhoto.tr);
+      return;
+    }
+    Get.dialog(TCustomDialogWidget(
+      title: TTexts.confirmUpdateTitle.tr,
+      description: TTexts.confirmUpdateMessage.tr,
+      icon: const Text('🖼️', style: TextStyle(fontSize: 40)),
+      primaryButtonText: TTexts.confirm.tr,
+      secondaryButtonText: TTexts.cancel.tr,
+      onSecondaryPressed: () => Get.back(),
+      onPrimaryPressed: () {
+        Get.back();
+        _executeSaveProductImage();
+      },
+    ));
+  }
+
+  // 5. SAVE PACKAGE DATA (Dùng khi Add/Edit Package lẻ tẻ)
+  void savePackageData() {
+    if (packageFormKey.currentState?.validate() != true ||
+        selectedUnitId.value.isEmpty) {
+      TSnackbarsWidget.warning(
+          title: TTexts.errorTitle.tr, message: TTexts.fillRequiredFields.tr);
+      return;
+    }
+    bool isUpdate = formMode.value == 'edit_package';
+    Get.dialog(TCustomDialogWidget(
+      title: isUpdate
+          ? TTexts.confirmUpdateTitle.tr
+          : TTexts.confirmCreateTitle.tr,
+      description: isUpdate
+          ? TTexts.confirmUpdateMessage.tr
+          : TTexts.confirmCreateMessage.tr,
+      icon: const Text('💾', style: TextStyle(fontSize: 40)),
+      primaryButtonText: TTexts.confirm.tr,
+      secondaryButtonText: TTexts.cancel.tr,
+      onSecondaryPressed: () => Get.back(),
+      onPrimaryPressed: () {
+        Get.back();
+        _executeSavePackageData();
+      },
+    ));
+  }
+
+  // 6. XÓA PACKAGE BẰNG DIALOG (Dành cho trang Chi tiết hoặc Catalog)
+  void confirmDeletePackage(String packageId) {
+    Get.dialog(TCustomDialogWidget(
+      title: TTexts.confirmDeleteTitle.tr,
+      description: TTexts.confirmDeleteMessage.tr,
+      icon: const Text('🗑️', style: TextStyle(fontSize: 40)),
+      primaryButtonText: TTexts.delete.tr,
+      secondaryButtonText: TTexts.cancel.tr,
+      onSecondaryPressed: () => Get.back(),
+      onPrimaryPressed: () async {
+        Get.back();
+        try {
+          FullScreenLoaderUtils.openLoadingDialog(TTexts.deleting.tr);
+          await _provider.deleteProductPackage(packageId);
+          FullScreenLoaderUtils.stopLoading();
+          _triggerRefreshAndClose(TTexts.packageDeletedSuccess.tr);
+        } catch (e) {
+          FullScreenLoaderUtils.stopLoading();
+          handleError(e);
+        }
+      },
+    ));
+  }
+
+  // ==========================================
+  // CORE API SAVE LOGICS (Internal/Private)
+  // ==========================================
+
+  Future<void> _executeCreateProductOnly() async {
+    if (isSaving.value) return;
+    try {
+      isSaving.value = true;
+      FullScreenLoaderUtils.openLoadingDialog(TTexts.saving.tr);
+
+      String? imageUrl;
+      if (selectedImage.value != null) {
+        imageUrl = await _supabaseStorageService.uploadImage(
+            imageFile: selectedImage.value!, folderPath: 'products');
+      }
+
+      final productPayload = {
+        'name': nameController.text.trim(),
+        'brand': brandController.text.trim(),
+        'categoryId': selectedCategory.value!.categoryId,
+        if (imageUrl != null) 'imageUrl': imageUrl,
+      };
+
+      await _provider.createProduct(productPayload);
+
+      FullScreenLoaderUtils.stopLoading();
+      _triggerRefreshAndClose(TTexts.productCreatedSuccess.tr);
+    } catch (e) {
+      FullScreenLoaderUtils.stopLoading();
+      handleError(e);
+    } finally {
+      isSaving.value = false;
+    }
+  }
+
+  Future<void> _executeSaveFullProduct() async {
+    if (isSaving.value) return;
+    try {
+      isSaving.value = true;
+      FullScreenLoaderUtils.openLoadingDialog(TTexts.saving.tr);
+
+      String? imageUrl;
+      if (selectedImage.value != null) {
+        imageUrl = await _supabaseStorageService.uploadImage(
+            imageFile: selectedImage.value!, folderPath: 'products');
+      }
+
+      final productPayload = {
+        'name': nameController.text.trim(),
+        'brand': brandController.text.trim(),
+        'categoryId': selectedCategory.value!.categoryId,
+        if (imageUrl != null) 'imageUrl': imageUrl,
+      };
+      final newProduct = await _provider.createProduct(productPayload);
+
+      final combinedDisplayName = packageDisplayNameController.text.trim();
+      final packagePayload = {
+        'displayName': combinedDisplayName,
+        'unitId': selectedUnitId.value,
+        'importPrice': double.tryParse(importPriceController.text) ?? 0,
+        'sellingPrice': double.tryParse(salePriceController.text) ?? 0,
+        'barcodeValue': barcodeController.text.trim(),
+        'barcodeType': 'ean',
+      };
+      final newPackage = await _provider.createProductPackage(
+          newProduct.productId, packagePayload);
+      final packageId = newPackage['productPackageId'] ?? newPackage['id'];
+
+      await _provider.createInventory(packageId,
+          reorderThreshold: int.tryParse(thresholdController.text) ?? 0);
+
+      FullScreenLoaderUtils.stopLoading();
+      _triggerRefreshAndClose(TTexts.productCreatedSuccess.tr);
+    } catch (e) {
+      FullScreenLoaderUtils.stopLoading();
+      handleError(e);
+    } finally {
+      isSaving.value = false;
+    }
+  }
+
+  Future<void> _executeSaveProductInfo() async {
+    if (isSaving.value) return;
+    try {
+      isSaving.value = true;
+      FullScreenLoaderUtils.openLoadingDialog(TTexts.saving.tr);
+
+      final payload = {
+        'name': nameController.text.trim(),
+        'brand': brandController.text.trim(),
+        'categoryId': selectedCategory.value!.categoryId,
+      };
+
+      await _provider.updateProduct(productToEdit!.productId, payload);
+      FullScreenLoaderUtils.stopLoading();
+      _triggerRefreshAndClose(TTexts.productUpdatedSuccess.tr,
+          newName: nameController.text.trim(),
+          newBrand: brandController.text.trim());
+    } catch (e) {
+      FullScreenLoaderUtils.stopLoading();
+      handleError(e);
+    } finally {
+      isSaving.value = false;
+    }
+  }
+
+  Future<void> _executeSaveProductImage() async {
+    if (isSaving.value) return;
+    try {
+      isSaving.value = true;
+      FullScreenLoaderUtils.openLoadingDialog(TTexts.saving.tr);
+
+      final newImageUrl = await _supabaseStorageService.uploadImage(
+          imageFile: selectedImage.value!, folderPath: 'products');
+      if (newImageUrl == null) throw Exception("Upload failed");
+
+      await _provider
+          .updateProduct(productToEdit!.productId, {'imageUrl': newImageUrl});
+
+      FullScreenLoaderUtils.stopLoading();
+      _triggerRefreshAndClose(TTexts.imageUpdatedSuccess.tr,
+          newImageUrl: newImageUrl);
+    } catch (e) {
+      FullScreenLoaderUtils.stopLoading();
+      handleError(e);
+    } finally {
+      isSaving.value = false;
+    }
+  }
+
+  Future<void> _executeSavePackageData() async {
+    if (isSaving.value) return;
+    try {
+      isSaving.value = true;
+      FullScreenLoaderUtils.openLoadingDialog(TTexts.saving.tr);
+
+      final combinedDisplayName = packageDisplayNameController.text.trim();
+      final packagePayload = {
+        'displayName': combinedDisplayName,
+        'unitId': selectedUnitId.value,
+        'importPrice': double.tryParse(importPriceController.text) ?? 0,
+        'sellingPrice': double.tryParse(salePriceController.text) ?? 0,
+        'barcodeValue': barcodeController.text.trim(),
+        'barcodeType': 'ean',
+      };
+      final inventoryPayload = {
+        'reorderThreshold': int.tryParse(thresholdController.text) ?? 0,
+      };
+
+      if (formMode.value == 'edit_package' && packageToEdit != null) {
+        await _provider.updateProductPackage(
+            packageToEdit!.productPackageId, packagePayload);
+        await _provider.updateInventorySettings(packageToEdit!.productPackageId,
+            reorderThreshold: inventoryPayload['reorderThreshold']);
+
+        FullScreenLoaderUtils.stopLoading();
+        _triggerRefreshAndClose(TTexts.packageUpdatedSuccess.tr);
+      } else {
+        final newPackageData = await _provider.createProductPackage(
+            productToEdit!.productId, packagePayload);
+        final pkgId =
+            newPackageData['productPackageId'] ?? newPackageData['id'];
+
+        await _provider.createInventory(pkgId,
+            reorderThreshold: inventoryPayload['reorderThreshold']);
+
+        final createdPkg = ProductPackageModel.fromJson(newPackageData);
+        FullScreenLoaderUtils.stopLoading();
+        _triggerRefreshAndClose(TTexts.packageCreatedSuccess.tr,
+            updatedPackage: createdPkg);
+      }
+    } catch (e) {
+      FullScreenLoaderUtils.stopLoading();
+      handleError(e);
+    } finally {
+      isSaving.value = false;
+    }
+  }
+
+  // ==========================================
+  // IMAGE PICKER & UI HELPERS
+  // ==========================================
+
   Future<void> pickImage(ImageSource source) async {
     if (isPickingImage.value) return;
     try {
@@ -372,222 +686,6 @@ class ProductFormController extends GetxController with TErrorHandler {
     existingImageUrl.value = '';
   }
 
-  // ==========================================
-  // 7. API CALLS (SAVE DATA)
-  // ==========================================
-  Future<void> saveProduct() async {
-    if (packageFormKey.currentState?.validate() != true) return;
-    if (isSaving.value) return;
-
-    try {
-      isSaving.value = true;
-      FullScreenLoaderUtils.openLoadingDialog(TTexts.saving.tr);
-
-      String? imageUrl;
-
-      if (selectedImage.value != null) {
-        imageUrl = await _supabaseStorageService.uploadImage(
-            imageFile: selectedImage.value!, folderPath: 'products');
-
-        if (imageUrl == null) {
-          FullScreenLoaderUtils.stopLoading();
-          TSnackbarsWidget.error(
-              title: TTexts.errorTitle.tr,
-              message: 'Upload ảnh thất bại. Vui lòng thử lại!');
-          return;
-        }
-      }
-
-      final productPayload = {
-        'name': nameController.text.trim(),
-        'brand': brandController.text.trim(),
-        'categoryId': selectedCategory.value!.categoryId,
-        if (imageUrl != null) 'imageUrl': imageUrl,
-      };
-      final newProduct = await _provider.createProduct(productPayload);
-
-      final packagePayload = {
-        'displayName': packageDisplayNameController.text.trim(),
-        'unitId': selectedUnitId.value,
-        'importPrice': double.tryParse(importPriceController.text) ?? 0,
-        'sellingPrice': double.tryParse(salePriceController.text) ?? 0,
-        'barcodeValue': barcodeController.text.trim(),
-        'barcodeType': 'ean',
-      };
-      final newPackage = await _provider.createProductPackage(
-          newProduct.productId, packagePayload);
-
-      final packageId = newPackage['productPackageId'] ?? newPackage['id'];
-      await _provider.createInventory({
-        'productPackageId': packageId,
-        'stockQuantity': 0,
-        'reorderThreshold': int.tryParse(thresholdController.text) ?? 0,
-      });
-
-      FullScreenLoaderUtils.stopLoading();
-      _triggerRefreshAndClose(TTexts.productCreatedSuccess.tr);
-    } on DioException catch (e) {
-      FullScreenLoaderUtils.stopLoading();
-      TSnackbarsWidget.error(
-          title: TTexts.errorTitle.tr,
-          message:
-              e.response?.data?['message'] ?? TTexts.errorUnknownMessage.tr);
-    } catch (e) {
-      FullScreenLoaderUtils.stopLoading();
-      handleError(e);
-    } finally {
-      isSaving.value = false;
-    }
-  }
-
-  Future<void> saveProductInfo() async {
-    if (baseFormKey.currentState?.validate() != true) return;
-    if (isSaving.value) return;
-
-    try {
-      isSaving.value = true;
-      FullScreenLoaderUtils.openLoadingDialog(TTexts.saving.tr);
-
-      final payload = {
-        'name': nameController.text.trim(),
-        'brand': brandController.text.trim(),
-        'categoryId': selectedCategory.value!.categoryId,
-      };
-
-      await _provider.updateProduct(productToEdit!.productId, payload);
-
-      FullScreenLoaderUtils.stopLoading();
-      _triggerRefreshAndClose(
-        TTexts.productUpdatedSuccess.tr,
-        newName: nameController.text.trim(),
-        newBrand: brandController.text.trim(),
-      );
-    } catch (e) {
-      FullScreenLoaderUtils.stopLoading();
-      handleError(e);
-    } finally {
-      isSaving.value = false;
-    }
-  }
-
-  Future<void> saveProductImage() async {
-    if (selectedImage.value == null) {
-      TSnackbarsWidget.warning(
-          title: TTexts.errorTitle.tr, message: TTexts.requirePhoto.tr);
-      return;
-    }
-    if (isSaving.value) return;
-
-    try {
-      isSaving.value = true;
-      FullScreenLoaderUtils.openLoadingDialog(TTexts.saving.tr);
-
-      final newImageUrl = await _supabaseStorageService.uploadImage(
-          imageFile: selectedImage.value!, folderPath: 'products');
-
-      if (newImageUrl == null) {
-        FullScreenLoaderUtils.stopLoading();
-        TSnackbarsWidget.error(
-            title: TTexts.errorTitle.tr, message: 'Upload ảnh thất bại!');
-        return;
-      }
-
-      final payload = {
-        'imageUrl': newImageUrl,
-      };
-      await _provider.updateProduct(productToEdit!.productId, payload);
-
-      FullScreenLoaderUtils.stopLoading();
-
-      _triggerRefreshAndClose(
-        TTexts.imageUpdatedSuccess.tr,
-        newImageUrl: newImageUrl,
-      );
-    } catch (e) {
-      FullScreenLoaderUtils.stopLoading();
-      handleError(e);
-    } finally {
-      isSaving.value = false;
-    }
-  }
-
-  Future<void> savePackageData() async {
-    if (packageFormKey.currentState?.validate() != true) return;
-    if (isSaving.value) return;
-
-    try {
-      isSaving.value = true;
-      FullScreenLoaderUtils.openLoadingDialog(TTexts.saving.tr);
-
-      final packagePayload = {
-        'displayName': packageDisplayNameController.text.trim(),
-        'unitId': selectedUnitId.value,
-        'importPrice': double.tryParse(importPriceController.text) ?? 0,
-        'sellingPrice': double.tryParse(salePriceController.text) ?? 0,
-        'barcodeValue': barcodeController.text.trim(),
-        'barcodeType': 'ean',
-      };
-
-      final inventoryPayload = {
-        'reorderThreshold': int.tryParse(thresholdController.text) ?? 0,
-      };
-
-      if (formMode.value == 'edit_package' && packageToEdit != null) {
-        await _provider.updateProductPackage(
-            packageToEdit!.productPackageId, packagePayload);
-
-        await _provider.updateInventoryByPackage(
-            packageToEdit!.productPackageId, inventoryPayload);
-
-        final updatedPkg = ProductPackageModel(
-          productPackageId: packageToEdit!.productPackageId,
-          displayName: packageDisplayNameController.text.trim(),
-          importPrice: double.tryParse(importPriceController.text) ?? 0,
-          sellingPrice: double.tryParse(salePriceController.text) ?? 0,
-          barcodeValue: barcodeController.text.trim(),
-          barcodeType: 'ean',
-          unitId: selectedUnitId.value,
-          productId: productToEdit!.productId,
-          activeStatus: packageToEdit!.activeStatus,
-        );
-
-        FullScreenLoaderUtils.stopLoading();
-        _triggerRefreshAndClose(TTexts.packageUpdatedSuccess.tr,
-            updatedPackage: updatedPkg);
-      } else {
-        final newPackage = await _provider.createProductPackage(
-            productToEdit!.productId, packagePayload);
-        final pkgId = newPackage['productPackageId'] ?? newPackage['id'];
-
-        await _provider.createInventory({
-          'productPackageId': pkgId,
-          'stockQuantity': 0,
-          'reorderThreshold': inventoryPayload['reorderThreshold'],
-        });
-
-        final createdPkg = ProductPackageModel.fromJson(newPackage);
-
-        FullScreenLoaderUtils.stopLoading();
-        _triggerRefreshAndClose(TTexts.packageCreatedSuccess.tr,
-            updatedPackage: createdPkg);
-      }
-    } on DioException catch (e) {
-      FullScreenLoaderUtils.stopLoading();
-      TSnackbarsWidget.error(
-          title: TTexts.errorTitle.tr,
-          message:
-              e.response?.data?['message'] ?? TTexts.errorUnknownMessage.tr);
-    } catch (e) {
-      FullScreenLoaderUtils.stopLoading();
-      handleError(e);
-    } finally {
-      isSaving.value = false;
-    }
-  }
-
-  // ==========================================
-  // 8. UI HELPERS (BOTTOM SHEETS & DIALOGS)
-  // ==========================================
   void _triggerRefreshAndClose(String successMessage,
       {String? newName,
       String? newBrand,
@@ -596,16 +694,13 @@ class ProductFormController extends GetxController with TErrorHandler {
     if (Get.isRegistered<CategoryDetailController>()) {
       Get.find<CategoryDetailController>().fetchProducts(isRefresh: true);
     }
-
     if (Get.isRegistered<ProductCatalogDetailController>()) {
       final detailCtrl = Get.find<ProductCatalogDetailController>();
-
       if (updatedPackage != null) {
         detailCtrl.updateLocalPackage(updatedPackage);
       } else {
         detailCtrl.fetchPackages(isRefresh: true);
       }
-
       detailCtrl.updateLocalInfo(
           name: newName, brand: newBrand, imageUrl: newImageUrl);
     }
@@ -627,43 +722,37 @@ class ProductFormController extends GetxController with TErrorHandler {
         padding: const EdgeInsets.only(bottom: AppSizes.p16),
         child: allCategories.isEmpty
             ? Center(
-                child: Text(
-                  TTexts.errorNotFoundMessage.tr,
-                  style: const TextStyle(color: AppColors.subText),
-                ),
+                child: Text(TTexts.errorNotFoundMessage.tr,
+                    style: const TextStyle(color: AppColors.subText)),
               )
             : ListView.separated(
                 shrinkWrap: true,
                 physics: const BouncingScrollPhysics(),
                 itemCount: allCategories.length,
                 separatorBuilder: (_, __) => const Divider(
-                  height: 1,
-                  color: AppColors.divider,
-                  indent: 12,
-                  endIndent: 12,
-                ),
+                    height: 1,
+                    color: AppColors.divider,
+                    indent: 12,
+                    endIndent: 12),
                 itemBuilder: (context, index) {
                   final cat = allCategories[index];
                   return Obx(() {
                     final isSelected =
                         selectedCategory.value?.categoryId == cat.categoryId;
-
                     return ListTile(
                       contentPadding:
                           const EdgeInsets.symmetric(horizontal: AppSizes.p12),
                       shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(12)),
-                      title: Text(
-                        cat.name,
-                        style: TextStyle(
-                          fontFamily: 'Poppins',
-                          fontWeight:
-                              isSelected ? FontWeight.bold : FontWeight.w500,
-                          color: isSelected
-                              ? AppColors.primary
-                              : AppColors.primaryText,
-                        ),
-                      ),
+                      title: Text(cat.name,
+                          style: TextStyle(
+                              fontFamily: 'Poppins',
+                              fontWeight: isSelected
+                                  ? FontWeight.bold
+                                  : FontWeight.w500,
+                              color: isSelected
+                                  ? AppColors.primary
+                                  : AppColors.primaryText)),
                       trailing: isSelected
                           ? const Icon(Icons.check_circle,
                               color: AppColors.primary, size: 20)
@@ -682,19 +771,30 @@ class ProductFormController extends GetxController with TErrorHandler {
 
   void confirmExit() {
     Get.dialog(
-      TCustomDialogWidget(
-        title: TTexts.discardChangesTitle.tr,
-        description: TTexts.discardChangesMessage.tr,
-        icon: const Text('⚠️', style: TextStyle(fontSize: 40)),
-        primaryButtonText: TTexts.discard.tr,
-        secondaryButtonText: TTexts.keepEditing.tr,
-        onSecondaryPressed: () => Get.back(),
-        onPrimaryPressed: () {
-          Get.back();
-          Get.back();
-        },
-      ),
-      barrierDismissible: false,
-    );
+        TCustomDialogWidget(
+          title: TTexts.discardChangesTitle.tr,
+          description: TTexts.discardChangesMessage.tr,
+          icon: const Text('⚠️', style: TextStyle(fontSize: 40)),
+          primaryButtonText: TTexts.discard.tr,
+          secondaryButtonText: TTexts.keepEditing.tr,
+          onSecondaryPressed: () => Get.back(),
+          onPrimaryPressed: () {
+            Get.back();
+            Get.back();
+          },
+        ),
+        barrierDismissible: false);
+  }
+
+  @override
+  void onClose() {
+    nameController.removeListener(_updateDynamicDisplayName);
+    unitNameController.removeListener(_updateDynamicDisplayName);
+    packageVariantNameController.removeListener(_updateDynamicDisplayName);
+
+    unitNameController.dispose();
+    packageDisplayNameController.dispose();
+    packageVariantNameController.dispose();
+    super.onClose();
   }
 }

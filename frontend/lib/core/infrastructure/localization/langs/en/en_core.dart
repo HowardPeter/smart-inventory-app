@@ -22,6 +22,8 @@ final Map<String, String> enCore = {
   TTexts.errorTooManyRequestsMessage:
       'You have requested too many times. Please wait a moment before trying again.',
   TTexts.exit: 'Exit',
+  TTexts.next: 'Next',
+  TTexts.confirm: 'Confirm',
   TTexts.done: 'Done',
   TTexts.errorServerTitle: 'Server Error',
   TTexts.errorServerMessage:
@@ -47,6 +49,10 @@ final Map<String, String> enCore = {
   TTexts.fair: 'Fair',
   TTexts.good: 'Good',
   TTexts.strong: 'Strong',
+
+  TTexts.loading: 'Loading...',
+  TTexts.saving: 'Saving...',
+  TTexts.deleting: 'Deleting...',
 
   // -- Splash Screen
   TTexts.splashSlogan: 'Smart Inventory, Smarter Business',

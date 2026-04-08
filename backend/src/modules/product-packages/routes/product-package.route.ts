@@ -47,17 +47,21 @@ productPackageRouter.get(
  *  - productId: string (UUID, required)
  *
  * API endpoint: POST /api/products/:productId/packages
- * Tạo package mới cho sản phẩm
+ * Tạo package và inventory mới cho sản phẩm
  *
  * Path params:
  *  - productId: string (UUID, required)
  *
  * Body:
- *  - unitId: string (UUID, required) - đơn vị tính của package
- *  - importPrice?: number | null - giá nhập
- *  - sellingPrice?: number | null - giá bán
- *  - barcodeValue?: string | null - giá trị mã vạch
- *  - barcodeType?: 'upc' | 'ean' | 'code128' | 'qr' | null
+ *  - package: object (required)
+ *    - unitId: string (UUID, required) - đơn vị tính của package
+ *    - importPrice?: number | null - giá nhập
+ *    - sellingPrice?: number | null - giá bán
+ *    - barcodeValue?: string | null - giá trị mã vạch
+ *    - barcodeType?: 'upc' | 'ean' | 'code128' | 'qr' | null
+ *  - inventory: object (required)
+ *    - quantity: number (integer, default: 0) - số lượng tồn kho ban đầu
+ *    - reorderThreshold?: number | null - ngưỡng cảnh báo
  *
  * Lưu ý:
  *  - Nếu truyền barcodeType thì cần truyền kèm barcodeValue

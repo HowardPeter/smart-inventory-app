@@ -150,11 +150,46 @@ class CategoryDetailController extends GetxController with TErrorHandler {
           } on DioException catch (e) {
             FullScreenLoaderUtils.stopLoading();
             final statusCode = e.response?.statusCode;
-            // Bắt đúng lỗi 409 từ Backend (Category đang chứa Products)
+
             if (statusCode == 409) {
-              TSnackbarsWidget.warning(
-                title: TTexts.errorTitle.tr,
-                message: TTexts.categoryNotEmptyError.tr,
+              // HIỆN POPUP XÁC NHẬN LẦN 2
+              Get.dialog(
+                TCustomDialogWidget(
+                  title: TTexts.deleteCategoryTitle.tr,
+                  description: TTexts.deleteCategoryWarning.tr,
+                  icon: const Text('⚠️', style: TextStyle(fontSize: 40)),
+                  primaryButtonText: TTexts.deleteCategoryConfirmBtn.tr,
+                  secondaryButtonText: TTexts.cancel.tr,
+                  onSecondaryPressed: () => Get.back(),
+                  onPrimaryPressed: () async {
+                    Get.back(); // Đóng dialog warning
+                    try {
+                      FullScreenLoaderUtils.openLoadingDialog(
+                          TTexts.loading.tr);
+
+                      // Gọi API xóa với cờ canReassignToUncategorized = true
+                      await _provider.deleteCategory(
+                          rxCategory.value.categoryId,
+                          canReassignToUncategorized: true);
+
+                      FullScreenLoaderUtils.stopLoading();
+
+                      // Refresh danh sách ở trang ngoài
+                      if (Get.isRegistered<ProductCatalogController>()) {
+                        Get.find<ProductCatalogController>().fetchCategories();
+                      }
+
+                      Get.back(); // Thoát trang chi tiết về Catalog
+                      TSnackbarsWidget.success(
+                        title: TTexts.successTitle.tr,
+                        message: TTexts.deleteCategorySuccess.tr,
+                      );
+                    } catch (err) {
+                      FullScreenLoaderUtils.stopLoading();
+                      handleError(err);
+                    }
+                  },
+                ),
               );
             } else {
               handleError(e);

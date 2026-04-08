@@ -197,10 +197,7 @@ export class ProductRepository {
     categoryId: string,
   ): Promise<ProductsByCategoryDto> {
     const products = await this.db.product.findMany({
-      where: {
-        categoryId,
-        activeStatus: 'active',
-      },
+      where: { categoryId },
       select: {
         productId: true,
         name: true,
@@ -215,6 +212,29 @@ export class ProductRepository {
       count: products.length,
       products,
     };
+  }
+
+  async findManyActiveByIds(
+    storeId: string,
+    productIds: string[],
+  ): Promise<{ productId: string; name: string }[]> {
+    if (productIds.length === 0) {
+      return [];
+    }
+
+    return await this.db.product.findMany({
+      where: {
+        productId: {
+          in: productIds,
+        },
+        storeId,
+        activeStatus: 'active',
+      },
+      select: {
+        productId: true,
+        name: true,
+      },
+    });
   }
 
   async uncategorizeMany(
@@ -235,13 +255,16 @@ export class ProductRepository {
     return uncategorized.count;
   }
 
-  async softDeleteOne(productId: string): Promise<void> {
-    await this.db.product.update({
+  async softDeleteOne(productId: string): Promise<{ productId: string }> {
+    return await this.db.product.update({
       where: {
         productId,
       },
       data: {
         activeStatus: 'inactive',
+      },
+      select: {
+        productId: true,
       },
     });
   }

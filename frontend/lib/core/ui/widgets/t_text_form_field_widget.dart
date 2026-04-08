@@ -10,6 +10,7 @@ class TTextFormFieldWidget extends StatelessWidget {
     required this.hintText,
     this.isObscure = false,
     this.isRequired = false,
+    this.readOnly = false,
     this.suffixIcon,
     this.controller,
     this.onChanged,
@@ -23,6 +24,7 @@ class TTextFormFieldWidget extends StatelessWidget {
   final String hintText;
   final bool isObscure;
   final bool isRequired;
+  final bool readOnly;
   final Widget? suffixIcon;
   final TextEditingController? controller;
   final Function(String)? onChanged;
@@ -33,6 +35,16 @@ class TTextFormFieldWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final InputBorder borderStyle = readOnly
+        ? OutlineInputBorder(
+            borderRadius: BorderRadius.circular(AppSizes.radius8),
+            borderSide: const BorderSide(color: Colors.transparent),
+          )
+        : OutlineInputBorder(
+            borderRadius: BorderRadius.circular(AppSizes.radius8),
+            borderSide: BorderSide(color: Colors.grey.shade300),
+          );
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -66,12 +78,14 @@ class TTextFormFieldWidget extends StatelessWidget {
           onChanged: onChanged,
           validator: validator,
           maxLines: isObscure ? 1 : maxLines,
+          readOnly: readOnly,
           cursorColor: AppColors.primary,
-          style: const TextStyle(
+          style: TextStyle(
             fontFamily: 'Poppins',
             fontSize: 14,
+            // 🟢 ĐÃ FIX: Trả về chữ thường và màu xám (subText) khi readOnly
             fontWeight: FontWeight.w500,
-            color: AppColors.primaryText,
+            color: readOnly ? AppColors.subText : AppColors.primaryText,
           ),
           decoration: InputDecoration(
             hintText: hintText,
@@ -79,18 +93,19 @@ class TTextFormFieldWidget extends StatelessWidget {
               color: AppColors.softGrey,
               fontWeight: FontWeight.w400,
             ),
+            filled: readOnly,
+            fillColor: Colors.grey.withOpacity(0.05),
             contentPadding: const EdgeInsets.symmetric(
               horizontal: AppSizes.p16,
               vertical: AppSizes.p16,
             ),
-            enabledBorder: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(AppSizes.radius8),
-              borderSide: BorderSide(color: Colors.grey.shade300),
-            ),
-            focusedBorder: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(AppSizes.radius8),
-              borderSide: const BorderSide(color: AppColors.primary),
-            ),
+            enabledBorder: borderStyle,
+            focusedBorder: readOnly
+                ? borderStyle
+                : OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(AppSizes.radius8),
+                    borderSide: const BorderSide(color: AppColors.primary),
+                  ),
             errorBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(AppSizes.radius8),
               borderSide: const BorderSide(color: AppColors.toastErrorBg),
@@ -110,9 +125,8 @@ class TTextFormFieldWidget extends StatelessWidget {
     );
   }
 
-  /// Nút Xóa nhanh
   Widget? _buildClearButton() {
-    if (controller == null || isObscure) {
+    if (controller == null || isObscure || readOnly) {
       return null;
     }
 

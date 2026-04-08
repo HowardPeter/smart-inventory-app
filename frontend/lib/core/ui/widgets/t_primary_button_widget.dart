@@ -8,8 +8,9 @@ class TPrimaryButtonWidget extends StatelessWidget {
     required this.text,
     required this.onPressed,
     this.icon,
+    this.customIcon,
     this.backgroundColor = AppColors.primary,
-    this.textColor = Colors.white,
+    this.textColor = AppColors.white,
     this.width = double.infinity,
     this.height = 52.0,
     this.borderRadius = AppSizes.radius12,
@@ -21,6 +22,7 @@ class TPrimaryButtonWidget extends StatelessWidget {
   final String text;
   final VoidCallback? onPressed;
   final IconData? icon;
+  final Widget? customIcon;
   final Color backgroundColor;
   final Color textColor;
   final double width;
@@ -77,23 +79,42 @@ class TPrimaryButtonWidget extends StatelessWidget {
     );
   }
 
-  // Hàm phụ: Render nội dung bên trong nút (chữ + icon)
+  // Render nội dung bên trong nút (chữ + icon)
   Widget _buildButtonContent() {
+    // KHIỂM TRA XEM NÚT CÓ ICON KHÔNG
+    final bool hasIcon = customIcon != null || icon != null;
+
     return Stack(
       alignment: Alignment.center,
       children: [
-        if (icon != null)
-          Positioned(
-            left: 0,
+        // 1. Icon ép sát mép trái (Nếu có)
+        if (customIcon != null)
+          Align(
+            alignment: Alignment.centerLeft,
+            child: customIcon!,
+          )
+        else if (icon != null)
+          Align(
+            alignment: Alignment.centerLeft,
             child: Icon(icon, size: AppSizes.iconMd, color: textColor),
           ),
-        Text(
-          text,
-          style: TextStyle(
-            fontFamily: 'Poppins',
-            fontSize: fontSize,
-            fontWeight: FontWeight.w600,
-            color: textColor,
+
+        // 2. Chữ ở giữa
+        Padding(
+          // CHỈ LÙI LỀ NẾU CÓ ICON.
+          // Nếu không có Icon, padding = 0 để chữ có đủ không gian hiển thị trong nút nhỏ!
+          padding: EdgeInsets.symmetric(horizontal: hasIcon ? 36.0 : 0.0),
+          child: Text(
+            text,
+            textAlign: TextAlign.center,
+            style: TextStyle(
+              fontFamily: 'Poppins',
+              fontSize: fontSize,
+              fontWeight: FontWeight.w600,
+              color: textColor,
+            ),
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis, // Tránh rớt dòng
           ),
         ),
       ],

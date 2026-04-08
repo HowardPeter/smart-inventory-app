@@ -6,7 +6,7 @@ import type { PaginationResponseDto } from '../../common/types/index.js';
 import type { Category } from '../categories/index.js';
 import type { ProductPackage, Unit } from '../product-packages/index.js';
 
-type ProductSimpleResponseDto = Omit<
+export type ProductSimpleResponseDto = Omit<
   Product,
   'activeStatus' | 'createdAt' | 'updatedAt'
 >;
