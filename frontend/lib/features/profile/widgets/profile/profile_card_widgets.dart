@@ -35,12 +35,26 @@ class ProfileStoreCardWidget extends StatelessWidget {
                 onTap: () {
                   controller.goToEditStoreProfile();
                 },
-                child: Text(
-                  TTexts.profileNameStore.tr,
-                  style: const TextStyle(
-                    fontWeight: FontWeight.w600,
-                    fontSize: 16,
-                  ),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Obx(() => Text(
+                      controller.storeName.value,
+                      style: const TextStyle(
+                        fontWeight: FontWeight.w700,
+                        fontSize: 16,
+                        color: AppColors.primaryText,
+                      ),
+                    )),
+                    //dòng chữ nhỏ mô tả bên dưới
+                    // Text(
+                    //   "Quản lý cửa hàng",
+                    //   style: TextStyle(
+                    //     fontSize: 12,
+                    //     color: AppColors.primaryText.withOpacity(0.6),
+                    //   ),
+                    // ),
+                  ],
                 ),
               ),
             ),

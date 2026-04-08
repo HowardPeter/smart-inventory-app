@@ -3,66 +3,91 @@ import 'package:frontend/core/infrastructure/utils/full_screen_loader_utils.dart
 import 'package:frontend/core/state/provider/user_profile_provider.dart';
 import 'package:frontend/core/state/services/auth_service.dart';
 import 'package:frontend/core/state/services/store_service.dart';
+import 'package:frontend/core/state/services/user_service.dart';
 import 'package:frontend/core/ui/widgets/t_snackbars_widget.dart';
 import 'package:frontend/features/auth/providers/auth_provider.dart';
+import 'package:frontend/features/profile/providers/profile_provider.dart';
 import 'package:get/get.dart';
 import 'package:frontend/routes/app_routes.dart';
-import 'package:frontend/core/state/services/user_service.dart';
-import 'package:supabase_flutter/supabase_flutter.dart';
 
 class ProfileController extends GetxController {
+  // Services
   final userService = Get.find<UserService>();
+  final storeService = Get.find<StoreService>();
+
+  // Providers
   final _profileProvider = UserProfileProvider();
-  final supabase = Supabase.instance.client;
+  final _storeProvider = StoreProvider();
+
   final apiClient = ApiClient();
 
-  // Observable để UI tự động cập nhật
+  // Observables để UI lắng nghe
   var fullName = "".obs;
   var email = "".obs;
+  var storeName = "".obs;
 
   @override
   void onInit() {
     super.onInit();
-    _loadUserProfile();
-    // Lắng nghe sự thay đổi của currentUser trong UserService (RAM)
+    _loadAllData();
+
+    // Lắng nghe thay đổi từ RAM để update UI tự động
     ever(userService.currentUser, (_) => _loadUserProfile());
+    ever(storeService.currentStoreName, (_) => _loadStoreInfo());
   }
 
-  /// Nạp thông tin cơ bản từ UserService lên UI
+  /// Nạp toàn bộ dữ liệu từ RAM lên biến local
+  void _loadAllData() {
+    _loadUserProfile();
+    _loadStoreInfo();
+  }
+
   void _loadUserProfile() {
     final user = userService.currentUser.value;
     if (user != null) {
-      // Chỉ lấy Tên và Email để tránh lỗi Undefined getter 'avatarUrl'
       fullName.value = user.fullName;
       email.value = user.email;
     }
   }
 
-  /// Làm mới dữ liệu từ Database (Pull-to-refresh)
+  void _loadStoreInfo() {
+    storeName.value = storeService.currentStoreName.value.isNotEmpty
+        ? storeService.currentStoreName.value
+        : "Chưa chọn cửa hàng";
+  }
+
+  /// Làm mới dữ liệu từ Server
   Future<void> refreshProfile() async {
     try {
-      // Gọi đúng hàm trong UserProfileProvider của bạn
+      // 1. Làm mới thông tin User
       final updatedUser = await _profileProvider.fetchMyProfile();
-      // Cập nhật lại RAM thông qua UserService
       userService.currentUser.value = updatedUser;
+
+      // 2. Làm mới thông tin Store (nếu đã chọn store)
+      final currentStoreId = storeService.currentStoreId.value;
+      if (currentStoreId.isNotEmpty) {
+        final storeData = await _storeProvider.getStoreDetail(currentStoreId);
+        final newName = storeData['name'] ?? "";
+        // Cập nhật cả RAM của StoreService để các màn hình khác cũng đổi theo
+        storeService.currentStoreName.value = newName;
+      }
+
+      TSnackbarsWidget.success(
+          title: 'Thành công', message: 'Dữ liệu đã được cập nhật');
     } catch (e) {
       TSnackbarsWidget.error(
-          title: 'Lỗi', message: 'Không thể cập nhật thông tin người dùng');
+          title: 'Lỗi', message: 'Không thể làm mới dữ liệu');
     }
   }
 
-  /// Logic Đăng xuất toàn diện
+  /// Đăng xuất và dọn dẹp sạch sẽ
   Future<void> executeLogout() async {
     try {
       FullScreenLoaderUtils.openLoadingDialog('Đang đăng xuất...');
 
-      // 1. Hủy session Supabase
       await AuthProvider(apiClient: apiClient).logout();
-      // 2. Xóa Token/Session dưới ổ cứng
       await Get.find<AuthService>().clearAuthData();
-      // 3. Xóa dữ liệu Workspace/Store
       await Get.find<StoreService>().clearWorkspaceData();
-      // 4. Xóa User trên RAM
       userService.clearUser();
 
       FullScreenLoaderUtils.stopLoading();
@@ -79,6 +104,7 @@ class ProfileController extends GetxController {
     } else {
       Get.toNamed(AppRoutes.storeSelection);
     }
+    _loadStoreInfo();
   }
 
   void goToEditProfile() => Get.toNamed(AppRoutes.editProfile);
