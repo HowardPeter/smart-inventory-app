@@ -55,7 +55,7 @@ export class UserProfileController {
     req: Request,
     res: Response<ApiResponse<UserProfileResponseDto>>,
   ): Promise<void> => {
-    requireReqUser(req);
+    const currentUser = requireReqUser(req);
 
     const { userId } = req.params;
     const payload = req.body as UpdateUserProfileDto;
@@ -64,6 +64,13 @@ export class UserProfileController {
       throw new CustomError({
         message: 'User ID is required and must be a valid string',
         status: StatusCodes.BAD_REQUEST,
+      });
+    }
+
+    if (userId !== currentUser.userId) {
+      throw new CustomError({
+        message: 'You do not have permission to update another user profile',
+        status: StatusCodes.FORBIDDEN,
       });
     }
 
