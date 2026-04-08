@@ -844,6 +844,39 @@ class TTexts {
       "change_password_hint_new_password";
   static const String changePasswordHintConfirmPassword =
       "change_password_hint_confirm";
+  static const String passwordNotMatch = "password_not_match";
+  static const String passwordSameAsOld = "password_same_as_old";
+  static const String passwordChangedSuccess = "password_changed_success";
+  static const String oldPasswordIncorrect = "old_password_incorrect";
+  static const String authSessionExpired = "auth_session_expired";
+  static const String systemError = "system_error";
+  static const String authError = "auth_error";
+
+  //--Edit store
+  static const String editStoreTitle = 'edit_store_title';
+  static const String editStoreSubtitle = 'edit_store_subtitle';
+  static const String editStoreNameLabel = 'edit_store_name_label';
+  static const String editStoreAddress = 'edit_store_address';
+  static const String editStoreAmountMember = 'edit_store_amount_member';
+  static const String editStoreBtnEdit = 'edit_store_btn_edit';
+  static const String profileUpdateSuccess = 'profile_update_success';
+  static const String loadingTitle = 'loading_title';
+  static const String editStoreCurrentStore = 'edit_store_current_store';
+  static const String profileNoStoreSelected = 'profile_no_store_selected';
+  static const String profileUpdateErrorTitle = 'profile_update_error_title';
+  static const String loggingOut = 'logging_out';
+  static const String logoutErrorTitle = 'logout_error_title';
+
+  // --Assigns role
+  static const String assignsRoleTitle = 'assigns_role_title';
+  static const String assignsRoleSubtitle = 'assigns_role_subtitle';
+  static const String assignsRoleBtnSave = 'assigns_role_btn_save';
+  static const String assignsRoleBtnCancel = 'assigns_role_btn_cancel';
+  static const String assignsRoleManager = 'assigns_role_manager';
+  static const String assignsRoleStaff = 'assigns_role_staff';
+  static const String assignsRoleAll = 'assigns_role_all';
+  static const String assignsRoleOwner = 'assigns_role_owner';
+  static const String assignsRoleSearchHint = 'assigns_role_search_hint';
 
   //-- System
   static const String systemSnackbarTitle = "system_snackbar_title";

@@ -40,4 +40,6 @@ class AppRoutes {
   static const notification = '/notification';
   static const editProfile = '/edit_profile';
   static const changePassword = '/change_password';
+  static const editStore = '/edit_store';
+  static const assignsRole = '/assign_role';
 }

@@ -46,6 +46,7 @@ class EditProfileHeaderWidget extends StatelessWidget {
                         child: IconButton(
                           icon: const Icon(
                             Icons.arrow_back_ios_new,
+                            color: AppColors.whiteText,
                           ),
                           onPressed: () {
                             Navigator.pop(context);
@@ -79,7 +80,7 @@ class EditProfileHeaderWidget extends StatelessWidget {
                     color: AppColors.white,
                     boxShadow: [
                       BoxShadow(
-                        color: Colors.black.withOpacity(0.08),
+                        color: AppColors.gradientBlackStart.withOpacity(0.08),
                         blurRadius: 15,
                         offset: const Offset(0, 8),
                       )

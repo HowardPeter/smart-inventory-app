@@ -1,72 +1,108 @@
 import 'package:flutter/material.dart';
-import 'package:frontend/core/infrastructure/constants/text_strings.dart';
-import 'package:frontend/core/infrastructure/utils/full_screen_loader_utils.dart';
-import 'package:frontend/core/ui/widgets/t_snackbars_widget.dart';
 import 'package:get/get.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
+import 'package:frontend/core/infrastructure/constants/text_strings.dart';
+import 'package:frontend/core/ui/widgets/t_snackbars_widget.dart';
 
 class ProfileChangePasswordController extends GetxController {
-  //controller
-  final TextEditingController oldPasswordController = TextEditingController();
-  final TextEditingController newPasswordController = TextEditingController();
-  final TextEditingController confirmPasswordController =
-      TextEditingController();
+  final formKey = GlobalKey<FormState>();
+  final oldPasswordController = TextEditingController();
+  final newPasswordController = TextEditingController();
+  final confirmPasswordController = TextEditingController();
 
-  final RxBool isLoading = false.obs;
+  final isLoading = false.obs;
+  final supabase = Supabase.instance.client;
 
-// HANDLE CHANGE PASSWORD
-  Future<void> handleChangePassword() async {
-    final oldPass = oldPasswordController.text.trim();
-    final newPass = newPasswordController.text.trim();
-    final confirmPass = confirmPasswordController.text.trim();
+  Future<void> updatePassword() async {
+    // 1. Kiểm tra Validate từ Form UI
+    if (!formKey.currentState!.validate()) return;
 
-    // ===== VALIDATE =====
-    if (oldPass.isEmpty || newPass.isEmpty || confirmPass.isEmpty) {
-      TSnackbarsWidget.warning(
-        title: TTexts.loginErrorEmptyFieldsTitle.tr,
-        message: TTexts.loginErrorEmptyFieldsMessage.tr,
-      );
-      return;
-    }
-
-    if (newPass != confirmPass) {
+    // 2. Kiểm tra khớp mật khẩu mới
+    if (newPasswordController.text != confirmPasswordController.text) {
       TSnackbarsWidget.error(
-        title: "Error",
-        message: "Passwords do not match",
+        title: TTexts.errorTitle.tr,
+        message: TTexts.passwordNotMatch.tr,
       );
       return;
     }
 
-    if (newPass.length < 6) {
+    // 3. Kiểm tra mật khẩu mới không được trùng mật khẩu cũ
+    if (newPasswordController.text == oldPasswordController.text) {
       TSnackbarsWidget.warning(
-        title: "Weak Password",
-        message: "Password must be at least 6 characters",
+        title: TTexts.warningTitle.tr,
+        message: TTexts.passwordSameAsOld.tr,
       );
       return;
     }
 
     isLoading.value = true;
-    FullScreenLoaderUtils.openLoadingDialog("Updating password...");
 
     try {
-      // ===== MOCK API =====
-      await Future.delayed(const Duration(seconds: 1));
+      final user = supabase.auth.currentUser;
+      if (user == null || user.email == null) {
+        throw Exception(TTexts.authSessionExpired.tr);
+      }
 
-      FullScreenLoaderUtils.stopLoading();
-
-      TSnackbarsWidget.success(
-        title: "Success",
-        message: "Password updated successfully",
+      // 4. Xác thực mật khẩu hiện tại (Re-authentication)
+      // Việc sử dụng AuthResponse giúp đảm bảo lấy được Session mới nhất
+      final AuthResponse authResponse = await supabase.auth.signInWithPassword(
+        email: user.email!,
+        password: oldPasswordController.text,
       );
 
-      Get.back();
-    } catch (e) {
-      FullScreenLoaderUtils.stopLoading();
+      // Kiểm tra session mới từ phản hồi của server
+      if (authResponse.session != null) {
+        // 5. Tiến hành cập nhật mật khẩu mới vào hệ thống
+        await supabase.auth.updateUser(
+          UserAttributes(password: newPasswordController.text),
+        );
+
+        // 6. Thông báo thành công theo phong cách Modern Clean
+        TSnackbarsWidget.success(
+          title: TTexts.successTitle.tr,
+          message: TTexts.passwordChangedSuccess.tr,
+        );
+
+        // Xóa trắng các trường sau khi hoàn tất
+        _clearForm();
+      } else {
+        throw Exception(TTexts.systemError.tr);
+      }
+    } on AuthException catch (e) {
+      // Xử lý các lỗi đặc thù từ Supabase
+      String errorMsg = e.message;
+      if (e.message.contains('Invalid login credentials')) {
+        errorMsg = TTexts.oldPasswordIncorrect.tr;
+      }
+
       TSnackbarsWidget.error(
-        title: "Error",
-        message: e.toString(),
+        title: TTexts.authError.tr,
+        message: errorMsg,
+      );
+    } catch (e) {
+      // Xử lý các lỗi ngoại lệ khác (mất mạng, lỗi server...)
+      TSnackbarsWidget.error(
+        title: TTexts.errorTitle.tr,
+        message: TTexts.systemError.tr,
       );
     } finally {
       isLoading.value = false;
     }
+  }
+
+  /// Hàm dọn dẹp dữ liệu trên Form
+  void _clearForm() {
+    oldPasswordController.clear();
+    newPasswordController.clear();
+    confirmPasswordController.clear();
+  }
+
+  @override
+  void onClose() {
+    // Giải phóng bộ nhớ cho các controller
+    oldPasswordController.dispose();
+    newPasswordController.dispose();
+    confirmPasswordController.dispose();
+    super.onClose();
   }
 }

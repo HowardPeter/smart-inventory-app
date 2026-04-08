@@ -38,6 +38,7 @@ class ProfileMenuWidget extends StatelessWidget {
         ProfileMenuItemWidget(
           icon: Iconsax.security_safe_copy,
           title: TTexts.profileUserPermissions.tr,
+          onTap: () => Get.find<ProfileController>().goToAssignsRoleProfile(),
         ),
       ],
     );

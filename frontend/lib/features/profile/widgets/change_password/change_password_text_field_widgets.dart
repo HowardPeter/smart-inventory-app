@@ -16,39 +16,42 @@ class ChangePasswordFormWidget
 
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: AppSizes.p16),
-      child: Column(
-        children: [
-          // OLD PASSWORD
-          TTextFormFieldWidget(
-            controller: controller.oldPasswordController,
-            label: TTexts.changePasswordOldPassword.tr,
-            hintText: TTexts.changePasswordHintOldPassword.tr,
-            isObscure: true,
-            prefixIcon: Icons.lock,
-          ),
+      child: Form(
+        key: controller.formKey,
+        child: Column(
+          children: [
+            // OLD PASSWORD
+            TTextFormFieldWidget(
+              controller: controller.oldPasswordController,
+              label: TTexts.changePasswordOldPassword.tr,
+              hintText: TTexts.changePasswordHintOldPassword.tr,
+              isObscure: true,
+              prefixIcon: Icons.lock,
+            ),
 
-          const SizedBox(height: AppSizes.p16),
+            const SizedBox(height: AppSizes.p16),
 
-          // NEW PASSWORD
-          TTextFormFieldWidget(
-            controller: controller.newPasswordController,
-            label: TTexts.changePasswordNewPassword.tr,
-            hintText: TTexts.changePasswordHintNewPassword.tr,
-            isObscure: true,
-            prefixIcon: Icons.lock_outline,
-          ),
+            // NEW PASSWORD
+            TTextFormFieldWidget(
+              controller: controller.newPasswordController,
+              label: TTexts.changePasswordNewPassword.tr,
+              hintText: TTexts.changePasswordHintNewPassword.tr,
+              isObscure: true,
+              prefixIcon: Icons.lock_outline,
+            ),
 
-          const SizedBox(height: AppSizes.p16),
+            const SizedBox(height: AppSizes.p16),
 
-          // CONFIRM PASSWORD
-          TTextFormFieldWidget(
-            controller: controller.confirmPasswordController,
-            label: TTexts.changePasswordConfirm.tr,
-            hintText: TTexts.changePasswordHintConfirmPassword.tr,
-            isObscure: true,
-            prefixIcon: Icons.lock_reset,
-          ),
-        ],
+            // CONFIRM PASSWORD
+            TTextFormFieldWidget(
+              controller: controller.confirmPasswordController,
+              label: TTexts.changePasswordConfirm.tr,
+              hintText: TTexts.changePasswordHintConfirmPassword.tr,
+              isObscure: true,
+              prefixIcon: Icons.lock_reset,
+            ),
+          ],
+        ),
       ),
     );
   }
