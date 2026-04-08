@@ -111,7 +111,7 @@ class OutboundTransactionExportTypeSelectorWidget extends StatelessWidget {
                     ),
                   ),
 
-                  // 🟢 HIỂN THỊ 3 TÙY CHỌN TÀI CHÍNH NẾU CHỌN "OTHER"
+                  // HIỂN THỊ 3 TÙY CHỌN TÀI CHÍNH NẾU CHỌN "OTHER"
                   if (reasonKey == TTexts.reasonOther && isSelected)
                     Padding(
                       padding: const EdgeInsets.only(

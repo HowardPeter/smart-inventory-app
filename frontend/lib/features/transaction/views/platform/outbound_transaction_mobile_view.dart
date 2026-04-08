@@ -94,7 +94,7 @@ class OutboundTransactionMobileView
           child: Divider(color: AppColors.divider),
         ),
 
-        // 🟢 WIDGET CHỌN LÝ DO
+        // WIDGET CHỌN LÝ DO
         Obx(() => OutboundTransactionExportTypeSelectorWidget(
               reasons: controller.predefinedReasons,
               selectedReason: controller.selectedReason.value,
@@ -107,7 +107,7 @@ class OutboundTransactionMobileView
 
         const SizedBox(height: 8),
 
-        // 🟢 WIDGET GHI CHÚ
+        // WIDGET GHI CHÚ
         Padding(
           padding: const EdgeInsets.symmetric(horizontal: AppSizes.p20),
           child: TTextFormFieldWidget(

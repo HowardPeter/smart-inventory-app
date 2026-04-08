@@ -3,7 +3,7 @@ import 'package:frontend/core/infrastructure/network/app_client.dart';
 import 'package:frontend/core/infrastructure/models/category_model.dart';
 import 'package:frontend/core/infrastructure/models/product_model.dart';
 import 'package:frontend/core/infrastructure/models/inventory_model.dart';
-import 'package:frontend/core/infrastructure/models/unit_model.dart'; // 🟢 IMPORT THÊM UNIT MODEL
+import 'package:frontend/core/infrastructure/models/unit_model.dart'; // IMPORT THÊM UNIT MODEL
 
 class InventoryProvider {
   final _apiClient = ApiClient();

@@ -100,11 +100,11 @@ class ProductCatalogController extends GetxController with TErrorHandler {
       }).toList();
     }
 
-    // 🟢 TÁCH NHÓM MẶC ĐỊNH VÀ NHÓM THƯỜNG
+    // TÁCH NHÓM MẶC ĐỊNH VÀ NHÓM THƯỜNG
     List<CategoryModel> defaultCats = list.where((c) => c.isDefault).toList();
     List<CategoryModel> normalCats = list.where((c) => !c.isDefault).toList();
 
-    // 🟢 Sắp xếp A-Z cho từng cụm
+    // Sắp xếp A-Z cho từng cụm
     defaultCats.sort(
         (a, b) => (a.name).toLowerCase().compareTo((b.name).toLowerCase()));
     normalCats.sort(
@@ -112,7 +112,7 @@ class ProductCatalogController extends GetxController with TErrorHandler {
 
     Map<String, List<CategoryModel>> grouped = {};
 
-    // 🟢 ĐẨY NHÓM MẶC ĐỊNH LÊN ĐẦU VỚI KEY LÀ ⭐
+    // ĐẨY NHÓM MẶC ĐỊNH LÊN ĐẦU VỚI KEY LÀ ⭐
     if (defaultCats.isNotEmpty) {
       grouped['⭐'] = defaultCats;
     }

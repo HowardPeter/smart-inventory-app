@@ -41,7 +41,26 @@ class TTexts {
   static const String searchItemsPackages = "search_items_packages";
   static const String searchEverything = "search_everything";
   static const String noResultsFound = "no_results_found";
-  static const String didYouMean = "didYouMean";
+  static const String didYouMean = "did_you_mean";
+  static const String transactionType = "transaction_type";
+  static const String transactionStatus = "transaction_status";
+  static const String applyFilters = "apply_filters";
+  static const String resetFilters = "reset_filters";
+  static const String filterInbound = "filter_inbound";
+  static const String filterOutbound = "filter_outbound";
+  static const String filterAdjustment = "filter_adjustment";
+  static const String filterCompleted = "filter_completed";
+  static const String filterPending = "filter_pending";
+  static const String filterCancelled = "filter_cancelled";
+  static const String searchTransactionHint = "search_transaction_hint";
+  static const String noTransactionsFound = "no_transactions_found";
+  static const String dateRange = "date_range";
+  static const String selectDateRange = "select_date_range";
+  static const String createdByUser = "created_by_user";
+  static const String enterUsernameOrId = "enter_username_or_id";
+  static const String activeFilters = "active_filters";
+  static const String userLabel = "user_label";
+  static const String me = "me";
 
   // -- Network Error Dialog
   static const String netErrorTitle = "net_error_title";
@@ -671,7 +690,6 @@ class TTexts {
   static const String transactionSuccessSub = "transaction_success_sub";
   static const String transactionNumber = "transaction_number";
   static const String transactionDate = "transaction_date";
-  static const String transactionType = "transaction_type";
   static const String totalItemsTransaction = "total_items_transaction";
   static const String checkDetails = "check_details";
   static const String transactionDetails = "transaction_details";
@@ -790,6 +808,7 @@ class TTexts {
   static const String filterAlerts = "filter_alerts";
   static const String filterTransactions = "filter_transactions";
   static const String filterSystem = "filter_system";
+
   //--Profile
   static const String profileTitle = 'profile_title';
   static const String profileNameUser = 'profile_name_user';

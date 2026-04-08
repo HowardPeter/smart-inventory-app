@@ -45,7 +45,7 @@ class ReportTransactionDetailController extends GetxController {
             unitId: 'unit-1',
             productId: 'prod-1',
             activeStatus: 'active',
-            // 🟢 THÊM MODEL SẢN PHẨM CÓ LINK ẢNH
+            // THÊM MODEL SẢN PHẨM CÓ LINK ẢNH
             product: ProductModel(
               productId: 'prod-1',
               name: 'Wireless Bluetooth Earbuds Pro',
@@ -72,7 +72,7 @@ class ReportTransactionDetailController extends GetxController {
             unitId: 'unit-1',
             productId: 'prod-2',
             activeStatus: 'active',
-            // 🟢 THÊM MODEL SẢN PHẨM CÓ LINK ẢNH
+            // THÊM MODEL SẢN PHẨM CÓ LINK ẢNH
             product: ProductModel(
               productId: 'prod-2',
               name: 'Anker PowerCore 20000mAh',

@@ -42,7 +42,7 @@ class InventoryProductFormActionButtonsWidget
           children: [
             Row(
               children: [
-                // 🟢 NÚT TRÁI (BACK HOẶC CANCEL)
+                // NÚT TRÁI (BACK HOẶC CANCEL)
                 Expanded(
                   flex: 1,
                   child: TPrimaryButtonWidget(
@@ -56,7 +56,7 @@ class InventoryProductFormActionButtonsWidget
                 ),
                 const SizedBox(width: 16),
 
-                // 🟢 NÚT PHẢI (NEXT HOẶC CREATE FULL PRODUCT)
+                // NÚT PHẢI (NEXT HOẶC CREATE FULL PRODUCT)
                 Expanded(
                   flex: 2,
                   child: TPrimaryButtonWidget(
@@ -76,7 +76,7 @@ class InventoryProductFormActionButtonsWidget
               ],
             ),
 
-            // 🟢 NÚT SKIP CHỈ XUẤT HIỆN Ở BƯỚC 3 NẰM BÊN DƯỚI
+            // NÚT SKIP CHỈ XUẤT HIỆN Ở BƯỚC 3 NẰM BÊN DƯỚI
             if (step == 3) ...[
               const SizedBox(height: 20),
               GestureDetector(

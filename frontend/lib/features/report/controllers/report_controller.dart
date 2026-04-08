@@ -19,7 +19,7 @@ class ReportController extends GetxController {
   @override
   void onInit() {
     super.onInit();
-    // 🟢 Lấy trạng thái Tab đã lưu từ Local Storage (Mặc định là Today)
+    // Lấy trạng thái Tab đã lưu từ Local Storage (Mặc định là Today)
     activeTab.value = _box.read('report_active_tab') ?? 'Today';
     fetchMockData();
   }
@@ -27,7 +27,7 @@ class ReportController extends GetxController {
   void changeTab(String tab) {
     if (activeTab.value == tab) return;
     activeTab.value = tab;
-    // 🟢 Lưu xuống Local Storage
+    // Lưu xuống Local Storage
     _box.write('report_active_tab', tab);
   }
 
@@ -36,7 +36,7 @@ class ReportController extends GetxController {
     focusedDay.value = focused;
   }
 
-  // 🟢 Hàm lấy danh sách giao dịch cho 1 ngày cụ thể (Dùng để vẽ chấm trên lịch)
+  // Hàm lấy danh sách giao dịch cho 1 ngày cụ thể (Dùng để vẽ chấm trên lịch)
   List<TransactionModel> getTransactionsForDay(DateTime day) {
     return allTransactions.where((tx) {
       if (tx.createdAt == null) return false;
@@ -44,7 +44,7 @@ class ReportController extends GetxController {
     }).toList();
   }
 
-  // 🟢 Hàm lọc dữ liệu để hiển thị bên dưới View
+  // Hàm lọc dữ liệu để hiển thị bên dưới View
   List<TransactionModel> get filteredTransactions {
     final targetDay =
         activeTab.value == 'Today' ? DateTime.now() : selectedDay.value;

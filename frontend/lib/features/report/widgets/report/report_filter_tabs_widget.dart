@@ -27,7 +27,7 @@ class ReportFilterTabsWidget extends GetView<ReportController> {
       child: Container(
         padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 10),
         decoration: BoxDecoration(
-          // 🟢 GRADIENT ĐEN CHO TAB ACTIVE
+          // GRADIENT ĐEN CHO TAB ACTIVE
           gradient: isActive
               ? const LinearGradient(
                   begin: Alignment.topCenter,

@@ -43,12 +43,12 @@ class NotificationMobileScreen extends StatelessWidget {
       ),
       body: Column(children: [
         // ==========================================
-        // 🟢 THANH FILTER TABS
+        // THANH FILTER TABS
         // ==========================================
         NotificationFilterTabWidget(controller: controller),
 
         // ==========================================
-        // 🟢 DANH SÁCH THÔNG BÁO (Bọc trong Expanded)
+        // DANH SÁCH THÔNG BÁO (Bọc trong Expanded)
         // ==========================================
         Expanded(
           child: Obx(() {

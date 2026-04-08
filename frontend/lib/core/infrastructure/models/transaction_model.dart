@@ -21,7 +21,7 @@ class TransactionModel {
     required this.items,
   });
 
-  // 🟢 HÀM MỚI BỔ SUNG: Parse từ JSON thành Object
+  // HÀM MỚI BỔ SUNG: Parse từ JSON thành Object
   factory TransactionModel.fromJson(Map<String, dynamic> json) {
     return TransactionModel(
       transactionId: json['transactionId'] ?? json['transaction_id'],

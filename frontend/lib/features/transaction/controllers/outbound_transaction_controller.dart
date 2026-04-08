@@ -11,7 +11,7 @@ import 'package:frontend/core/ui/theme/app_colors.dart';
 import 'package:frontend/features/transaction/providers/transaction_provider.dart';
 import 'package:frontend/routes/app_routes.dart';
 import 'package:get/get.dart';
-import 'package:dio/dio.dart'; // 🟢 Bổ sung Dio để bắt lỗi HTTP
+import 'package:dio/dio.dart'; // Bổ sung Dio để bắt lỗi HTTP
 
 class OutboundTransactionController extends GetxController with TErrorHandler {
   final TransactionProvider _provider = TransactionProvider();
@@ -112,7 +112,7 @@ class OutboundTransactionController extends GetxController with TErrorHandler {
     );
   }
 
-  // 🟢 1. BẪY LỖI THOÁT TRANG
+  // 1. BẪY LỖI THOÁT TRANG
   void handleExit() {
     if (cartItems.isNotEmpty) {
       Get.dialog(
@@ -199,7 +199,7 @@ class OutboundTransactionController extends GetxController with TErrorHandler {
     );
   }
 
-  // 🟢 THỰC THI API CÓ BẪY LỖI CONCURRENCY (HẾT HÀNG ĐỘT NGỘT)
+  // THỰC THI API CÓ BẪY LỖI CONCURRENCY (HẾT HÀNG ĐỘT NGỘT)
   Future<void> completeExport({required bool updatePrice}) async {
     try {
       FullScreenLoaderUtils.openLoadingDialog(TTexts.processingExport.tr);

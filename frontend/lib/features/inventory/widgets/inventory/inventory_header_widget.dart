@@ -42,7 +42,7 @@ class InventoryHeaderWidget extends StatelessWidget {
           ),
           const SizedBox(width: AppSizes.p12),
 
-          // 🟢 BADGE CHỨC VỤ ĐÃ ĐƯỢC CHUYỂN SANG ĐÂY
+          // BADGE CHỨC VỤ ĐÃ ĐƯỢC CHUYỂN SANG ĐÂY
           Obx(() {
             final storeService = Get.find<StoreService>();
             final role = storeService.currentRole.value.toLowerCase();

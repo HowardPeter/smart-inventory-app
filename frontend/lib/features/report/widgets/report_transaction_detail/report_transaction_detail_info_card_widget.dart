@@ -14,7 +14,7 @@ class ReportTransactionDetailInfoCardWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    // 🟢 LẤY THÔNG TIN REAL TỪ SERVICES
+    // LẤY THÔNG TIN REAL TỪ SERVICES
     final userService = Get.find<UserService>();
     final storeService = Get.find<StoreService>();
 
@@ -23,7 +23,7 @@ class ReportTransactionDetailInfoCardWidget extends StatelessWidget {
     final String authUserId =
         userService.currentUser.value?.authUserId ?? tx.userId ?? 'default';
 
-    // 🟢 FORMAT ROLE: "owner" -> "Owner", "manager" -> "Manager", "staff" -> "Staff"
+    // FORMAT ROLE: "owner" -> "Owner", "manager" -> "Manager", "staff" -> "Staff"
     final String displayRole =
         storeService.currentRole.value.capitalizeFirst ?? 'Staff';
     final String storeName = storeService.currentStoreName.value.isNotEmpty

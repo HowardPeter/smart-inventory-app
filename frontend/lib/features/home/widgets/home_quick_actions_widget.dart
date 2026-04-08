@@ -38,10 +38,10 @@ class HomeQuickActionsWidget extends StatelessWidget {
               // 1. THẺ SCAN
               _buildPremiumCard(
                 icon: Iconsax.scan_barcode_copy,
-                title: TTexts
-                    .homeScanBarcode.tr, // 🟢 Đã đổi sang biến đa ngôn ngữ
+                title:
+                    TTexts.homeScanBarcode.tr, // Đã đổi sang biến đa ngôn ngữ
                 subtitle: TTexts
-                    .homeScanBarcodeSub.tr, // 🟢 Đã đổi sang biến đa ngôn ngữ
+                    .homeScanBarcodeSub.tr, // Đã đổi sang biến đa ngôn ngữ
                 gradient: const LinearGradient(
                   begin: Alignment.topLeft,
                   end: Alignment.bottomRight,

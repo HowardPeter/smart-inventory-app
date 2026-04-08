@@ -3,7 +3,7 @@ import 'package:frontend/core/ui/widgets/t_search_bar_widget.dart';
 import 'package:frontend/core/ui/widgets/t_app_bar_widget.dart';
 import 'package:frontend/features/transaction/controllers/inbound_transaction_controller.dart';
 import 'package:frontend/features/transaction/widgets/inbound_transaction/inbound_transaction_bottom_bar_widget.dart';
-// 🟢 SỬ DỤNG CHUNG WIDGET CART VỚI OUTBOUND
+// SỬ DỤNG CHUNG WIDGET CART VỚI OUTBOUND
 import 'package:frontend/features/transaction/widgets/shared/transaction_cart_item_widget.dart';
 import 'package:frontend/core/infrastructure/constants/text_strings.dart';
 import 'package:frontend/features/transaction/widgets/shared/transaction_empty_widget.dart';
@@ -65,7 +65,7 @@ class InboundTransactionMobileView
                         separatorBuilder: (_, __) => const SizedBox(height: 12),
                         itemBuilder: (context, index) {
                           final item = controller.cartItems[index];
-                          // 🟢 SỬ DỤNG WIDGET CHUNG CỦA TRANSACTIONS
+                          // SỬ DỤNG WIDGET CHUNG CỦA TRANSACTIONS
                           return TransactionCartItemWidget(
                             item: item,
                             onIncrease: () => controller.updateQuantity(
@@ -76,7 +76,7 @@ class InboundTransactionMobileView
                         },
                       ),
 
-                      // 🟢 THÊM PHẦN GHI CHÚ
+                      // THÊM PHẦN GHI CHÚ
                       _buildNoteSection(),
                     ],
                   );

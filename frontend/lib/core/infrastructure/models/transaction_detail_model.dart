@@ -20,7 +20,7 @@ class TransactionDetailModel {
     this.reorderThreshold = 0,
   });
 
-  // 🟢 HÀM MỚI BỔ SUNG: Parse từ JSON thành Object
+  // HÀM MỚI BỔ SUNG: Parse từ JSON thành Object
   factory TransactionDetailModel.fromJson(Map<String, dynamic> json) {
     return TransactionDetailModel(
       // Bắt cả 2 trường hợp camelCase và snake_case

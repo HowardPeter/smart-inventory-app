@@ -40,7 +40,7 @@ class InventoryProductPackageFormFieldsWidget
             controller: controller.packageVariantNameController,
           ),
 
-          // 🟢 THANH GỢI Ý CHIPS
+          // THANH GỢI Ý CHIPS
           Obx(() {
             final suggestions = controller.variantNameSuggestions;
             if (suggestions.isEmpty) return const SizedBox.shrink();

@@ -5,6 +5,8 @@ import 'package:frontend/core/ui/widgets/t_bottom_sheet_widget.dart';
 import 'package:frontend/core/ui/widgets/t_snackbars_widget.dart';
 import 'package:frontend/features/report/controllers/report_controller.dart';
 import 'package:frontend/features/report/widgets/report/report_export_bottom_sheet_widget.dart';
+import 'package:frontend/routes/app_routes.dart';
+import 'package:frontend/features/search/controllers/search_controller.dart';
 import 'package:get/get.dart';
 import 'package:iconsax_flutter/iconsax_flutter.dart';
 import 'package:intl/intl.dart';
@@ -41,12 +43,28 @@ class ReportHistoryHeaderWidget extends StatelessWidget {
               ],
             ),
           ),
+
+          // NÚT SEARCH ĐÃ ĐƯỢC KẾT NỐI
           IconButton(
-            onPressed: () {},
+            onPressed: () {
+              // Chuyển sang trang Search, truyền argument để đổi Hint Text
+              // Sau này có API, bạn chỉ cần vào TSearchController check target là xong
+              Get.toNamed(
+                AppRoutes.search,
+                arguments: {
+                  'target': SearchTarget.transactions,
+                  'hint': 'Search by ID, note, or type...',
+                },
+              );
+            },
             icon: const Icon(Iconsax.search_normal_1_copy,
                 color: AppColors.primary, size: 26),
+            padding: EdgeInsets.zero,
+            constraints: const BoxConstraints(),
           ),
           const SizedBox(width: AppSizes.p16),
+
+          // --- NÚT EXPORT GRADIENT ---
           InkWell(
             onTap: () {
               final currentList = reportCtrl.filteredTransactions;

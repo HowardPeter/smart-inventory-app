@@ -22,14 +22,14 @@ class TransactionProductInfoWidget extends StatelessWidget {
   Widget build(BuildContext context) {
     final controller = _controller;
 
-    // 🟢 THÊM SIZEDBOX DOUBLE INFINITY ĐỂ ÉP NÓ NẰM CHÍNH GIỮA MÀN HÌNH
+    // THÊM SIZEDBOX DOUBLE INFINITY ĐỂ ÉP NÓ NẰM CHÍNH GIỮA MÀN HÌNH
     return SizedBox(
       width: double.infinity,
       child: Padding(
         padding: const EdgeInsets.symmetric(horizontal: AppSizes.p20),
         child: Column(
           crossAxisAlignment:
-              CrossAxisAlignment.center, // 🟢 Đảm bảo các con nằm giữa
+              CrossAxisAlignment.center, // Đảm bảo các con nằm giữa
           children: [
             Obx(() => Text(
                   controller.displayName,

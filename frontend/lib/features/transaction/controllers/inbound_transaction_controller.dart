@@ -76,14 +76,13 @@ class InboundTransactionController extends GetxController with TErrorHandler {
     }
   }
 
-  // 🟢 XÓA SẢN PHẨM (Dùng Emoji Icon)
+  // XÓA SẢN PHẨM (Dùng Emoji Icon)
   void removeItem(int index) {
     Get.dialog(
       TCustomDialogWidget(
         title: TTexts.removeItem.tr,
         description: TTexts.confirmRemoveItemTransaction.tr,
-        icon:
-            const Text('🗑️', style: TextStyle(fontSize: 40)), // 🟢 EMOJI ICON
+        icon: const Text('🗑️', style: TextStyle(fontSize: 40)), // EMOJI ICON
         primaryButtonText: TTexts.remove.tr,
         onPrimaryPressed: () {
           cartItems.removeAt(index);
@@ -96,7 +95,7 @@ class InboundTransactionController extends GetxController with TErrorHandler {
     );
   }
 
-  // 🟢 1. KIỂM TRA THAY ĐỔI GIÁ (IMPORT PRICE)
+  // 1. KIỂM TRA THAY ĐỔI GIÁ (IMPORT PRICE)
   void handleImportWithPriceCheck() {
     if (cartItems.isEmpty) {
       TSnackbarsWidget.warning(
@@ -115,8 +114,7 @@ class InboundTransactionController extends GetxController with TErrorHandler {
         TCustomDialogWidget(
           title: TTexts.priceChangeDetected.tr,
           description: TTexts.priceChangeMessage.tr,
-          icon:
-              const Text('💰', style: TextStyle(fontSize: 40)), // 🟢 EMOJI ICON
+          icon: const Text('💰', style: TextStyle(fontSize: 40)), // EMOJI ICON
           content: Column(
             mainAxisSize: MainAxisSize.min,
             children: changedPriceItems.map((item) {
@@ -149,13 +147,13 @@ class InboundTransactionController extends GetxController with TErrorHandler {
     }
   }
 
-  // 🟢 2. XÁC NHẬN NHẬP KHO CHÍNH THỨC
+  // 2. XÁC NHẬN NHẬP KHO CHÍNH THỨC
   void _showConfirmImportDialog({required bool updatePrice}) {
     Get.dialog(
       TCustomDialogWidget(
         title: TTexts.confirmImportTitle.tr,
         description: TTexts.confirmImportDescription.tr,
-        icon: const Text('📦', style: TextStyle(fontSize: 40)), // 🟢 EMOJI ICON
+        icon: const Text('📦', style: TextStyle(fontSize: 40)), // EMOJI ICON
         primaryButtonText: TTexts.proceedImport.tr,
         onPrimaryPressed: () {
           Get.back();
@@ -168,7 +166,7 @@ class InboundTransactionController extends GetxController with TErrorHandler {
     );
   }
 
-  // 🟢 3. THỰC THI API CÓ BẪY LỖI
+  // 3. THỰC THI API CÓ BẪY LỖI
   Future<void> completeImport({required bool updatePrice}) async {
     try {
       FullScreenLoaderUtils.openLoadingDialog(TTexts.creatingImportTicket.tr);
@@ -216,7 +214,7 @@ class InboundTransactionController extends GetxController with TErrorHandler {
           note: finalNote,
         ));
 
-        // 🟢 NẾU CHỌN CẬP NHẬT GIÁ -> BẮN API ĐỔI IMPORT PRICE
+        // NẾU CHỌN CẬP NHẬT GIÁ -> BẮN API ĐỔI IMPORT PRICE
         if (updatePrice) {
           updateTasks.add(_provider
               .updateProductPackage(pkgId, {'importPrice': item.unitPrice}));

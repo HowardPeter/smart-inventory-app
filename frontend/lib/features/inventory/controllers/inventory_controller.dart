@@ -194,7 +194,7 @@ class InventoryController extends GetxController with TErrorHandler {
     }
 
     // =========================================================
-    // 🟢 ĐOẠN CẬP NHẬT: SẮP XẾP DANH MỤC THÔNG MINH
+    // ĐOẠN CẬP NHẬT: SẮP XẾP DANH MỤC THÔNG MINH
     // =========================================================
     tempCatStats.sort((a, b) {
       // 1. Tìm thông tin gốc từ danh sách `categories` để xem nó có phải là Mặc định (isDefault) không
