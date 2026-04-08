@@ -58,7 +58,9 @@ final Map<String, String> enProfile = {
   TTexts.editStoreAddress: 'Store Address',
   TTexts.editStoreAmountMember: 'Members',
   TTexts.editStoreBtnEdit: 'Edit',
-
+  TTexts.profileUpdateSuccess: 'Profile updated successfully',
+  TTexts.loadingTitle: 'Loading',
+  TTexts.editStoreCurrentStore: 'Current Store',
   //Assign Role
   TTexts.assignsRoleTitle: 'Assigns Role',
   TTexts.assignsRoleSubtitle: 'Manage user roles and permissions',

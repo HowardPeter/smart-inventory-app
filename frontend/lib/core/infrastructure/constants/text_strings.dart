@@ -650,6 +650,9 @@ class TTexts {
   static const String editStoreAddress = 'edit_store_address';
   static const String editStoreAmountMember = 'edit_store_amount_member';
   static const String editStoreBtnEdit = 'edit_store_btn_edit';
+  static const String profileUpdateSuccess = 'profile_update_success';
+  static const String loadingTitle = 'loading_title';
+  static const String editStoreCurrentStore = 'edit_store_current_store';
 
   // --Assigns role
   static const String assignsRoleTitle = 'assigns_role_title';

@@ -1,72 +1,85 @@
 import 'package:flutter/material.dart';
 import 'package:frontend/core/infrastructure/constants/text_strings.dart';
 import 'package:frontend/core/infrastructure/utils/full_screen_loader_utils.dart';
+import 'package:frontend/core/state/services/store_service.dart';
 import 'package:frontend/core/ui/widgets/t_snackbars_widget.dart';
+import 'package:frontend/features/profile/providers/profile_provider.dart';
 import 'package:get/get.dart';
 
 class ProfileEditStoreController extends GetxController {
-  //controller
-  final TextEditingController oldPasswordController = TextEditingController();
-  final TextEditingController newPasswordController = TextEditingController();
-  final TextEditingController confirmPasswordController =
-      TextEditingController();
+  static ProfileEditStoreController get instance => Get.find();
 
-  final RxBool isLoading = false.obs;
+  // Services & Providers
+  final _storeService = Get.find<StoreService>();
+  final _storeProvider = StoreProvider();
 
-// HANDLE CHANGE PASSWORD
-  Future<void> handleChangePassword() async {
-    final oldPass = oldPasswordController.text.trim();
-    final newPass = newPasswordController.text.trim();
-    final confirmPass = confirmPasswordController.text.trim();
+  // Controllers cho các ô nhập liệu (TextField)
+  final nameController = TextEditingController();
+  final addressController = TextEditingController();
+  final phoneController = TextEditingController();
 
-    // ===== VALIDATE =====
-    if (oldPass.isEmpty || newPass.isEmpty || confirmPass.isEmpty) {
-      TSnackbarsWidget.warning(
-        title: TTexts.loginErrorEmptyFieldsTitle.tr,
-        message: TTexts.loginErrorEmptyFieldsMessage.tr,
-      );
-      return;
-    }
+  // GlobalKey để validate Form
+  GlobalKey<FormState> editStoreFormKey = GlobalKey<FormState>();
 
-    if (newPass != confirmPass) {
-      TSnackbarsWidget.error(
-        title: "Error",
-        message: "Passwords do not match",
-      );
-      return;
-    }
+  @override
+  void onInit() {
+    super.onInit();
+    _initializeFields();
+  }
 
-    if (newPass.length < 6) {
-      TSnackbarsWidget.warning(
-        title: "Weak Password",
-        message: "Password must be at least 6 characters",
-      );
-      return;
-    }
+  /// Nạp dữ liệu cũ vào các ô nhập liệu khi vừa mở trang
+  void _initializeFields() {
+    nameController.text = _storeService.currentStoreName.value;
+    // Có thể nạp thêm các trường khác nếu StoreService có lưu
+    // addressController.text = _storeService.currentStoreAddress.value;
+  }
 
-    isLoading.value = true;
-    FullScreenLoaderUtils.openLoadingDialog("Updating password...");
-
+  /// Logic cập nhật thông tin cửa hàng
+  Future<void> updateStoreDetails() async {
     try {
-      // ===== MOCK API =====
-      await Future.delayed(const Duration(seconds: 1));
+      // 1. Kiểm tra Validate Form (ô trống, định dạng...)
+      if (!editStoreFormKey.currentState!.validate()) return;
 
+      // 2. Hiện Loading
+      FullScreenLoaderUtils.openLoadingDialog(TTexts.loadingTitle.tr);
+
+      // 3. Chuẩn bị dữ liệu gửi lên Backend
+      final String storeId = _storeService.currentStoreId.value;
+      final Map<String, dynamic> updateData = {
+        'name': nameController.text.trim(),
+        'address': addressController.text.trim(),
+        'phone': phoneController.text.trim(),
+      };
+
+      // 4. Gọi Provider để cập nhật vào Database
+      await _storeProvider.updateStore(storeId, updateData);
+
+      // 5. Cập nhật lại RAM (StoreService) để trang Profile & EditCard tự nhảy tên mới
+      _storeService.currentStoreName.value = nameController.text.trim();
+
+      // 6. Tắt Loading & Thông báo thành công
       FullScreenLoaderUtils.stopLoading();
-
       TSnackbarsWidget.success(
-        title: "Success",
-        message: "Password updated successfully",
+        title: TTexts.successTitle.tr,
+        message: TTexts.profileUpdateSuccess.tr,
       );
 
+      // 7. Quay lại trang trước
       Get.back();
     } catch (e) {
       FullScreenLoaderUtils.stopLoading();
       TSnackbarsWidget.error(
-        title: "Error",
+        title: TTexts.errorTitle.tr,
         message: e.toString(),
       );
-    } finally {
-      isLoading.value = false;
     }
+  }
+
+  @override
+  void onClose() {
+    nameController.dispose();
+    addressController.dispose();
+    phoneController.dispose();
+    super.onClose();
   }
 }
