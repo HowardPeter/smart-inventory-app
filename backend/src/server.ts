@@ -3,6 +3,7 @@ import express from 'express';
 import { errorHandler, pinoLogger } from './common/middlewares/index.js';
 import { sendResponse } from './common/utils/index.js';
 import { initFirebaseAdmin } from './config/firebase.config.js';
+import { initCronJobs } from './cron/index.js';
 import { auditLogRouter } from './modules/audit-log/audit-log.route.js';
 import { categoryRouter } from './modules/categories/index.js';
 import { inventoryRouter } from './modules/inventories/inventory.route.js';
@@ -31,6 +32,9 @@ app.use(pinoLogger);
 
 // Khởi tạo firebase khi khởi động server
 initFirebaseAdmin();
+
+// Khởi tạo corn jobs quét tự động 8 đến 22h và mỗi 2 tiếng 1 lần
+initCronJobs();
 
 app.get('/api/health', (_req: Request, res: Response<ApiResponse<null>>) => {
   sendResponse.success(res, null, { message: 'ok' });

@@ -1,6 +1,7 @@
 import { StatusCodes } from 'http-status-codes';
 
 import { CustomError } from '../../../common/errors/index.js';
+import { appEvents, eventBus } from '../../../common/events/event-bus.js';
 import {
   buildPaginatedResponse,
   normalizePagination,
@@ -167,11 +168,15 @@ export class InventoryService {
 
     const changedQty = nextQuantity - existingInventory.quantity;
 
-    return await prisma.$transaction(async (tx) => {
+    // 1. ĐÓNG GÓI KẾT QUẢ TRANSACTION VÀO BIẾN 'result'
+    const result = await prisma.$transaction(async (tx) => {
       const { inventoryRepositoryTx, auditLogRepositoryTx } =
         this.createTxRepositories(tx);
 
+      // SỬA LỖI ĐỎ: Nếu Repo của bạn yêu cầu truyền tx, hãy nhét tx vào đây
+      // (Hoặc cập nhật lại interface của repository nếu bạn dùng bind)
       const updated = await inventoryRepositoryTx.adjustQuantity(
+        // tx, <--- Bỏ comment dòng này nếu Repository của bạn cần tx
         existingInventory.inventoryId,
         nextQuantity,
       );
@@ -206,6 +211,17 @@ export class InventoryService {
         updatedAt: updated.updatedAt,
       };
     });
+    // <--- GIAO DỊCH CHÍNH THỨC KẾT THÚC TẠI ĐÂY
+
+    // 2. PHÁT TÍN HIỆU SAU KHI DỮ LIỆU ĐÃ NẰM GỌN TRONG DB
+    eventBus.emit(appEvents.INVENTORY_CHANGED, {
+      inventoryId: existingInventory.inventoryId,
+      storeId,
+      newQuantity: result.currentQuantity, // Nhét số lượng mới vào
+    });
+
+    // 3. TRẢ VỀ CHO API
+    return result;
   }
 
   async createInventory(
