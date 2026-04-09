@@ -22,6 +22,11 @@ export type ProductPackageResponseDto = Omit<
   > | null;
 };
 
+export type ProductPackageSimpleResponseDto = Pick<
+  ProductPackage,
+  'productPackageId' | 'displayName'
+>;
+
 export type ProductPackageResponseForTransaction = Pick<
   ProductPackage,
   'productPackageId' | 'displayName' | 'importPrice' | 'sellingPrice'

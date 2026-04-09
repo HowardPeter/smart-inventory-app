@@ -39,10 +39,11 @@ export class ProductService {
     auditLogRepositoryTx: new AuditLogRepository(db),
   });
 
-  private async checkProductExisted(
+  // public để product-package dùng
+  public async checkProductExisted(
     storeId: string,
     productId: string,
-  ): Promise<ProductSimpleResponseDto | null> {
+  ): Promise<ProductSimpleResponseDto> {
     const existingProduct = await this.productRepository.findOne(
       storeId,
       productId,
@@ -200,6 +201,55 @@ export class ProductService {
     return newProduct;
   }
 
+  // đồng bộ product-package display name khi update product name
+  async syncDisplayNameWithProductName(
+    storeId: string,
+    productId: string,
+    oldProductName: string,
+    newProductName: string,
+    db: DbClient,
+  ): Promise<{ productPackageId: string; displayName: string | null }[]> {
+    const { productPackageRepositoryTx: productPackageRepository } =
+      this.createTxRepositories(db);
+
+    const oldPackages =
+      await productPackageRepository.findManyByProductIdForNameSync(
+        storeId,
+        productId,
+      );
+
+    const updatedPackages: {
+      productPackageId: string;
+      displayName: string | null;
+    }[] = [];
+
+    for (const item of oldPackages) {
+      const currentDisplayName = item.displayName;
+
+      if (!currentDisplayName) {
+        throw new CustomError({
+          message: 'Product package displayName not found',
+          status: StatusCodes.BAD_REQUEST,
+        });
+      }
+
+      const newDisplayName = currentDisplayName.replace(
+        oldProductName,
+        newProductName,
+      );
+
+      const updated =
+        await productPackageRepository.updateDisplayNameWithProduct(
+          item.productPackageId,
+          newDisplayName,
+        );
+
+      updatedPackages.push(updated);
+    }
+
+    return updatedPackages;
+  }
+
   async updateProduct(
     storeId: string,
     userId: string,
@@ -228,6 +278,20 @@ export class ProductService {
 
       const product = await productRepositoryTx.updateOne(productId, data);
 
+      let syncedPackagesCount = 0;
+
+      if (data.name !== undefined && data.name !== existingProduct.name) {
+        const syncedPackages = await this.syncDisplayNameWithProductName(
+          storeId,
+          productId,
+          existingProduct.name,
+          data.name,
+          tx,
+        );
+
+        syncedPackagesCount = syncedPackages.length;
+      }
+
       // chỉ log khi có thay đổi thực sự
       if (Object.keys(newValue).length > 0) {
         await auditLogRepositoryTx.createLog({
@@ -235,7 +299,10 @@ export class ProductService {
           entityType: 'Product',
           userId,
           storeId,
-          note: null,
+          note:
+            syncedPackagesCount > 0
+              ? `Synced ${syncedPackagesCount} product package display names`
+              : null,
           oldValue: oldValue as Prisma.InputJsonObject,
           newValue: newValue as Prisma.InputJsonObject,
         });

@@ -75,7 +75,8 @@ export class ProductPackageService {
     storeId: string,
     productId: string,
   ): Promise<ProductPackageResponseDto[]> {
-    await productService.getProductById(storeId, productId);
+    // check product tồn tại
+    await productService.checkProductExisted(storeId, productId);
 
     return await this.productPackageRepository.findManyByProductId(
       storeId,
@@ -104,7 +105,8 @@ export class ProductPackageService {
     storeId: string,
     productIds: string[],
   ): Promise<string[]> {
-    return await this.productPackageRepository.findProductIdsHavingActivePackages(
+    return await this.productPackageRepository
+    .findProductIdsHavingActivePackages(
       storeId,
       productIds,
     );
