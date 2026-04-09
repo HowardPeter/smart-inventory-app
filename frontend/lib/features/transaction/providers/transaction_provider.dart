@@ -10,7 +10,7 @@ class TransactionProvider {
     return true;
   }
 
-  // 🟢 MOCK: LẤY CÁC GIAO DỊCH NHẬP KHO (INBOUND) CŨ LÀM LÔ HÀNG (FIFO)
+  // MOCK: LẤY CÁC GIAO DỊCH NHẬP KHO (INBOUND) CŨ LÀM LÔ HÀNG (FIFO)
   Future<List<TransactionModel>> getInboundTransactionsForPackage(
       String packageId) async {
     await Future.delayed(const Duration(milliseconds: 300));
@@ -51,7 +51,7 @@ class TransactionProvider {
           items: [
             TransactionDetailModel(
                 productPackageId: packageId, quantity: 0, unitPrice: 6.0)
-          ], // 🟢 Lô hết hàng
+          ], // Lô hết hàng
         ),
         TransactionModel(
           transactionId: "tx-inbound-004",

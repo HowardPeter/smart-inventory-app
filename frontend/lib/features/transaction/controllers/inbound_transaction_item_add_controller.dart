@@ -75,7 +75,7 @@ class InboundTransactionItemAddController extends GetxController
     return TTexts.uncategorized.tr;
   }
 
-  // 🟢 CÁC HÀM UI CỦA PRODUCT INFO BỊ THIẾU ĐÃ ĐƯỢC BỔ SUNG
+  // CÁC HÀM UI CỦA PRODUCT INFO BỊ THIẾU ĐÃ ĐƯỢC BỔ SUNG
   String get healthStatusText {
     if (currentStock <= 0) return TTexts.statusOut.tr;
     if (currentStock <= threshold) return TTexts.statusLow.tr;

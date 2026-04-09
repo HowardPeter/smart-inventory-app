@@ -137,7 +137,7 @@ class _InventoryProductPackageUnitDropdownWidgetState
                                   onTap: () {
                                     controller.selectedUnitId.value =
                                         unit.unitId;
-                                    // 🟢 CHỈ CẦN GÁN TEXT LÀ XONG, LISTENER SẼ LÀM VIỆC CÒN LẠI
+                                    // CHỈ CẦN GÁN TEXT LÀ XONG, LISTENER SẼ LÀM VIỆC CÒN LẠI
                                     controller.unitNameController.text =
                                         unit.name;
                                     _closeDropdown();
@@ -160,7 +160,7 @@ class _InventoryProductPackageUnitDropdownWidgetState
                                                 fontFamily: 'Poppins',
                                                 fontSize: 12,
                                                 color: AppColors
-                                                    .subText, // 🟢 ĐỔI SANG MÀU XÁM THEO Ý BẠN
+                                                    .subText, // ĐỔI SANG MÀU XÁM THEO Ý BẠN
                                                 fontWeight: FontWeight.w500)),
                                       ],
                                     ),

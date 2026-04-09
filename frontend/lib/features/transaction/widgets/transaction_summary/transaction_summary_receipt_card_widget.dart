@@ -28,7 +28,7 @@ class TransactionSummaryReceiptCardWidget
         children: [
           _buildRow(
             TTexts.transactionNumber.tr,
-            // 🟢 THAY TEXT CỨNG N/A
+            // THAY TEXT CỨNG N/A
             controller.transaction.transactionId ?? TTexts.na.tr,
             rightWidget: _buildFakeBarcode(),
           ),

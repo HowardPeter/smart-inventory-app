@@ -39,6 +39,9 @@ import 'package:frontend/features/profile/views/profile_change_password_view.dar
 import 'package:frontend/features/profile/views/profile_edit_store_view.dart';
 import 'package:frontend/features/profile/views/profile_edit_view.dart';
 import 'package:frontend/features/profile/views/profile_view.dart';
+import 'package:frontend/features/report/bindings/report_transaction_detail_binding.dart';
+import 'package:frontend/features/report/views/platform/report_transaction_detail_mobile_view.dart';
+import 'package:frontend/features/report/views/report_view.dart';
 import 'package:frontend/features/search/bindings/search_binding.dart';
 import 'package:frontend/features/search/views/search_view.dart';
 import 'package:frontend/features/transaction/bindings/inbound_transaction_binding.dart';
@@ -315,6 +318,19 @@ class AppPages {
       name: AppRoutes.transactionSummary,
       page: () => const TransactionSummaryView(),
       binding: TransactionSummaryBinding(),
+      transition: Transition.cupertino,
+    ),
+
+    // -- Report
+    GetPage(
+      name: AppRoutes.report,
+      page: () => const ReportView(),
+    ),
+
+    GetPage(
+      name: AppRoutes.transactionDetail,
+      page: () => const ReportTransactionDetailView(),
+      binding: ReportTransactionDetailBinding(),
       transition: Transition.cupertino,
     ),
 

@@ -42,7 +42,7 @@ class OutboundTransactionItemAddMobileView
                   const TransactionProductInfoWidget(),
                   const _Divider(),
 
-                  // 🟢 UI CHỌN NHIỀU LÔ HÀNG (Y HỆT FIGMA)
+                  // UI CHỌN NHIỀU LÔ HÀNG (Y HỆT FIGMA)
                   Obx(() => TransactionBatchSelectorWidget(
                         inboundTransactions:
                             controller.availableInboundTxs.toList(),
@@ -89,7 +89,7 @@ class OutboundTransactionItemAddMobileView
 
                   const _Divider(),
 
-                  // 🟢 HIỂN THỊ TỔNG SỐ LƯỢNG LẤY TỪ CÁC LÔ VÀ TỔNG TIỀN
+                  // HIỂN THỊ TỔNG SỐ LƯỢNG LẤY TỪ CÁC LÔ VÀ TỔNG TIỀN
                   Padding(
                     padding:
                         const EdgeInsets.symmetric(horizontal: AppSizes.p20),

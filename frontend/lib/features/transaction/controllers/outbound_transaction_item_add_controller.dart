@@ -117,7 +117,7 @@ class OutboundTransactionItemAddController extends GetxController
     }
   }
 
-  // 🟢 HÀM NÀY ĐÃ ĐƯỢC FIX LỖI "CỨNG ĐƠ" UI
+  // HÀM NÀY ĐÃ ĐƯỢC FIX LỖI "CỨNG ĐƠ" UI
   void updateBatchQty(String batchId, int newQty, int maxStock) {
     if (newQty < 0) newQty = 0;
     if (newQty > maxStock) {
@@ -128,7 +128,7 @@ class OutboundTransactionItemAddController extends GetxController
 
     selectedBatchesQty[batchId] = newQty;
 
-    // 🟢 DÒNG CỐT LÕI: Đánh thức GetX render lại UI cho RxMap
+    // DÒNG CỐT LÕI: Đánh thức GetX render lại UI cho RxMap
     selectedBatchesQty.refresh();
 
     _calculateSubtotal();
@@ -141,7 +141,7 @@ class OutboundTransactionItemAddController extends GetxController
       if (totalQty <= 0) {
         TSnackbarsWidget.warning(
             title: TTexts.warningTitle.tr,
-            message: TTexts.specifyBatchQuantity.tr); // 🟢 Sửa text cứng
+            message: TTexts.specifyBatchQuantity.tr); // Sửa text cứng
         return;
       }
 

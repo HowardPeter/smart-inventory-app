@@ -31,7 +31,7 @@ class StockAdjustmentItemHeaderWidget extends StatelessWidget {
           ],
         ),
         const SizedBox(height: 12),
-        // 🟢 CARD SẢN PHẨM RIÊNG BIỆT
+        // CARD SẢN PHẨM RIÊNG BIỆT
         Container(
           padding: const EdgeInsets.all(16),
           decoration: BoxDecoration(

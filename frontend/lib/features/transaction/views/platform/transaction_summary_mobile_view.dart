@@ -21,7 +21,7 @@ class TransactionSummaryMobileView
 
     return Scaffold(
       backgroundColor: AppColors.background,
-      // 🟢 KÍCH HOẠT HIỆU ỨNG BLUR CHO APPBAR
+      // KÍCH HOẠT HIỆU ỨNG BLUR CHO APPBAR
       extendBodyBehindAppBar: true,
       appBar: TAppBarWidget(
         title: TTexts.transactionCompletedTitle.tr,
@@ -34,13 +34,13 @@ class TransactionSummaryMobileView
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.center,
           children: [
-            // 🟢 HÌNH ẢNH NHỎ LẠI NHƯ YÊU CẦU
+            // HÌNH ẢNH NHỎ LẠI NHƯ YÊU CẦU
             Image.asset(TImages.coreImages.successTransaction,
                 width: 160, height: 160),
 
             const SizedBox(height: 16),
 
-            // 🟢 TEXT SUCCESS MỎNG LẠI (w500 thay vì bold)
+            // TEXT SUCCESS MỎNG LẠI (w500 thay vì bold)
             Text(
               TTexts.transactionSuccessTitle.tr,
               style: const TextStyle(

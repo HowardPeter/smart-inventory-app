@@ -4,7 +4,7 @@ import 'package:frontend/core/ui/theme/app_colors.dart';
 import 'package:frontend/core/ui/theme/app_sizes.dart';
 import 'package:frontend/core/ui/widgets/t_app_bar_widget.dart';
 import 'package:frontend/core/ui/widgets/t_editable_search_bar_widget.dart';
-// 🟢 IMPORT TEMPTYSTATEWIDGET
+// IMPORT TEMPTYSTATEWIDGET
 import 'package:frontend/core/ui/widgets/t_empty_state_widget.dart';
 import 'package:frontend/features/transaction/controllers/stock_adjustment_controller.dart';
 import 'package:frontend/features/transaction/widgets/stock_adjustment/stock_adjustment_fab_widget.dart';
@@ -62,7 +62,7 @@ class StockAdjustmentMobileView extends GetView<StockAdjustmentController> {
                 ),
                 Expanded(
                   child: Obx(() {
-                    // 🟢 THAY THẾ BẰNG EMPTY STATE WIDGET
+                    // THAY THẾ BẰNG EMPTY STATE WIDGET
                     if (controller.filteredItems.isEmpty) {
                       return SingleChildScrollView(
                         physics: const BouncingScrollPhysics(),
