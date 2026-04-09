@@ -9,6 +9,7 @@ export type AuditLog = {
   eventId: string;
   actionType: AuditActionType | null;
   entityType: string | null;
+  entityId: string | null;
   oldValue: Prisma.JsonValue | null;
   newValue: Prisma.JsonValue | null;
   performedAt: Date;

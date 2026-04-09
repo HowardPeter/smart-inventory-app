@@ -121,6 +121,7 @@ export class InventoryService {
       await auditLogRepositoryTx.createLog({
         actionType: 'update',
         entityType: 'Inventory',
+        entityId: existingInventory.inventoryId,
         userId,
         storeId,
         oldValue: {
@@ -178,6 +179,7 @@ export class InventoryService {
       await auditLogRepositoryTx.createLog({
         actionType: 'update',
         entityType: 'Inventory',
+        entityId: existingInventory.inventoryId,
         userId,
         storeId,
         note: data.note ?? null,
@@ -254,6 +256,7 @@ export class InventoryService {
           await auditLogRepositoryTx.createLog({
             actionType: 'create',
             entityType: 'Inventory',
+            entityId: restored.inventoryId,
             userId,
             storeId,
             oldValue: { activeStatus: 'inactive' } as Prisma.InputJsonObject,
@@ -275,6 +278,7 @@ export class InventoryService {
       await auditLogRepositoryTx.createLog({
         actionType: 'create',
         entityType: 'Inventory',
+        entityId: created.inventoryId,
         userId,
         storeId,
         oldValue: null,
@@ -367,6 +371,7 @@ export class InventoryService {
             await auditLogRepositoryTx.createLog({
               actionType: 'update',
               entityType: 'Inventory',
+              entityId: item.inventoryId,
               userId,
               storeId,
               note: null,
@@ -408,6 +413,7 @@ export class InventoryService {
             await auditLogRepositoryTx.createLog({
               actionType: 'update',
               entityType: 'Inventory',
+              entityId: item.inventoryId,
               userId,
               storeId,
               note: 'export transaction',
@@ -455,6 +461,7 @@ export class InventoryService {
       await auditLogRepositoryTx.createLog({
         actionType: 'delete',
         entityType: 'Inventory',
+        entityId: existingInventory.inventoryId,
         userId,
         storeId,
         oldValue: { activeStatus: 'active' } as Prisma.InputJsonObject,

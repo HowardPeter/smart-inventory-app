@@ -16,7 +16,7 @@ export class UserProfileService {
     authUserId: string,
     payload: CreateUserProfileDto,
   ): Promise<UserProfileResponseDto> {
-    // 🔥 check tồn tại
+    // check tồn tại
     const existing =
       await this.userProfileRepository.findByAuthUserId(authUserId);
 
@@ -24,7 +24,7 @@ export class UserProfileService {
       return existing;
     }
 
-    // 🔥 create mới
+    // create mới
     return await this.userProfileRepository.createOne(authUserId, payload);
   }
 
