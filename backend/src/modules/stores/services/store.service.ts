@@ -1,6 +1,7 @@
 import { StatusCodes } from 'http-status-codes';
 
 import { CustomError } from '../../../common/errors/index.js';
+import { generateFormattedInviteCode } from '../../../common/utils/index.js';
 import { prisma } from '../../../db/prismaClient.js'; // gọi prisma để dùng cơ chế $transaction
 import { StoreMemberRepository } from '../repositories/store-member.repository.js';
 import { StoreRepository } from '../repositories/store.repository.js';
@@ -81,9 +82,12 @@ export class StoreService {
       const storeRepositoryTx = new StoreRepository(tx);
       const storeMemberRepositoryTx = new StoreMemberRepository(tx);
 
+      const newInviteCode = generateFormattedInviteCode();
+
       const createdStore = await storeRepositoryTx.createOne({
         ...data,
         userId,
+        inviteCode: newInviteCode,
       });
 
       // gán role manager cho user khi tạo store thành công

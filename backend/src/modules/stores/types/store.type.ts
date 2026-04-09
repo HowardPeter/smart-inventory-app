@@ -5,6 +5,7 @@ export type Store = {
   address: string | null;
   timezone: string | null;
   name: string | null;
+  inviteCode: string | null;
   createdAt: Date;
   updatedAt: Date;
   activeStatus: ActiveStatus;
