@@ -2,6 +2,7 @@ import {
   normalizePagination,
   buildPaginatedResponse,
 } from '../../common/utils/index.js';
+import { StorageService } from '../../common/utils/index.js';
 
 import type {
   SearchByKeywordQueryDto,
@@ -42,13 +43,44 @@ export class SearchService {
         ...normalizedPagination,
       });
 
-    return buildPaginatedResponse(items, totalItems, normalizedPagination);
+    // Tạo Signed URL cho danh sách sản phẩm
+    const itemsWithSignedUrls = await Promise.all(
+      items.map(async (item) => ({
+        ...item,
+        imageUrl: await StorageService.getSignedUrl(
+          process.env.STORAGE_BUCKET ?? 'images',
+          item.imageUrl,
+        ),
+      })),
+    );
+
+    return buildPaginatedResponse(
+      itemsWithSignedUrls,
+      totalItems,
+      normalizedPagination,
+    );
   }
 
   async searchProductsByPrefix(
     storeId: string,
     query: SearchByPrefixQueryDto,
   ): Promise<SearchProductPrefixResponseDto[]> {
-    return await this.searchRepository.searchProductsByPrefix(storeId, query);
+    const result = await this.searchRepository.searchProductsByPrefix(
+      storeId,
+      query,
+    );
+
+    // Tạo Signed URL cho danh sách sản phẩm
+    const resultWithSignedUrls = await Promise.all(
+      result.map(async (item) => ({
+        ...item,
+        imageUrl: await StorageService.getSignedUrl(
+          process.env.STORAGE_BUCKET ?? 'images',
+          item.imageUrl,
+        ),
+      })),
+    );
+
+    return resultWithSignedUrls;
   }
 }

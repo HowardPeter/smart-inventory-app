@@ -85,5 +85,5 @@ export type ListProductByKeywordResponseDto =
 
 export type SearchProductPrefixResponseDto = Pick<
   Product,
-  'productId' | 'name' | 'brand'
+  'productId' | 'name' | 'brand' | 'imageUrl'
 >;
