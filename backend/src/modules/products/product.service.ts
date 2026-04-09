@@ -3,7 +3,7 @@ import { StatusCodes } from 'http-status-codes';
 
 import { ProductRepository } from './product.repository.js';
 import { CustomError } from '../../common/errors/index.js';
-import { StorageService } from '../../common/services/storage.service.js';
+import { StorageService } from '../../common/utils/get-signed-url.util.js';
 import {
   normalizePagination,
   buildPaginatedResponse,
