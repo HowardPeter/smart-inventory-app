@@ -149,34 +149,31 @@ export class InventoryService {
       productPackageId,
     );
 
-    let nextQuantity = existingInventory.quantity;
-
-    if (data.type === 'set') {
-      nextQuantity = data.quantity;
-    } else if (data.type === 'increase') {
-      nextQuantity = existingInventory.quantity + data.quantity;
-    } else if (data.type === 'decrease') {
-      nextQuantity = existingInventory.quantity - data.quantity;
-    }
-
-    if (nextQuantity < 0) {
+    // Bẫy an toàn bổ sung:
+    // Kiểm tra số lượng giảm không được vượt quá số lượng đang có
+    if (
+      data.type === 'decrease' &&
+      existingInventory.quantity < data.quantity
+    ) {
       throw new CustomError({
-        message: 'Inventory quantity cannot be negative',
+        message: 'Số lượng giảm không được lớn hơn số lượng tồn kho hiện tại',
         status: StatusCodes.BAD_REQUEST,
       });
     }
 
-    const changedQty = nextQuantity - existingInventory.quantity;
-
-    // 1. ĐÓNG GÓI KẾT QUẢ TRANSACTION VÀO BIẾN 'result'
     const result = await prisma.$transaction(async (tx) => {
       const { inventoryRepositoryTx, auditLogRepositoryTx } =
         this.createTxRepositories(tx);
 
+      // Gọi Repository bằng hàm Atomic mới
       const updated = await inventoryRepositoryTx.adjustQuantity(
         existingInventory.inventoryId,
-        nextQuantity,
+        data.type,
+        data.quantity,
       );
+
+      // Tính toán lượng thay đổi cho Audit Log
+      const changedQty = updated.quantity - existingInventory.quantity;
 
       await auditLogRepositoryTx.createLog({
         actionType: 'update',
@@ -209,14 +206,16 @@ export class InventoryService {
       };
     });
 
-    // 2. PHÁT TÍN HIỆU SAU KHI DỮ LIỆU ĐÃ NẰM GỌN TRONG DB
+    // PHÁT TÍN HIỆU NGAY BÊN NGOÀI TRANSACTION (ĐÃ BỔ SUNG OLD_QUANTITY)
     eventBus.emit(appEvents.INVENTORY_CHANGED, {
       inventoryId: existingInventory.inventoryId,
       storeId,
-      newQuantity: result.currentQuantity, // Nhét số lượng mới vào
+      oldQuantity: result.previousQuantity,
+      // 👉 Truyền số lượng cũ để check lọc SPAM
+      newQuantity: result.currentQuantity,
+      // 👉 Truyền số lượng mới
     });
 
-    // 3. TRẢ VỀ CHO API
     return result;
   }
 
@@ -325,6 +324,14 @@ export class InventoryService {
         // map để lấy list productPackageId từ items
         items.map((item) => item.productPackageId),
       );
+
+    if (inventoryRecords.length !== items.length) {
+      throw new CustomError({
+        message:
+          'Một hoặc nhiều sản phẩm không tồn tại trong kho hoặc đã bị vô hiệu hóa!',
+        status: StatusCodes.BAD_REQUEST,
+      });
+    }
 
     // Tạo Map để lookup inventory theo productPackageId (O(1))
     const inventoryMap = new Map(

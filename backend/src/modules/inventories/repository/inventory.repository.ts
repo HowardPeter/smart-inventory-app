@@ -323,11 +323,22 @@ export class InventoryRepository {
 
   async adjustQuantity(
     inventoryId: string,
-    nextQuantity: number,
+    type: 'set' | 'increase' | 'decrease',
+    quantityValue: number,
   ): Promise<InventoryDetailResponseDto> {
+    let updateData: Prisma.InventoryUpdateInput = {};
+
+    if (type === 'set') {
+      updateData = { quantity: quantityValue };
+    } else if (type === 'increase') {
+      updateData = { quantity: { increment: quantityValue } };
+    } else if (type === 'decrease') {
+      updateData = { quantity: { decrement: quantityValue } };
+    }
+
     const inventory = await this.prisma.inventory.update({
       where: { inventoryId },
-      data: { quantity: nextQuantity },
+      data: updateData,
       select: inventorySelect,
     });
 
