@@ -12,30 +12,35 @@ export class SmartAlertService {
   private initEventListeners() {
     eventBus.on(
       appEvents.INVENTORY_CHANGED,
-      (payload: { inventoryId: string; storeId: string }) => {
-        this.checkLowStockRule(payload.inventoryId, payload.storeId).catch(
-          (err) => console.error('Lỗi khi check rules:', err),
-        );
+      (payload: {
+        inventoryId: string;
+        storeId: string;
+        oldQuantity?: number; // <--- Đón nhận thêm oldQuantity
+        newQuantity?: number;
+      }) => {
+        this.checkLowStockRule(
+          payload.inventoryId,
+          payload.storeId,
+          payload.newQuantity,
+          payload.oldQuantity, // <--- Truyền xuống hàm check
+        ).catch((err) => console.error('Lỗi khi check rules:', err));
       },
     );
   }
 
-  // 2. LOGIC KIỂM TRA DÙNG CHUNG (TÁI SỬ DỤNG)
+  // 2. LOGIC KIỂM TRA CHỐNG SPAM & GỬI ĐÚNG NGƯỜI
   public async checkLowStockRule(
     inventoryId: string,
     providedStoreId?: string,
+    newQuantity?: number,
+    oldQuantity?: number, // <--- Nhận tham số mới
   ) {
     const inventory = await prisma.inventory.findUnique({
       where: { inventoryId: inventoryId },
       include: {
-        // Dò theo đúng chuỗi: Inventory -> ProductPackage -> Product -> Store
         productPackage: {
           include: {
-            product: {
-              include: {
-                store: true, // Tới đây mới lấy được thông tin Store và Owner
-              },
-            },
+            product: true,
           },
         },
       },
@@ -46,34 +51,75 @@ export class SmartAlertService {
     }
 
     const threshold = inventory.reorderThreshold ?? 0;
+    const currentQty = newQuantity ?? inventory.quantity;
 
-    // RULE: Nếu số lượng hiện tại <= ngưỡng an toàn
-    if (inventory.quantity <= threshold) {
-      const product = inventory.productPackage?.product;
-      const productName = product?.name ?? 'Sản phẩm';
+    // ==========================================
+    // 🛡️ LỚP BẢO VỆ 1: LỌC SPAM (EDGE TRIGGER)
+    // ==========================================
+    if (oldQuantity !== undefined) {
+      // Dành cho Real-time: Chỉ báo động khi VỪA RỚT QUA NGƯỠNG
+      const isSafe = oldQuantity > threshold;
+      const isNowLow = currentQty <= threshold;
 
-      // Lấy storeId (ưu tiên cái truyền vào, nếu không có thì lấy từ DB)
-      const storeId = providedStoreId || product?.storeId;
-      // Lấy userId của chủ cửa hàng từ bảng Store
-      const ownerId = product?.store?.userId;
-
-      if (!storeId || !ownerId) {
+      // Nếu trước đó đã thấp sẵn rồi (isSafe = false)
+      // thì KHÔNG gửi nữa (Chống Spam)
+      if (!(isSafe && isNowLow)) {
         return;
-      } // Bảo vệ an toàn tránh lỗi null
-
-      await this.notificationService.createAndSendNotification(
-        ownerId, // Gửi cho người tạo cửa hàng
-        storeId,
-        '⚠️ Tồn kho ở mức báo động',
-        `${productName} chỉ còn ${inventory.quantity} đơn vị. Hãy nhập thêm!`,
-        'LOW_STOCK',
-        inventory.productPackageId,
-        // Trỏ về gói sản phẩm để app mở đúng màn hình
-      );
+      }
+    } else {
+      // Dành cho Cron Job (quét tự động không có oldQuantity):
+      // Lấy tất cả kho <= ngưỡng
+      if (currentQty > threshold) {
+        return;
+      }
     }
+
+    // Lấy storeId
+    const storeId =
+      providedStoreId || inventory.productPackage?.product?.storeId;
+
+    if (!storeId) {
+      return;
+    }
+
+    // ==========================================
+    // 🎯 LỚP BẢO VỆ 2: TÌM ĐÚNG NGƯỜI NHẬN
+    // ==========================================
+    // Lấy danh sách Chủ và Quản lý của cửa hàng này
+    const targetMembers = await prisma.storeMember.findMany({
+      where: {
+        storeId: storeId,
+        role: { in: ['owner', 'manager'] }, // Chỉ lấy Owner và Manager
+        activeStatus: 'active',
+      },
+      select: { userId: true },
+    });
+
+    if (targetMembers.length === 0) {
+      return;
+    }
+
+    const productName = inventory.productPackage?.product?.name ?? 'Sản phẩm';
+
+    // ==========================================
+    // 🚀 BẮN THÔNG BÁO CHO TOÀN BỘ BAN QUẢN LÝ
+    // ==========================================
+    // Dùng Promise.all để gửi đồng loạt không bị nghẽn
+    await Promise.all(
+      targetMembers.map((member) =>
+        this.notificationService.createAndSendNotification(
+          member.userId,
+          storeId,
+          '⚠️ Tồn kho ở mức báo động',
+          `${productName} chỉ còn ${currentQty} đơn vị. Hãy nhập thêm!`,
+          'LOW_STOCK',
+          inventory.productPackageId,
+        ),
+      ),
+    );
   }
 
-  // 3. HÀM DÀNH CHO CRON JOB QUÉT ĐỊNH KỲ
+  // 3. HÀM DÀNH CHO CRON JOB QUÉT ĐỊNH KỲ (Giữ nguyên như của bạn)
   public async scanAllStoresForLowStock() {
     console.info('[Cron] Đang quét toàn hệ thống tìm hàng tồn kho thấp...');
 
@@ -84,12 +130,7 @@ export class SmartAlertService {
         activeStatus: 'active',
       },
       include: {
-        // Include để lấy storeId truyền vào hàm check
-        productPackage: {
-          include: {
-            product: true,
-          },
-        },
+        productPackage: { include: { product: true } },
       },
     });
 
@@ -102,9 +143,7 @@ export class SmartAlertService {
     }
   }
 }
-// KHỞI TẠO INSTANCE ĐỂ EXPORT DÙNG CHUNG CHO CRON JOB VÀ CÁC MODULE KHÁC
-// (Lưu ý: Bạn cần import notificationRepository vào đây hoặc
-// quản lý qua Dependency Injection của project)
+
 export const smartAlertService = new SmartAlertService(
   new NotificationService(new NotificationRepository()),
 );

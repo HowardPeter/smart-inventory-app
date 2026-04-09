@@ -173,10 +173,7 @@ export class InventoryService {
       const { inventoryRepositoryTx, auditLogRepositoryTx } =
         this.createTxRepositories(tx);
 
-      // SỬA LỖI ĐỎ: Nếu Repo của bạn yêu cầu truyền tx, hãy nhét tx vào đây
-      // (Hoặc cập nhật lại interface của repository nếu bạn dùng bind)
       const updated = await inventoryRepositoryTx.adjustQuantity(
-        // tx, <--- Bỏ comment dòng này nếu Repository của bạn cần tx
         existingInventory.inventoryId,
         nextQuantity,
       );
@@ -211,7 +208,6 @@ export class InventoryService {
         updatedAt: updated.updatedAt,
       };
     });
-    // <--- GIAO DỊCH CHÍNH THỨC KẾT THÚC TẠI ĐÂY
 
     // 2. PHÁT TÍN HIỆU SAU KHI DỮ LIỆU ĐÃ NẰM GỌN TRONG DB
     eventBus.emit(appEvents.INVENTORY_CHANGED, {
@@ -373,6 +369,7 @@ export class InventoryService {
       };
     });
 
+    // 1. CHẠY GIAO DỊCH DATABASE (TRANSACTION)
     await prisma.$transaction(async (tx) => {
       const { inventoryRepositoryTx, auditLogRepositoryTx } =
         this.createTxRepositories(tx);
@@ -455,7 +452,22 @@ export class InventoryService {
             status: StatusCodes.BAD_REQUEST,
           });
       }
-    });
+    }); // <--- TRANSACTION THỰC SỰ KẾT THÚC TẠI ĐÂY
+
+    // 2. PHÁT TÍN HIỆU NGAY TẠI ĐÂY (HOÀN TOÀN BÊN NGOÀI TRANSACTION)
+    // Đảm bảo dữ liệu đã được lưu thành công vào DB mới phát tín hiệu
+    for (const item of inventoryItems) {
+      const newQuantity =
+        transactionType === 'import'
+          ? item.quantity + item.transactionQuantity
+          : item.quantity - item.transactionQuantity;
+
+      eventBus.emit(appEvents.INVENTORY_CHANGED, {
+        inventoryId: item.inventoryId,
+        storeId,
+        newQuantity: newQuantity, // Gửi luôn số lượng mới đã tính toán
+      });
+    }
   }
 
   async deleteInventory(
