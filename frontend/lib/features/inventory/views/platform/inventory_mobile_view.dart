@@ -27,18 +27,14 @@ class InventoryMobileView extends GetView<InventoryController> {
     return Scaffold(
       backgroundColor: AppColors.background,
       body: SafeArea(
-        // ĐẶT REFRESH INDICATOR NGOÀI CÙNG ĐỂ LUÔN LẮNG NGHE LỆNH VUỐT
         child: TRefreshIndicatorWidget(
           onRefresh: () => controller.fetchDashboardData(isRefresh: true),
           child: Obx(() {
-            // KIỂM TRA TRẠNG THÁI LOADING ĐỂ HIỆN SHIMMER
             if (controller.isLoading.value) {
               return const InventoryDashboardShimmerWidget();
             }
 
-            // GIAO DIỆN CHÍNH KHI ĐÃ CÓ DATA
             return SingleChildScrollView(
-              // physics Always giúp RefreshIndicator luôn hoạt động kể cả khi nội dung ngắn
               physics: const AlwaysScrollableScrollPhysics(
                   parent: BouncingScrollPhysics()),
               child: Column(

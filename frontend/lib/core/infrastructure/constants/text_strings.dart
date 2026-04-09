@@ -273,6 +273,7 @@ class TTexts {
   static const String addMembersSubtitle = "add_members_subtitle";
   static const String membersCount = "members_count";
   static const String roleManager = "role_manager";
+  static const String roleOwner = "role_owner";
   static const String roleStaff = "role_staff";
   static const String youBadge = "you_badge";
   static const String generateInviteCodeBtn = "generate_invite_code_btn";
@@ -288,6 +289,7 @@ class TTexts {
   static const String emptyMemberSubtitle = "empty_member_subtitle";
 
   // -- Home
+  static const String homeRoleOwnerTooltip = "home_role_owner_tooltip";
   static const String homeRoleManagerTooltip = "home_role_manager_tooltip";
   static const String homeRoleStaffTooltip = "home_role_staff_tooltip";
   static const String goodMorning = "goodMorning";

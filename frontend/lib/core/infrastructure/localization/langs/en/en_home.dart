@@ -2,6 +2,7 @@ import 'package:frontend/core/infrastructure/constants/text_strings.dart';
 
 final Map<String, String> enHome = {
   // Tooltip
+  TTexts.homeRoleOwnerTooltip: 'Owner Access',
   TTexts.homeRoleManagerTooltip: 'Manager Access',
   TTexts.homeRoleStaffTooltip: 'Staff Access',
 

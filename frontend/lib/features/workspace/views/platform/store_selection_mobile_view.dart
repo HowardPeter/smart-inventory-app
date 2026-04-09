@@ -75,29 +75,37 @@ class StoreSelectionMobileView extends GetView<StoreSelectionController> {
                       );
                     }
 
-                    // Render danh sách thẻ dựa trên data thật
                     return Column(
                       children: [
                         ...controller.stores.map((store) {
-                          final isManager =
-                              store.role.toLowerCase() == 'manager';
+                          final roleLowerCase = store.role.toLowerCase();
+
+                          String roleText = TTexts.roleStaff.tr;
+                          IconData roleIcon = Iconsax.user_octagon_copy;
+                          Color roleColor = AppColors.toastSuccessGradientStart;
+
+                          if (roleLowerCase == 'owner') {
+                            roleText = TTexts.roleOwner.tr;
+                            roleIcon = Iconsax.crown_1_copy;
+                            roleColor = AppColors.primary;
+                          } else if (roleLowerCase == 'manager') {
+                            roleText = TTexts.roleManager.tr;
+                            roleIcon = Iconsax.security_user_copy;
+                            roleColor = AppColors.toastWarningGradientEnd;
+                          }
 
                           return StoreSelectionCardWidget(
                             title: store.name,
-                            role: isManager ? 'Manager' : 'Staff',
-                            icon: isManager
-                                ? Iconsax.crown_1_copy
-                                : Iconsax.user_octagon_copy,
-                            iconColor: isManager
-                                ? AppColors.toastWarningGradientEnd
-                                : AppColors.toastSuccessGradientStart,
+                            role: roleText,
+                            icon: roleIcon,
+                            iconColor: roleColor,
                             onTap: () => controller.selectStore(store),
                           );
                         }),
 
                         const SizedBox(height: AppSizes.p8),
 
-                        // Thẻ Request Access (Giữ nguyên không đổi)
+                        // --- THẺ REQUEST ACCESS ---
                         Material(
                           color: AppColors.surface,
                           borderRadius:
@@ -158,7 +166,7 @@ class StoreSelectionMobileView extends GetView<StoreSelectionController> {
                 ),
               ),
 
-              // --- PHẦN 3: ACTION BUTTONS (SliverFillRemaining) ---
+              // --- PHẦN 3: ACTION BUTTONS ---
               SliverFillRemaining(
                 hasScrollBody: false,
                 child: Align(

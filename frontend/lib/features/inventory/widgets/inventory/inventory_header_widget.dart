@@ -3,7 +3,6 @@ import 'package:frontend/core/ui/theme/app_colors.dart';
 import 'package:frontend/core/ui/theme/app_sizes.dart';
 import 'package:get/get.dart';
 import 'package:frontend/core/infrastructure/constants/text_strings.dart';
-// THÊM IMPORT STORE SERVICE ĐỂ LẤY ROLE
 import 'package:frontend/core/state/services/store_service.dart';
 
 class InventoryHeaderWidget extends StatelessWidget {
@@ -41,24 +40,34 @@ class InventoryHeaderWidget extends StatelessWidget {
             ),
           ),
           const SizedBox(width: AppSizes.p12),
-
-          // BADGE CHỨC VỤ ĐÃ ĐƯỢC CHUYỂN SANG ĐÂY
           Obx(() {
             final storeService = Get.find<StoreService>();
             final role = storeService.currentRole.value.toLowerCase();
-            final isManager = role == 'manager';
 
-            final String tooltipMessage = isManager
-                ? TTexts.homeRoleManagerTooltip.tr
-                : TTexts.homeRoleStaffTooltip.tr;
+            String tooltipMessage;
+            List<Color> gradientColors;
+            IconData roleIcon;
 
-            final List<Color> gradientColors = isManager
-                ? [AppColors.primary, AppColors.secondPrimary]
-                : [const Color(0xFFFF9900), const Color(0xFFFFCC00)];
-
-            final IconData roleIcon = isManager
-                ? Icons.admin_panel_settings_rounded
-                : Icons.badge_rounded;
+            // Phân nhánh UI cho 3 Role
+            if (role == 'owner') {
+              tooltipMessage = TTexts.roleOwner.tr;
+              gradientColors = [AppColors.primary, AppColors.secondPrimary];
+              roleIcon = Icons.workspace_premium_rounded;
+            } else if (role == 'manager') {
+              tooltipMessage = TTexts.homeRoleManagerTooltip.tr;
+              gradientColors = [
+                const Color(0xFFFF9900),
+                const Color(0xFFFFCC00)
+              ];
+              roleIcon = Icons.admin_panel_settings_rounded;
+            } else {
+              tooltipMessage = TTexts.homeRoleStaffTooltip.tr;
+              gradientColors = [
+                const Color(0xFF00C853),
+                const Color(0xFF69F0AE)
+              ];
+              roleIcon = Icons.badge_rounded;
+            }
 
             return Tooltip(
               message: tooltipMessage,

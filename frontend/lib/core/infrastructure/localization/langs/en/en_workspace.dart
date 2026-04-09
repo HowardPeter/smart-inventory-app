@@ -77,6 +77,7 @@ final Map<String, String> enWorkspace = {
       "View and manage your team members and their roles within this workspace.",
   TTexts.membersCount: "Members",
   TTexts.roleManager: "Manager",
+  TTexts.roleOwner: 'Owner',
   TTexts.roleStaff: "Staff",
   TTexts.youBadge: "You",
 
