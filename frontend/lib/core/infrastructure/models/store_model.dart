@@ -1,6 +1,7 @@
 class StoreModel {
   final String storeId;
   final String name;
+  final String? inviteCode;
   final String? address;
   final String role;
   final String activeStatus;
@@ -8,6 +9,7 @@ class StoreModel {
   StoreModel({
     required this.storeId,
     required this.name,
+    this.inviteCode,
     this.address,
     required this.role,
     required this.activeStatus,
@@ -17,6 +19,7 @@ class StoreModel {
     return StoreModel(
       storeId: json['storeId'] ?? '',
       name: json['name'] ?? 'Unknown Store',
+      inviteCode: json['inviteCode'] ?? "Pls, generate new code!",
       address: json['address'],
       role: json['role'] ?? 'staff',
       activeStatus: json['activeStatus'] ?? 'active',

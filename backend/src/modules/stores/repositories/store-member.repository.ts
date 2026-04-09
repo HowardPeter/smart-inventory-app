@@ -1,4 +1,5 @@
 import type { DbClient } from '../../../common/types/index.js';
+import type { StoreRole } from '../../../generated/prisma/client.js';
 import type {
   StoreMembershipResponseDto,
   CreateStoreMembershipDto,
@@ -76,4 +77,20 @@ export class StoreMemberRepository {
   //     },
   //   });
   // }
+
+  // Thêm vào class StoreMemberRepository (nếu chưa có)
+  async findMembership(userId: string, storeId: string) {
+    return await this.db.storeMember.findFirst({
+      where: { userId, storeId },
+    });
+  }
+
+  // Nếu user đã từng tham gia nhưng bị kích (inactive),
+  // có thể bạn sẽ cần hàm update để khôi phục
+  async reactivateMembership(userId: string, storeId: string, role: StoreRole) {
+    return await this.db.storeMember.update({
+      where: { userId_storeId: { userId, storeId } },
+      data: { activeStatus: 'active', role },
+    });
+  }
 }
