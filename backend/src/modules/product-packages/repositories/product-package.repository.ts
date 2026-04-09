@@ -10,6 +10,7 @@ import type {
   PackageQueryDto,
   ProductPackageResponseDto,
   UpdateProductPackageDto,
+  ProductPackageSimpleResponseDto,
   ProductPackageResponseForTransaction,
   CreateInventoryData,
 } from '../product-package.dto.js';
@@ -147,6 +148,29 @@ export class ProductPackageRepository {
     return productPackages.map((productPackage) =>
       this.toResponseDto(productPackage),
     );
+  }
+
+  async findManyByProductIdForNameSync(
+    storeId: string,
+    productId: string,
+  ): Promise<ProductPackageSimpleResponseDto[]> {
+    return await this.db.productPackage.findMany({
+      where: {
+        productId,
+        activeStatus: 'active',
+        product: {
+          storeId,
+          activeStatus: 'active',
+        },
+      },
+      orderBy: {
+        createdAt: 'desc',
+      },
+      select: {
+        productPackageId: true,
+        displayName: true,
+      },
+    });
   }
 
   async findOne(
@@ -312,6 +336,22 @@ export class ProductPackageRepository {
     return this.toResponseDto(productPackage);
   }
 
+  async updateDisplayNameWithProduct(
+    productPackageId: string,
+    newDisplayName: string,
+  ): Promise<ProductPackageSimpleResponseDto> {
+    return await this.db.productPackage.update({
+      where: { productPackageId },
+      data: {
+        displayName: newDisplayName,
+      },
+      select: {
+        productPackageId: true,
+        displayName: true,
+      },
+    });
+  }
+
   async softDeleteOne(
     productPackageId: string,
   ): Promise<{ productPackageId: string }> {
@@ -326,12 +366,14 @@ export class ProductPackageRepository {
     });
   }
 
-  async softDeleteManyByProductId(productId: string): Promise<void> {
-    await this.db.productPackage.updateMany({
+  async softDeleteManyByProductId(productId: string): Promise<number> {
+    const deleted = await this.db.productPackage.updateMany({
       where: { productId },
       data: {
         activeStatus: 'inactive',
       },
     });
+
+    return deleted.count;
   }
 }

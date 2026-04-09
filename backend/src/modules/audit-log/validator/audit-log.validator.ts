@@ -1,9 +1,3 @@
-/* Định nghĩa các schema kiểm tra dữ liệu đầu vào
-(validation) bằng thư viện Zod cho module Audit Log.
-Các middleware trong file này sẽ được gắn vào
-Route để xác thực các tham số tìm kiếm (query params)
-trước khi chúng đi vào xử lý tại Controller. */
-
 import { z } from 'zod';
 
 import { validateSchema } from '../../../common/utils/index.js';

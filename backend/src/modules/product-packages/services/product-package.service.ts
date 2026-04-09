@@ -75,7 +75,8 @@ export class ProductPackageService {
     storeId: string,
     productId: string,
   ): Promise<ProductPackageResponseDto[]> {
-    await productService.getProductById(storeId, productId);
+    // check product tồn tại
+    await productService.checkProductExisted(storeId, productId);
 
     return await this.productPackageRepository.findManyByProductId(
       storeId,
@@ -104,7 +105,8 @@ export class ProductPackageService {
     storeId: string,
     productIds: string[],
   ): Promise<string[]> {
-    return await this.productPackageRepository.findProductIdsHavingActivePackages(
+    return await this.productPackageRepository
+    .findProductIdsHavingActivePackages(
       storeId,
       productIds,
     );
@@ -161,11 +163,11 @@ export class ProductPackageService {
       await auditLogRepositoryTx.createLog({
         actionType: 'create',
         entityType: 'ProductPackage',
+        entityId: createdProductPackage.productPackageId,
         userId,
         storeId,
         oldValue: null,
         newValue: {
-          productPackageId: createdProductPackage.productPackageId,
           productId: createdProductPackage.product.productId,
           displayName: createdProductPackage.displayName,
           unitId: createdProductPackage.unit.unitId,
@@ -179,11 +181,11 @@ export class ProductPackageService {
       await auditLogRepositoryTx.createLog({
         actionType: 'create',
         entityType: 'Inventory',
+        entityId: createdProductPackage.inventory?.inventoryId ?? null,
         userId,
         storeId,
         oldValue: null,
         newValue: {
-          inventoryId: createdProductPackage.inventory?.inventoryId,
           quantity: createdProductPackage.inventory?.quantity,
           reorderThreshold: createdProductPackage.inventory?.reorderThreshold,
           productPackageId: createdProductPackage.productPackageId,
@@ -273,6 +275,7 @@ export class ProductPackageService {
         await auditLogRepositoryTx.createLog({
           actionType: 'update',
           entityType: 'ProductPackage',
+          entityId: updatedPackage.productPackageId,
           userId,
           storeId,
           note: null,
@@ -306,15 +309,14 @@ export class ProductPackageService {
       await auditLogRepositoryTx.createLog({
         actionType: 'delete',
         entityType: 'ProductPackage',
+        entityId: softDeletedPackage.productPackageId,
         userId,
         storeId,
         note: null,
         oldValue: {
-          productPackageId: softDeletedPackage.productPackageId,
           activeStatus: 'active',
         } as Prisma.InputJsonObject,
         newValue: {
-          productPackageId: softDeletedPackage.productPackageId,
           activeStatus: 'inactive',
         } as Prisma.InputJsonObject,
       });
@@ -325,17 +327,14 @@ export class ProductPackageService {
       await auditLogRepositoryTx.createLog({
         actionType: 'delete',
         entityType: 'Inventory',
+        entityId: softDeletedInventory.inventoryId,
         userId,
         storeId,
         note: null,
         oldValue: {
-          productPackageId: softDeletedPackage.productPackageId,
-          inventoryId: softDeletedInventory.inventoryId,
           activeStatus: 'active',
         } as Prisma.InputJsonObject,
         newValue: {
-          productPackageId: softDeletedPackage.productPackageId,
-          inventoryId: softDeletedInventory.inventoryId,
           activeStatus: 'inactive',
         } as Prisma.InputJsonObject,
       });

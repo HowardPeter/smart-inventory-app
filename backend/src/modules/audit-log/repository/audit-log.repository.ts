@@ -8,22 +8,9 @@ import type { DbClient } from '../../../common/types/index.js';
 import type {
   AuditLogListItemDto,
   ListAuditLogsQueryDto,
+  CreateAuditLogDto,
 } from '../dto/audit-log.dto.js';
 
-export type CreateAuditLogPayload = {
-  actionType: 'create' | 'update' | 'delete';
-  entityType: string;
-  userId: string;
-  storeId: string;
-  oldValue: Prisma.InputJsonValue | null; // Sử dụng kiểu JSON Input của Prisma
-  newValue: Prisma.InputJsonValue | null;
-  note?: string | null;
-};
-
-/* Lớp Repository chịu trách nhiệm tương tác trực tiếp với
-cơ sở dữ liệu (Prisma) cho module Audit Log.
-Cung cấp các phương thức truy xuất lịch sử hệ thống
-với khả năng lọc (filter) động linh hoạt. */
 export class AuditLogRepository {
   constructor(private readonly db: DbClient) {}
 
@@ -81,11 +68,12 @@ export class AuditLogRepository {
 
   // NOTE: Hàm này nhận vào tx (Prisma.TransactionClient)
   // để chạy chung giao dịch với module khác
-  async createLog(data: CreateAuditLogPayload): Promise<void> {
+  async createLog(data: CreateAuditLogDto): Promise<void> {
     await this.db.auditLog.create({
       data: {
         actionType: data.actionType,
         entityType: data.entityType,
+        entityId: data.entityId,
         userId: data.userId,
         storeId: data.storeId,
         // Dùng Nullish Coalescing (??)

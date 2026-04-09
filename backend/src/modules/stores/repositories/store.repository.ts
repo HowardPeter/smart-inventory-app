@@ -28,6 +28,7 @@ export class StoreRepository {
         address: true,
         timezone: true,
         name: true,
+        inviteCode: true,
         createdAt: true,
         updatedAt: true,
         userId: true,
@@ -56,6 +57,7 @@ export class StoreRepository {
         address: true,
         timezone: true,
         name: true,
+        inviteCode: true,
         createdAt: true,
         updatedAt: true,
         userId: true,
@@ -84,6 +86,7 @@ export class StoreRepository {
         address: true,
         timezone: true,
         name: true,
+        inviteCode: true,
         createdAt: true,
         updatedAt: true,
         userId: true,
@@ -92,7 +95,9 @@ export class StoreRepository {
     });
   }
 
-  async createOne(data: CreateStoreDto): Promise<StoreResponseDto> {
+  async createOne(
+    data: CreateStoreDto & { inviteCode: string },
+  ): Promise<StoreResponseDto> {
     return await this.db.store.create({
       data,
       select: {
@@ -100,6 +105,7 @@ export class StoreRepository {
         address: true,
         timezone: true,
         name: true,
+        inviteCode: true,
         createdAt: true,
         updatedAt: true,
         userId: true,
@@ -120,6 +126,7 @@ export class StoreRepository {
         address: true,
         timezone: true,
         name: true,
+        inviteCode: true,
         createdAt: true,
         updatedAt: true,
         userId: true,
@@ -133,6 +140,47 @@ export class StoreRepository {
       where: { storeId: storeId },
       data: {
         activeStatus: 'inactive',
+      },
+    });
+  }
+
+  async updateInviteCode(
+    storeId: string,
+    inviteCode: string,
+  ): Promise<StoreResponseDto> {
+    return await this.db.store.update({
+      where: { storeId },
+      data: { inviteCode },
+      select: {
+        storeId: true,
+        address: true,
+        timezone: true,
+        name: true,
+        inviteCode: true,
+        createdAt: true,
+        updatedAt: true,
+        userId: true,
+        activeStatus: true,
+      },
+    });
+  }
+
+  async findByInviteCode(inviteCode: string): Promise<StoreResponseDto | null> {
+    return await this.db.store.findFirst({
+      where: {
+        inviteCode,
+        activeStatus: 'active',
+      },
+      select: {
+        storeId: true,
+        address: true,
+        timezone: true,
+        name: true,
+        inviteCode: true,
+        createdAt: true,
+        updatedAt: true,
+        userId: true,
+        activeStatus: true,
       },
     });
   }

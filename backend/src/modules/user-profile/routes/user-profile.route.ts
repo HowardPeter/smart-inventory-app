@@ -38,7 +38,7 @@ router.get(
  */
 userProfileRouter.patch(
   '/:userId',
-  userProfileRouter.use(authenticate),
+  authenticate,
   validator(updateUserProfileSchema),
   asyncWrapper(userProfileController.updateUserProfile),
 );

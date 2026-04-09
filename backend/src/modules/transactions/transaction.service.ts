@@ -234,12 +234,12 @@ export class TransactionService {
       await auditLogRepositoryTx.createLog({
         actionType: 'create',
         entityType: 'Transaction',
+        entityId: transaction.transactionId,
         userId,
         storeId,
         note: null,
         oldValue: null,
         newValue: {
-          transactionId: transaction.transactionId,
           type: transaction.type,
           status: transaction.status,
           note: transaction.note,
@@ -332,12 +332,12 @@ export class TransactionService {
       await auditLogRepositoryTx.createLog({
         actionType: 'create',
         entityType: 'Transaction',
+        entityId: transaction.transactionId,
         userId,
         storeId,
         note: null,
         oldValue: null,
         newValue: {
-          transactionId: transaction.transactionId,
           type: transaction.type,
           status: transaction.status,
           note: transaction.note,
