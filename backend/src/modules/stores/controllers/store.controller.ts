@@ -99,4 +99,19 @@ export class StoreController {
 
     sendResponse.success(res, updatedStore, { status: StatusCodes.OK });
   };
+
+  joinStore = async (
+    req: Request,
+    res: Response<ApiResponse<StoreResponseDto>>,
+  ): Promise<void> => {
+    const userId = requireReqUser(req).userId;
+    const { inviteCode } = req.body; // Lấy từ body do ta dùng POST
+
+    const store = await this.storeService.joinStoreByInviteCode(
+      userId,
+      inviteCode,
+    );
+
+    sendResponse.success(res, store, { status: StatusCodes.OK });
+  };
 }

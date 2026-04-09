@@ -7,6 +7,7 @@ import {
   validateGetStoreById,
   validateDeleteStore,
   validateUpdateStore,
+  validateJoinStore,
 } from './store.validator.js';
 import { asyncWrapper } from '../../common/middlewares/index.js';
 import { requirePermission, PERMISSION } from '../access-control/index.js';
@@ -92,4 +93,15 @@ storeRouter.post(
   asyncWrapper(storeController.refreshInviteCode),
 );
 
+/**
+ * API endpoint: POST /api/stores/join
+ * Tham gia vào cửa hàng bằng mã mời
+ * * Body:
+ * - inviteCode: string (required)
+ */
+storeRouter.post(
+  '/join',
+  validateJoinStore,
+  asyncWrapper(storeController.joinStore),
+);
 export { storeRouter };

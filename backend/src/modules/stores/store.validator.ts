@@ -94,3 +94,16 @@ export const validateDeleteStore = (
   req.params = validateSchema(paramsSchema, req.params);
   next();
 };
+
+const joinStoreBodySchema = z.object({
+  inviteCode: z.string().trim().min(1, 'Invite code is required'),
+});
+
+export const validateJoinStore = (
+  req: Request,
+  _res: Response,
+  next: NextFunction,
+): void => {
+  req.body = validateSchema(joinStoreBodySchema, req.body);
+  next();
+};

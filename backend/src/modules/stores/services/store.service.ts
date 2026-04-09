@@ -183,4 +183,59 @@ export class StoreService {
 
     return await this.storeRepository.updateInviteCode(storeId, newInviteCode);
   }
+
+  public async joinStoreByInviteCode(
+    userId: string,
+    inviteCode: string,
+  ): Promise<StoreResponseDto> {
+    return await prisma.$transaction(async (tx) => {
+      const storeRepositoryTx = new StoreRepository(tx);
+      const storeMemberRepositoryTx = new StoreMemberRepository(tx);
+
+      // 1. Tìm cửa hàng bằng mã mời
+      const store = await storeRepositoryTx.findByInviteCode(inviteCode);
+
+      if (!store) {
+        throw new CustomError({
+          message: 'Invalid invite code or store not found',
+          status: StatusCodes.NOT_FOUND,
+        });
+      }
+
+      // 2. Kiểm tra xem user đã là thành viên chưa
+      const existingMembership = await storeMemberRepositoryTx.findMembership(
+        userId,
+        store.storeId,
+      );
+
+      if (existingMembership) {
+        // Nếu đang active thì báo lỗi (không cho join lại)
+        if (existingMembership.activeStatus === 'active') {
+          throw new CustomError({
+            message: 'You are already a member of this store',
+            status: StatusCodes.CONFLICT, // 409 Conflict
+          });
+        } else {
+          // Nếu đã từng tham gia nhưng bị xoá/rời đi (inactive),
+          // thì khôi phục lại với role staff
+          await storeMemberRepositoryTx.reactivateMembership(
+            userId,
+            store.storeId,
+            'staff',
+          );
+
+          return store;
+        }
+      }
+
+      // 3. Nếu chưa từng tham gia, tạo mới StoreMember với role là staff
+      await storeMemberRepositoryTx.createOne({
+        userId,
+        storeId: store.storeId,
+        role: 'staff',
+      });
+
+      return store;
+    });
+  }
 }

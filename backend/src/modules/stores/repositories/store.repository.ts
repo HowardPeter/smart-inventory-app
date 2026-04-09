@@ -164,4 +164,24 @@ export class StoreRepository {
       },
     });
   }
+
+  async findByInviteCode(inviteCode: string): Promise<StoreResponseDto | null> {
+    return await this.db.store.findFirst({
+      where: {
+        inviteCode,
+        activeStatus: 'active',
+      },
+      select: {
+        storeId: true,
+        address: true,
+        timezone: true,
+        name: true,
+        inviteCode: true,
+        createdAt: true,
+        updatedAt: true,
+        userId: true,
+        activeStatus: true,
+      },
+    });
+  }
 }
