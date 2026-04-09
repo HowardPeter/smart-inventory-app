@@ -84,4 +84,19 @@ export class StoreController {
 
     sendResponse.success(res, null, { status: StatusCodes.OK });
   };
+
+  refreshInviteCode = async (
+    req: Request,
+    res: Response<ApiResponse<StoreResponseDto>>,
+  ): Promise<void> => {
+    const userId = requireReqUser(req).userId;
+    const { storeId } = req.params;
+
+    const updatedStore = await this.storeService.refreshInviteCode(
+      storeId as string,
+      userId,
+    );
+
+    sendResponse.success(res, updatedStore, { status: StatusCodes.OK });
+  };
 }

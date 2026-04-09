@@ -143,4 +143,25 @@ export class StoreRepository {
       },
     });
   }
+
+  async updateInviteCode(
+    storeId: string,
+    inviteCode: string,
+  ): Promise<StoreResponseDto> {
+    return await this.db.store.update({
+      where: { storeId },
+      data: { inviteCode },
+      select: {
+        storeId: true,
+        address: true,
+        timezone: true,
+        name: true,
+        inviteCode: true,
+        createdAt: true,
+        updatedAt: true,
+        userId: true,
+        activeStatus: true,
+      },
+    });
+  }
 }

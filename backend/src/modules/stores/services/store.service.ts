@@ -164,4 +164,23 @@ export class StoreService {
     //          .disableAllStoreMembership(storeMemberships);
     // });
   }
+
+  public async refreshInviteCode(
+    storeId: string,
+    userId: string,
+  ): Promise<StoreResponseDto> {
+    const store = await this.storeRepository.findByIdAndUserId(storeId, userId);
+
+    if (!store) {
+      throw new CustomError({
+        message: 'Store not found or you do not have permission',
+        status: StatusCodes.NOT_FOUND,
+      });
+    }
+
+    // Sinh mã mới bằng util đã tách ở bước trước
+    const newInviteCode = generateFormattedInviteCode();
+
+    return await this.storeRepository.updateInviteCode(storeId, newInviteCode);
+  }
 }

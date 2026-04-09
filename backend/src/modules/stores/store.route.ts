@@ -78,4 +78,18 @@ storeRouter
     asyncWrapper(storeController.softDeleteStore),
   );
 
+/**
+ * API endpoint: POST /api/stores/:storeId/refresh-invite-code
+ * Tạo mới (refresh) mã mời cho cửa hàng
+ *
+ * Path params:
+ * - storeId: string (UUID, required)
+ */
+storeRouter.post(
+  '/:storeId/refresh-invite-code',
+  requireStoreContext,
+  requirePermission(PERMISSION.STORE_WRITE),
+  asyncWrapper(storeController.refreshInviteCode),
+);
+
 export { storeRouter };
