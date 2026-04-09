@@ -1,4 +1,5 @@
 import 'package:frontend/features/inventory/controllers/inventory_controller.dart';
+import 'package:frontend/features/navigation/controllers/chatbot_ui_controller.dart';
 import 'package:frontend/features/notification/controller/notification_controller.dart';
 import 'package:frontend/features/report/controllers/report_controller.dart';
 import 'package:frontend/features/report/controllers/report_export_controller.dart';
@@ -22,6 +23,7 @@ class NavigationBinding extends Bindings {
     Get.lazyPut(() => ReportController(), fenix: true);
 
     // 3. Các Controller phụ của Tab.
+    Get.lazyPut(() => ChatbotUiController(), fenix: true);
     Get.lazyPut(() => ReportExportController(), fenix: true);
   }
 }

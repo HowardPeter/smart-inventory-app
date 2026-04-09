@@ -60,6 +60,8 @@ class CoreImages {
       'assets/images/core/success-transaction.png';
 
   final String defaultAvatar = 'assets/images/core/default-avatar.jpg';
+
+  final String chatbotai = 'assets/lotties/chatbotai.json';
 }
 
 class OnboardingImages {

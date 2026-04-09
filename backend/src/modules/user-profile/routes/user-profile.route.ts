@@ -10,8 +10,6 @@ import { updateUserProfileSchema } from '../validator/user-profile.validator.js'
 
 const router = Router();
 
-userProfileRouter.use(authenticate);
-
 router.post(
   '/me/profile',
   verifyAuthOnly,
@@ -40,6 +38,7 @@ router.get(
  */
 userProfileRouter.patch(
   '/:userId',
+  userProfileRouter.use(authenticate),
   validator(updateUserProfileSchema),
   asyncWrapper(userProfileController.updateUserProfile),
 );
