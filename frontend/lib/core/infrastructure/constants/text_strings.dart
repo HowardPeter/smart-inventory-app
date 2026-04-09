@@ -352,6 +352,17 @@ class TTexts {
   static const String topCategories = 'top_categories';
   static const String inventoryFlow = 'inventory_flow';
 
+  // -- Chatbot AI
+  static const String chatbotName = "chatbot_name";
+  static const String chatbotOnline = "chatbot_online";
+  static const String chatbotInputHint = "chatbot_input_hint";
+  static const String chatbotWelcomeMsg = "chatbot_welcome_msg";
+  static const String chatbotErrorTitle = "chatbot_error_title";
+  static const String chatbotErrorMsg = "chatbot_error_msg";
+  static const String chatbotTyping = "chatbot_typing";
+  static const String chatbotEmptyInputWarning = "chatbot_empty_input_warning";
+  static const String chatbotMockResponse = "chatbot_mock_response";
+
   // -- Customize Catalog
   static const String customizeCatalog = "customize_catalog";
   static const String pinnedOnHome = "pinned_on_home";

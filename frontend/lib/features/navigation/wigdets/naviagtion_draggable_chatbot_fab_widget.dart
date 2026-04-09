@@ -77,25 +77,18 @@ class _NavigationDraggableChatbotFabWidgetState
     final size = MediaQuery.of(context).size;
     final chatHeight = size.height - 140.0;
 
-    final bottomInset = MediaQuery.of(context).viewInsets.bottom;
-    final bottomSafe = MediaQuery.of(context).padding.bottom;
-    double keyboardOffset = 0.0;
-
-    if (bottomInset > 0) {
-      keyboardOffset = bottomInset - bottomSafe;
-      if (keyboardOffset < 0) keyboardOffset = 0;
-    }
-
     return Obx(() {
       final isOpen = _uiController.isChatOpen.value;
 
       return Stack(
         children: [
-          // 1. NỀN ĐEN MỜ
           if (isOpen)
             Positioned.fill(
               child: GestureDetector(
-                onTap: _uiController.closeChat,
+                onTap: () {
+                  FocusScope.of(context).unfocus();
+                  _uiController.closeChat();
+                },
                 child: AnimatedOpacity(
                   duration: const Duration(milliseconds: 300),
                   opacity: isOpen ? 1.0 : 0.0,
@@ -103,17 +96,15 @@ class _NavigationDraggableChatbotFabWidgetState
                 ),
               ),
             ),
-
           AnimatedPositioned(
             duration: const Duration(milliseconds: 350),
             curve: Curves.easeOutQuart,
             top: isOpen ? 140.0 : size.height,
-            bottom: isOpen ? keyboardOffset : -chatHeight,
+            bottom: isOpen ? 0 : -chatHeight,
             left: 0,
             right: 0,
             child: const ChatbotWindowLayout(),
           ),
-
           AnimatedPositioned(
             duration:
                 _isDragging ? Duration.zero : const Duration(milliseconds: 350),

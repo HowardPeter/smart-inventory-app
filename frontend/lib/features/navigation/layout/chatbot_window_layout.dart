@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:frontend/core/infrastructure/constants/image_strings.dart';
+import 'package:frontend/core/infrastructure/constants/text_strings.dart';
 import 'package:frontend/core/ui/theme/app_colors.dart';
 import 'package:frontend/features/navigation/controllers/chatbot_ui_controller.dart';
+import 'package:frontend/features/navigation/models/chat_message_model.dart';
 import 'package:iconsax_flutter/iconsax_flutter.dart';
 import 'package:get/get.dart';
 
@@ -10,15 +12,13 @@ class ChatbotWindowLayout extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final isKeyboardOpen = MediaQuery.of(context).viewInsets.bottom > 0;
-    final bottomSafe = MediaQuery.of(context).padding.bottom;
+    // Gọi Controller
+    final controller = Get.find<ChatbotUiController>();
 
-    final footerBottomPadding =
-        isKeyboardOpen ? 12.0 : (bottomSafe > 0 ? bottomSafe + 8.0 : 20.0);
-
-    return Material(
-      color: Colors.transparent,
-      child: Container(
+    return Scaffold(
+      backgroundColor: Colors.transparent,
+      resizeToAvoidBottomInset: true,
+      body: Container(
         decoration: const BoxDecoration(
           color: AppColors.background,
           borderRadius: BorderRadius.vertical(top: Radius.circular(28)),
@@ -34,7 +34,6 @@ class ChatbotWindowLayout extends StatelessWidget {
           borderRadius: const BorderRadius.vertical(top: Radius.circular(28)),
           child: Column(
             children: [
-              // --- CHAT HEADER ---
               Container(
                 padding: const EdgeInsets.fromLTRB(20, 20, 12, 16),
                 color: AppColors.background,
@@ -57,9 +56,9 @@ class ChatbotWindowLayout extends StatelessWidget {
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          const Text(
-                            "Trợ lý AI Storix",
-                            style: TextStyle(
+                          Text(
+                            TTexts.chatbotName.tr,
+                            style: const TextStyle(
                               fontSize: 16,
                               fontWeight: FontWeight.bold,
                               color: AppColors.primaryText,
@@ -77,9 +76,9 @@ class ChatbotWindowLayout extends StatelessWidget {
                                 ),
                               ),
                               const SizedBox(width: 6),
-                              const Text(
-                                "Đang hoạt động",
-                                style: TextStyle(
+                              Text(
+                                TTexts.chatbotOnline.tr,
+                                style: const TextStyle(
                                   fontSize: 12,
                                   color: AppColors.subText,
                                 ),
@@ -94,66 +93,36 @@ class ChatbotWindowLayout extends StatelessWidget {
                           color: AppColors.subText),
                       onPressed: () {
                         FocusScope.of(context).unfocus();
-                        Get.find<ChatbotUiController>().closeChat();
+                        controller.closeChat();
                       },
                     )
                   ],
                 ),
               ),
-
               Container(height: 1, color: AppColors.divider.withOpacity(0.5)),
-
-              // --- BODY (Khu vực tin nhắn lướt) ---
-              Expanded(
+              Flexible(
                 child: Container(
                   color: AppColors.surface,
-                  child: ListView(
-                    padding: const EdgeInsets.all(20),
-                    children: [
-                      Align(
-                        alignment: Alignment.centerLeft,
-                        child: Container(
-                          constraints: BoxConstraints(
-                            maxWidth: MediaQuery.of(context).size.width * 0.75,
-                          ),
-                          padding: const EdgeInsets.symmetric(
-                              horizontal: 16, vertical: 12),
-                          margin: const EdgeInsets.only(bottom: 16),
-                          decoration: BoxDecoration(
-                            color: Colors.white,
-                            borderRadius: const BorderRadius.only(
-                              topLeft: Radius.circular(20),
-                              topRight: Radius.circular(20),
-                              bottomRight: Radius.circular(20),
-                              bottomLeft: Radius.circular(4),
-                            ),
-                            border: Border.all(
-                                color: AppColors.divider.withOpacity(0.5)),
-                            boxShadow: [
-                              BoxShadow(
-                                color: Colors.black.withOpacity(0.02),
-                                blurRadius: 4,
-                                offset: const Offset(0, 2),
-                              )
-                            ],
-                          ),
-                          child: const Text(
-                            "Xin chào! Mình là trợ lý AI. Mình có thể giúp bạn kiểm tra tồn kho, tạo phiếu xuất/nhập hàng nhanh chóng. Bạn cần gì nào?",
-                            style: TextStyle(
-                                color: AppColors.primaryText,
-                                fontSize: 14,
-                                height: 1.4),
-                          ),
-                        ),
-                      ),
-                    ],
+                  child: Obx(
+                    () => ListView.builder(
+                      controller: controller.scrollController,
+                      padding: const EdgeInsets.all(20),
+                      itemCount: controller.messages.length +
+                          (controller.isTyping.value ? 1 : 0),
+                      itemBuilder: (context, index) {
+                        // Hiển thị trạng thái "AI đang gõ..." ở cuối danh sách
+                        if (index == controller.messages.length) {
+                          return _buildTypingIndicator();
+                        }
+
+                        final msg = controller.messages[index];
+                        return _buildChatBubble(msg);
+                      },
+                    ),
                   ),
                 ),
               ),
-
-              // --- FOOTER (Thanh nhập văn bản) ---
               Container(
-                padding: EdgeInsets.fromLTRB(16, 12, 16, footerBottomPadding),
                 decoration: BoxDecoration(
                   color: Colors.white,
                   boxShadow: [
@@ -164,54 +133,116 @@ class ChatbotWindowLayout extends StatelessWidget {
                     )
                   ],
                 ),
-                child: Row(
-                  crossAxisAlignment: CrossAxisAlignment.end,
-                  children: [
-                    const Padding(
-                      padding: EdgeInsets.only(bottom: 4, right: 12),
-                      child: Icon(Iconsax.add_circle_copy,
-                          color: AppColors.primary, size: 28),
-                    ),
-                    Expanded(
-                      child: Container(
-                        decoration: BoxDecoration(
-                          color: AppColors.surface,
-                          borderRadius: BorderRadius.circular(24),
-                        ),
-                        child: const TextField(
-                          maxLines: 4,
-                          minLines: 1,
-                          decoration: InputDecoration(
-                            hintText: "Nhập tin nhắn...",
-                            hintStyle: TextStyle(
-                                color: AppColors.subText, fontSize: 14),
-                            border: InputBorder.none,
-                            contentPadding: EdgeInsets.symmetric(
-                                horizontal: 16, vertical: 12),
+                child: SafeArea(
+                  top: false,
+                  child: Padding(
+                    padding: const EdgeInsets.symmetric(
+                        horizontal: 16, vertical: 12),
+                    child: Row(
+                      crossAxisAlignment: CrossAxisAlignment.end,
+                      children: [
+                        Expanded(
+                          child: Container(
+                            decoration: BoxDecoration(
+                              color: AppColors.surface,
+                              borderRadius: BorderRadius.circular(24),
+                            ),
+                            child: TextField(
+                              controller: controller.textController,
+                              maxLines: 4,
+                              minLines: 1,
+                              cursorColor: AppColors.primary,
+                              textInputAction: TextInputAction.send,
+                              onSubmitted: (_) => controller.sendMessage(),
+                              decoration: InputDecoration(
+                                hintText: TTexts.chatbotInputHint.tr,
+                                hintStyle: const TextStyle(
+                                    color: AppColors.subText, fontSize: 14),
+                                border: InputBorder.none,
+                                contentPadding: const EdgeInsets.symmetric(
+                                    horizontal: 16, vertical: 12),
+                              ),
+                            ),
                           ),
                         ),
-                      ),
-                    ),
-                    const SizedBox(width: 12),
-                    GestureDetector(
-                      onTap: () {},
-                      child: Container(
-                        height: 48,
-                        width: 48,
-                        margin: const EdgeInsets.only(bottom: 2),
-                        decoration: const BoxDecoration(
-                          color: AppColors.primary,
-                          shape: BoxShape.circle,
+                        const SizedBox(width: 12),
+                        GestureDetector(
+                          onTap: controller.sendMessage,
+                          child: Container(
+                            height: 48,
+                            width: 48,
+                            margin: const EdgeInsets.only(bottom: 2),
+                            decoration: const BoxDecoration(
+                              color: AppColors.primary,
+                              shape: BoxShape.circle,
+                            ),
+                            child: const Icon(Iconsax.send_1_copy,
+                                color: Colors.white, size: 20),
+                          ),
                         ),
-                        child: const Icon(Iconsax.send_1_copy,
-                            color: Colors.white, size: 20),
-                      ),
+                      ],
                     ),
-                  ],
+                  ),
                 ),
               )
             ],
           ),
+        ),
+      ),
+    );
+  }
+
+  // Widget hỗ trợ vẽ bong bóng chat
+  Widget _buildChatBubble(ChatMessage msg) {
+    return Align(
+      alignment: msg.isUser ? Alignment.centerRight : Alignment.centerLeft,
+      child: Container(
+        constraints: BoxConstraints(maxWidth: Get.width * 0.75),
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+        margin: const EdgeInsets.only(bottom: 16),
+        decoration: BoxDecoration(
+          color: msg.isUser ? AppColors.primary : Colors.white,
+          borderRadius: BorderRadius.only(
+            topLeft: const Radius.circular(20),
+            topRight: const Radius.circular(20),
+            bottomLeft: Radius.circular(msg.isUser ? 20 : 4),
+            bottomRight: Radius.circular(msg.isUser ? 4 : 20),
+          ),
+          border: msg.isUser
+              ? null
+              : Border.all(color: AppColors.divider.withOpacity(0.5)),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withOpacity(0.02),
+              blurRadius: 4,
+              offset: const Offset(0, 2),
+            )
+          ],
+        ),
+        child: Text(
+          msg.text,
+          style: TextStyle(
+            color: msg.isUser ? Colors.white : AppColors.primaryText,
+            fontSize: 14,
+            height: 1.4,
+          ),
+        ),
+      ),
+    );
+  }
+
+  // Widget hỗ trợ hiển thị "AI đang gõ..."
+  Widget _buildTypingIndicator() {
+    return Align(
+      alignment: Alignment.centerLeft,
+      child: Padding(
+        padding: const EdgeInsets.only(bottom: 16, left: 8),
+        child: Text(
+          TTexts.chatbotTyping.tr,
+          style: const TextStyle(
+              color: AppColors.subText,
+              fontSize: 12,
+              fontStyle: FontStyle.italic),
         ),
       ),
     );

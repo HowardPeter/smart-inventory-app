@@ -62,7 +62,7 @@ class NavigationCustomBottomNavigationWidget
               }),
             ),
             Positioned(
-              bottom: 30,
+              bottom: 40,
               child: GestureDetector(
                 onTap: () {
                   TBottomSheetWidget.show(
