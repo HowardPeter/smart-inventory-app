@@ -1,7 +1,4 @@
-/* Định nghĩa các Data Transfer Object (DTO) cho module Audit Log.
-Bao gồm các contract quy định cấu trúc dữ liệu đầu vào
-(query params) và đầu ra (response) của API,
-giúp đồng bộ kiểu dữ liệu giữa Frontend và Backend. */
+import { Prisma } from '../../../generated/prisma/client.js';
 
 import type {
   ListPaginationQueryDto,
@@ -28,3 +25,14 @@ export type ListAuditLogsQueryDto = ListPaginationQueryDto<'performedAt'> & {
 // DTO bọc danh sách kết quả trả về kèm theo thông tin phân trang (meta)
 export type ListAuditLogsResponseDto =
   PaginationResponseDto<AuditLogListItemDto>;
+
+export type CreateAuditLogDto = {
+  actionType: 'create' | 'update' | 'delete';
+  entityType: string | null;
+  entityId: string | null;
+  userId: string;
+  storeId: string;
+  oldValue: Prisma.InputJsonValue | null; // Sử dụng kiểu JSON Input của Prisma
+  newValue: Prisma.InputJsonValue | null;
+  note?: string | null;
+};

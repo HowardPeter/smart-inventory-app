@@ -24,11 +24,11 @@ import type {
   ListProductsResponseDto,
   ProductsByCategoryDto,
 } from './product.dto.js';
-import type { DbClient } from '../../common/types/db.type.js';
+import type { DbClient } from '../../common/types/index.js';
 import type { Prisma } from '../../generated/prisma/client.js';
 
 // Khai báo tên bucket dạng hằng số để dễ quản lý và tái sử dụng
-const STORAGE_BUCKET = 'images';
+const STORAGE_BUCKET = process.env.STORAGE_BUCKET ?? 'images';
 
 export class ProductService {
   constructor(private readonly productRepository: ProductRepository) {}
@@ -178,11 +178,11 @@ export class ProductService {
       await auditLogRepositoryTx.createLog({
         actionType: 'create',
         entityType: 'Product',
+        entityId: newProduct.productId,
         userId,
         storeId,
         oldValue: null,
         newValue: {
-          productId: newProduct.productId,
           productName: newProduct.name,
           brand: newProduct.brand,
           category: newProduct.category,
@@ -297,14 +297,14 @@ export class ProductService {
         await auditLogRepositoryTx.createLog({
           actionType: 'update',
           entityType: 'Product',
+          entityId: existingProduct.productId,
           userId,
           storeId,
-          note:
-            syncedPackagesCount > 0
-              ? `Synced ${syncedPackagesCount} product package display names`
-              : null,
           oldValue: oldValue as Prisma.InputJsonObject,
-          newValue: newValue as Prisma.InputJsonObject,
+          newValue: {
+            ...newValue,
+            packageNameSyncedCount: syncedPackagesCount,
+          } as Prisma.InputJsonObject,
         });
       }
 
@@ -337,23 +337,23 @@ export class ProductService {
       const softDeletedProduct =
         await productRepositoryTx.softDeleteOne(productId);
 
+      const deletedPackages =
+        await productPackageRepositoryTx.softDeleteManyByProductId(productId);
+
       await auditLogRepositoryTx.createLog({
         actionType: 'delete',
         entityType: 'Product',
+        entityId: softDeletedProduct.productId,
         userId,
         storeId,
-        note: null,
         oldValue: {
-          productId: softDeletedProduct.productId,
           activeStatus: 'active',
         } as Prisma.InputJsonObject,
         newValue: {
-          productId: softDeletedProduct.productId,
           activeStatus: 'inactive',
+          deletedPackageCount: deletedPackages,
         } as Prisma.InputJsonObject,
       });
-
-      await productPackageRepositoryTx.softDeleteManyByProductId(productId);
     });
   }
 }

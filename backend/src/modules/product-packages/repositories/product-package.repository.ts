@@ -366,12 +366,14 @@ export class ProductPackageRepository {
     });
   }
 
-  async softDeleteManyByProductId(productId: string): Promise<void> {
-    await this.db.productPackage.updateMany({
+  async softDeleteManyByProductId(productId: string): Promise<number> {
+    const deleted = await this.db.productPackage.updateMany({
       where: { productId },
       data: {
         activeStatus: 'inactive',
       },
     });
+
+    return deleted.count;
   }
 }

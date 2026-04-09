@@ -4,6 +4,7 @@ import { CategoriesService } from './category.service.js';
 import {
   sendResponse,
   requireReqStoreContext,
+  requireReqUser,
 } from '../../common/utils/index.js';
 
 import type {
@@ -34,10 +35,12 @@ export class CategoryController {
     res: Response<ApiResponse<CategoryResponseDto>>,
   ): Promise<void> => {
     const storeId = requireReqStoreContext(req).storeId;
+    const userId = requireReqUser(req).userId;
     const payload = req.body as CreateCategoryDto;
 
     const createdCategory = await this.categoryService.createOne(
       storeId,
+      userId,
       payload,
     );
 
@@ -51,11 +54,13 @@ export class CategoryController {
     res: Response<ApiResponse<CategoryResponseDto>>,
   ): Promise<void> => {
     const storeId = requireReqStoreContext(req).storeId;
+    const userId = requireReqUser(req).userId;
     const { categoryId } = req.params;
     const payload = req.body as UpdateCategoryDto;
 
     const updatedCategory = await this.categoryService.updateOne(
       storeId,
+      userId,
       categoryId as string,
       payload,
     );
@@ -93,6 +98,7 @@ export class CategoryController {
     res: Response<ApiResponse<null>>,
   ): Promise<void> => {
     const storeId = requireReqStoreContext(req).storeId;
+    const userId = requireReqUser(req).userId;
     const { categoryId } = req.params;
 
     // FE gửi cờ canReassignToUncategorized để thể hiện người dùng
@@ -103,6 +109,7 @@ export class CategoryController {
 
     await this.categoryService.deleteCustomCategory(
       storeId,
+      userId,
       categoryId as string,
       canReassignToUncategorized ?? false,
     );
