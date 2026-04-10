@@ -1,3 +1,4 @@
+import 'dotenv/config';
 import { StatusCodes } from 'http-status-codes';
 
 import { CustomError } from '../../../common/errors/index.js';
@@ -6,6 +7,7 @@ import {
   buildPaginatedResponse,
   normalizePagination,
 } from '../../../common/utils/index.js';
+import { StorageService } from '../../../common/utils/index.js';
 import { prisma } from '../../../db/prismaClient.js'; // gọi prisma để dùng cơ chế $transaction
 import { AuditLogRepository } from '../../audit-log/index.js';
 import { InventoryRepository } from '../../inventories/index.js';
@@ -56,6 +58,23 @@ export class ProductPackageService {
     return existingProductPackage;
   }
 
+  private async getSignedUrlForItemImageUrl(
+    items: ProductPackageResponseDto[],
+  ): Promise<ProductPackageResponseDto[]> {
+    return await Promise.all(
+      items.map(async (item) => ({
+        ...item,
+        product: {
+          ...item.product,
+          imageUrl: await StorageService.getSignedUrl(
+            process.env.STORAGE_BUCKET ?? 'images',
+            item.product.imageUrl,
+          ),
+        },
+      })),
+    );
+  }
+
   async getProductPackagesByStore(
     storeId: string,
     query: PackageQueryDto,
@@ -68,7 +87,13 @@ export class ProductPackageService {
         ...normalizedPagination,
       });
 
-    return buildPaginatedResponse(items, totalItems, normalizedPagination);
+    const itemsWithSignedUrls = await this.getSignedUrlForItemImageUrl(items);
+
+    return buildPaginatedResponse(
+      itemsWithSignedUrls,
+      totalItems,
+      normalizedPagination,
+    );
   }
 
   async getProductPackagesByProductId(
@@ -78,10 +103,12 @@ export class ProductPackageService {
     // check product tồn tại
     await productService.checkProductExisted(storeId, productId);
 
-    return await this.productPackageRepository.findManyByProductId(
+    const packages = await this.productPackageRepository.findManyByProductId(
       storeId,
       productId,
     );
+
+    return await this.getSignedUrlForItemImageUrl(packages);
   }
 
   async getProductPackageById(
@@ -91,6 +118,7 @@ export class ProductPackageService {
     return await this.checkProductPackageExisted(storeId, productPackageId);
   }
 
+  // dùng cho transaction để tạo TransactionDetail, xử lý duplicate
   async getProductPackagesByIds(
     storeId: string,
     productPackageIds: string[],
@@ -105,11 +133,13 @@ export class ProductPackageService {
     storeId: string,
     productIds: string[],
   ): Promise<string[]> {
-    return await this.productPackageRepository
-    .findProductIdsHavingActivePackages(
-      storeId,
-      productIds,
-    );
+    const ids =
+      await this.productPackageRepository.findProductIdsHavingActivePackages(
+        storeId,
+        productIds,
+      );
+
+    return ids;
   }
 
   async createProductPackage(

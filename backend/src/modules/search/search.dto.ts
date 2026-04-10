@@ -67,13 +67,7 @@ export type SearchProductItemDto = {
   categoryName: string;
 };
 
-export type SearchProductRow = {
-  productId: string;
-  productName: string;
-  imageUrl: string | null;
-  brand: string | null;
-  categoryId: string;
-  categoryName: string;
+export type SearchProductRow = SearchProductItemDto & {
   rank?: number;
 };
 

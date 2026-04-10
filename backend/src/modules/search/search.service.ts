@@ -16,6 +16,20 @@ import type { SearchRepository } from './search.repository.js';
 export class SearchService {
   constructor(private readonly searchRepository: SearchRepository) {}
 
+  private async getSignedUrlForItemImageUrl<
+    T extends { imageUrl: string | null },
+  >(items: T[]): Promise<T[]> {
+    return await Promise.all(
+      items.map(async (item) => ({
+        ...item,
+        imageUrl: await StorageService.getSignedUrl(
+          process.env.STORAGE_BUCKET ?? 'images',
+          item.imageUrl,
+        ),
+      })),
+    );
+  }
+
   async searchProductPackagesByKeyword(
     storeId: string,
     query: SearchByKeywordQueryDto,
@@ -28,7 +42,13 @@ export class SearchService {
         ...normalizedPagination,
       });
 
-    return buildPaginatedResponse(items, totalItems, normalizedPagination);
+    const itemsWithSignedUrls = await this.getSignedUrlForItemImageUrl(items);
+
+    return buildPaginatedResponse(
+      itemsWithSignedUrls,
+      totalItems,
+      normalizedPagination,
+    );
   }
 
   async searchProductsByKeyword(
@@ -43,16 +63,7 @@ export class SearchService {
         ...normalizedPagination,
       });
 
-    // Tạo Signed URL cho danh sách sản phẩm
-    const itemsWithSignedUrls = await Promise.all(
-      items.map(async (item) => ({
-        ...item,
-        imageUrl: await StorageService.getSignedUrl(
-          process.env.STORAGE_BUCKET ?? 'images',
-          item.imageUrl,
-        ),
-      })),
-    );
+    const itemsWithSignedUrls = await this.getSignedUrlForItemImageUrl(items);
 
     return buildPaginatedResponse(
       itemsWithSignedUrls,
@@ -70,16 +81,7 @@ export class SearchService {
       query,
     );
 
-    // Tạo Signed URL cho danh sách sản phẩm
-    const resultWithSignedUrls = await Promise.all(
-      result.map(async (item) => ({
-        ...item,
-        imageUrl: await StorageService.getSignedUrl(
-          process.env.STORAGE_BUCKET ?? 'images',
-          item.imageUrl,
-        ),
-      })),
-    );
+    const resultWithSignedUrls = await this.getSignedUrlForItemImageUrl(result);
 
     return resultWithSignedUrls;
   }

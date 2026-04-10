@@ -15,7 +15,7 @@ export type ProductPackageResponseDto = Omit<
 > & {
   unit: Unit;
   category: Pick<Category, 'categoryId' | 'name'>;
-  product: Pick<Product, 'productId' | 'name' | 'storeId'>;
+  product: Pick<Product, 'productId' | 'imageUrl'>;
   inventory: Pick<
     Inventory,
     'inventoryId' | 'quantity' | 'reorderThreshold'
