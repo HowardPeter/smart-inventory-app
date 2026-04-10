@@ -81,9 +81,18 @@ export const buildPaginatedResponse = <T>(
   };
 };
 
+// convert date string thành dạng Date UTC+7
+const parseDateStartOfDay = (date: string): Date => {
+  return new Date(`${date}T00:00:00.000+07:00`);
+};
+
+const parseDateEndOfDay = (date: string): Date => {
+  return new Date(`${date}T23:59:59.999+07:00`);
+};
+
 export const dateRangeFilter = (
-  startDate?: Date,
-  endDate?: Date,
+  startDate?: string,
+  endDate?: string,
 ): Prisma.DateTimeFilter | undefined => {
   if (!startDate && !endDate) {
     return undefined;
@@ -92,15 +101,14 @@ export const dateRangeFilter = (
   const filter: Prisma.DateTimeFilter = {};
 
   if (startDate) {
-    filter.gte = startDate;
+    filter.gte = parseDateStartOfDay(startDate);
   }
 
   if (endDate) {
-    // lấy tới cuối ngày
-    filter.lte = new Date(
-      new Date(endDate).setHours(23, 59, 59, 999),
-    );
+    filter.lte = parseDateEndOfDay(endDate);
   }
+
+  console.info('Date range filter: ', filter);
 
   return filter;
 };

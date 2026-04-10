@@ -15,8 +15,8 @@ export const listTransactionsQuerySchema = z
     sortBy: z.enum(['createdAt', 'totalPrice']).optional().default('createdAt'),
     sortOrder: z.enum(['asc', 'desc']).optional().default('desc'),
     type: z.enum(['import', 'export']).optional(),
-    startDate: z.coerce.date().optional(),
-    endDate: z.coerce.date().optional(),
+    startDate: z.string().regex(/^\d{4}-\d{2}-\d{2}$/).optional(),
+    endDate: z.string().regex(/^\d{4}-\d{2}-\d{2}$/).optional(),
   })
   .refine(
     (data) => {
