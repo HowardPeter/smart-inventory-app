@@ -10,6 +10,24 @@ class TransactionProvider {
     return true;
   }
 
+  Future<Map<String, dynamic>> createImportTransaction({
+    required String note,
+    required List<Map<String, dynamic>> items,
+  }) async {
+    try {
+      final response = await _apiClient.post(
+        '/api/transactions/import',
+        data: {
+          if (note.isNotEmpty) 'note': note,
+          'items': items,
+        },
+      );
+      return response.data['data'] ?? response.data;
+    } catch (e) {
+      rethrow;
+    }
+  }
+
   // MOCK: LẤY CÁC GIAO DỊCH NHẬP KHO (INBOUND) CŨ LÀM LÔ HÀNG (FIFO)
   Future<List<TransactionModel>> getInboundTransactionsForPackage(
       String packageId) async {
