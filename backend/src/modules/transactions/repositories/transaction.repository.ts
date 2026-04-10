@@ -1,6 +1,6 @@
 import {
   getPaginationSkip,
-  dateRangeFilter,
+  buildDateRangeFilter,
 } from '../../../common/utils/index.js';
 import { Prisma } from '../../../generated/prisma/client.js';
 
@@ -25,7 +25,7 @@ export class TransactionRepository {
   ): Promise<ListPaginationResponseDto<TransactionListItemDto>> {
     const { page, limit, sortBy, sortOrder, type, startDate, endDate } = query;
 
-    const dateRange = dateRangeFilter(startDate, endDate);
+    const dateRange = buildDateRangeFilter(startDate, endDate);
 
     const where: Prisma.TransactionWhereInput = {
       storeId,

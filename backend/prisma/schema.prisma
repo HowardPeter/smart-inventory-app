@@ -61,8 +61,8 @@ model UserProfile {
   fullName     String?      @map("full_name")
   phone        String?
   address      String?
-  createdAt    DateTime     @default(now()) @map("created_at")
-  updatedAt    DateTime     @updatedAt @map("updated_at")
+  createdAt    DateTime     @default(now()) @map("created_at") @db.Timestamptz(3)
+  updatedAt    DateTime     @updatedAt @map("updated_at") @db.Timestamptz(3)
   activeStatus ActiveStatus @default(active) @map("active_status")
 
   storesOwned   Store[]
@@ -78,9 +78,9 @@ model Store {
   address      String?
   timezone     String?
   name         String?
-  inviteCode   String?       @unique @map("invite_code")
-  createdAt    DateTime     @default(now()) @map("created_at")
-  updatedAt    DateTime     @updatedAt @map("updated_at")
+  inviteCode   String?      @unique @map("invite_code")
+  createdAt    DateTime     @default(now()) @map("created_at") @db.Timestamptz(3)
+  updatedAt    DateTime     @updatedAt @map("updated_at") @db.Timestamptz(3)
   activeStatus ActiveStatus @default(active) @map("active_status")
   userId       String       @map("user_id")
 
@@ -98,7 +98,7 @@ model StoreMember {
   userId       String       @map("user_id")
   storeId      String       @map("store_id")
   role         StoreRole
-  joinedAt     DateTime     @default(now()) @map("joined_at")
+  joinedAt     DateTime     @default(now()) @map("joined_at") @db.Timestamptz(3)
   activeStatus ActiveStatus @default(active) @map("active_status")
 
   user  UserProfile @relation(fields: [userId], references: [userId])
@@ -135,8 +135,8 @@ model Product {
   imageUrl     String?      @map("image_url")
   brand        String?
   activeStatus ActiveStatus @default(active) @map("active_status")
-  createdAt    DateTime     @default(now()) @map("created_at")
-  updatedAt    DateTime     @updatedAt @map("updated_at")
+  createdAt    DateTime     @default(now()) @map("created_at") @db.Timestamptz(3)
+  updatedAt    DateTime     @updatedAt @map("updated_at") @db.Timestamptz(3)
   storeId      String       @map("store_id")
   categoryId   String       @map("category_id")
 
@@ -161,8 +161,8 @@ model ProductPackage {
   activeStatus     ActiveStatus @default(active) @map("active_status")
   barcodeValue     String?      @map("barcode_value")
   barcodeType      BarcodeType? @map("barcode_type")
-  createdAt        DateTime     @default(now()) @map("created_at")
-  updatedAt        DateTime     @updatedAt @map("updated_at")
+  createdAt        DateTime     @default(now()) @map("created_at") @db.Timestamptz(3)
+  updatedAt        DateTime     @updatedAt @map("updated_at") @db.Timestamptz(3)
   unitId           String       @map("unit_id")
   productId        String       @map("product_id")
 
@@ -177,7 +177,7 @@ model Inventory {
   quantity         Int
   reorderThreshold Int?         @map("reorder_threshold")
   lastCount        Int?         @map("last_count")
-  updatedAt        DateTime     @updatedAt @map("updated_at")
+  updatedAt        DateTime     @updatedAt @map("updated_at") @db.Timestamptz(3)
   activeStatus     ActiveStatus @default(active) @map("active_status")
   productPackageId String       @unique @map("product_package_id")
 
@@ -189,7 +189,7 @@ model Transaction {
   type          TransactionType
   note          String?
   status        TransactionStatus
-  createdAt     DateTime          @default(now()) @map("created_at")
+  createdAt     DateTime          @default(now()) @map("created_at") @db.Timestamptz(3)
   totalPrice    Decimal           @map("total_price") @db.Decimal(18, 2)
   userId        String            @map("user_id")
   storeId       String            @map("store_id")
@@ -218,7 +218,7 @@ model AuditLog {
   entityId    String?          @map("entity_id")
   oldValue    Json?            @map("old_value")
   newValue    Json?            @map("new_value")
-  performedAt DateTime         @default(now()) @map("performed_at")
+  performedAt DateTime         @default(now()) @map("performed_at") @db.Timestamptz(3)
   userId      String           @map("user_id")
   storeId     String           @map("store_id")
   note        String?
@@ -233,17 +233,17 @@ model BarcodeApiCache {
   provider  String?
   type      BarcodeType?
   status    BarcodeStatus
-  fetchedAt DateTime      @default(now()) @map("fetched_at")
+  fetchedAt DateTime      @default(now()) @map("fetched_at") @db.Timestamptz(3)
 }
 
 model FcmToken {
   tokenId   String   @id @default(uuid()) @map("token_id")
   token     String   @unique
-  createdAt DateTime @default(now()) @map("created_at")
-  updatedAt DateTime @updatedAt @map("updated_at")
-  userId String      @map("user_id")
+  createdAt DateTime @default(now()) @map("created_at") @db.Timestamptz(3)
+  updatedAt DateTime @updatedAt @map("updated_at") @db.Timestamptz(3)
+  userId    String   @map("user_id")
 
-  user   UserProfile @relation(fields: [userId], references: [userId], onDelete: Cascade)
+  user UserProfile @relation(fields: [userId], references: [userId], onDelete: Cascade)
 }
 
 model Notification {
@@ -255,7 +255,7 @@ model Notification {
   isRead         Boolean      @default(false) @map("is_read")
   activeStatus   ActiveStatus @default(active) @map("active_status")
   storeId        String?      @map("store_id")
-  createdAt      DateTime     @default(now()) @map("created_at")
+  createdAt      DateTime     @default(now()) @map("created_at") @db.Timestamptz(3)
   userId         String       @map("user_id")
 
   user  UserProfile @relation(fields: [userId], references: [userId], onDelete: Cascade)
