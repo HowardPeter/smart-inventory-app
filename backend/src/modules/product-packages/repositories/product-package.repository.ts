@@ -35,8 +35,7 @@ const productPackageResponseSelect = {
   product: {
     select: {
       productId: true,
-      name: true,
-      storeId: true,
+      imageUrl: true,
       category: {
         select: {
           categoryId: true,
@@ -79,8 +78,7 @@ export class ProductPackageRepository {
       category: productPackage.product.category,
       product: {
         productId: productPackage.product.productId,
-        name: productPackage.product.name,
-        storeId: productPackage.product.storeId,
+        imageUrl: productPackage.product.imageUrl,
       },
       inventory: productPackage.inventory,
     };
