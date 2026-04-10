@@ -1,4 +1,3 @@
-// src/modules/notification/validators/notification.validator.ts
 import { z } from 'zod';
 
 export const registerTokenSchema = z.object({

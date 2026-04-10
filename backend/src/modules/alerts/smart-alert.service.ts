@@ -53,9 +53,6 @@ export class SmartAlertService {
     const threshold = inventory.reorderThreshold ?? 0;
     const currentQty = newQuantity ?? inventory.quantity;
 
-    // ==========================================
-    // 🛡️ LỚP BẢO VỆ 1: LỌC SPAM (EDGE TRIGGER)
-    // ==========================================
     if (oldQuantity !== undefined) {
       // Dành cho Real-time: Chỉ báo động khi VỪA RỚT QUA NGƯỠNG
       const isSafe = oldQuantity > threshold;
@@ -82,9 +79,6 @@ export class SmartAlertService {
       return;
     }
 
-    // ==========================================
-    // 🎯 LỚP BẢO VỆ 2: TÌM ĐÚNG NGƯỜI NHẬN
-    // ==========================================
     // Lấy danh sách Chủ và Quản lý của cửa hàng này
     const targetMembers = await prisma.storeMember.findMany({
       where: {
@@ -101,9 +95,6 @@ export class SmartAlertService {
 
     const productName = inventory.productPackage?.product?.name ?? 'Sản phẩm';
 
-    // ==========================================
-    // 🚀 BẮN THÔNG BÁO CHO TOÀN BỘ BAN QUẢN LÝ
-    // ==========================================
     // Dùng Promise.all để gửi đồng loạt không bị nghẽn
     await Promise.all(
       targetMembers.map((member) =>

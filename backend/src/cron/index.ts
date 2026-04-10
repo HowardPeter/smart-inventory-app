@@ -9,7 +9,7 @@ export const initCronJobs = () => {
     '0 8-22/2 * * *',
     //'*/1 * * * *',
     async () => {
-      console.info('🤖 [Cron] Đang chạy kiểm tra tồn kho tự động...');
+      console.info('[Cron] Đang chạy kiểm tra tồn kho tự động...');
       await smartAlertService.scanAllStoresForLowStock();
     },
     {
@@ -18,6 +18,6 @@ export const initCronJobs = () => {
   );
 
   console.info(
-    '⏰ [Smart Cron Job] Giờ làm việc: 8h-22h, cách 2h/lần đã kích hoạt!',
+    '[Smart Cron Job] Giờ làm việc: 8h-22h, cách 2h/lần đã kích hoạt!',
   );
 };
