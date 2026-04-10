@@ -14,6 +14,7 @@ import 'package:frontend/core/state/services/user_service.dart';
 import 'package:share_plus/share_plus.dart';
 
 class AddMembersController extends GetxController with TErrorHandler {
+  final RxBool isInitialLoading = true.obs;
   final RxList<StoreMemberModel> members = <StoreMemberModel>[].obs;
   final RxBool isLoadingMembers = false.obs;
 
@@ -31,7 +32,29 @@ class AddMembersController extends GetxController with TErrorHandler {
     _workspaceProvider = WorkspaceProvider();
 
     _checkExistingInviteCode();
-    _fetchMembers();
+    _loadInitialData();
+  }
+
+  bool get canManageWorkspace =>
+      _storeService.currentRole.value == 'owner' ||
+      _storeService.currentRole.value == 'manager';
+
+  Future<void> _loadInitialData() async {
+    isInitialLoading.value = true;
+    await Future.wait([
+      _checkExistingInviteCode(),
+      _fetchMembers(),
+    ]);
+    isInitialLoading.value = false;
+  }
+
+  Future<void> refreshData() async {
+    isInitialLoading.value = true;
+    await Future.wait([
+      _checkExistingInviteCode(),
+      _fetchMembers(),
+    ]);
+    isInitialLoading.value = false;
   }
 
   Future<void> _fetchMembers() async {
@@ -41,7 +64,6 @@ class AddMembersController extends GetxController with TErrorHandler {
     if (storeId.isEmpty) return;
 
     try {
-      isLoadingMembers.value = true;
       final loadedMembers =
           await _workspaceProvider.getStoreMembers(storeId, currentUserId);
 
@@ -62,8 +84,6 @@ class AddMembersController extends GetxController with TErrorHandler {
       members.assignAll(loadedMembers);
     } catch (e) {
       handleError(e);
-    } finally {
-      isLoadingMembers.value = false;
     }
   }
 

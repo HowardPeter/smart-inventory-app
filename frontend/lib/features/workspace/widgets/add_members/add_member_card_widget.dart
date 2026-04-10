@@ -23,13 +23,13 @@ class AddMemberCardWidget extends StatelessWidget {
 
     Color roleColor = isOwner
         ? Colors.orange
-        : (isManager ? AppColors.primary : Colors.grey[600]!);
+        : (isManager ? AppColors.primary : AppColors.stockIn);
+
     Color bgColor = isOwner
         ? Colors.orange.withOpacity(0.1)
         : (isManager
             ? AppColors.primary.withOpacity(0.1)
-            : Colors.grey.withOpacity(0.1));
-
+            : AppColors.stockIn.withOpacity(0.1));
     bool hasHighlight = isOwner || isManager;
 
     return Container(
@@ -40,7 +40,7 @@ class AddMemberCardWidget extends StatelessWidget {
         border: Border.all(
             color: hasHighlight
                 ? roleColor.withOpacity(0.5)
-                : AppColors.softGrey.withOpacity(0.3),
+                : AppColors.stockIn.withOpacity(0.3),
             width: 1),
         boxShadow: [
           if (hasHighlight)

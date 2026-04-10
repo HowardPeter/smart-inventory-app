@@ -164,7 +164,7 @@ class _AddMemberRoleBadgeWidgetState extends State<AddMemberRoleBadgeWidget>
               _buildMenuItem(
                 icon: Iconsax.user_copy,
                 text: TTexts.roleStaff.tr,
-                color: Colors.grey[700],
+                color: AppColors.stockIn,
                 isSelected: widget.member.role == 'staff',
                 onTap: () {
                   _closeMenu();
