@@ -1,5 +1,3 @@
-import { Prisma } from '../../generated/prisma/client.js';
-
 import type { PaginationMeta, PaginationQuery } from '../types/index.js';
 
 type PaginationParams = Required<PaginationQuery>;
@@ -79,36 +77,4 @@ export const buildPaginatedResponse = <T>(
     items,
     meta: buildPaginationMeta(totalItems, query),
   };
-};
-
-// convert date string thành dạng Date UTC+7
-const parseDateStartOfDay = (date: string): Date => {
-  return new Date(`${date}T00:00:00.000+07:00`);
-};
-
-const parseDateEndOfDay = (date: string): Date => {
-  return new Date(`${date}T23:59:59.999+07:00`);
-};
-
-export const dateRangeFilter = (
-  startDate?: string,
-  endDate?: string,
-): Prisma.DateTimeFilter | undefined => {
-  if (!startDate && !endDate) {
-    return undefined;
-  }
-
-  const filter: Prisma.DateTimeFilter = {};
-
-  if (startDate) {
-    filter.gte = parseDateStartOfDay(startDate);
-  }
-
-  if (endDate) {
-    filter.lte = parseDateEndOfDay(endDate);
-  }
-
-  console.info('Date range filter: ', filter);
-
-  return filter;
 };
