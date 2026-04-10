@@ -32,7 +32,6 @@ class InboundTransactionItemAddController extends GetxController
     super.onInit();
     if (Get.arguments is InventoryInsightDisplayModel) {
       initialItem = Get.arguments;
-      // INBOUND: MẶC ĐỊNH LẤY IMPORT PRICE
       priceController.text = initialItem.inventory.productPackage?.importPrice
               .toStringAsFixed(2) ??
           '0.00';
@@ -75,7 +74,6 @@ class InboundTransactionItemAddController extends GetxController
     return TTexts.uncategorized.tr;
   }
 
-  // CÁC HÀM UI CỦA PRODUCT INFO BỊ THIẾU ĐÃ ĐƯỢC BỔ SUNG
   String get healthStatusText {
     if (currentStock <= 0) return TTexts.statusOut.tr;
     if (currentStock <= threshold) return TTexts.statusLow.tr;

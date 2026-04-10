@@ -21,6 +21,13 @@ class TExceptions {
           break;
         case DioExceptionType.badResponse:
           final statusCode = e.response?.statusCode;
+
+          if (e.response?.data != null && e.response?.data['message'] != null) {
+            title = TTexts.errorServerTitle.tr; 
+            message = e.response?.data['message'];
+            break;
+          }
+
           if (statusCode == 404) {
             title = TTexts.errorNotFoundTitle.tr;
             message = TTexts.errorNotFoundMessage.tr;

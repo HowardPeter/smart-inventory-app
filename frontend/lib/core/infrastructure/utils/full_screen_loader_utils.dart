@@ -68,6 +68,12 @@ class FullScreenLoaderUtils {
   static void stopLoading() {
     if (Get.isDialogOpen ?? false) {
       Get.back();
+    } else {
+      Future.delayed(const Duration(milliseconds: 500), () {
+        if (Get.isDialogOpen ?? false) {
+          Get.back();
+        }
+      });
     }
   }
 }

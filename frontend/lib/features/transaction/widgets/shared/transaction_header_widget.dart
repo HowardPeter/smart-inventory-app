@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:iconsax_flutter/iconsax_flutter.dart';
 import 'package:frontend/core/ui/theme/app_colors.dart';
-import 'package:frontend/core/ui/theme/app_sizes.dart';
+
 import 'package:frontend/core/ui/widgets/t_no_image_widget.dart';
 
 class TransactionHeaderWidget extends StatelessWidget {
@@ -19,15 +19,11 @@ class TransactionHeaderWidget extends StatelessWidget {
       backgroundColor: AppColors.background.withOpacity(0.7),
       elevation: 0,
       leadingWidth: 64,
-      leading: InkWell(
-        onTap: () => Get.back(),
-        borderRadius: BorderRadius.circular(AppSizes.radius8),
-        child: const Center(
-          child: Icon(
-            Iconsax.arrow_left_2_copy,
-            color: AppColors.primaryText,
-            size: 24,
-          ),
+      leading: Padding(
+        padding: const EdgeInsets.only(left: 16.0, top: 8.0, bottom: 8.0),
+        child: _buildGlassIcon(
+          icon: Iconsax.arrow_left_2_copy,
+          onTap: () => Get.back(),
         ),
       ),
       flexibleSpace: FlexibleSpaceBar(
@@ -54,6 +50,74 @@ class TransactionHeaderWidget extends StatelessWidget {
                 iconSize: 64,
                 borderRadius: 0,
               ),
+      ),
+    );
+  }
+
+  Widget _buildGlassIcon({
+    required IconData icon,
+    required VoidCallback onTap,
+  }) {
+    return GestureDetector(
+      onTap: onTap,
+      child: Container(
+        width: 42,
+        height: 42,
+        decoration: const BoxDecoration(
+          shape: BoxShape.circle,
+        ),
+        child: Stack(
+          children: [
+            Container(
+              decoration: BoxDecoration(
+                shape: BoxShape.circle,
+                color: Colors.white.withOpacity(0.12),
+              ),
+            ),
+            Container(
+              decoration: BoxDecoration(
+                shape: BoxShape.circle,
+                gradient: LinearGradient(
+                  begin: Alignment.topLeft,
+                  end: Alignment.bottomRight,
+                  colors: [
+                    Colors.white.withOpacity(0.45),
+                    Colors.white.withOpacity(0.05),
+                  ],
+                ),
+              ),
+            ),
+            Container(
+              decoration: BoxDecoration(
+                shape: BoxShape.circle,
+                border: Border.all(
+                  color: Colors.white.withOpacity(0.7),
+                  width: 1.2,
+                ),
+              ),
+            ),
+            Container(
+              decoration: BoxDecoration(
+                shape: BoxShape.circle,
+                gradient: RadialGradient(
+                  center: const Alignment(-0.3, -0.3),
+                  radius: 1.2,
+                  colors: [
+                    Colors.white.withOpacity(0.15),
+                    Colors.transparent,
+                  ],
+                ),
+              ),
+            ),
+            Center(
+              child: Icon(
+                icon,
+                size: 20,
+                color: AppColors.primaryText,
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }

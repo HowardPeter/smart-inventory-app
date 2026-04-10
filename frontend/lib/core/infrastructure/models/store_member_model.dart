@@ -35,4 +35,27 @@ class StoreMemberModel {
       isCurrentUser: uId == currentUserId,
     );
   }
+
+  // --- BỔ SUNG HÀM COPYWITH ---
+  StoreMemberModel copyWith({
+    String? id,
+    String? storeId,
+    String? userId,
+    String? name,
+    String? email,
+    String? role,
+    String? joinedAt,
+    bool? isCurrentUser,
+  }) {
+    return StoreMemberModel(
+      id: id ?? this.id,
+      storeId: storeId ?? this.storeId,
+      userId: userId ?? this.userId,
+      name: name ?? this.name,
+      email: email ?? this.email,
+      role: role ?? this.role,
+      joinedAt: joinedAt ?? this.joinedAt,
+      isCurrentUser: isCurrentUser ?? this.isCurrentUser,
+    );
+  }
 }

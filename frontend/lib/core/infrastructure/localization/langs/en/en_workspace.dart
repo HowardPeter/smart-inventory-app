@@ -53,9 +53,9 @@ final Map<String, String> enWorkspace = {
 
   TTexts.joinWorkspaceTitle: "Join Workspace",
   TTexts.joinWorkspaceSubtitle:
-      "Enter the 6-character invite code provided by your Manager to connect to the system.",
+      "Enter the invite code provided by your Manager to connect to the system.",
   TTexts.enterInviteCodeLabel: "Invite Code",
-  TTexts.enterInviteCodeHint: "e.g., X7B9Q2",
+  TTexts.enterInviteCodeHint: "e.g., ABCD-EFGH",
   TTexts.joinBtn: "Join Now",
   TTexts.joiningBtn: "Joining...",
   TTexts.checkingInviteCode: "Checking invite code...",
@@ -93,4 +93,15 @@ final Map<String, String> enWorkspace = {
   TTexts.emptyMemberTitle: "No Members Yet",
   TTexts.emptyMemberSubtitle:
       "Generate an invite code and share it with your team to start collaborating.",
+  TTexts.confirmChangeRoleTitle: "Change Role?",
+  TTexts.confirmChangeRoleMessage:
+      "Are you sure you want to change the role for",
+  TTexts.updatingRole: "Updating role...",
+  TTexts.roleUpdatedSuccess: "Member role updated successfully.",
+  TTexts.inviteCodeGeneratedSuccess:
+      "New invite code has been generated successfully!",
+  TTexts.plsGenerateNewCode: "Pls, generate new code!",
+  TTexts.copyTooltip: "Copy",
+  TTexts.shareTooltip: "Share",
+  TTexts.generateNewCodeTooltip: "Generate new code",
 };

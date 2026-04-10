@@ -287,6 +287,15 @@ class TTexts {
   static const String activeInviteCodeTitle = "active_invite_code_title";
   static const String emptyMemberTitle = "empty_member_title";
   static const String emptyMemberSubtitle = "empty_member_subtitle";
+  static const String confirmChangeRoleTitle = "confirm_change_role_title";
+  static const String confirmChangeRoleMessage = "confirm_change_role_message";
+  static const String updatingRole = "updating_role";
+  static const String roleUpdatedSuccess = "role_updated_success";
+  static const String inviteCodeGeneratedSuccess = "invite_code_generated_success";
+  static const String plsGenerateNewCode = "pls_generate_new_code";
+  static const String copyTooltip = "copy_tooltip";
+  static const String shareTooltip = "share_tooltip";
+  static const String generateNewCodeTooltip = "generate_new_code_tooltip";
 
   // -- Home
   static const String homeRoleOwnerTooltip = "home_role_owner_tooltip";

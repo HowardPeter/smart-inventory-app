@@ -1,72 +1,42 @@
-import 'package:frontend/core/infrastructure/models/transaction_model.dart';
-import 'package:frontend/core/infrastructure/models/transaction_detail_model.dart';
 import 'package:frontend/core/infrastructure/network/app_client.dart';
 
 class TransactionProvider {
   final _apiClient = ApiClient();
 
-  Future<bool> createTransaction(TransactionModel data) async {
-    await Future.delayed(const Duration(seconds: 2));
-    return true;
+  Future<Map<String, dynamic>> createImportTransaction({
+    required String note,
+    required List<Map<String, dynamic>> items,
+  }) async {
+    try {
+      final response = await _apiClient.post(
+        '/api/transactions/import',
+        data: {
+          if (note.isNotEmpty) 'note': note,
+          'items': items,
+        },
+      );
+      return response.data['data'] ?? response.data;
+    } catch (e) {
+      rethrow;
+    }
   }
 
-  // MOCK: LẤY CÁC GIAO DỊCH NHẬP KHO (INBOUND) CŨ LÀM LÔ HÀNG (FIFO)
-  Future<List<TransactionModel>> getInboundTransactionsForPackage(
-      String packageId) async {
-    await Future.delayed(const Duration(milliseconds: 300));
-
-    // Test với Coca Carton (hoặc Coca Can)
-    if (packageId == '22222222-2222-4222-a222-222222222010' ||
-        packageId == '22222222-2222-4222-a222-222222222009') {
-      return [
-        TransactionModel(
-          transactionId: "tx-inbound-001",
-          createdAt: DateTime.parse("2026-01-10 08:00:00"),
-          type: "INBOUND",
-          status: "COMPLETED",
-          totalPrice: 0,
-          items: [
-            TransactionDetailModel(
-                productPackageId: packageId, quantity: 5, unitPrice: 6.0)
-          ],
-        ),
-        TransactionModel(
-          transactionId: "tx-inbound-002",
-          createdAt: DateTime.parse("2026-01-15 09:30:00"),
-          type: "INBOUND",
-          status: "COMPLETED",
-          totalPrice: 0,
-          items: [
-            TransactionDetailModel(
-                productPackageId: packageId, quantity: 10, unitPrice: 6.0)
-          ],
-        ),
-        TransactionModel(
-          transactionId: "tx-inbound-003",
-          createdAt: DateTime.parse("2026-02-01 10:00:00"),
-          note: "Lô này đã hết hàng để test UI",
-          type: "INBOUND",
-          status: "COMPLETED",
-          totalPrice: 0,
-          items: [
-            TransactionDetailModel(
-                productPackageId: packageId, quantity: 0, unitPrice: 6.0)
-          ], // Lô hết hàng
-        ),
-        TransactionModel(
-          transactionId: "tx-inbound-004",
-          createdAt: DateTime.parse("2026-03-26 16:30:00"),
-          type: "INBOUND",
-          status: "COMPLETED",
-          totalPrice: 0,
-          items: [
-            TransactionDetailModel(
-                productPackageId: packageId, quantity: 20, unitPrice: 6.0)
-          ],
-        ),
-      ];
+  Future<Map<String, dynamic>> createExportTransaction({
+    required String note,
+    required List<Map<String, dynamic>> items,
+  }) async {
+    try {
+      final response = await _apiClient.post(
+        '/api/transactions/export',
+        data: {
+          if (note.isNotEmpty) 'note': note,
+          'items': items,
+        },
+      );
+      return response.data['data'] ?? response.data;
+    } catch (e) {
+      rethrow;
     }
-    return [];
   }
 
   Future<Map<String, dynamic>> getInventoryDetailByPackageId(
@@ -103,10 +73,7 @@ class TransactionProvider {
 
   Future<List<dynamic>> getInventoriesForAdjustment() async {
     try {
-      // Gọi API lấy danh sách tồn kho (limit cao để kiểm kê)
       final response = await _apiClient.get('/api/inventories?limit=100');
-
-      // Tùy thuộc vào cấu trúc trả về của Backend (thường là response.data['data']['items'])
       final data = response.data['data']?['items'] ??
           response.data['data'] ??
           response.data;
