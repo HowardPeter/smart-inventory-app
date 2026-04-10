@@ -82,7 +82,7 @@ class InboundTransactionController extends GetxController with TErrorHandler {
       TCustomDialogWidget(
         title: TTexts.removeItem.tr,
         description: TTexts.confirmRemoveItemTransaction.tr,
-        icon: const Text('🗑️', style: TextStyle(fontSize: 40)), // EMOJI ICON
+        icon: const Text('🗑️', style: TextStyle(fontSize: 40)),
         primaryButtonText: TTexts.remove.tr,
         onPrimaryPressed: () {
           cartItems.removeAt(index);
@@ -114,7 +114,7 @@ class InboundTransactionController extends GetxController with TErrorHandler {
         TCustomDialogWidget(
           title: TTexts.priceChangeDetected.tr,
           description: TTexts.priceChangeMessage.tr,
-          icon: const Text('💰', style: TextStyle(fontSize: 40)), // EMOJI ICON
+          icon: const Text('💰', style: TextStyle(fontSize: 40)),
           content: Column(
             mainAxisSize: MainAxisSize.min,
             children: changedPriceItems.map((item) {
@@ -153,7 +153,7 @@ class InboundTransactionController extends GetxController with TErrorHandler {
       TCustomDialogWidget(
         title: TTexts.confirmImportTitle.tr,
         description: TTexts.confirmImportDescription.tr,
-        icon: const Text('📦', style: TextStyle(fontSize: 40)), // EMOJI ICON
+        icon: const Text('📦', style: TextStyle(fontSize: 40)), 
         primaryButtonText: TTexts.proceedImport.tr,
         onPrimaryPressed: () {
           Get.back();
