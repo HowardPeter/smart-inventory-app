@@ -1,4 +1,7 @@
+import { StatusCodes } from 'http-status-codes';
+
 import { SupabaseProvider } from '../../config/supabaseClient.js';
+import { CustomError } from '../errors/index.js';
 
 export class StorageService {
   /**
@@ -8,7 +11,7 @@ export class StorageService {
     bucket: string,
     path: string | null,
   ): Promise<string | null> {
-    if (!path) {
+    if (!path || path === undefined) {
       return null;
     }
 
@@ -22,16 +25,20 @@ export class StorageService {
         .createSignedUrl(path, 60 * 60); // 3600 giây = 1 giờ
 
       if (error) {
-        console.error('Lỗi khi tạo signed URL Supabase:', error);
-
-        return null;
+        throw new CustomError({
+          message: `Error occured while creating signed URL Supabase: ${error}`,
+          status: StatusCodes.INTERNAL_SERVER_ERROR,
+          isOperational: false,
+        });
       }
 
       return data.signedUrl;
     } catch (error) {
-      console.error('Exception khi gọi Supabase:', error);
-
-      return null;
+      throw new CustomError({
+        message: `Exception occured while creating signed URL Supabase: ${error}`,
+        status: StatusCodes.INTERNAL_SERVER_ERROR,
+        isOperational: false,
+      });
     }
   }
 }

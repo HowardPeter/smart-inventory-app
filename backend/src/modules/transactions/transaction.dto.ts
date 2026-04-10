@@ -1,5 +1,10 @@
+import { z } from 'zod';
+
 import type { Transaction, TransactionDetail } from './transaction.type.js';
+import type { listTransactionsQuerySchema } from './transaction.validator.js';
+import type { PaginationResponseDto } from '../../common/types/index.js';
 import type { Prisma } from '../../generated/prisma/client.js';
+import type { ProductPackage } from '../product-packages/index.js';
 import type { ProductPackageResponseForTransaction } from '../product-packages/index.js';
 
 export type ProductPackageData = ProductPackageResponseForTransaction;
@@ -48,3 +53,23 @@ export type CreateImportTransactionResponseDto = CreateTransactionResultDto & {
 };
 
 export type CreateExportTransactionResponseDto = CreateTransactionResultDto;
+
+export type ListTransactionsQueryDto = z.infer<
+  typeof listTransactionsQuerySchema
+>;
+
+export type TransactionListItemDto = TransactionResponseDto & {
+  itemCount: number;
+};
+
+export type ListTransactionsResponseDto =
+  PaginationResponseDto<TransactionListItemDto>;
+
+type DetailTransactionItem = Pick<TransactionDetail, 'quantity' | 'unitPrice'> &
+  Pick<ProductPackage, 'productPackageId' | 'displayName' | 'barcodeValue'> & {
+    imageUrl: string | null;
+  };
+
+export type DetailTransactionResponseDto = TransactionResponseDto & {
+  items: DetailTransactionItem[];
+};
