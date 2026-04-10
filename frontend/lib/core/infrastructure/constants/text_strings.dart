@@ -851,6 +851,9 @@ class TTexts {
   static const String authSessionExpired = "auth_session_expired";
   static const String systemError = "system_error";
   static const String authError = "auth_error";
+  static const String changePasswordDialogDescription =
+      "change_password_dialog_description";
+  static const String fillAllFields = "fill_all_fields";
 
   //--Edit store
   static const String editStoreTitle = 'edit_store_title';

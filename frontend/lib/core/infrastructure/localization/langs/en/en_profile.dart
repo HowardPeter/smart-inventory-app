@@ -50,6 +50,9 @@ final Map<String, String> enProfile = {
   TTexts.authSessionExpired: 'Session expired. Please log in again.',
   TTexts.systemError: 'A system error occurred. Please try again later.',
   TTexts.authError: 'Authentication failed',
+  TTexts.changePasswordDialogDescription:
+      'Are you sure you want to change your password?',
+  TTexts.fillAllFields: 'Please fill in all the information.',
 
   //Edit Store\
   TTexts.editStoreTitle: 'My Stores',
