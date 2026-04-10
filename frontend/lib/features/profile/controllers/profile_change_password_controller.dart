@@ -10,7 +10,20 @@ class ProfileChangePasswordController extends GetxController {
   final newPasswordController = TextEditingController();
   final confirmPasswordController = TextEditingController();
 
-  final isLoading = false.obs;
+  // Biến trạng thái (State)
+  final RxBool isOldPasswordHidden = true.obs;
+  final RxBool isNewPasswordHidden = true.obs;
+  final RxBool isConfirmPasswordHidden = true.obs;
+  final RxBool isLoading = false.obs;
+
+  // --- HÀM XỬ LÝ GIAO DIỆN ---
+  void toggleOldPasswordVisibility() =>
+      isOldPasswordHidden.value = !isOldPasswordHidden.value;
+  void toggleNewPasswordVisibility() =>
+      isNewPasswordHidden.value = !isNewPasswordHidden.value;
+  void toggleConfirmPasswordVisibility() =>
+      isConfirmPasswordHidden.value = !isConfirmPasswordHidden.value;
+
   final supabase = Supabase.instance.client;
 
   Future<bool> validateBeforeSubmit() async {
