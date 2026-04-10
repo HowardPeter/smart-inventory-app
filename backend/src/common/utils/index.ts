@@ -4,4 +4,5 @@ export * from './require-req.js';
 export * from './pagination.js';
 export * from './validate-schema.util.js';
 export * from './build-audit-diff.js';
+export * from './get-signed-url.util.js';
 export * from '../../modules/stores/store.util.js';
