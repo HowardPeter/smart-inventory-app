@@ -1,6 +1,7 @@
 import { StatusCodes } from 'http-status-codes';
 
 import { CustomError } from '../../../common/errors/index.js';
+import { appEvents, eventBus } from '../../../common/events/event-bus.js';
 import {
   buildPaginatedResponse,
   normalizePagination,
@@ -148,33 +149,31 @@ export class InventoryService {
       productPackageId,
     );
 
-    let nextQuantity = existingInventory.quantity;
-
-    if (data.type === 'set') {
-      nextQuantity = data.quantity;
-    } else if (data.type === 'increase') {
-      nextQuantity = existingInventory.quantity + data.quantity;
-    } else if (data.type === 'decrease') {
-      nextQuantity = existingInventory.quantity - data.quantity;
-    }
-
-    if (nextQuantity < 0) {
+    // Bẫy an toàn bổ sung:
+    // Kiểm tra số lượng giảm không được vượt quá số lượng đang có
+    if (
+      data.type === 'decrease' &&
+      existingInventory.quantity < data.quantity
+    ) {
       throw new CustomError({
-        message: 'Inventory quantity cannot be negative',
+        message: 'Số lượng giảm không được lớn hơn số lượng tồn kho hiện tại',
         status: StatusCodes.BAD_REQUEST,
       });
     }
 
-    const changedQty = nextQuantity - existingInventory.quantity;
-
-    return await prisma.$transaction(async (tx) => {
+    const result = await prisma.$transaction(async (tx) => {
       const { inventoryRepositoryTx, auditLogRepositoryTx } =
         this.createTxRepositories(tx);
 
+      // Gọi Repository bằng hàm Atomic mới
       const updated = await inventoryRepositoryTx.adjustQuantity(
         existingInventory.inventoryId,
-        nextQuantity,
+        data.type,
+        data.quantity,
       );
+
+      // Tính toán lượng thay đổi cho Audit Log
+      const changedQty = updated.quantity - existingInventory.quantity;
 
       await auditLogRepositoryTx.createLog({
         actionType: 'update',
@@ -206,6 +205,18 @@ export class InventoryService {
         updatedAt: updated.updatedAt,
       };
     });
+
+    // PHÁT TÍN HIỆU NGAY BÊN NGOÀI TRANSACTION (ĐÃ BỔ SUNG OLD_QUANTITY)
+    eventBus.emit(appEvents.INVENTORY_CHANGED, {
+      inventoryId: existingInventory.inventoryId,
+      storeId,
+      oldQuantity: result.previousQuantity,
+      // 👉 Truyền số lượng cũ để check lọc SPAM
+      newQuantity: result.currentQuantity,
+      // 👉 Truyền số lượng mới
+    });
+
+    return result;
   }
 
   async createInventory(
@@ -314,6 +325,14 @@ export class InventoryService {
         items.map((item) => item.productPackageId),
       );
 
+    if (inventoryRecords.length !== items.length) {
+      throw new CustomError({
+        message:
+          'Một hoặc nhiều sản phẩm không tồn tại trong kho hoặc đã bị vô hiệu hóa!',
+        status: StatusCodes.BAD_REQUEST,
+      });
+    }
+
     // Tạo Map để lookup inventory theo productPackageId (O(1))
     const inventoryMap = new Map(
       inventoryRecords.map((inventory) => [
@@ -357,6 +376,7 @@ export class InventoryService {
       };
     });
 
+    // 1. CHẠY GIAO DỊCH DATABASE (TRANSACTION)
     await prisma.$transaction(async (tx) => {
       const { inventoryRepositoryTx, auditLogRepositoryTx } =
         this.createTxRepositories(tx);
@@ -439,7 +459,22 @@ export class InventoryService {
             status: StatusCodes.BAD_REQUEST,
           });
       }
-    });
+    }); // <--- TRANSACTION THỰC SỰ KẾT THÚC TẠI ĐÂY
+
+    // 2. PHÁT TÍN HIỆU NGAY TẠI ĐÂY (HOÀN TOÀN BÊN NGOÀI TRANSACTION)
+    // Đảm bảo dữ liệu đã được lưu thành công vào DB mới phát tín hiệu
+    for (const item of inventoryItems) {
+      const newQuantity =
+        transactionType === 'import'
+          ? item.quantity + item.transactionQuantity
+          : item.quantity - item.transactionQuantity;
+
+      eventBus.emit(appEvents.INVENTORY_CHANGED, {
+        inventoryId: item.inventoryId,
+        storeId,
+        newQuantity: newQuantity, // Gửi luôn số lượng mới đã tính toán
+      });
+    }
   }
 
   async deleteInventory(

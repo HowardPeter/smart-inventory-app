@@ -1,10 +1,10 @@
 import { StatusCodes } from 'http-status-codes';
 
 import { CustomError } from '../../../common/errors/index.js';
-import { generateFormattedInviteCode } from '../../../common/utils/index.js';
 import { prisma } from '../../../db/prismaClient.js'; // gọi prisma để dùng cơ chế $transaction
 import { StoreMemberRepository } from '../repositories/store-member.repository.js';
 import { StoreRepository } from '../repositories/store.repository.js';
+import { generateFormattedInviteCode } from '../store.util.js';
 
 import type {
   StoreResponseDto,

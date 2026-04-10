@@ -19,15 +19,12 @@ export class NotificationService {
   // --- LUỒNG CHÍNH: LƯU DB VÀ BẮN PUSH ---
   public async createAndSendNotification(
     userId: string,
-    storeId: string, // 👉 Bổ sung tham số storeId
+    storeId: string,
     title: string,
     body: string,
     type: string,
     referenceId?: string,
   ): Promise<void> {
-    // ==========================================
-    // 1. LẤY TÊN CỬA HÀNG SIÊU NHANH GỌN
-    // ==========================================
     const storeName =
       await this.notificationRepository.getStoreNameById(storeId);
     const displayTitle = `[${storeName}]\n${title}`;
@@ -36,7 +33,7 @@ export class NotificationService {
     const newNoti = await this.notificationRepository.createNotification(
       userId,
       storeId,
-      displayTitle, // 👉 Đưa title có tên cửa hàng vào DB
+      displayTitle,
       body,
       type,
       referenceId,
@@ -119,14 +116,13 @@ export class NotificationService {
     size: number,
     type: string,
   ) {
-    // 👉 Thêm tham số storeId
     return await this.notificationRepository.getUserNotifications(
       userId,
       storeId,
       page,
       size,
       type,
-    ); // 👉 Đồng bộ với Repo
+    );
   }
 
   public async markAsRead(userId: string, notificationId: string) {

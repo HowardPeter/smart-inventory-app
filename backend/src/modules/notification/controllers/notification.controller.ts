@@ -122,7 +122,7 @@ export class NotificationController {
 
     await this.notificationService.createAndSendNotification(
       user.userId,
-      storeId, // 👉 Truyền storeId xuống Service
+      storeId,
       title,
       body,
       type,
