@@ -1,27 +1,26 @@
-// lib/features/workspace/controllers/add_members_controller.dart
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:frontend/core/infrastructure/utils/error_handler_utils.dart';
 import 'package:frontend/core/ui/widgets/t_custom_dialog_widget.dart';
+import 'package:frontend/features/workspace/provider/workspace_provider.dart';
 import 'package:get/get.dart';
+import 'package:intl/intl.dart';
 import 'package:frontend/core/infrastructure/constants/text_strings.dart';
 import 'package:frontend/core/ui/widgets/t_snackbars_widget.dart';
 import 'package:frontend/core/infrastructure/utils/full_screen_loader_utils.dart';
-import 'package:intl/intl.dart';
-
 import 'package:frontend/core/infrastructure/models/store_member_model.dart';
-import 'package:frontend/features/workspace/provider/workspace_provider.dart';
 import 'package:frontend/core/state/services/store_service.dart';
 import 'package:frontend/core/state/services/user_service.dart';
+import 'package:share_plus/share_plus.dart';
 
-class AddMembersController extends GetxController {
+class AddMembersController extends GetxController with TErrorHandler {
   final RxList<StoreMemberModel> members = <StoreMemberModel>[].obs;
-  final RxBool isLoadingMembers = false.obs; // Biến kích hoạt Skeleton
+  final RxBool isLoadingMembers = false.obs;
 
   late final WorkspaceProvider _workspaceProvider;
   late final StoreService _storeService = Get.find<StoreService>();
   late final UserService _userService = Get.find<UserService>();
 
-  // Trạng thái Invite Code
   final RxBool hasGeneratedCode = false.obs;
   final RxString activeInviteCode = "".obs;
   final RxString generatedTimeStr = "".obs;
@@ -30,13 +29,14 @@ class AddMembersController extends GetxController {
   void onInit() {
     super.onInit();
     _workspaceProvider = WorkspaceProvider();
+
+    _checkExistingInviteCode();
     _fetchMembers();
   }
 
   Future<void> _fetchMembers() async {
     final storeId = _storeService.currentStoreId.value;
-    final currentUserId =
-        _userService.currentUser.value?.userId ?? 'dummy_user_id';
+    final currentUserId = _userService.currentUser.value?.userId ?? '';
 
     if (storeId.isEmpty) return;
 
@@ -45,21 +45,72 @@ class AddMembersController extends GetxController {
       final loadedMembers =
           await _workspaceProvider.getStoreMembers(storeId, currentUserId);
 
-      // SẮP XẾP: 1. You -> 2. Manager -> 3. Staff
+      // Sắp xếp danh sách User
       loadedMembers.sort((a, b) {
         if (a.isCurrentUser) return -1;
         if (b.isCurrentUser) return 1;
-        if (a.role == 'manager' && b.role != 'manager') return -1;
-        if (a.role != 'manager' && b.role == 'manager') return 1;
+
+        int weightA = a.role == 'owner' ? 3 : (a.role == 'manager' ? 2 : 1);
+        int weightB = b.role == 'owner' ? 3 : (b.role == 'manager' ? 2 : 1);
+
+        if (weightA != weightB) {
+          return weightB.compareTo(weightA);
+        }
         return a.name.compareTo(b.name);
       });
 
       members.assignAll(loadedMembers);
     } catch (e) {
-      TSnackbarsWidget.error(
-          title: TTexts.errorTitle.tr, message: e.toString());
+      handleError(e);
     } finally {
       isLoadingMembers.value = false;
+    }
+  }
+
+  void changeMemberRole(String targetUserId, String newRole) {
+    final memberIndex = members.indexWhere((m) => m.userId == targetUserId);
+    if (memberIndex == -1) return;
+    final memberName = members[memberIndex].name;
+
+    String roleText =
+        newRole == 'manager' ? TTexts.roleManager.tr : TTexts.roleStaff.tr;
+
+    Get.dialog(
+      TCustomDialogWidget(
+        title: TTexts.confirmChangeRoleTitle.tr,
+        description:
+            '${TTexts.confirmChangeRoleMessage.tr} $memberName -> $roleText?',
+        icon: const Text('🛡', style: TextStyle(fontSize: 40)),
+        primaryButtonText: TTexts.confirm.tr,
+        secondaryButtonText: TTexts.cancel.tr,
+        onPrimaryPressed: () {
+          Get.back();
+          _executeChangeRole(targetUserId, newRole);
+        },
+        onSecondaryPressed: () => Get.back(),
+      ),
+    );
+  }
+
+  Future<void> _executeChangeRole(String targetUserId, String newRole) async {
+    try {
+      FullScreenLoaderUtils.openLoadingDialog(TTexts.updatingRole.tr);
+
+      await _workspaceProvider.updateMemberRole(targetUserId, newRole);
+
+      final index = members.indexWhere((m) => m.userId == targetUserId);
+      if (index != -1) {
+        final updatedMember = members[index].copyWith(role: newRole);
+        members[index] = updatedMember;
+      }
+
+      FullScreenLoaderUtils.stopLoading();
+
+      TSnackbarsWidget.success(
+          title: TTexts.successTitle.tr, message: TTexts.roleUpdatedSuccess.tr);
+    } catch (e) {
+      FullScreenLoaderUtils.stopLoading();
+      handleError(e);
     }
   }
 
@@ -72,31 +123,68 @@ class AddMembersController extends GetxController {
         primaryButtonText: TTexts.confirmGenerate.tr,
         secondaryButtonText: TTexts.cancel.tr,
         onPrimaryPressed: () {
-          Get.back(); // Tắt dialog
-          _executeFakeCodeGeneration();
+          Get.back();
+          executeRealCodeGeneration();
         },
         onSecondaryPressed: () => Get.back(),
       ),
     );
   }
 
-  Future<void> _executeFakeCodeGeneration() async {
+  Future<void> _checkExistingInviteCode() async {
+    final savedCode = _storeService.currentInviteCode.value;
+    if (savedCode.isNotEmpty &&
+        savedCode != TTexts.plsGenerateNewCode.tr &&
+        savedCode != "Pls, generate new code!") {
+      activeInviteCode.value = savedCode;
+      hasGeneratedCode.value = true;
+    }
+
+    final storeId = _storeService.currentStoreId.value;
+    if (storeId.isEmpty) return;
+
+    try {
+      final store = await _workspaceProvider.getStoreById(storeId);
+
+      if (store.inviteCode != null &&
+          store.inviteCode!.isNotEmpty &&
+          store.inviteCode != TTexts.plsGenerateNewCode.tr &&
+          store.inviteCode != "Pls, generate new code!") {
+        activeInviteCode.value = store.inviteCode!;
+        hasGeneratedCode.value = true;
+
+        _storeService.updateInviteCode(store.inviteCode!);
+      } else {
+        hasGeneratedCode.value = false;
+      }
+    } catch (e) {
+      debugPrint('Lỗi khi lấy đồng bộ mã mời ngầm: $e');
+    }
+  }
+
+  Future<void> executeRealCodeGeneration() async {
+    final storeId = _storeService.currentStoreId.value;
+    if (storeId.isEmpty) return;
+
     try {
       FullScreenLoaderUtils.openLoadingDialog(TTexts.generatingCode.tr);
 
-      // Fake delay
-      await Future.delayed(const Duration(seconds: 2));
+      final newCode = await _workspaceProvider.refreshInviteCode(storeId);
 
-      activeInviteCode.value = "K9M2XQ";
+      activeInviteCode.value = newCode;
       final now = DateTime.now();
       generatedTimeStr.value = DateFormat('hh:mm a, MMM dd').format(now);
       hasGeneratedCode.value = true;
 
+      _storeService.updateInviteCode(newCode);
+
       FullScreenLoaderUtils.stopLoading();
       TSnackbarsWidget.success(
-          title: TTexts.successTitle.tr, message: "New code generated!");
+          title: TTexts.successTitle.tr,
+          message: TTexts.inviteCodeGeneratedSuccess.tr);
     } catch (e) {
       FullScreenLoaderUtils.stopLoading();
+      handleError(e);
     }
   }
 
@@ -105,5 +193,14 @@ class AddMembersController extends GetxController {
     TSnackbarsWidget.success(
         title: TTexts.inviteCodeCopiedTitle.tr,
         message: TTexts.inviteCodeCopiedMessage.tr);
+  }
+
+  void shareCode() {
+    if (activeInviteCode.value.isNotEmpty) {
+      final storeName = _storeService.currentStoreName.value;
+      Share.share(
+          "${TTexts.joinWorkspaceTitle.tr} $storeName! ${TTexts.enterInviteCodeLabel.tr}: ${activeInviteCode.value}",
+          subject: TTexts.joinWorkspaceTitle.tr);
+    }
   }
 }

@@ -1,3 +1,6 @@
+import 'package:frontend/core/infrastructure/constants/text_strings.dart';
+import 'package:get/get.dart';
+
 class StoreModel {
   final String storeId;
   final String name;
@@ -19,7 +22,7 @@ class StoreModel {
     return StoreModel(
       storeId: json['storeId'] ?? '',
       name: json['name'] ?? 'Unknown Store',
-      inviteCode: json['inviteCode'] ?? "Pls, generate new code!",
+      inviteCode: json['inviteCode'] ?? TTexts.plsGenerateNewCode.tr,
       address: json['address'],
       role: json['role'] ?? 'staff',
       activeStatus: json['activeStatus'] ?? 'active',

@@ -33,11 +33,10 @@ class WorkspaceProvider {
 
   Future<StoreModel> joinStore(String inviteCode) async {
     try {
-      final response = await _apiClient.post('/api/stores/join', data: {
-        'inviteCode': inviteCode,
-      });
-
-      // Lấy thông tin cửa hàng vừa join thành công trả về từ Backend
+      final response = await _apiClient.post(
+        '/api/stores/join',
+        data: {'inviteCode': inviteCode},
+      );
       final dynamic data = response.data['data'] ?? response.data;
       return StoreModel.fromJson(data);
     } catch (e) {
@@ -48,58 +47,51 @@ class WorkspaceProvider {
   Future<List<StoreMemberModel>> getStoreMembers(
       String storeId, String currentUserId) async {
     try {
-      // TODO: Bỏ comment 2 dòng dưới khi Backend đã có API /api/stores/:storeId/members
-      // final response = await _apiClient.get('/api/stores/$storeId/members');
-      // final List<dynamic> data = response.data['data'] ?? response.data;
+      final response =
+          await _apiClient.get('/api/store-members/$storeId/members');
 
-      // ---- FAKE MOCK DATA (Xóa đoạn này khi có API thật) ----
-      await Future.delayed(
-          const Duration(seconds: 2)); // Giả lập độ trễ mạng để xem Skeleton
-
-      final List<dynamic> data = [
-        {
-          "id": "mem_1",
-          "storeId": storeId,
-          "userId": currentUserId,
-          "role": "manager",
-          "createdAt": "2026-03-24",
-          "user": {
-            "id": currentUserId,
-            "fullName": "John Boss (You)",
-            "email": "john@store.com"
-          }
-        },
-        {
-          "id": "mem_2",
-          "storeId": storeId,
-          "userId": "u_2",
-          "role": "staff",
-          "createdAt": "2026-03-24",
-          "user": {
-            "id": "u_2",
-            "fullName": "Alex Staff",
-            "email": "alex@store.com"
-          }
-        },
-        {
-          "id": "mem_3",
-          "storeId": storeId,
-          "userId": "u_3",
-          "role": "manager",
-          "createdAt": "2026-03-24",
-          "user": {
-            "id": "u_3",
-            "fullName": "Sarah Co-founder",
-            "email": "sarah@store.com"
-          }
-        }
-      ];
-      // --------------------------------------------------------
+      final List<dynamic> data = response.data['data'] ?? response.data;
 
       return data
           .map((json) =>
               StoreMemberModel.fromJson(json, currentUserId: currentUserId))
           .toList();
+    } catch (e) {
+      rethrow;
+    }
+  }
+
+  Future<StoreModel> getStoreById(String storeId) async {
+    try {
+      final response = await _apiClient.get('/api/stores/$storeId');
+      final dynamic data = response.data['data'] ?? response.data;
+      return StoreModel.fromJson(data);
+    } catch (e) {
+      rethrow;
+    }
+  }
+
+  Future<String> refreshInviteCode(String storeId) async {
+    try {
+      final response = await _apiClient.post(
+        '/api/stores/refresh-invite-code',
+      );
+
+      final dynamic data = response.data['data'] ?? response.data;
+      return data['inviteCode'] as String;
+    } catch (e) {
+      rethrow;
+    }
+  }
+
+  Future<void> updateMemberRole(String userId, String newRole) async {
+    try {
+      await _apiClient.patch(
+        '/api/store-members/$userId/role',
+        data: {
+          'role': newRole,
+        },
+      );
     } catch (e) {
       rethrow;
     }

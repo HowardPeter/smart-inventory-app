@@ -57,6 +57,7 @@ class StoreSelectionController extends GetxController with TErrorHandler {
       final String currentId = store.storeId;
       final String currentName = store.name;
       final String currentRole = store.role;
+      final String currentInviteCode = store.inviteCode ?? '';
 
       if (currentId.isEmpty) {
         debugPrint("LỖI CRITICAL: ID Cửa hàng bị rỗng!");
@@ -69,7 +70,7 @@ class StoreSelectionController extends GetxController with TErrorHandler {
 
       // Lưu vào máy và RAM
       await _storeService.saveSelectedStore(
-          currentId, currentName, currentRole);
+          currentId, currentName, currentRole, currentInviteCode);
 
       // Nhảy vào trang Home
       Get.offAllNamed(AppRoutes.main);
