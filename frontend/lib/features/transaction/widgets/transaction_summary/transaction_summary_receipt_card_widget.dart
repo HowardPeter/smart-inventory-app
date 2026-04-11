@@ -58,7 +58,7 @@ class TransactionSummaryReceiptCardWidget
           ),
           const SizedBox(height: 20),
           _buildRow(
-            TTexts.totalItemsTransaction.tr,
+            controller.bottomLabel,
             '',
             customLeftWidget: Row(
               children: [

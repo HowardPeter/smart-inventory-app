@@ -14,34 +14,38 @@ class ReportTransactionDetailInfoCardWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    // LẤY THÔNG TIN REAL TỪ SERVICES
     final userService = Get.find<UserService>();
     final storeService = Get.find<StoreService>();
 
     final String userName =
         userService.currentUser.value?.fullName ?? 'Unknown User';
-    final String authUserId =
-        userService.currentUser.value?.authUserId ?? tx.userId ?? 'default';
 
-    // FORMAT ROLE: "owner" -> "Owner", "manager" -> "Manager", "staff" -> "Staff"
+    const String? realAvatarUrl = null;
+
     final String displayRole =
         storeService.currentRole.value.capitalizeFirst ?? 'Staff';
     final String storeName = storeService.currentStoreName.value.isNotEmpty
         ? storeService.currentStoreName.value
         : 'Main HQ Store';
 
+    // ĐÃ FIX: Đồng bộ check type theo "import" và "export"
     Color typeColor = AppColors.primaryText;
-    if (tx.type == 'INBOUND') typeColor = AppColors.stockIn;
-    if (tx.type == 'OUTBOUND') typeColor = AppColors.stockOut;
-    if (tx.type == 'ADJUSTMENT') typeColor = const Color(0xFFFF9900);
+    final String typeLower = tx.type.toLowerCase();
+
+    if (typeLower == 'import') typeColor = AppColors.stockIn;
+    if (typeLower == 'export') typeColor = AppColors.stockOut;
+    if (typeLower == 'adjustment') typeColor = const Color(0xFFFF9900);
 
     Color statusColor = AppColors.stockIn;
-    if (tx.status == 'PENDING') statusColor = const Color(0xFFFF9900);
-    if (tx.status == 'CANCELLED') statusColor = AppColors.stockOut;
+    if (tx.status.toUpperCase() == 'PENDING') {
+      statusColor = const Color(0xFFFF9900);
+    }
+    if (tx.status.toUpperCase() == 'CANCELLED') {
+      statusColor = AppColors.stockOut;
+    }
 
     final dateFormatted =
         DateFormat('dd MMM yyyy, HH:mm').format(tx.createdAt ?? DateTime.now());
-    final String avatarUrl = 'https://i.pravatar.cc/150?u=$authUserId';
 
     return Container(
       padding: const EdgeInsets.all(20),
@@ -65,29 +69,8 @@ class ReportTransactionDetailInfoCardWidget extends StatelessWidget {
             children: [
               Row(
                 children: [
-                  ClipRRect(
-                    borderRadius: BorderRadius.circular(20),
-                    child: CachedNetworkImage(
-                      imageUrl: avatarUrl,
-                      width: 40,
-                      height: 40,
-                      fit: BoxFit.cover,
-                      placeholder: (context, url) => Container(
-                        color: AppColors.softGrey.withOpacity(0.2),
-                        child: const Center(
-                            child: SizedBox(
-                                width: 16,
-                                height: 16,
-                                child: CircularProgressIndicator(
-                                    strokeWidth: 2, color: AppColors.primary))),
-                      ),
-                      errorWidget: (context, url, error) => Container(
-                        color: AppColors.primary.withOpacity(0.1),
-                        child:
-                            const Icon(Icons.person, color: AppColors.primary),
-                      ),
-                    ),
-                  ),
+                  // --- GỌI WIDGET AVATAR (Có xử lý logic fallback) ---
+                  _buildUserAvatar(realAvatarUrl),
                   const SizedBox(width: 12),
                   Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
@@ -132,7 +115,11 @@ class ReportTransactionDetailInfoCardWidget extends StatelessWidget {
           _buildInfoRow('Transaction ID', tx.transactionId ?? 'N/A',
               isBold: true),
           const SizedBox(height: 12),
-          _buildInfoRow('Type', tx.type, valueColor: typeColor, isBold: true),
+
+          // Dùng hàm _capitalize để in hoa chữ cái đầu: import -> Import
+          _buildInfoRow('Type', _capitalize(tx.type),
+              valueColor: typeColor, isBold: true),
+
           const SizedBox(height: 12),
           _buildInfoRow('Date', dateFormatted),
           const SizedBox(height: 12),
@@ -144,6 +131,48 @@ class ReportTransactionDetailInfoCardWidget extends StatelessWidget {
         ],
       ),
     );
+  }
+
+  Widget _buildUserAvatar(String? imageUrl) {
+    if (imageUrl != null && imageUrl.isNotEmpty) {
+      return ClipRRect(
+        borderRadius: BorderRadius.circular(20),
+        child: CachedNetworkImage(
+          imageUrl: imageUrl,
+          width: 40,
+          height: 40,
+          fit: BoxFit.cover,
+          placeholder: (context, url) => Container(
+            color: AppColors.softGrey.withOpacity(0.2),
+            child: const Center(
+                child: SizedBox(
+                    width: 16,
+                    height: 16,
+                    child: CircularProgressIndicator(
+                        strokeWidth: 2, color: AppColors.primary))),
+          ),
+          errorWidget: (context, url, error) => _buildDefaultAvatar(),
+        ),
+      );
+    }
+    return _buildDefaultAvatar();
+  }
+
+  Widget _buildDefaultAvatar() {
+    return Container(
+      width: 40,
+      height: 40,
+      decoration: BoxDecoration(
+        color: AppColors.primary.withOpacity(0.1),
+        shape: BoxShape.circle,
+      ),
+      child: const Icon(Icons.person, color: AppColors.primary, size: 22),
+    );
+  }
+
+  String _capitalize(String text) {
+    if (text.isEmpty) return text;
+    return '${text[0].toUpperCase()}${text.substring(1).toLowerCase()}';
   }
 
   Widget _buildInfoRow(String label, String value,

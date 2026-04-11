@@ -7,6 +7,7 @@ import 'package:frontend/core/infrastructure/utils/full_screen_loader_utils.dart
 import 'package:frontend/core/ui/layouts/t_barcode_scanner_layout.dart';
 import 'package:frontend/core/ui/widgets/t_snackbars_widget.dart';
 import 'package:frontend/core/ui/widgets/t_custom_dialog_widget.dart';
+import 'package:frontend/features/report/controllers/report_controller.dart';
 import 'package:frontend/features/transaction/providers/transaction_provider.dart';
 import 'package:frontend/routes/app_routes.dart';
 import 'package:get/get.dart';
@@ -181,7 +182,7 @@ class OutboundTransactionController extends GetxController with TErrorHandler {
       final transaction = TransactionModel(
         transactionId: response['transactionId'] ?? 'NEW-TX',
         totalPrice: totalAmount,
-        type: 'OUTBOUND',
+        type: 'export',
         status: 'COMPLETED',
         note: finalNote,
         createdAt: DateTime.now(),
@@ -191,6 +192,10 @@ class OutboundTransactionController extends GetxController with TErrorHandler {
       cartItems.clear();
       noteController.clear();
       selectedReason.value = TTexts.reasonRetailSale;
+
+      if (Get.isRegistered<ReportController>()) {
+        Get.find<ReportController>().fetchTransactions();
+      }
 
       Get.offNamed(AppRoutes.transactionSummary, arguments: transaction);
       TSnackbarsWidget.success(

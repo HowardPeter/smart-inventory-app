@@ -29,4 +29,10 @@ class ReportProvider {
 
     return listData.map((json) => TransactionModel.fromJson(json)).toList();
   }
+
+  Future<TransactionModel> getTransactionById(String transactionId) async {
+    final response = await _apiClient.get('/api/transactions/$transactionId');
+    final data = response.data['data'] ?? response.data;
+    return TransactionModel.fromJson(data);
+  }
 }

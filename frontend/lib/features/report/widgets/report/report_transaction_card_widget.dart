@@ -37,7 +37,7 @@ class ReportTransactionCardWidget extends StatelessWidget {
       margin: const EdgeInsets.only(bottom: AppSizes.p16),
       padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
-        color: AppColors.white, // Nền trắng y hệt Receipt
+        color: AppColors.white,
         borderRadius: BorderRadius.circular(16),
         boxShadow: [
           BoxShadow(
