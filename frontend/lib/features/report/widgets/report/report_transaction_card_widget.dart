@@ -113,26 +113,36 @@ class ReportTransactionCardWidget extends StatelessWidget {
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       crossAxisAlignment: CrossAxisAlignment.center,
       children: [
-        Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(leftTitle,
-                style: const TextStyle(
-                    fontSize: 10,
-                    fontWeight: FontWeight.w500,
-                    color: AppColors.subText,
-                    fontFamily: 'Poppins')),
-            const SizedBox(height: 4),
-            customLeftWidget ??
-                Text(leftValue,
-                    style: const TextStyle(
-                        fontSize: 13,
-                        fontWeight: FontWeight.w400,
-                        color: AppColors.primaryText,
-                        fontFamily: 'Poppins')),
-          ],
+        // ĐÃ FIX: Bọc Expanded và ép Ellipsis (...) để không bị tràn ID dài
+        Expanded(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(leftTitle,
+                  style: const TextStyle(
+                      fontSize: 10,
+                      fontWeight: FontWeight.w500,
+                      color: AppColors.subText,
+                      fontFamily: 'Poppins')),
+              const SizedBox(height: 4),
+              customLeftWidget ??
+                  Text(leftValue,
+                      style: const TextStyle(
+                          fontSize: 13,
+                          fontWeight: FontWeight.w400,
+                          color: AppColors.primaryText,
+                          fontFamily: 'Poppins'),
+                      overflow: TextOverflow.ellipsis, // Cắt "..."
+                      maxLines: 1),
+            ],
+          ),
         ),
-        if (rightWidget != null) rightWidget,
+
+        // ĐÃ FIX: Thêm khoảng trắng để chữ không dính sát vào Barcode / Icon
+        if (rightWidget != null) ...[
+          const SizedBox(width: 24),
+          rightWidget,
+        ]
       ],
     );
   }

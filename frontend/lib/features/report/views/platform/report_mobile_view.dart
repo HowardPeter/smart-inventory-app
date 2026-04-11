@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:frontend/core/infrastructure/utils/day_formatter_utils.dart';
 import 'package:frontend/core/ui/theme/app_colors.dart';
 import 'package:frontend/core/ui/theme/app_sizes.dart';
 import 'package:frontend/core/ui/widgets/t_empty_state_widget.dart';
@@ -23,7 +24,7 @@ class ReportMobileView extends GetView<ReportController> {
       backgroundColor: AppColors.surface,
       body: SafeArea(
         child: TRefreshIndicatorWidget(
-          onRefresh: () => controller.fetchMockData(),
+          onRefresh: () => controller.fetchTransactions(),
           child: Obx(() {
             if (controller.isLoading.value) return const ReportShimmerWidget();
 
@@ -47,10 +48,7 @@ class ReportMobileView extends GetView<ReportController> {
                       duration: const Duration(milliseconds: 300),
                       transitionBuilder:
                           (Widget child, Animation<double> animation) {
-                        return FadeTransition(
-                          opacity: animation,
-                          child: child,
-                        );
+                        return FadeTransition(opacity: animation, child: child);
                       },
                       layoutBuilder: (Widget? currentChild,
                           List<Widget> previousChildren) {
@@ -86,26 +84,29 @@ class ReportMobileView extends GetView<ReportController> {
                           const EdgeInsets.symmetric(horizontal: AppSizes.p16),
                       child: Column(
                         children: displayList.map((tx) {
-                          // Tương tự logic UI cũ của bạn
-                          Color typeColor = AppColors.primaryText;
-                          Color moneyColor = AppColors.primaryText;
-                          Color itemsColor = AppColors.primaryText;
+                          Color themeColor = AppColors.primaryText;
                           String bottomLabel = 'Total Items / Transaction';
 
-                          if (tx.type == 'INBOUND') {
-                            typeColor = AppColors.stockIn;
-                            itemsColor = AppColors.stockIn;
-                            moneyColor = AppColors.stockOut;
-                          } else if (tx.type == 'OUTBOUND') {
-                            typeColor = AppColors.stockOut;
-                            itemsColor = AppColors.stockOut;
-                            moneyColor = AppColors.stockIn;
-                          } else {
-                            typeColor = const Color(0xFFFF9900);
-                            itemsColor = const Color(0xFFFF9900);
-                            moneyColor = AppColors.stockIn;
-                            bottomLabel = 'Check Items / Stock Stats';
+                          // Lấy type nguyên bản để check
+                          final String typeLower = tx.type.toLowerCase();
+
+                          // ĐÃ FIX: Check theo đúng data thật từ DB
+                          if (typeLower == 'import') {
+                            themeColor = AppColors.stockIn; // XANH LÁ TOÀN TẬP
+                          } else if (typeLower == 'export') {
+                            themeColor = AppColors.stockOut; // ĐỎ TOÀN TẬP
                           }
+
+                          // Viết hoa chữ cái đầu cho đẹp UI (import -> Import)
+                          final String displayType = tx.type.isNotEmpty
+                              ? '${tx.type[0].toUpperCase()}${tx.type.substring(1).toLowerCase()}'
+                              : 'Unknown';
+
+                          final String itemCountDisplay = tx.itemCount > 0
+                              ? tx.itemCount.toString()
+                              : (tx.items.isNotEmpty
+                                  ? tx.items.length.toString()
+                                  : '0');
 
                           return GestureDetector(
                             onTap: () {
@@ -116,18 +117,18 @@ class ReportMobileView extends GetView<ReportController> {
                             },
                             child: ReportTransactionCardWidget(
                               transactionId: tx.transactionId ?? 'N/A',
-                              dateStr: tx.createdAt != null
-                                  ? '${tx.createdAt!.day}/${tx.createdAt!.month}/${tx.createdAt!.year}'
-                                  : 'N/A',
-                              typeDisplay: tx.type,
-                              typeColor: typeColor,
+                              dateStr:
+                                  DayFormatterUtils.formatDate(tx.createdAt),
+                              typeDisplay: displayType,
+                              typeColor: themeColor,
                               leftBottomLabel: bottomLabel,
-                              itemsDisplay: '0',
-                              itemsColor: itemsColor,
-                              moneyDisplay: '${tx.totalPrice} đ',
-                              moneyColor: moneyColor,
-                              isInbound: tx.type == 'INBOUND',
-                              isOutbound: tx.type == 'OUTBOUND',
+                              itemsDisplay: itemCountDisplay,
+                              itemsColor: themeColor,
+                              moneyDisplay:
+                                  '\$${tx.totalPrice.toStringAsFixed(2)}',
+                              moneyColor: themeColor,
+                              isInbound: typeLower == 'import',
+                              isOutbound: typeLower == 'export',
                             ),
                           );
                         }).toList(),
