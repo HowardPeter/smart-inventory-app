@@ -7,6 +7,7 @@ import 'package:frontend/core/infrastructure/utils/full_screen_loader_utils.dart
 import 'package:frontend/core/ui/layouts/t_barcode_scanner_layout.dart';
 import 'package:frontend/core/ui/widgets/t_snackbars_widget.dart';
 import 'package:frontend/core/ui/widgets/t_custom_dialog_widget.dart';
+import 'package:frontend/features/home/controllers/home_controller.dart';
 import 'package:frontend/features/report/controllers/report_controller.dart';
 import 'package:frontend/features/transaction/providers/transaction_provider.dart';
 import 'package:frontend/routes/app_routes.dart';
@@ -195,6 +196,10 @@ class OutboundTransactionController extends GetxController with TErrorHandler {
 
       if (Get.isRegistered<ReportController>()) {
         Get.find<ReportController>().fetchTransactions();
+      }
+
+      if (Get.isRegistered<HomeController>()) {
+        Get.find<HomeController>().loadAllHomeData();
       }
 
       Get.offNamed(AppRoutes.transactionSummary, arguments: transaction);

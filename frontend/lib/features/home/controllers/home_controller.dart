@@ -1,39 +1,32 @@
-import 'dart:convert';
+// ignore_for_file: curly_braces_in_flow_control_structures
+
 import 'dart:math';
-import 'package:flutter/services.dart';
 import 'package:flutter/widgets.dart';
+import 'package:frontend/features/home/providers/home_provider.dart'; // ĐÃ THÊM PROVIDER
 import 'package:frontend/features/notification/controller/notification_controller.dart';
 import 'package:get/get.dart';
 import 'package:fl_chart/fl_chart.dart';
 
 import 'package:frontend/core/infrastructure/constants/text_strings.dart';
 import 'package:frontend/core/infrastructure/models/inventory_model.dart';
+import 'package:frontend/core/infrastructure/models/transaction_model.dart'; // ĐÃ ĐỔI SANG MODEL THẬT
 import 'package:frontend/core/infrastructure/models/user_profile_model.dart';
 import 'package:frontend/core/state/provider/user_profile_provider.dart';
-import 'package:frontend/features/home/model/home_inventory_transaction_model.dart';
 
 class HomeController extends GetxController {
-  // ==========================================
-  // 1. CÁC BIẾN STATE (GỘP TỪ HEAD VÀ MAIN)
-  // ==========================================
+  final HomeProvider _provider = HomeProvider(); // Khởi tạo Provider
 
-  // Từ HEAD (Quản lý Dashboard)
   final RxBool isLoading = true.obs;
-  final RxList<HomeInventoryTransactionModel> transactions =
-      <HomeInventoryTransactionModel>[].obs;
-  final RxList<InventoryModel> inventories = <InventoryModel>[].obs;
 
-  // Từ MAIN (Quản lý User)
+  // Dùng thẳng Model chuẩn của hệ thống
+  final RxList<TransactionModel> transactions = <TransactionModel>[].obs;
+  final RxList<InventoryModel> lowStockItems = <InventoryModel>[].obs;
+  final RxInt totalStockQuantity = 0.obs;
+
   var userProfile = Rxn<UserProfileModel>();
   final UserProfileProvider userProfileProvider = UserProfileProvider();
-
-  // Xử lý notification
   final notificationController = Get.find<NotificationController>();
   RxInt unreadCount = 0.obs;
-
-  // ==========================================
-  // 2. LIFECYCLE VÀ GETTERS CƠ BẢN
-  // ==========================================
 
   String get greetingText {
     final hour = DateTime.now().hour;
@@ -45,116 +38,92 @@ class HomeController extends GetxController {
   @override
   void onInit() {
     super.onInit();
-    // Chạy song song cả load data ảo và lấy profile thật
     loadAllHomeData();
     getMyProfile();
 
-    // Lắng nghe: Cứ khi nào unreadCount bên Notification thay đổi,
-    // thì cập nhật unreadCount của Home
     ever(notificationController.unreadCount, (int count) {
       unreadCount.value = count;
     });
-
-    // Lấy giá trị hiện tại (phòng trường hợp đã có data rồi)
     unreadCount.value = notificationController.unreadCount.value;
   }
-
-  // ==========================================
-  // 3. LOGIC TỪ NHÁNH MAIN (API & AUTH)
-  // ==========================================
 
   Future<void> getMyProfile() async {
     try {
       final profile = await userProfileProvider.fetchMyProfile();
       userProfile.value = profile;
-      debugPrint(
-          "Data user model: ${userProfile.value!.fullName + userProfile.value!.email}");
     } catch (e) {
-      debugPrint("Lỗi Không thể lấy thông tin cá nhân: ${e.toString()}");
+      debugPrint("Lỗi Profile: $e");
     }
   }
 
   // ==========================================
-  // 4. LOGIC TỪ NHÁNH HEAD (DASHBOARD & CHARTS)
+  // GỌI API THẬT CHO HOME DASHBOARD
   // ==========================================
-
   Future<void> loadAllHomeData() async {
     try {
       isLoading.value = true;
-      final String response =
-          await rootBundle.loadString('assets/mock_data/home_raw_data.json');
-      final data = json.decode(response);
 
-      // Parse Transactions sang Model
-      if (data['transactions'] != null) {
-        transactions.value = (data['transactions'] as List)
-            .map((e) => HomeInventoryTransactionModel.fromJson(
-                e as Map<String, dynamic>))
-            .toList();
-      }
+      // Chạy 3 API song song để tiết kiệm thời gian chờ
+      final results = await Future.wait([
+        _provider.getTransactions(),
+        _provider.getLowStockInventories(),
+        _provider.getTotalStockQuantity(),
+      ]);
 
-      // --- LOAD INVENTORY ---
-      if (data['inventories'] != null) {
-        inventories.value = (data['inventories'] as List)
-            .map((e) => InventoryModel.fromJson(e))
-            .toList();
-      }
+      transactions.assignAll(results[0] as List<TransactionModel>);
+      lowStockItems.assignAll(results[1] as List<InventoryModel>);
+      totalStockQuantity.value = results[2] as int;
+    } catch (e) {
+      debugPrint("Lỗi load Home Data: $e");
     } finally {
       isLoading.value = false;
     }
   }
 
-  // --- LOGIC TÍNH TOÁN KHOẢNG CHIA (INTERVAL) CHO 5 MỐC ---
   Map<String, double> _calculateAxisLimits(List<double> values) {
     if (values.isEmpty) return {'min': -1.0, 'max': 4.0, 'interval': 1.25};
 
     double minVal = values.reduce(min);
     double maxVal = values.reduce(max);
 
-    // Luôn giữ trục 0 để có đường base line giữa âm và dương
     if (minVal > 0) minVal = 0;
     if (maxVal < 0) maxVal = 0;
 
     double amplitude = (maxVal - minVal).abs();
     if (amplitude == 0) amplitude = 1.0;
 
-    double padding = amplitude * 0.1; // Thêm 10% padding ở trên và dưới
-
-    // Làm tròn min xuống số nguyên
+    double padding = amplitude * 0.1;
     double finalMin = (minVal - padding).floorToDouble();
     double tempMax = (maxVal + padding).ceilToDouble();
 
-    // Tính interval và ép nó làm tròn lên số nguyên (hoặc số chẵn)
     double range = tempMax - finalMin;
     double interval = (range / 4).ceilToDouble();
-
-    // QUAN TRỌNG: Tính lại finalMax dựa trên finalMin và interval để đảm bảo lưới chia đều tăm tắp, không bị lẻ số gây dính chữ
     double finalMax = finalMin + (interval * 4);
 
     return {'min': finalMin, 'max': finalMax, 'interval': interval};
   }
 
-  // --- LINE CHART (Tính theo doanh thu) ---
+  // --- REVENUE CALCS ---
   List<FlSpot> get lineChartSpots {
     final today = DateTime.now();
     Map<double, double> hourly = {0.0: 0, 4.0: 0, 8.0: 0, 12.0: 0};
 
     for (var t in transactions) {
-      final d = t.createdAt; // Dùng Model
+      if (t.createdAt == null) continue;
+      final d = t.createdAt!.toLocal();
+
       if (d.year == today.year &&
           d.month == today.month &&
           d.day == today.day) {
-        final amt = t.totalPrice / 1000; // Dùng Model
+        final amt = t.totalPrice / 1000;
         final h = d.hour;
-        if (h >= 8 && h < 12) {
+        if (h >= 8 && h < 12)
           hourly[0.0] = hourly[0.0]! + amt;
-        } else if (h >= 12 && h < 16) {
+        else if (h >= 12 && h < 16)
           hourly[4.0] = hourly[4.0]! + amt;
-        } else if (h >= 16 && h < 20) {
+        else if (h >= 16 && h < 20)
           hourly[8.0] = hourly[8.0]! + amt;
-        } else if (h >= 20) {
-          hourly[12.0] = hourly[12.0]! + amt;
-        }
+        else if (h >= 20) hourly[12.0] = hourly[12.0]! + amt;
       }
     }
     return hourly.entries.map((e) => FlSpot(e.key, e.value)).toList();
@@ -163,11 +132,11 @@ class HomeController extends GetxController {
   Map<String, double> get lineLimits =>
       _calculateAxisLimits(lineChartSpots.map((s) => s.y).toList());
 
-  // --- BAR CHART (Tính theo doanh thu) ---
   List<double> get weeklyBarData {
     Map<int, double> daily = {1: 0, 2: 0, 3: 0, 4: 0, 5: 0, 6: 0, 7: 0};
     for (var t in transactions) {
-      final d = t.createdAt;
+      if (t.createdAt == null) continue;
+      final d = t.createdAt!.toLocal();
       daily[d.weekday] = (daily[d.weekday] ?? 0) + (t.totalPrice / 1000);
     }
     return daily.values.toList();
@@ -175,7 +144,6 @@ class HomeController extends GetxController {
 
   Map<String, double> get barLimits => _calculateAxisLimits(weeklyBarData);
 
-  // --- DOANH THU & % ---
   double get todayRevenue => _sumRevenueByDate(DateTime.now());
   double get yesterdayRevenue =>
       _sumRevenueByDate(DateTime.now().subtract(const Duration(days: 1)));
@@ -194,10 +162,10 @@ class HomeController extends GetxController {
 
   double _sumRevenueByDate(DateTime date) {
     return transactions.where((t) {
-      return t.createdAt.year == date.year &&
-          t.createdAt.month == date.month &&
-          t.createdAt.day == date.day;
-    }).fold(0.0, (sum, t) => sum + t.totalPrice); // Gọi t.totalPrice từ Model
+      if (t.createdAt == null) return false;
+      final d = t.createdAt!.toLocal();
+      return d.year == date.year && d.month == date.month && d.day == date.day;
+    }).fold(0.0, (sum, t) => sum + t.totalPrice);
   }
 
   double _sumRevenueByWeek(int weeksAgo) {
@@ -207,74 +175,39 @@ class HomeController extends GetxController {
     final end = start.add(const Duration(days: 6, hours: 23, minutes: 59));
 
     return transactions.where((t) {
-      return t.createdAt.isAfter(start.subtract(const Duration(seconds: 1))) &&
-          t.createdAt.isBefore(end);
+      if (t.createdAt == null) return false;
+      return t.createdAt!
+              .toLocal()
+              .isAfter(start.subtract(const Duration(seconds: 1))) &&
+          t.createdAt!.toLocal().isBefore(end);
     }).fold(0.0, (sum, t) => sum + t.totalPrice);
   }
 
   // --- INVENTORY STATS ---
-  int get totalStockQuantity =>
-      inventories.fold(0, (sum, item) => sum + item.quantity);
 
-  // LOGIC ĐẾM CHÍNH XÁC SỐ LƯỢNG ITEM THEO NGÀY
-  int get stockInToday {
+  List<TransactionModel> get todayTransactions {
     final now = DateTime.now();
-    int tempStockIn = 0;
-    for (var t in transactions) {
-      if (t.createdAt.year == now.year &&
-          t.createdAt.month == now.month &&
-          t.createdAt.day == now.day) {
-        // Đếm tổng số lượng trong chi tiết giao dịch
-        int qtySum = t.details.fold(0, (sum, detail) => sum + detail.quantity);
+    var filteredList = transactions.where((t) {
+      if (t.createdAt == null) return false;
+      final d = t.createdAt!.toLocal();
+      return d.year == now.year && d.month == now.month && d.day == now.day;
+    }).toList();
 
-        if (t.type == 'refund' || t.type == 'import') {
-          tempStockIn += qtySum.abs();
-        } else if (t.type == 'adjustment' && qtySum > 0) {
-          tempStockIn += qtySum;
-        }
-      }
-    }
-    return tempStockIn;
+    filteredList.sort((a, b) => b.createdAt!.compareTo(a.createdAt!));
+    return filteredList;
+  }
+
+int get stockInToday {
+    return todayTransactions
+        .where((t) => t.type.toLowerCase() == 'import')
+        // ĐÃ FIX: Dùng itemCount, nếu null/0 thì mới fallback về items.length
+        .fold<int>(0, (int sum, t) => sum + (t.itemCount > 0 ? t.itemCount : t.items.length));
   }
 
   int get stockOutToday {
-    final now = DateTime.now();
-    int tempStockOut = 0;
-    for (var t in transactions) {
-      if (t.createdAt.year == now.year &&
-          t.createdAt.month == now.month &&
-          t.createdAt.day == now.day) {
-        // Đếm tổng số lượng trong chi tiết giao dịch
-        int qtySum = t.details.fold(0, (sum, detail) => sum + detail.quantity);
-
-        if (t.type == 'sale') {
-          tempStockOut += qtySum.abs();
-        } else if (t.type == 'adjustment' && qtySum < 0) {
-          tempStockOut += qtySum.abs();
-        }
-      }
-    }
-    return tempStockOut;
-  }
-
-  // --- RECENT TRANSACTIONS ---
-  List<HomeInventoryTransactionModel> get recentTransactions {
-    var sortedList = List<HomeInventoryTransactionModel>.from(transactions);
-    // Sắp xếp giảm dần theo thời gian sử dụng field createdAt của Model
-    sortedList.sort((a, b) => b.createdAt.compareTo(a.createdAt));
-    return sortedList.take(3).toList();
-  }
-
-  // --- BỔ SUNG LOGIC LOW STOCK ALERTS ---
-  List<InventoryModel> get lowStockItems {
-    // Lọc các item có số lượng <= mức cảnh báo
-    var lowStockList = inventories
-        .where((item) => item.quantity <= item.reorderThreshold)
-        .toList();
-
-    // Sắp xếp: Thằng nào quantity = 0 (hết sạch) lên đầu, sau đó tăng dần
-    lowStockList.sort((a, b) => a.quantity.compareTo(b.quantity));
-
-    return lowStockList;
+    return todayTransactions
+        .where((t) => t.type.toLowerCase() == 'export')
+        // ĐÃ FIX: Dùng itemCount
+        .fold<int>(0, (int sum, t) => sum + (t.itemCount > 0 ? t.itemCount : t.items.length));
   }
 }

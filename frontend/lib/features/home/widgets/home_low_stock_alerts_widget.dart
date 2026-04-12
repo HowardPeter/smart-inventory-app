@@ -11,11 +11,9 @@ class HomeLowStockAlertsWidget extends GetView<HomeController> {
 
   @override
   Widget build(BuildContext context) {
-    // Bọc Obx để tự động cập nhật khi kho hàng thay đổi
     return Obx(() {
       final items = controller.lowStockItems;
 
-      // Ẩn hẳn widget nếu không có cảnh báo nào
       if (items.isEmpty) return const SizedBox.shrink();
 
       return Container(
@@ -49,7 +47,6 @@ class HomeLowStockAlertsWidget extends GetView<HomeController> {
                             borderRadius:
                                 BorderRadius.circular(AppSizes.radius12)),
                         child: Text(
-                          // Cập nhật số lượng item động
                           '${items.length} ${TTexts.homeItems.tr}',
                           style: const TextStyle(
                               fontFamily: 'Poppins',
@@ -61,22 +58,29 @@ class HomeLowStockAlertsWidget extends GetView<HomeController> {
                     ],
                   ),
                   const SizedBox(height: AppSizes.p16),
-
-                  // DUYỆT QUA DANH SÁCH CẢNH BÁO
-                  // Lấy tối đa 3-4 item để không làm thẻ bị quá dài, phần còn lại xem ở trang chi tiết
                   ...items.take(3).map((item) {
+                    final name = item.productPackage?.displayName ??
+                        item.productPackage?.product?.name ??
+                        'Unknown Product';
+
+                    final barcode = item.productPackage?.barcodeValue;
+                    final category =
+                        item.productPackage?.product?.categoryId ?? 'Product';
+
+                    final String displaySubtitle =
+                        (barcode != null && barcode.isNotEmpty)
+                            ? '${TTexts.barcodeLabel.tr}: $barcode'
+                            : category;
+
                     return Padding(
                       padding: const EdgeInsets.only(bottom: AppSizes.p12),
                       child: _buildAlertItem(
-                        // Gọi an toàn ?. để tránh lỗi null
-                        name: item.productPackageId,
-                        // Tạm gán Category (bạn có thể bổ sung category vào Model sau)
-                        category: 'Product',
+                        name: name,
+                        subtitle: displaySubtitle,
                         quantityLeft: item.quantity,
                       ),
                     );
                   }),
-
                   const SizedBox(height: 30),
                 ],
               ),
@@ -84,7 +88,7 @@ class HomeLowStockAlertsWidget extends GetView<HomeController> {
             TCustomFadeOverlayWidget(
               text: TTexts.homeTapToViewAll.tr,
               onTap: () {
-                // TODO: Xử lý chuyển sang trang danh sách Alert
+                // TODO: Chuyển sang trang danh sách Alert
               },
             ),
           ],
@@ -95,10 +99,10 @@ class HomeLowStockAlertsWidget extends GetView<HomeController> {
 
   Widget _buildAlertItem(
       {required String name,
-      required String category,
+      required String subtitle,
       required int quantityLeft}) {
-    String quantityText = quantityLeft == 0
-        ? TTexts.homeOutOfStock.tr // Thêm check nếu = 0 thì báo HẾT HÀNG
+    String quantityText = quantityLeft <= 0
+        ? TTexts.homeOutOfStock.tr
         : TTexts.homeOnlyLeft.tr
             .replaceAll('@quantity', quantityLeft.toString());
 
@@ -115,7 +119,8 @@ class HomeLowStockAlertsWidget extends GetView<HomeController> {
             decoration: BoxDecoration(
                 color: AppColors.surface,
                 borderRadius: BorderRadius.circular(AppSizes.radius8)),
-            child: const Icon(Icons.image_outlined, color: AppColors.softGrey),
+            child: const Icon(Icons.warning_amber_rounded,
+                color: AppColors.toastErrorGradientEnd),
           ),
           const SizedBox(width: AppSizes.p12),
           Expanded(
@@ -130,7 +135,7 @@ class HomeLowStockAlertsWidget extends GetView<HomeController> {
                         fontWeight: FontWeight.w600,
                         fontSize: 14,
                         color: AppColors.primaryText)),
-                Text(category,
+                Text(subtitle,
                     style: const TextStyle(
                         fontFamily: 'Poppins',
                         fontSize: 12,
