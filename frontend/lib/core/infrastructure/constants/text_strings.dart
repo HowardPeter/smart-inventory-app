@@ -61,6 +61,7 @@ class TTexts {
   static const String activeFilters = "active_filters";
   static const String userLabel = "user_label";
   static const String me = "me";
+  static const String resultsFound = "results found";
 
   // -- Network Error Dialog
   static const String netErrorTitle = "net_error_title";
@@ -291,7 +292,8 @@ class TTexts {
   static const String confirmChangeRoleMessage = "confirm_change_role_message";
   static const String updatingRole = "updating_role";
   static const String roleUpdatedSuccess = "role_updated_success";
-  static const String inviteCodeGeneratedSuccess = "invite_code_generated_success";
+  static const String inviteCodeGeneratedSuccess =
+      "invite_code_generated_success";
   static const String plsGenerateNewCode = "pls_generate_new_code";
   static const String copyTooltip = "copy_tooltip";
   static const String shareTooltip = "share_tooltip";

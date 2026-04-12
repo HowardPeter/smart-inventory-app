@@ -10,6 +10,8 @@ class UserProfileModel {
 
   final DateTime? createdAt;
   final DateTime? updatedAt;
+  final String? phone;
+  final String avatarUrl;
 
   UserProfileModel({
     required this.userId,
@@ -21,6 +23,8 @@ class UserProfileModel {
     this.address,
     this.createdAt,
     this.updatedAt,
+    this.phone,
+    this.avatarUrl = '',
   });
 
   factory UserProfileModel.fromJson(Map<String, dynamic> json) {
@@ -45,6 +49,7 @@ class UserProfileModel {
           : json['updated_at'] != null
               ? DateTime.tryParse(json['updated_at'].toString())
               : null,
+      avatarUrl: json['avatarUrl'] ?? '',
     );
   }
 
@@ -59,6 +64,9 @@ class UserProfileModel {
       'address': address,
       'createdAt': createdAt?.toIso8601String(),
       'updatedAt': updatedAt?.toIso8601String(),
+      if (phone != null) 'phone': phone,
+      if (address != null) 'address': address,
+      if (avatarUrl.isNotEmpty) 'avatarUrl': avatarUrl,
     };
   }
 
@@ -72,6 +80,8 @@ class UserProfileModel {
     String? address,
     DateTime? createdAt,
     DateTime? updatedAt,
+    String? phone,
+    String? avatarUrl,
   }) {
     return UserProfileModel(
       userId: userId ?? this.userId,
@@ -83,6 +93,8 @@ class UserProfileModel {
       address: address ?? this.address,
       createdAt: createdAt ?? this.createdAt,
       updatedAt: updatedAt ?? this.updatedAt,
+      phone: phone ?? this.phone,
+      avatarUrl: avatarUrl ?? this.avatarUrl,
     );
   }
 }
