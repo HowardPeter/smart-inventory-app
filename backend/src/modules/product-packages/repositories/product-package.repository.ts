@@ -8,11 +8,13 @@ import type { Prisma } from '../../../generated/prisma/client.js';
 import type {
   CreateProductPackageData,
   PackageQueryDto,
-  ProductPackageResponseDto,
-  UpdateProductPackageDto,
+  ProductPackageDetailResponseDto,
+  UpdateProductPackageData,
   ProductPackageSimpleResponseDto,
   ProductPackageResponseForTransaction,
   CreateInventoryData,
+  ProductPackageResponseDto,
+  CreatePackageAndInventoryResponseDto,
 } from '../product-package.dto.js';
 
 const productPackageResponseSelect = {
@@ -20,11 +22,9 @@ const productPackageResponseSelect = {
   displayName: true,
   importPrice: true,
   sellingPrice: true,
-  activeStatus: true,
   barcodeValue: true,
   barcodeType: true,
   createdAt: true,
-  updatedAt: true,
   unit: {
     select: {
       unitId: true,
@@ -63,17 +63,15 @@ export class ProductPackageRepository {
   // convert importPrice, sellingPrice từ Prisma Decimal sang number | null.
   private toResponseDto(
     productPackage: ProductPackageRecord,
-  ): ProductPackageResponseDto {
+  ): ProductPackageDetailResponseDto {
     return {
       productPackageId: productPackage.productPackageId,
       displayName: productPackage.displayName,
       importPrice: productPackage.importPrice?.toNumber() ?? null,
       sellingPrice: productPackage.sellingPrice?.toNumber() ?? null,
-      activeStatus: productPackage.activeStatus,
       barcodeValue: productPackage.barcodeValue,
       barcodeType: productPackage.barcodeType,
       createdAt: productPackage.createdAt,
-      updatedAt: productPackage.updatedAt,
       unit: productPackage.unit,
       category: productPackage.product.category,
       product: {
@@ -87,7 +85,7 @@ export class ProductPackageRepository {
   async findManyByStore(
     storeId: string,
     query: PackageQueryDto,
-  ): Promise<ListPaginationResponseDto<ProductPackageResponseDto>> {
+  ): Promise<ListPaginationResponseDto<ProductPackageDetailResponseDto>> {
     const { page, limit, categoryId, sortBy, sortOrder } = query;
 
     const where: Prisma.ProductPackageWhereInput = {
@@ -127,7 +125,7 @@ export class ProductPackageRepository {
   async findManyByProductId(
     storeId: string,
     productId: string,
-  ): Promise<ProductPackageResponseDto[]> {
+  ): Promise<ProductPackageDetailResponseDto[]> {
     const productPackages = await this.db.productPackage.findMany({
       where: {
         productId,
@@ -175,6 +173,40 @@ export class ProductPackageRepository {
     storeId: string,
     productPackageId: string,
   ): Promise<ProductPackageResponseDto | null> {
+    const productPackage = await this.db.productPackage.findFirst({
+      where: {
+        productPackageId,
+        activeStatus: 'active',
+        product: {
+          storeId,
+          activeStatus: 'active',
+        },
+      },
+      select: {
+        productPackageId: true,
+        displayName: true,
+        importPrice: true,
+        sellingPrice: true,
+        barcodeValue: true,
+        barcodeType: true,
+        unitId: true,
+        productId: true,
+      },
+    });
+
+    return productPackage
+      ? {
+          ...productPackage,
+          importPrice: productPackage.importPrice?.toNumber() ?? null,
+          sellingPrice: productPackage.sellingPrice?.toNumber() ?? null,
+        }
+      : null;
+  }
+
+  async findDetailOne(
+    storeId: string,
+    productPackageId: string,
+  ): Promise<ProductPackageDetailResponseDto | null> {
     const productPackage = await this.db.productPackage.findFirst({
       where: {
         productPackageId,
@@ -291,7 +323,7 @@ export class ProductPackageRepository {
   async createOneAndInventory(
     packageData: CreateProductPackageData,
     inventoryData: CreateInventoryData,
-  ): Promise<ProductPackageResponseDto> {
+  ): Promise<CreatePackageAndInventoryResponseDto> {
     const productPackage = await this.db.productPackage.create({
       data: {
         ...packageData,
@@ -299,15 +331,36 @@ export class ProductPackageRepository {
           create: inventoryData,
         },
       },
-      select: productPackageResponseSelect,
+      select: {
+        productPackageId: true,
+        displayName: true,
+        importPrice: true,
+        sellingPrice: true,
+        barcodeValue: true,
+        barcodeType: true,
+        createdAt: true,
+        productId: true,
+        unitId: true,
+        inventory: {
+          select: {
+            inventoryId: true,
+            quantity: true,
+            reorderThreshold: true,
+          },
+        },
+      },
     });
 
-    return this.toResponseDto(productPackage);
+    return {
+      ...productPackage,
+      importPrice: productPackage.importPrice?.toNumber() ?? null,
+      sellingPrice: productPackage.sellingPrice?.toNumber() ?? null,
+    };
   }
 
   async updateOne(
     productPackageId: string,
-    data: UpdateProductPackageDto,
+    data: UpdateProductPackageData,
   ): Promise<ProductPackageResponseDto> {
     const productPackage = await this.db.productPackage.update({
       where: { productPackageId },
@@ -328,10 +381,23 @@ export class ProductPackageRepository {
           barcodeType: data.barcodeType,
         }),
       },
-      select: productPackageResponseSelect,
+      select: {
+        productPackageId: true,
+        displayName: true,
+        importPrice: true,
+        sellingPrice: true,
+        barcodeValue: true,
+        barcodeType: true,
+        unitId: true,
+        productId: true,
+      },
     });
 
-    return this.toResponseDto(productPackage);
+    return {
+      ...productPackage,
+      importPrice: productPackage.importPrice?.toNumber() ?? null,
+      sellingPrice: productPackage.sellingPrice?.toNumber() ?? null,
+    };
   }
 
   async updateDisplayNameWithProduct(
