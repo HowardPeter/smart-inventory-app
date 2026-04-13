@@ -44,33 +44,31 @@ class HomeTransactionListWidget extends GetView<HomeController> {
               final formattedTime =
                   DateFormat('hh:mm a').format(date.toLocal());
 
-              int totalQuantity =
-                  t.itemCount > 0 ? t.itemCount : t.items.length;
-
               IconData icon;
               Color color;
               String title;
               bool isPositive;
-              String displayAmount = totalQuantity.toString();
+              String displayAmount = '\$${t.totalPrice.toStringAsFixed(2)}';
 
               if (type == 'export') {
                 icon = Icons.upload_rounded;
                 color = AppColors.stockOut;
                 title = TTexts.homeOutboundDelivery.tr;
-                isPositive = false;
-                displayAmount = "-$displayAmount";
+                isPositive = true;
+                displayAmount = "+$displayAmount";
               } else if (type == 'import') {
                 icon = Icons.download_rounded;
                 color = AppColors.stockIn;
                 title = TTexts.homeInboundShipment.tr;
-                isPositive = true;
-                displayAmount = "+$displayAmount";
+                isPositive = false;
+                displayAmount = "-$displayAmount";
               } else {
                 icon = Icons.sync_alt_rounded;
                 color = AppColors.primary;
                 title = TTexts.homeStockAdjustment.tr;
-                isPositive = true;
-                displayAmount = "+$displayAmount";
+
+                isPositive = t.totalPrice >= 0;
+                displayAmount = "${t.totalPrice > 0 ? '+' : ''}$displayAmount";
               }
 
               return HomeTransactionItemWidget(

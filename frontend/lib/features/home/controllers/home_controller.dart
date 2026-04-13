@@ -5,6 +5,7 @@ import 'package:frontend/core/infrastructure/utils/error_handler_utils.dart';
 import 'package:frontend/features/home/model/home_adjustment_model.dart';
 import 'package:frontend/features/home/providers/home_provider.dart';
 import 'package:frontend/features/notification/controller/notification_controller.dart';
+import 'package:frontend/routes/app_routes.dart';
 import 'package:get/get.dart';
 import 'package:fl_chart/fl_chart.dart';
 
@@ -75,9 +76,9 @@ class HomeController extends GetxController with TErrorHandler {
       transactions.assignAll(results[0] as List<TransactionModel>);
       lowStockItems.assignAll(results[1] as List<InventoryModel>);
 
-      // ==============================================================
-      // 1. TẠO TỪ ĐIỂN TÊN SẢN PHẨM (DÙNG CẢ 2 ID ĐỂ KHÔNG BAO GIỜ TRƯỢT)
-      // ==============================================================
+      // =============================
+      // 1. TẠO TỪ ĐIỂN TÊN SẢN PHẨM
+      // =============================
       final allInventories = results[2] as List<InventoryModel>;
       totalStockQuantity.value =
           allInventories.fold<int>(0, (sum, item) => sum + item.quantity);
@@ -86,14 +87,13 @@ class HomeController extends GetxController with TErrorHandler {
       for (var inv in allInventories) {
         if (inv.productPackage != null) {
           nameLookup[inv.productPackageId] = inv.productPackage!.displayName;
-          nameLookup[inv.inventoryId] = inv
-              .productPackage!.displayName; // Ánh xạ dự phòng bằng Inventory ID
+          nameLookup[inv.inventoryId] = inv.productPackage!.displayName;
         }
       }
 
-      // ==============================================================
+      // =======================================
       // 2. PARSE AUDIT LOG VÀ TÌM TÊN SẢN PHẨM
-      // ==============================================================
+      // =======================================
       final logs = results[3] as List<Map<String, dynamic>>;
       int lost = 0;
       int found = 0;
@@ -106,7 +106,6 @@ class HomeController extends GetxController with TErrorHandler {
         Map<String, dynamic> oldVal = {};
         Map<String, dynamic> newVal = {};
 
-        // Ép kiểu JSON từ String (Nếu backend trả về chuỗi bọc ngoặc kép)
         if (oldRaw is String) {
           try {
             oldVal = jsonDecode(oldRaw);
@@ -139,10 +138,8 @@ class HomeController extends GetxController with TErrorHandler {
         if (pkgId != null && nameLookup.containsKey(pkgId)) {
           pName = nameLookup[pkgId]!;
         } else if (entityId != null && nameLookup.containsKey(entityId)) {
-          pName =
-              nameLookup[entityId]!; // Dò bằng Inventory ID của bảng AuditLog
+          pName = nameLookup[entityId]!;
         } else {
-          // Chỉ fallback về chữ System khi tìm mọi cách mà vẫn vô vọng
           pName = log['note']?.toString() ?? '';
           if (pName.isEmpty ||
               pName == 'Stock Take' ||
@@ -179,9 +176,9 @@ class HomeController extends GetxController with TErrorHandler {
     }
   }
 
-  // ==========================================================
-  // CÁC HÀM DOANH THU & LOGIC BIỂU ĐỒ (GIỮ NGUYÊN HOÀN TOÀN)
-  // ==========================================================
+  // ====================================
+  // CÁC HÀM DOANH THU & LOGIC BIỂU ĐỒ
+  // ====================================
   Map<String, double> _calculateAxisLimits(List<double> values) {
     if (values.isEmpty) return {'min': -1.0, 'max': 4.0, 'interval': 1.25};
     double minVal = values.reduce(min);
@@ -305,5 +302,12 @@ class HomeController extends GetxController with TErrorHandler {
             (int sum, t) =>
                 sum + (t.itemCount > 0 ? t.itemCount : t.items.length));
     return exportQty + itemsLostToday.value;
+  }
+
+  // ====================================
+  // CÁC HÀM NAVIGATION
+  // ====================================
+  void goToAdjustmentHistory() {
+    Get.toNamed(AppRoutes.adjustmentHistory);
   }
 }

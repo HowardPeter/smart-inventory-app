@@ -156,4 +156,78 @@ class HomeProvider {
       return [];
     }
   }
+
+  Future<List<InventoryModel>> getAllInventoriesForDictionary() async {
+    try {
+      int currentPage = 1;
+      int totalPages = 1;
+      List<InventoryModel> allItems = [];
+
+      do {
+        final response =
+            await _apiClient.get('/api/inventories', queryParameters: {
+          'limit': 100,
+          'page': currentPage,
+        });
+        final responseData = response.data['data'];
+        List<dynamic> listData = [];
+
+        if (responseData != null) {
+          if (responseData is Map && responseData.containsKey('items')) {
+            listData = responseData['items'];
+            totalPages = responseData['totalPages'] ?? 1;
+          } else if (responseData is List) {
+            listData = responseData;
+          }
+        }
+        allItems.addAll(
+            listData.map((json) => InventoryModel.fromJson(json)).toList());
+        currentPage++;
+      } while (currentPage <= totalPages);
+
+      return allItems;
+    } catch (e) {
+      debugPrint("Lỗi getAllInventoriesForDictionary: $e");
+      return [];
+    }
+  }
+
+  Future<List<Map<String, dynamic>>> getAuditLogs({
+    int page = 1,
+    int limit = 20,
+    String? search,
+    String? startDate,
+    String? endDate,
+  }) async {
+    try {
+      final queryParams = {
+        'page': page,
+        'limit': limit,
+        'entityType': 'Inventory',
+        'sortBy': 'performedAt',
+        'sortOrder': 'desc',
+      };
+
+      if (search != null && search.isNotEmpty) queryParams['search'] = search;
+      if (startDate != null) queryParams['startDate'] = startDate;
+      if (endDate != null) queryParams['endDate'] = endDate;
+
+      final response =
+          await _apiClient.get('/api/audit-logs', queryParameters: queryParams);
+      final responseData = response.data['data'];
+      List<dynamic> listData = [];
+
+      if (responseData != null) {
+        if (responseData is Map && responseData.containsKey('items')) {
+          listData = responseData['items'];
+        } else if (responseData is List) {
+          listData = responseData;
+        }
+      }
+      return listData.cast<Map<String, dynamic>>();
+    } catch (e) {
+      debugPrint("Lỗi getAuditLogs (Provider): $e");
+      return [];
+    }
+  }
 }

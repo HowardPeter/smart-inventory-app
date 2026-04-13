@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:frontend/core/infrastructure/models/transaction_model.dart';
 import 'package:frontend/core/infrastructure/utils/day_formatter_utils.dart';
 import 'package:frontend/core/ui/theme/app_colors.dart';
-import 'package:frontend/features/navigation/controllers/navigation_controller.dart';
+import 'package:frontend/features/home/controllers/home_controller.dart';
 import 'package:frontend/features/transaction/widgets/transaction_summary/transaction_summary_details_bottom_sheet_widget.dart';
 import 'package:frontend/core/infrastructure/constants/text_strings.dart';
 import 'package:frontend/core/ui/widgets/t_bottom_sheet_widget.dart';
@@ -34,8 +34,12 @@ class TransactionSummaryController extends GetxController {
   }
 
   // Số lượng Items
-  int get totalItems =>
-      transaction.items.fold<int>(0, (int sum, item) => sum + (item.quantity));
+  int get totalItems {
+    if (isAdjustment) {
+      return transaction.items.length;
+    }
+    return transaction.items.fold(0, (sum, item) => sum + item.quantity.abs());
+  }
 
   // Giao diện y hệt Report: Bỏ dấu +/-
   String get itemsDisplay => totalItems.toString();
@@ -72,8 +76,9 @@ class TransactionSummaryController extends GetxController {
 
   void goToHome() {
     Get.until((route) => route.isFirst);
-    if (Get.isRegistered<NavigationController>()) {
-      Get.find<NavigationController>().changeIndex(0);
+
+    if (Get.isRegistered<HomeController>()) {
+      Get.find<HomeController>().loadAllHomeData();
     }
   }
 

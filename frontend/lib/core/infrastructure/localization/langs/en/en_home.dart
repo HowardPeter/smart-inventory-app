@@ -55,4 +55,17 @@ final Map<String, String> enHome = {
   TTexts.homeTapToViewAll: "Tap to view all",
   TTexts.homeInStock: "In stock",
   TTexts.homeOutOfStock: "Ouf of stock",
+
+  // Adjustment History
+  TTexts.adjustmentHistoryTitle: "Adjustment History",
+  TTexts.searchAdjustmentHint: "Search by product name or note...",
+  TTexts.selectDate: "Select Date",
+  TTexts.clearFilter: "Clear Filter",
+  TTexts.noAdjustmentsFound: "No adjustments found",
+  TTexts.noAdjustmentsFoundDesc: "Try adjusting your search or date filter.",
+  TTexts.filtered: "Filtered:",
+  TTexts.today: "Today",
+  TTexts.yesterday: "Yesterday",
+  TTexts.note: "Note",
+  TTexts.productName: "Product Name",
 };

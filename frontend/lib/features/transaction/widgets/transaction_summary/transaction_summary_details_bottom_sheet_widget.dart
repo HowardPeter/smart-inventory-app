@@ -152,21 +152,27 @@ class TransactionSummaryDetailsBottomSheetWidget
         ),
 
         // Tổng tiền (Lệch)
-        Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: [
-            Text(TTexts.total.tr.toUpperCase(),
-                style: const TextStyle(
-                    fontWeight: FontWeight.w500,
-                    fontSize: 12,
-                    color: AppColors.subText)),
-            Text('\$${controller.rawTotal.abs().toStringAsFixed(2)}',
-                style: const TextStyle(
-                    fontWeight: FontWeight.bold,
-                    color: AppColors.primary,
-                    fontSize: 18)),
-          ],
-        ),
+        if (!controller.isAdjustment) ...[
+          const Padding(
+            padding: EdgeInsets.symmetric(vertical: 16),
+            child: Divider(color: AppColors.divider, height: 1),
+          ),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Text(TTexts.total.tr.toUpperCase(),
+                  style: const TextStyle(
+                      fontWeight: FontWeight.w500,
+                      fontSize: 12,
+                      color: AppColors.subText)),
+              Text(controller.moneyDisplay,
+                  style: const TextStyle(
+                      fontWeight: FontWeight.bold,
+                      color: AppColors.primary,
+                      fontSize: 18)),
+            ],
+          ),
+        ],
 
         const SizedBox(height: 24),
 

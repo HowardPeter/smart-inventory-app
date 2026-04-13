@@ -24,7 +24,12 @@ class HomeLowStockAlertsWidget extends GetView<HomeController> {
         child: Stack(
           children: [
             Padding(
-              padding: const EdgeInsets.all(AppSizes.p20),
+              padding: EdgeInsets.only(
+                left: AppSizes.p20,
+                top: AppSizes.p20,
+                right: AppSizes.p20,
+                bottom: items.length > 3 ? 60 : AppSizes.p20,
+              ),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
@@ -59,38 +64,35 @@ class HomeLowStockAlertsWidget extends GetView<HomeController> {
                   ),
                   const SizedBox(height: AppSizes.p16),
                   ...items.take(3).map((item) {
-                    final name = item.productPackage?.displayName ??
-                        item.productPackage?.product?.name ??
-                        'Unknown Product';
+                    final pkg = item.productPackage;
 
-                    final barcode = item.productPackage?.barcodeValue;
-                    final category =
-                        item.productPackage?.product?.categoryId ?? 'Product';
-
-                    final String displaySubtitle =
-                        (barcode != null && barcode.isNotEmpty)
-                            ? '${TTexts.barcodeLabel.tr}: $barcode'
-                            : category;
+                    final name = pkg?.displayName ??
+                        pkg?.product?.name ??
+                        TTexts.unknownProduct.tr;
+                    final barcode = pkg?.barcodeValue ?? '';
+                    final String displaySubtitle = barcode.isNotEmpty
+                        ? '${TTexts.barcodeLabel.tr}: $barcode'
+                        : (pkg?.product?.brand ?? 'Product');
 
                     return Padding(
                       padding: const EdgeInsets.only(bottom: AppSizes.p12),
                       child: _buildAlertItem(
                         name: name,
-                        subtitle: displaySubtitle,
+                        category: displaySubtitle,
                         quantityLeft: item.quantity,
                       ),
                     );
                   }),
-                  const SizedBox(height: 30),
                 ],
               ),
             ),
-            TCustomFadeOverlayWidget(
-              text: TTexts.homeTapToViewAll.tr,
-              onTap: () {
-                // TODO: Chuyển sang trang danh sách Alert
-              },
-            ),
+            if (items.length > 3)
+              TCustomFadeOverlayWidget(
+                text: TTexts.homeTapToViewAll.tr,
+                onTap: () {
+                  // TODO: Xử lý chuyển sang trang danh sách Alert
+                },
+              ),
           ],
         ),
       );
@@ -99,7 +101,7 @@ class HomeLowStockAlertsWidget extends GetView<HomeController> {
 
   Widget _buildAlertItem(
       {required String name,
-      required String subtitle,
+      required String category,
       required int quantityLeft}) {
     String quantityText = quantityLeft <= 0
         ? TTexts.homeOutOfStock.tr
@@ -135,7 +137,7 @@ class HomeLowStockAlertsWidget extends GetView<HomeController> {
                         fontWeight: FontWeight.w600,
                         fontSize: 14,
                         color: AppColors.primaryText)),
-                Text(subtitle,
+                Text(category,
                     style: const TextStyle(
                         fontFamily: 'Poppins',
                         fontSize: 12,

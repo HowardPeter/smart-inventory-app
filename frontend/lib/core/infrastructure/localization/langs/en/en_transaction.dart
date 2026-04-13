@@ -212,6 +212,7 @@ final Map<String, String> enTransaction = {
 
   // -- Transaction Summary
   TTexts.qty: "Qty",
+  TTexts.modifiedProducts: "Modified Products",
   TTexts.adjustmentSummaryBrief:
       "This is a brief summary of the stock adjustment. To view the detailed list of adjusted items, please check the Transaction History.",
 };

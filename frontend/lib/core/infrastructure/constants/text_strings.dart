@@ -336,6 +336,17 @@ class TTexts {
   static const String recentAdjustments = 'recent_adjustments';
   static const String systemAdjustment = 'system_adjustment';
   static const String itemsText = 'items_text';
+  static const String adjustmentHistoryTitle = 'adjustment_history_title';
+  static const String searchAdjustmentHint = 'search_adjustment_hint';
+  static const String selectDate = 'select_date';
+  static const String clearFilter = 'clear_filter';
+  static const String noAdjustmentsFound = 'no_adjustments_found';
+  static const String noAdjustmentsFoundDesc = 'no_adjustments_found_desc';
+  static const String filtered = 'filtered';
+  static const String today = 'today';
+  static const String yesterday = 'yesterday';
+  static const String note = 'note';
+  static const String productName = 'product_name';
 
   // -- Inventory
   static const String inventoryHub = "inventory_hub";
@@ -818,6 +829,7 @@ class TTexts {
 
   // -- Transaction Summary
   static const String qty = "qty";
+  static const String modifiedProducts = 'modified_products';
   static const String adjustmentSummaryBrief = "adjustment_summary_brief";
 
   // -- Notifications
