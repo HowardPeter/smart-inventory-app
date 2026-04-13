@@ -10,6 +10,7 @@ import 'package:frontend/features/home/widgets/home_header_widget.dart';
 import 'package:frontend/features/home/widgets/home_quick_actions_widget.dart';
 import 'package:frontend/features/home/widgets/home_revenue_chart_widget.dart';
 import 'package:frontend/features/home/widgets/home_daily_summary_widget.dart';
+import 'package:frontend/features/home/widgets/home_adjustment_stats_widget.dart'; // ĐÃ IMPORT
 import 'package:frontend/features/home/widgets/home_low_stock_alerts_widget.dart';
 import 'package:frontend/features/home/widgets/home_transaction_list_widget.dart';
 
@@ -58,6 +59,16 @@ class HomeMobileScreen extends GetView<HomeController> {
                       const SizedBox(height: AppSizes.p12),
                       const HomeDailySummaryWidget(),
                       const SizedBox(height: AppSizes.p24),
+
+                      // ==========================================
+                      // BỔ SUNG LỊCH SỬ KIỂM KHO VÀO ĐÚNG VỊ TRÍ
+                      // ==========================================
+                      Obx(() => controller.todayAdjustments.isNotEmpty
+                          ? const Padding(
+                              padding: EdgeInsets.only(bottom: AppSizes.p24),
+                              child: HomeAdjustmentStatsWidget(),
+                            )
+                          : const SizedBox.shrink()),
 
                       // 5. CẢNH BÁO KHO
                       Obx(() => controller.lowStockItems.isNotEmpty

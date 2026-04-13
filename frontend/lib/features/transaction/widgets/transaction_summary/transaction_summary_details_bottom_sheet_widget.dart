@@ -16,7 +16,10 @@ class TransactionSummaryDetailsBottomSheetWidget
       mainAxisSize: MainAxisSize.min,
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        _buildInfoRow(TTexts.transactionNumber.tr,
+        _buildInfoRow(
+            controller.isAdjustment
+                ? TTexts.adjustmentId.tr
+                : TTexts.transactionNumber.tr,
             controller.transaction.transactionId ?? TTexts.na.tr),
         const SizedBox(height: 8),
         _buildInfoRow(TTexts.transactionDate.tr, controller.dateStr),
@@ -188,7 +191,7 @@ class TransactionSummaryDetailsBottomSheetWidget
         Expanded(
           child: Text(
             value,
-            textAlign: TextAlign.right, 
+            textAlign: TextAlign.right,
             style: const TextStyle(
                 fontSize: 12,
                 fontWeight: FontWeight.w500,

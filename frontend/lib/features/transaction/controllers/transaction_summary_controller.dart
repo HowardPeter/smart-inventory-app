@@ -62,7 +62,7 @@ class TransactionSummaryController extends GetxController {
 
   // Label góc trái dưới cùng
   String get bottomLabel {
-    if (isAdjustment) return 'Check Items / Stock Stats';
+    if (isAdjustment) return TTexts.checkItemsStats.tr;
     return TTexts.totalItemsTransaction.tr;
   }
 

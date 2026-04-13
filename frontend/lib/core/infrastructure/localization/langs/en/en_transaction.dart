@@ -200,6 +200,15 @@ final Map<String, String> enTransaction = {
   TTexts.discardTransactionTitle: "Discard Transaction?",
   TTexts.discardTransactionDesc:
       "You have items in your ticket. If you exit now, this transaction will be lost. Do you want to exit anyway?",
+  TTexts.noDifferencesFound:
+      "No differences found. Please modify at least one item.",
+  TTexts.adjustmentCompletedTitle: "Adjustment Completed",
+  TTexts.adjustmentSuccessSub:
+      "Your stock adjustment has been processed successfully.",
+  TTexts.adjustmentId: "Adjustment ID",
+  TTexts.checkItemsStats: "Check Items / Stock Stats",
+
+  TTexts.totalDifference: "Total Difference",
 
   // -- Transaction Summary
   TTexts.qty: "Qty",

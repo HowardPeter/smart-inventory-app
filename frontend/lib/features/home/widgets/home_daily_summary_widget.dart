@@ -33,74 +33,140 @@ class HomeDailySummaryWidget extends GetView<HomeController> {
           Obx(() {
             final double stockIn = controller.stockInToday.toDouble();
             final double stockOut = controller.stockOutToday.toDouble();
-            final double total = stockIn + stockOut;
+            final int adjustmentsCount = controller.todayAdjustments.length;
+
+            double maxY = (stockIn > stockOut ? stockIn : stockOut) * 1.3;
+            if (maxY == 0) maxY = 10;
 
             return Row(
+              crossAxisAlignment: CrossAxisAlignment.center,
               children: [
-                // =========================================
-                // BIỂU ĐỒ DONUT (PIE CHART) Ở BÊN TRÁI
-                // =========================================
+                // =====================================
+                // CỘT TRÁI: BIỂU ĐỒ 
+                // =====================================
                 SizedBox(
-                  height: 120,
-                  width: 120,
-                  child: Stack(
-                    alignment: Alignment.center,
-                    children: [
-                      PieChart(
-                        PieChartData(
-                          pieTouchData: PieTouchData(enabled: false),
-                          borderData: FlBorderData(show: false),
-                          sectionsSpace: 4,
-                          centerSpaceRadius: 42, // Kích thước lỗ tròn ở giữa
-                          sections: _showingSections(stockIn, stockOut, total),
+                  height: 150,
+                  width: 110,
+                  child: BarChart(
+                    BarChartData(
+                      alignment: BarChartAlignment.spaceAround,
+                      maxY: maxY,
+                      minY: 0,
+                      barTouchData: BarTouchData(
+                        enabled: false,
+                        touchTooltipData: BarTouchTooltipData(
+                          getTooltipColor: (group) =>
+                              Colors.transparent, 
+                          tooltipMargin: 2,
+                          tooltipPadding: EdgeInsets.zero, 
+                          getTooltipItem: (group, groupIndex, rod, rodIndex) {
+                            return BarTooltipItem(
+                              rod.toY.toInt().toString(),
+                              const TextStyle(
+                                color: AppColors
+                                    .primaryText, 
+                                fontWeight: FontWeight.w600,
+                                fontSize: 11,
+                                fontFamily: 'Poppins',
+                              ),
+                            );
+                          },
                         ),
                       ),
-                      // CHỮ TỔNG CỘNG Ở GIỮA
-                      Column(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          Text(
-                            total.toInt().toString(),
-                            style: const TextStyle(
-                              fontFamily: 'Poppins',
-                              fontSize: 22,
-                              fontWeight: FontWeight.bold,
-                              color: AppColors.primaryText,
-                            ),
+                      titlesData: FlTitlesData(
+                        show: true,
+                        bottomTitles: AxisTitles(
+                          sideTitles: SideTitles(
+                            showTitles: true,
+                            reservedSize: 24,
+                            getTitlesWidget: (double value, TitleMeta meta) {
+                              const style = TextStyle(
+                                  color: AppColors.subText,
+                                  fontSize: 11,
+                                  fontWeight: FontWeight.bold);
+                              String text = value == 0 ? 'IN' : 'OUT';
+                              return Padding(
+                                padding: const EdgeInsets.only(top: 8.0),
+                                child: Text(text, style: style),
+                              );
+                            },
                           ),
-                          Text(
-                            TTexts.homeItems.tr.toLowerCase(),
-                            style: const TextStyle(
-                              fontFamily: 'Poppins',
-                              fontSize: 11,
-                              fontWeight: FontWeight.w500,
-                              color: AppColors.subText,
-                            ),
-                          ),
-                        ],
+                        ),
+                        leftTitles: const AxisTitles(
+                            sideTitles: SideTitles(showTitles: false)),
+                        topTitles: const AxisTitles(
+                            sideTitles: SideTitles(showTitles: false)),
+                        rightTitles: const AxisTitles(
+                            sideTitles: SideTitles(showTitles: false)),
                       ),
-                    ],
+                      gridData: FlGridData(
+                        show: true,
+                        drawVerticalLine: false,
+                        getDrawingHorizontalLine: (value) => FlLine(
+                          color: AppColors.softGrey.withOpacity(0.15),
+                          strokeWidth: 1,
+                          dashArray: [4, 4],
+                        ),
+                      ),
+                      borderData: FlBorderData(show: false),
+                      barGroups: [
+                        BarChartGroupData(
+                          x: 0,
+                          showingTooltipIndicators: [0], // Luôn hiện số
+                          barRods: [
+                            BarChartRodData(
+                              toY: stockIn,
+                              color: AppColors.stockIn,
+                              width: 26,
+                              borderRadius: const BorderRadius.vertical(
+                                  top: Radius.circular(6)),
+                            ),
+                          ],
+                        ),
+                        BarChartGroupData(
+                          x: 1,
+                          showingTooltipIndicators: [0], // Luôn hiện số
+                          barRods: [
+                            BarChartRodData(
+                              toY: stockOut,
+                              color: AppColors.stockOut,
+                              width: 26,
+                              borderRadius: const BorderRadius.vertical(
+                                  top: Radius.circular(6)),
+                            ),
+                          ],
+                        ),
+                      ],
+                    ),
                   ),
                 ),
-                const SizedBox(width: 32),
 
-                // =========================================
-                // CHÚ THÍCH (LEGEND) Ở BÊN PHẢI
-                // =========================================
+                const SizedBox(width: 24),
+
+                // =====================================
+                // CỘT PHẢI: CHÚ THÍCH
+                // =====================================
                 Expanded(
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
                       _buildLegend(TTexts.homeStockIn.tr, AppColors.stockIn,
-                          stockIn.toInt()),
-                      const SizedBox(height: 16),
+                          stockIn.toInt().toString()),
+                      const SizedBox(height: 12),
                       Divider(
                           color: AppColors.softGrey.withOpacity(0.1),
                           height: 1),
-                      const SizedBox(height: 16),
+                      const SizedBox(height: 12),
                       _buildLegend(TTexts.homeStockOut.tr, AppColors.stockOut,
-                          stockOut.toInt()),
+                          stockOut.toInt().toString()),
+                      const SizedBox(height: 12),
+                      Divider(
+                          color: AppColors.softGrey.withOpacity(0.1),
+                          height: 1),
+                      const SizedBox(height: 12),
+                      _buildLegend(TTexts.homeStockAdjustment.tr, Colors.orange,
+                          "$adjustmentsCount ${TTexts.itemsText.tr.toLowerCase()}"),
                     ],
                   ),
                 ),
@@ -112,66 +178,42 @@ class HomeDailySummaryWidget extends GetView<HomeController> {
     );
   }
 
-  // Hàm chia tỷ lệ cho biểu đồ
-  List<PieChartSectionData> _showingSections(
-      double stockIn, double stockOut, double total) {
-    // Nếu hôm nay chưa có giao dịch nào -> Trả về vòng xám mờ
-    if (total == 0) {
-      return [
-        PieChartSectionData(
-          color: AppColors.softGrey.withOpacity(0.15),
-          value: 100,
-          title: '',
-          radius: 12,
-        )
-      ];
-    }
-
-    return [
-      PieChartSectionData(
-        color: AppColors.stockIn,
-        value: stockIn,
-        title: '',
-        radius: stockIn >= stockOut ? 16 : 12, // Làm dày hơn nếu chiếm đa số
-      ),
-      PieChartSectionData(
-        color: AppColors.stockOut,
-        value: stockOut,
-        title: '',
-        radius: stockOut > stockIn ? 16 : 12,
-      ),
-    ];
-  }
-
-  // Hàm build dòng chú thích
-  Widget _buildLegend(String title, Color color, int value) {
+  Widget _buildLegend(String title, Color color, String value) {
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      crossAxisAlignment: CrossAxisAlignment.center,
       children: [
-        Row(
-          children: [
-            Container(
-              width: 12,
-              height: 12,
-              decoration: BoxDecoration(color: color, shape: BoxShape.circle),
-            ),
-            const SizedBox(width: 8),
-            Text(
-              title,
-              style: const TextStyle(
-                fontFamily: 'Poppins',
-                fontSize: 13,
-                fontWeight: FontWeight.w500,
-                color: AppColors.subText,
+        Expanded(
+          child: Row(
+            children: [
+              Container(
+                width: 10,
+                height: 10,
+                decoration: BoxDecoration(color: color, shape: BoxShape.circle),
               ),
-            ),
-          ],
+              const SizedBox(width: 8),
+              Expanded(
+                child: Text(
+                  title,
+                  style: const TextStyle(
+                    fontFamily: 'Poppins',
+                    fontSize: 12,
+                    fontWeight: FontWeight.w500,
+                    color: AppColors.subText,
+                  ),
+                  maxLines: 2,
+                  overflow: TextOverflow.ellipsis,
+                ),
+              ),
+            ],
+          ),
         ),
+        const SizedBox(width: 8),
         Text(
-          value.toString(),
+          value,
           style: const TextStyle(
             fontFamily: 'Poppins',
-            fontSize: 16,
+            fontSize: 14,
             fontWeight: FontWeight.bold,
             color: AppColors.primaryText,
           ),

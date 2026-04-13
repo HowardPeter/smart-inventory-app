@@ -330,6 +330,12 @@ class TTexts {
   static const String homeAddProductSub = "home_add_product_sub";
   static const String homeViewReports = "home_view_reports";
   static const String homeViewReportsSub = "home_view_reports_sub";
+  static const String surplus = 'surplus';
+  static const String shrinkage = 'shrinkage';
+  static const String dailyStockHealth = 'daily_stock_health';
+  static const String recentAdjustments = 'recent_adjustments';
+  static const String systemAdjustment = 'system_adjustment';
+  static const String itemsText = 'items_text';
 
   // -- Inventory
   static const String inventoryHub = "inventory_hub";
@@ -803,6 +809,12 @@ class TTexts {
   static const String discardTransactionTitle = "discard_transaction_title";
   static const String discardTransactionDesc = "discard_transaction_desc";
   static const String profileEmailUser = "profile_email_user";
+  static const String noDifferencesFound = 'no_differences_found';
+  static const String adjustmentCompletedTitle = 'adjustment_completed_title';
+  static const String adjustmentSuccessSub = 'adjustment_success_sub';
+  static const String adjustmentId = 'adjustment_id';
+  static const String checkItemsStats = 'check_items_stats';
+  static const String totalDifference = 'total_difference';
 
   // -- Transaction Summary
   static const String qty = "qty";

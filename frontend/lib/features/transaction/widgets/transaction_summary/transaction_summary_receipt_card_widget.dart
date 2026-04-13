@@ -27,8 +27,8 @@ class TransactionSummaryReceiptCardWidget
       ),
       child: Column(
         children: [
-          _buildRow(
-            TTexts.transactionNumber.tr,
+         _buildRow(
+            controller.isAdjustment ? TTexts.adjustmentId.tr : TTexts.transactionNumber.tr,
             controller.transaction.transactionId ?? TTexts.na.tr,
             rightWidget: _buildFakeBarcode(),
           ),

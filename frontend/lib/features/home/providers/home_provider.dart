@@ -2,7 +2,7 @@ import 'package:flutter/foundation.dart';
 import 'package:frontend/core/infrastructure/models/transaction_model.dart';
 import 'package:frontend/core/infrastructure/models/inventory_model.dart';
 import 'package:frontend/core/infrastructure/network/app_client.dart';
-import 'package:frontend/core/infrastructure/utils/day_formatter_utils.dart'; 
+import 'package:frontend/core/infrastructure/utils/day_formatter_utils.dart';
 
 class HomeProvider {
   final _apiClient = ApiClient();
@@ -10,7 +10,6 @@ class HomeProvider {
   Future<List<TransactionModel>> getTransactions() async {
     try {
       final now = DateTime.now();
-      // Lấy từ tháng trước đến tháng sau (y hệt Report) để chắc chắn lấy đủ ngày ở biên múi giờ
       final startDateStr =
           DayFormatterUtils.formatApiDate(DateTime(now.year, now.month - 1, 1));
       final endDateStr =
@@ -78,11 +77,67 @@ class HomeProvider {
     }
   }
 
-  Future<int> getTotalStockQuantity() async {
+  Future<List<InventoryModel>> getAllInventories() async {
     try {
+      int currentPage = 1;
+      int totalPages = 1;
+      List<InventoryModel> allItems = [];
+
+      do {
+        final response =
+            await _apiClient.get('/api/inventories', queryParameters: {
+          'limit': 100,
+          'page': currentPage,
+        });
+
+        final responseData = response.data['data'];
+        List<dynamic> listData = [];
+
+        if (responseData != null) {
+          if (responseData is Map) {
+            if (responseData.containsKey('items')) {
+              listData = responseData['items'];
+            }
+            totalPages = responseData['totalPages'] ?? 1;
+          } else if (responseData is List) {
+            listData = responseData;
+          }
+        }
+
+        final inventories =
+            listData.map((json) => InventoryModel.fromJson(json)).toList();
+        allItems.addAll(inventories);
+
+        currentPage++;
+      } while (currentPage <= totalPages);
+
+      return allItems;
+    } catch (e) {
+      debugPrint("Lỗi getAllInventories (Home): $e");
+      return [];
+    }
+  }
+
+  Future<List<Map<String, dynamic>>> getTodayAuditLogs() async {
+    try {
+      final now = DateTime.now();
+
+      // Lấy chính xác điểm bắt đầu và kết thúc của "Ngày hôm nay" ở Local
+      final startOfDay = DateTime(now.year, now.month, now.day, 0, 0, 0);
+      final endOfDay = DateTime(now.year, now.month, now.day, 23, 59, 59, 999);
+
+      // Chuyển sang chuẩn ISO 8601 (UTC) để Backend Prisma đọc
+      final startDateStr = startOfDay.toUtc().toIso8601String();
+      final endDateStr = endOfDay.toUtc().toIso8601String();
+
       final response =
-          await _apiClient.get('/api/inventories', queryParameters: {
-        'limit': 1000,
+          await _apiClient.get('/api/audit-logs', queryParameters: {
+        'limit': 100,
+        'entityType': 'Inventory',
+        'startDate': startDateStr,
+        'endDate': endDateStr,
+        'sortBy': 'performedAt',
+        'sortOrder': 'desc',
       });
 
       final responseData = response.data['data'];
@@ -94,18 +149,11 @@ class HomeProvider {
         } else if (responseData is List) {
           listData = responseData;
         }
-      } else if (response.data is List) {
-        listData = response.data;
-      } else if (response.data is Map && response.data.containsKey('items')) {
-        listData = response.data['items'];
       }
-
-      final inventories =
-          listData.map((json) => InventoryModel.fromJson(json)).toList();
-      return inventories.fold<int>(0, (int sum, item) => sum + item.quantity);
+      return listData.cast<Map<String, dynamic>>();
     } catch (e) {
-      debugPrint("Lỗi getTotalStockQuantity (Home): $e");
-      return 0;
+      debugPrint("Lỗi getTodayAuditLogs: $e");
+      return [];
     }
   }
 }

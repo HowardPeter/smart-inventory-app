@@ -35,7 +35,6 @@ class HomeTransactionListWidget extends GetView<HomeController> {
             );
           }
 
-          // Lấy 3 giao dịch mới nhất trong ngày hiển thị ra ngoài
           final recentList = todayList.take(3).toList();
 
           return Column(
@@ -44,6 +43,7 @@ class HomeTransactionListWidget extends GetView<HomeController> {
               final date = t.createdAt ?? DateTime.now();
               final formattedTime =
                   DateFormat('hh:mm a').format(date.toLocal());
+
               int totalQuantity =
                   t.itemCount > 0 ? t.itemCount : t.items.length;
 
