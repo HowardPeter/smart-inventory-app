@@ -28,6 +28,10 @@ Smart Retail Store Assistant (Storix) is a mobile-first inventory platform for s
 - PostgreSQL
 - Supabase
 
+### Others
+
+- GitHub Actions
+
 ## System Architecture
 
 ### Frontend Architecture
