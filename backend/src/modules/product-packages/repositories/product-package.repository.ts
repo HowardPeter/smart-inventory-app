@@ -289,7 +289,7 @@ export class ProductPackageRepository {
     productId: string,
     unitId: string,
   ): Promise<{ productPackageId: string } | null> {
-    return this.db.productPackage.findFirst({
+    return await this.db.productPackage.findFirst({
       where: {
         productId,
         unitId,
@@ -305,7 +305,7 @@ export class ProductPackageRepository {
     storeId: string,
     barcodeValue: string,
   ): Promise<{ productPackageId: string } | null> {
-    return this.db.productPackage.findFirst({
+    return await this.db.productPackage.findFirst({
       where: {
         barcodeValue,
         activeStatus: 'active',
