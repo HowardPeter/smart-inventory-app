@@ -38,12 +38,11 @@ Smart Retail Store Assistant (Storix) is a mobile-first inventory platform for s
 
 The Flutter app follows a feature-first structure under `lib/features`, with shared capabilities grouped under `lib/core`.
 
-- `presentation/screens`: Feature views are split by domain such as auth, inventory, transaction, notification, report, and workspace.
+- `presentation/screens`: Feature views are split by domain such as auth, inventory, transaction.
 - `widgets/components`: Reusable UI is separated into shared widgets and feature-scoped widgets to keep screens composable.
 - `services/data layer`: Network access, auth/session handling, storage, and notification services live in the core state and infrastructure layers.
-- `models`: Frontend models map API payloads into app-facing objects for products, packages, inventory, transactions, stores, and notifications.
+- `models`: Frontend models map API payloads into app-facing objects.
 - `state management`: GetX bindings and controllers keep navigation and screen logic close to each feature.
-- `local storage`: `GetStorage` and secure storage persist selected store context, user session state, and device-level settings.
 - `API communication`: Dio is configured with authorization headers and the active store context, allowing the mobile client to work against store-scoped backend APIs.
 
 ### Backend Architecture
@@ -106,32 +105,45 @@ frontend/
 docs/
 ```
 
-## Core Operational Flow
+## Core Features
 
-### Product and package management
+### Inventory Management
+Provides essential tools to manage and monitor stock accurately across daily operations.
 
-- A store defines categories, then creates products under that store context.
-- Each product can have one or more `ProductPackage` records representing sellable or scannable units such as a bottle size or package variant.
-- Barcode, unit, import price, selling price, and threshold-related inventory data are attached at the package level, not only at the product level.
+- Create import and export transactions
+- Adjust inventory when discrepancies occur
+- Track stock levels in real-time
 
-### Inventory movement
+### Product Management
+Enables flexible and efficient product data management.
 
-- Import and export transactions create a `Transaction` header plus `TransactionDetail` line items.
-- The service layer applies stock changes to the related package inventory, preserving consistent business rules in one place.
-- Inventory history, stock health, and operational reporting are derived from these package-level movements.
+- Create, update, and delete products
+- Create products quickly using barcode scanning
+- Organize products with category management
 
-### Barcode-assisted operations
+### Barcode System
+Optimizes data entry and product lookup using barcode-first workflows.
 
-- Staff can scan or enter a barcode to find an existing package quickly.
-- Barcode data is stored on `ProductPackage`, making transaction entry faster and reducing manual selection errors.
-- External barcode lookup results can be cached through `BarcodeApiCache` to avoid repeated requests and keep product creation faster.
+- Scan barcode to search or create products
+- Cache external barcode API responses to reduce latency
+- Map barcode values directly to product packages for fast reuse
 
-### Notifications and smart support
+### Notifications
+Provides real-time alerts to help users respond proactively to inventory issues.
 
-- Inventory changes can emit low-stock checks in real time through the backend event flow.
-- Scheduled cron jobs re-scan low-stock items during active business hours to catch missed or newly risky items.
-- Notifications are sent to the relevant store members, especially owners and managers.
-- The frontend surfaces inventory insight dashboards, alert views, and a chatbot-ready interaction layer for assistant-style workflows.
+- Low stock warnings
+- Reorder suggestions based on thresholds
+- Detection of abnormal inventory discrepancies
+
+### Smart Decision Support
+Enhances decision-making with data-driven insights and AI-assisted features.
+
+- Suggest optimal reorder quantities
+- Identify fast-moving and slow-moving products
+- Provide an inventory insights dashboard
+- LLM-based chatbot that:
+  - Answers inventory-related questions in natural language
+  - Calls backend APIs to execute supported actions
 
 ## Setup and Installation
 
