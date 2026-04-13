@@ -36,6 +36,13 @@ const createProductPackageBodySchema = z
         .nullable()
         .optional(),
       barcodeType: barcodeTypeSchema.nullable().optional(),
+      displayNameSuffix: z
+        .string()
+        .trim()
+        .min(1, 'Display name suffix cannot be empty')
+        .max(255, 'Display name suffix cannot exceed 255 characters')
+        .optional()
+        .default(''),
     }),
     inventory: z.object({
       quantity: z
@@ -64,11 +71,11 @@ const createProductPackageBodySchema = z
 
 const updateProductPackageBodySchema = z
   .object({
-    displayName: z
+    displayNameSuffix: z
       .string()
       .trim()
-      .min(1, 'Display name cannot be empty')
-      .max(255, 'Display name cannot exceed 255 characters')
+      .min(1, 'Display name suffix cannot be empty')
+      .max(255, 'Display name suffix cannot exceed 255 characters')
       .nullable()
       .optional(),
     importPrice: z.coerce

@@ -23,13 +23,15 @@ export class TransactionRepository {
     storeId: string,
     query: ListTransactionsQueryDto,
   ): Promise<ListPaginationResponseDto<TransactionListItemDto>> {
-    const { page, limit, sortBy, sortOrder, type, startDate, endDate } = query;
+    const { page, limit, sortBy, sortOrder, type, userId, startDate, endDate } =
+      query;
 
     const dateRange = buildDateRangeFilter(startDate, endDate);
 
     const where: Prisma.TransactionWhereInput = {
       storeId,
       ...(type && { type }),
+      ...(userId && { userId }),
       ...(dateRange && {
         createdAt: dateRange,
       }),
