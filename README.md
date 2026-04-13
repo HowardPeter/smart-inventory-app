@@ -36,22 +36,22 @@ Smart Retail Store Assistant (Storix) is a mobile-first inventory platform for s
 
 ### Frontend Architecture
 
-The Flutter app follows a feature-first structure under `lib/features`, with shared capabilities grouped under `lib/core`.
+The Flutter app follows a feature-first structure under `frontend/lib/features`, with shared capabilities grouped under `frontend/lib/core`.
 
 - `presentation/screens`: Feature views are split by domain such as auth, inventory, transaction.
 - `widgets/components`: Reusable UI is separated into shared widgets and feature-scoped widgets to keep screens composable.
 - `services/data layer`: Network access, auth/session handling, storage, and notification services live in the core state and infrastructure layers.
 - `models`: Frontend models map API payloads into app-facing objects.
 - `state management`: GetX bindings and controllers keep navigation and screen logic close to each feature.
-- `API communication`: Dio is configured with authorization headers and the active store context, allowing the mobile client to work against store-scoped backend APIs.
+- `API communication`: Dio is configured with authorization headers and the active store context, allowing the mobile client to communicate with backend APIs.
 
 ### Backend Architecture
 
 The backend is organized by business module under `backend/src/modules`, with a layered design that keeps HTTP concerns separate from business logic and persistence.
 
-- `route`: Defines API endpoints, middleware order, authentication, store-context requirements, and permission checks.
+- `route`: Defines API endpoints and middleware order.
 - `controller`: Translates HTTP requests into service calls and returns consistent response payloads.
-- `service`: Implements business rules such as stock movement handling, notification triggering, and workflow coordination.
+- `service`: Implements business rules such as product management, stock movement handling, and notification triggering.
 - `repository`: Encapsulates Prisma queries and persistence details.
 - `validator`: Uses schema validation to keep request validation outside controllers.
 - `dto` and `type`: Keep request/response contracts explicit and easier to evolve.
