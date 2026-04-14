@@ -3,7 +3,7 @@ import 'package:frontend/core/infrastructure/constants/text_strings.dart';
 import 'package:frontend/core/infrastructure/utils/full_screen_loader_utils.dart';
 import 'package:frontend/core/state/services/store_service.dart';
 import 'package:frontend/core/ui/widgets/t_snackbars_widget.dart';
-import 'package:frontend/features/profile/providers/profile_provider.dart';
+import 'package:frontend/features/profile/providers/store_provider.dart';
 import 'package:get/get.dart';
 
 class ProfileEditStoreController extends GetxController {
@@ -30,7 +30,6 @@ class ProfileEditStoreController extends GetxController {
   /// Nạp dữ liệu cũ vào các ô nhập liệu khi vừa mở trang
   void _initializeFields() {
     nameController.text = _storeService.currentStoreName.value;
-    // Có thể nạp thêm các trường khác nếu StoreService có lưu
     // addressController.text = _storeService.currentStoreAddress.value;
   }
 

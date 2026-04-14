@@ -28,7 +28,7 @@ class StoreProvider {
     }
   }
 
-  // Cập nhật thông tin cửa hàng 
+  // Cập nhật thông tin cửa hàng
   Future<void> updateStore(String storeId, Map<String, dynamic> data) async {
     await _apiClient.patch('/api/stores/$storeId', data: data);
   }

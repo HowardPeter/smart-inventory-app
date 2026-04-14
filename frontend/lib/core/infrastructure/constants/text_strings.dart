@@ -760,6 +760,7 @@ class TTexts {
   static const String noItemsFoundDesc = "no_items_found_desc";
   static const String discardTransactionTitle = "discard_transaction_title";
   static const String discardTransactionDesc = "discard_transaction_desc";
+  static const String profileEmailUser = "profile_email_user";
 
   // -- Transaction Summary
   static const String qty = "qty";
@@ -793,7 +794,7 @@ class TTexts {
   //--Profile
   static const String profileTitle = 'profile_title';
   static const String profileNameUser = 'profile_name_user';
-  static const String profileEmaiUser = 'profile_mail_user';
+  static const String profilePhoneNumber = 'profile_phone_number';
   static const String profileNameStore = 'profile_name_store';
   static const String profileBtnSwitchStore = 'profile_btn_switch_store';
   static const String profileAccount = 'profile_account';
@@ -828,6 +829,16 @@ class TTexts {
   static const String editHintName = 'edit_hint_name';
   static const String editHintEmail = 'edit_hint_email';
   static const String editUpdate = 'edit_update';
+  static const String editPhoneNumberEmpty = 'edit_phone_number_empty';
+  static const String editPhoneNumberInvalid = 'edit_phone_number_invalid';
+  static const String editPhoneNumber = 'edit_phone_number';
+  static const String editPhoneNumberHint = 'edit_phone_number_hint';
+  static const String editErrorEmptyFieldsTitle =
+      'edit_error_empty_fields_title';
+  static const String editErrorEmptyFieldsMessage =
+      'edit_error_empty_fields_message';
+  static const String confirmUpdate = 'confirm_update';
+  static const String confirmUpdateDescription = 'confirm_update_description';
 
   //--Change password
   static const String changePasswordTitle = "change_password_title";

@@ -3,9 +3,10 @@ import 'package:frontend/core/infrastructure/constants/text_strings.dart';
 final Map<String, String> enProfile = {
   //--Profile
   TTexts.profileTitle: 'Profile',
-  //--Uer
+  //--User
   TTexts.profileNameUser: '',
-  TTexts.profileEmaiUser: '',
+  TTexts.profileEmailUser: '',
+  TTexts.profilePhoneNumber: '',
   TTexts.profileNameStore: '',
   //--Section
   TTexts.profileAccount: "Account",
@@ -32,6 +33,14 @@ final Map<String, String> enProfile = {
   TTexts.editHintName: 'Enter full name',
   TTexts.editHintEmail: 'Enter email',
   TTexts.editUpdate: 'Update',
+  TTexts.editPhoneNumberEmpty: 'Please enter your phone number.',
+  TTexts.editPhoneNumberInvalid: 'Please enter a valid phone number.',
+  TTexts.editPhoneNumber: 'Phone Number',
+  TTexts.editPhoneNumberHint: 'Enter phone number',
+  TTexts.editErrorEmptyFieldsTitle: 'Input Error',
+  TTexts.confirmUpdate: 'Confirm Update',
+  TTexts.confirmUpdateDescription:
+      'Are you sure you want to update your profile?',
 
   //Change Password
   TTexts.changePasswordTitle: 'Change Password',
@@ -52,9 +61,9 @@ final Map<String, String> enProfile = {
   TTexts.authError: 'Authentication failed',
   TTexts.changePasswordDialogDescription:
       'Are you sure you want to change your password?',
-  TTexts.fillAllFields: 'Please fill in all the information.',
+  TTexts.fillAllFields: 'Please enter full information',
 
-  //Edit Store\
+  //Edit Store
   TTexts.editStoreTitle: 'My Stores',
   TTexts.editStoreSubtitle: 'Manage and Edit your stores',
   TTexts.editStoreNameLabel: 'Store Name',
