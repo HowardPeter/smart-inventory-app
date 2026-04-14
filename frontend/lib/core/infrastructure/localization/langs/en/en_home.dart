@@ -66,6 +66,16 @@ final Map<String, String> enHome = {
   TTexts.adjust: "Adjust",
   TTexts.totalIn: "TOTAL IN",
   TTexts.totalOut: "TOTAL OUT",
+  TTexts.noRecentAdjustments: "No adjustments today",
+  TTexts.homeViewAdjustments: "Adjustments",
+  TTexts.homeViewAdjustmentsSub: "Track stock\nhistory",
+  TTexts.homeLowStock: "Low Stock",
+  TTexts.homeLowStockSub: "Check inventory\nalerts",
+  TTexts.lowStockTitle: "Low Stock Alerts",
+  TTexts.noLowStock: "Stock is Healthy",
+  TTexts.noLowStockDesc:
+      "There are currently no items running low in stock. Great job!",
+  TTexts.stockLeft: "Stock Left: ",
 
   // Adjustment History
   TTexts.adjustmentHistoryTitle: "Adjustment History",
@@ -79,4 +89,8 @@ final Map<String, String> enHome = {
   TTexts.yesterday: "Yesterday",
   TTexts.note: "Note",
   TTexts.productName: "Product Name",
+
+  // Low Stock
+  TTexts.outOfStockSection: "Out of Stock",
+  TTexts.lowStockSection: "Running Low",
 };

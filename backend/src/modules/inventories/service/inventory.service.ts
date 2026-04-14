@@ -24,6 +24,7 @@ import type {
   UpdateInventoryDto,
   InventoryForTransactionData,
 } from '../dto/inventory.dto.js';
+import { SupabaseProvider } from '../../../config/supabaseClient.js';
 
 export class InventoryService {
   constructor(
@@ -76,6 +77,7 @@ export class InventoryService {
     storeId: string,
     query: ListInventoriesQueryDto,
   ): Promise<LowStockInventoriesResponseDto> {
+    const supabase = SupabaseProvider.getClient();
     const normalizedPagination = normalizePagination(query);
 
     const { items, totalItems } =
@@ -83,6 +85,24 @@ export class InventoryService {
         ...query,
         ...normalizedPagination,
       });
+
+    for (const item of items) {
+      if (item.productPackage?.product?.imageUrl) {
+        const rawPath = item.productPackage.product.imageUrl;
+        
+        try {
+          const { data } = await supabase.storage
+            .from('images') 
+            .createSignedUrl(rawPath, 3600); 
+            
+          if (data?.signedUrl) {
+            item.productPackage.product.imageUrl = data.signedUrl;
+          }
+        } catch (err) {
+          console.error('Lỗi tạo signed URL cho Low Stock:', err);
+        }
+      }
+    }
 
     return buildPaginatedResponse(items, totalItems, normalizedPagination);
   }

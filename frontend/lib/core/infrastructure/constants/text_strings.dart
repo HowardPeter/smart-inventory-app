@@ -356,6 +356,19 @@ class TTexts {
   static const String adjust = 'adjust';
   static const String totalIn = 'total_in';
   static const String totalOut = 'total_out';
+  static const String noRecentAdjustments = 'no_recent_adjustments';
+  static const String homeViewAdjustments = 'home_view_adjustments';
+  static const String homeViewAdjustmentsSub = 'home_view_adjustments_sub';
+  static const String homeLowStock = 'home_low_stock';
+  static const String homeLowStockSub = 'home_low_stock_sub';
+  static const String lowStockTitle = 'low_stock_title';
+  static const String noLowStock = 'no_low_stock';
+  static const String noLowStockDesc = 'no_low_stock_desc';
+  static const String stockLeft = 'stock_left';
+
+  // -- Low Stock
+  static const String outOfStockSection = 'out_of_stock_section';
+  static const String lowStockSection = 'low_stock_section';
 
   // -- Inventory
   static const String inventoryHub = "inventory_hub";
@@ -366,7 +379,7 @@ class TTexts {
   static const String inventoryInsights = "inventory_insights";
   static const String manageData = "manage_data";
   static const String productCatalog = "product_catalog";
-  static const String totalItemsValue = "total_items_value"; // updated
+  static const String totalItemsValue = "total_items_value";
   static const String stockValue = "stock_value";
   static const String stockHealth = "stock_health";
   static const String statusHealthy = "status_healthy";

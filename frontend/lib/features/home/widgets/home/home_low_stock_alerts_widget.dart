@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:frontend/core/ui/widgets/t_custom_fade_overlay_widget.dart';
+import 'package:frontend/routes/app_routes.dart'; // ĐÃ IMPORT ROUTES
 import 'package:get/get.dart';
 import 'package:frontend/core/infrastructure/constants/text_strings.dart';
 import 'package:frontend/core/ui/theme/app_colors.dart';
@@ -76,10 +77,13 @@ class HomeLowStockAlertsWidget extends GetView<HomeController> {
 
                     return Padding(
                       padding: const EdgeInsets.only(bottom: AppSizes.p12),
-                      child: _buildAlertItem(
-                        name: name,
-                        category: displaySubtitle,
-                        quantityLeft: item.quantity,
+                      child: GestureDetector(
+                        onTap: () => Get.toNamed(AppRoutes.lowStock),
+                        child: _buildAlertItem(
+                          name: name,
+                          category: displaySubtitle,
+                          quantityLeft: item.quantity,
+                        ),
                       ),
                     );
                   }),
@@ -90,7 +94,7 @@ class HomeLowStockAlertsWidget extends GetView<HomeController> {
               TCustomFadeOverlayWidget(
                 text: TTexts.homeTapToViewAll.tr,
                 onTap: () {
-                  // TODO: Xử lý chuyển sang trang danh sách Alert
+                  Get.toNamed(AppRoutes.lowStock); // ĐÃ LINK ROUTE
                 },
               ),
           ],

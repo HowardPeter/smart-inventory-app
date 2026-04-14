@@ -7,8 +7,10 @@ import 'package:frontend/features/auth/views/login_view.dart';
 import 'package:frontend/features/auth/views/register_view.dart';
 import 'package:frontend/features/auth/views/verify_email_view.dart';
 import 'package:frontend/features/home/bindings/adjustment_history_binding.dart';
+import 'package:frontend/features/home/bindings/low_stock_binding.dart';
 import 'package:frontend/features/home/views/adjustment_history_view.dart';
 import 'package:frontend/features/home/views/home_view.dart';
+import 'package:frontend/features/home/views/low_stock_view.dart';
 import 'package:frontend/features/inventory/bindings/all_products_binding.dart';
 import 'package:frontend/features/inventory/bindings/category_form_binding.dart';
 import 'package:frontend/features/inventory/bindings/category_detail_binding.dart';
@@ -189,10 +191,19 @@ class AppPages {
       page: () => const HomeView(),
     ),
 
+    // -- Adjustment History
     GetPage(
       name: AppRoutes.adjustmentHistory,
       page: () => const AdjustmentHistoryView(),
       binding: AdjustmentHistoryBinding(),
+      transition: Transition.cupertino,
+    ),
+
+    // -- Low Stock
+    GetPage(
+      name: AppRoutes.lowStock,
+      page: () => const LowStockView(),
+      binding: LowStockBinding(),
       transition: Transition.cupertino,
     ),
 

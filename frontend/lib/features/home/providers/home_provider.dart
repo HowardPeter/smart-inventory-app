@@ -46,11 +46,15 @@ class HomeProvider {
     }
   }
 
-  Future<List<InventoryModel>> getLowStockInventories() async {
+  Future<List<InventoryModel>> getLowStockInventories({
+    int page = 1,
+    int limit = 20,
+  }) async {
     try {
       final response =
           await _apiClient.get('/api/inventories/low-stock', queryParameters: {
-        'limit': 10,
+        'page': page,
+        'limit': limit,
         'sortBy': 'quantity',
         'sortOrder': 'asc',
       });

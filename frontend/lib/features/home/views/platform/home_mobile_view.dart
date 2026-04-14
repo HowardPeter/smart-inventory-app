@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:frontend/core/ui/widgets/t_bottom_nav_spacer_widget.dart';
 import 'package:frontend/core/ui/widgets/t_custom_fade_overlay_widget.dart';
-import 'package:frontend/core/ui/widgets/t_refresh_indicator_widget.dart'; // ĐÃ IMPORT
+import 'package:frontend/core/ui/widgets/t_refresh_indicator_widget.dart';
 import 'package:frontend/features/home/widgets/home/home_adjustment_stats_widget.dart';
 import 'package:frontend/features/navigation/controllers/navigation_controller.dart';
 import 'package:get/get.dart';
@@ -33,28 +33,26 @@ class HomeMobileScreen extends GetView<HomeController> {
             physics: const AlwaysScrollableScrollPhysics(),
             child: Padding(
               padding: const EdgeInsets.only(bottom: AppSizes.p32),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  const HomeHeaderWidget(),
-                  Padding(
-                    padding:
-                        const EdgeInsets.symmetric(horizontal: AppSizes.p16),
-                    child: Obx(() {
-                      if (controller.isLoading.value) {
-                        return const HomeShimmerWidget();
-                      }
+              child: Obx(() {
+                if (controller.isLoading.value) {
+                  return const HomeShimmerWidget();
+                }
 
-                      return Column(
+                return Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    const HomeHeaderWidget(),
+                    Padding(
+                      padding:
+                          const EdgeInsets.symmetric(horizontal: AppSizes.p16),
+                      child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           const SizedBox(height: AppSizes.p8),
                           const HomeRevenueChartWidget(),
                           const SizedBox(height: AppSizes.p32),
-
                           const HomeQuickActionsWidget(),
                           const SizedBox(height: AppSizes.p32),
-
                           Text(
                             TTexts.homeDailyOverview.tr,
                             style: const TextStyle(
@@ -66,63 +64,56 @@ class HomeMobileScreen extends GetView<HomeController> {
                           const SizedBox(height: AppSizes.p12),
                           const HomeDailySummaryWidget(),
                           const SizedBox(height: AppSizes.p24),
-
-                          Obx(() => controller.todayAdjustments.isNotEmpty
-                              ? const Padding(
-                                  padding:
-                                      EdgeInsets.only(bottom: AppSizes.p24),
-                                  child: HomeAdjustmentStatsWidget(),
-                                )
-                              : const SizedBox.shrink()),
-
-                          Obx(() => controller.lowStockItems.isNotEmpty
-                              ? const Padding(
-                                  padding:
-                                      EdgeInsets.only(bottom: AppSizes.p24),
-                                  child: HomeLowStockAlertsWidget(),
-                                )
-                              : const SizedBox.shrink()),
-
-                          // 6. GIAO DỊCH GẦN NHẤT
-                          Container(
-                            decoration: BoxDecoration(
-                              color: AppColors.surface,
-                              borderRadius:
-                                  BorderRadius.circular(AppSizes.radius24),
+                          if (controller.todayAdjustments.isNotEmpty)
+                            const Padding(
+                              padding: EdgeInsets.only(bottom: AppSizes.p24),
+                              child: HomeAdjustmentStatsWidget(),
                             ),
-                            child: Stack(
-                              children: [
-                                Padding(
-                                  padding: EdgeInsets.only(
-                                    left: AppSizes.p20,
-                                    top: AppSizes.p20,
-                                    right: AppSizes.p20,
-                                    bottom:
-                                        controller.recentTransactions.length > 3
-                                            ? 60
-                                            : AppSizes.p20,
-                                  ),
-                                  child: const HomeTransactionListWidget(),
-                                ),
-                                if (controller.recentTransactions.length > 3)
-                                  TCustomFadeOverlayWidget(
-                                    text: TTexts.homeTapToViewMoreHistory.tr,
-                                    onTap: () {
-                                      Get.find<NavigationController>()
-                                          .changeIndex(3);
-                                    },
-                                  ),
-                              ],
+                          if (controller.lowStockItems.isNotEmpty)
+                            const Padding(
+                              padding: EdgeInsets.only(bottom: AppSizes.p24),
+                              child: HomeLowStockAlertsWidget(),
                             ),
-                          ),
-
+                          if (controller.recentTransactions.isNotEmpty)
+                            Container(
+                              decoration: BoxDecoration(
+                                color: AppColors.surface,
+                                borderRadius:
+                                    BorderRadius.circular(AppSizes.radius24),
+                              ),
+                              child: Stack(
+                                children: [
+                                  Padding(
+                                    padding: EdgeInsets.only(
+                                      left: AppSizes.p20,
+                                      top: AppSizes.p20,
+                                      right: AppSizes.p20,
+                                      bottom:
+                                          controller.recentTransactions.length >
+                                                  3
+                                              ? 60
+                                              : AppSizes.p20,
+                                    ),
+                                    child: const HomeTransactionListWidget(),
+                                  ),
+                                  if (controller.recentTransactions.length > 3)
+                                    TCustomFadeOverlayWidget(
+                                      text: TTexts.homeTapToViewMoreHistory.tr,
+                                      onTap: () {
+                                        Get.find<NavigationController>()
+                                            .changeIndex(3);
+                                      },
+                                    ),
+                                ],
+                              ),
+                            ),
                           const TBottomNavSpacerWidget(),
                         ],
-                      );
-                    }),
-                  ),
-                ],
-              ),
+                      ),
+                    ),
+                  ],
+                );
+              }),
             ),
           ),
         ),

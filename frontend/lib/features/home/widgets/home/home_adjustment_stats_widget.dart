@@ -6,6 +6,7 @@ import 'package:frontend/core/infrastructure/constants/text_strings.dart';
 import 'package:frontend/features/home/controllers/home_controller.dart';
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';
+import 'package:iconsax_flutter/iconsax_flutter.dart';
 
 class HomeAdjustmentStatsWidget extends GetView<HomeController> {
   const HomeAdjustmentStatsWidget({super.key});
@@ -14,8 +15,6 @@ class HomeAdjustmentStatsWidget extends GetView<HomeController> {
   Widget build(BuildContext context) {
     return Obx(() {
       final logs = controller.todayAdjustments;
-
-      if (logs.isEmpty) return const SizedBox.shrink();
 
       return Container(
         decoration: BoxDecoration(
@@ -44,18 +43,12 @@ class HomeAdjustmentStatsWidget extends GetView<HomeController> {
                         color: AppColors.primaryText),
                   ),
                   const SizedBox(height: AppSizes.p16),
-                  ...logs.take(5).map((item) {
-                    final timeStr = DateFormat('HH:mm').format(item.time);
-                    final diffStr = item.difference == 0
-                        ? '0'
-                        : (item.isPositive
-                            ? '+${item.difference}'
-                            : '${item.difference}');
-                    return GestureDetector(
-                      onTap: () => controller.openDetails(item),
+                  if (logs.isEmpty)
+                    GestureDetector(
+                      onTap: controller.goToAdjustmentHistory,
                       child: Container(
-                        margin: const EdgeInsets.only(bottom: AppSizes.p12),
-                        padding: const EdgeInsets.all(AppSizes.p12),
+                        width: double.infinity,
+                        padding: const EdgeInsets.symmetric(vertical: 32),
                         decoration: BoxDecoration(
                           color: AppColors.background,
                           borderRadius:
@@ -63,58 +56,96 @@ class HomeAdjustmentStatsWidget extends GetView<HomeController> {
                           border:
                               Border.all(color: Colors.black.withOpacity(0.03)),
                         ),
-                        child: Row(
+                        child: Column(
                           children: [
-                            Container(
-                              padding: const EdgeInsets.all(10),
-                              decoration: BoxDecoration(
-                                  color: Colors.orange.withOpacity(0.15),
-                                  shape: BoxShape.circle),
-                              child: const Icon(Icons.sync_alt_rounded,
-                                  size: 22, color: Colors.orange),
-                            ),
-                            const SizedBox(width: AppSizes.p16),
-                            Expanded(
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  Text(
-                                    item.productName,
-                                    maxLines: 2,
-                                    overflow: TextOverflow.ellipsis,
-                                    style: const TextStyle(
-                                        fontFamily: 'Poppins',
-                                        fontSize: 14,
-                                        fontWeight: FontWeight.w600,
-                                        color: AppColors.primaryText),
-                                  ),
-                                  const SizedBox(height: 2),
-                                  Text(
-                                    timeStr,
-                                    style: const TextStyle(
-                                        fontFamily: 'Poppins',
-                                        fontSize: 13,
-                                        color: AppColors.softGrey),
-                                  ),
-                                ],
-                              ),
-                            ),
-                            const SizedBox(width: 8),
-                            Text(
-                              diffStr,
-                              style: TextStyle(
-                                  fontFamily: 'Poppins',
-                                  fontSize: 16,
-                                  fontWeight: FontWeight.bold,
-                                  color: item.isPositive
-                                      ? AppColors.stockIn
-                                      : AppColors.stockOut),
-                            ),
+                            const Icon(Iconsax.document_filter_copy,
+                                size: 32, color: AppColors.softGrey),
+                            const SizedBox(height: 12),
+                            Text(TTexts.noRecentAdjustments.tr,
+                                style: const TextStyle(
+                                    fontSize: 13, color: AppColors.subText)),
+                            const SizedBox(height: 4),
+                            Text(TTexts.homeTapToViewMoreHistory.tr,
+                                style: const TextStyle(
+                                    fontSize: 13,
+                                    color: AppColors.primary,
+                                    fontWeight: FontWeight.w600)),
                           ],
                         ),
                       ),
-                    );
-                  }),
+                    )
+                  else
+                    ...logs.take(5).map((item) {
+                      final timeStr = DateFormat('HH:mm').format(item.time);
+                      final diffStr = item.difference == 0
+                          ? '0'
+                          : (item.isPositive
+                              ? '+${item.difference}'
+                              : '${item.difference}');
+                      return GestureDetector(
+                        onTap: () => controller.openDetails(item),
+                        child: Container(
+                          margin: const EdgeInsets.only(bottom: AppSizes.p12),
+                          padding: const EdgeInsets.all(AppSizes.p12),
+                          decoration: BoxDecoration(
+                            color: AppColors.background,
+                            borderRadius:
+                                BorderRadius.circular(AppSizes.radius16),
+                            border: Border.all(
+                                color: Colors.black.withOpacity(0.03)),
+                          ),
+                          child: Row(
+                            children: [
+                              Container(
+                                padding: const EdgeInsets.all(10),
+                                decoration: BoxDecoration(
+                                    color: Colors.orange.withOpacity(0.15),
+                                    shape: BoxShape.circle),
+                                child: const Icon(Icons.sync_alt_rounded,
+                                    size: 22, color: Colors.orange),
+                              ),
+                              const SizedBox(width: AppSizes.p16),
+                              Expanded(
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Text(
+                                      item.productName,
+                                      maxLines: 2,
+                                      overflow: TextOverflow.ellipsis,
+                                      style: const TextStyle(
+                                          fontFamily: 'Poppins',
+                                          fontSize: 14,
+                                          fontWeight: FontWeight.w600,
+                                          color: AppColors.primaryText),
+                                    ),
+                                    const SizedBox(height: 2),
+                                    Text(
+                                      timeStr,
+                                      style: const TextStyle(
+                                          fontFamily: 'Poppins',
+                                          fontSize: 13,
+                                          color: AppColors.softGrey),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                              const SizedBox(width: 8),
+                              Text(
+                                diffStr,
+                                style: TextStyle(
+                                    fontFamily: 'Poppins',
+                                    fontSize: 16,
+                                    fontWeight: FontWeight.bold,
+                                    color: item.isPositive
+                                        ? AppColors.stockIn
+                                        : AppColors.stockOut),
+                              ),
+                            ],
+                          ),
+                        ),
+                      );
+                    }),
                 ],
               ),
             ),
