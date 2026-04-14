@@ -38,12 +38,7 @@ export type ProductPackageResponseForTransaction = Pick<
 >;
 
 type CreateProductPackageDto = Pick<ProductPackage, 'unitId'> &
-  Partial<
-    Pick<
-      ProductPackage,
-      'importPrice' | 'sellingPrice' | 'barcodeValue' | 'barcodeType'
-    >
-  >;
+  Partial<Pick<ProductPackage, 'importPrice' | 'sellingPrice'>>;
 
 export type CreateProductPackageData = CreateProductPackageDto &
   Pick<ProductPackage, 'productId' | 'displayName'>;
@@ -71,23 +66,13 @@ export type CreatePackageAndInventoryResponseDto = Omit<
   Pick<ProductPackage, 'productId' | 'unitId'>;
 
 export type UpdateProductPackageDto = Partial<
-  Pick<
-    ProductPackage,
-    'importPrice' | 'sellingPrice' | 'barcodeValue' | 'barcodeType'
-  >
+  Pick<ProductPackage, 'importPrice' | 'sellingPrice'>
 > & {
   displayNameSuffix?: string | null;
 };
 
 export type UpdateProductPackageData = Partial<
-  Pick<
-    ProductPackage,
-    | 'displayName'
-    | 'importPrice'
-    | 'sellingPrice'
-    | 'barcodeValue'
-    | 'barcodeType'
-  >
+  Pick<ProductPackage, 'displayName' | 'importPrice' | 'sellingPrice'>
 >;
 
 /* Thừa kế type dựa trên schema Zod listPackageQuerySchema

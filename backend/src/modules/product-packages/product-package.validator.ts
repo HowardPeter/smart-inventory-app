@@ -12,8 +12,6 @@ const productPackageParamsSchema = z.object({
   productPackageId: z.uuid('Invalid productPackageId'),
 });
 
-const barcodeTypeSchema = z.enum(['upc', 'ean', 'code128', 'qr']);
-
 const createProductPackageBodySchema = z
   .object({
     package: z.object({
@@ -35,7 +33,6 @@ const createProductPackageBodySchema = z
         .max(255, 'Barcode value cannot exceed 255 characters')
         .nullable()
         .optional(),
-      barcodeType: barcodeTypeSchema.nullable().optional(),
       displayNameSuffix: z
         .string()
         .trim()
@@ -59,15 +56,10 @@ const createProductPackageBodySchema = z
       lastCount: z.number().int().min(0).nullable().optional(),
     }),
   })
-  .superRefine((data, ctx) => {
-    if (data.package.barcodeType && !data.package.barcodeValue) {
-      ctx.addIssue({
-        code: z.ZodIssueCode.custom,
-        message: 'barcodeType requires barcodeValue',
-        path: ['barcodeType'],
-      });
-    }
-  });
+  .refine(
+    (data) => Object.keys(data).length > 0,
+    'Request body cannot be empty',
+  );
 
 const updateProductPackageBodySchema = z
   .object({
@@ -95,21 +87,11 @@ const updateProductPackageBodySchema = z
       .max(255, 'Barcode value cannot exceed 255 characters')
       .nullable()
       .optional(),
-    barcodeType: barcodeTypeSchema.nullable().optional(),
   })
   .refine(
     (data) => Object.keys(data).length > 0,
     'Request body cannot be empty',
-  )
-  .superRefine((data, ctx) => {
-    if (data.barcodeType && !('barcodeValue' in data)) {
-      ctx.addIssue({
-        code: z.ZodIssueCode.custom,
-        message: 'barcodeType requires barcodeValue',
-        path: ['barcodeType'],
-      });
-    }
-  });
+  );
 
 export const listPackageQuerySchema = z.object({
   page: z.coerce.number().int().min(1).optional().default(1),

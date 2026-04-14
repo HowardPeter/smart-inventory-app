@@ -348,7 +348,6 @@ export class InventoryService {
               activeStatus: 'active',
               quantity: restored.quantity,
               reorderThreshold: restored.reorderThreshold,
-              lastCount: restored.lastCount,
               productPackageId: restored.productPackage.productPackageId,
             } as Prisma.InputJsonObject,
           });
@@ -357,7 +356,7 @@ export class InventoryService {
         }
       }
 
-      const created = await inventoryRepository.create(data);
+      const created = await inventoryRepository.createOne(data);
 
       await auditLogRepositoryTx.createLog({
         actionType: 'create',
@@ -369,7 +368,6 @@ export class InventoryService {
         newValue: {
           quantity: created.quantity,
           reorderThreshold: created.reorderThreshold,
-          lastCount: created.lastCount,
           productPackageId: created.productPackage.productPackageId,
         } as Prisma.InputJsonObject,
       });

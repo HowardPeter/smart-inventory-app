@@ -57,8 +57,6 @@ productPackageRouter.get(
  *    - unitId: string (UUID, required) - đơn vị tính của package
  *    - importPrice?: number | null - giá nhập
  *    - sellingPrice?: number | null - giá bán
- *    - barcodeValue?: string | null - giá trị mã vạch
- *    - barcodeType?: 'upc' | 'ean' | 'code128' | 'qr' | null
  *    - displayNameSuffix?: string | null - phần custom của displayName
  *  - inventory: object (required)
  *    - quantity: number (integer, default: 0) - số lượng tồn kho ban đầu
@@ -96,8 +94,6 @@ productPackageProductRouter
  * Body:
  *  - importPrice?: number | null - giá nhập
  *  - sellingPrice?: number | null - giá bán
- *  - barcodeValue?: string | null - giá trị mã vạch
- *  - barcodeType?: 'upc' | 'ean' | 'code128' | 'qr' | null
  *  - displayNameSuffix?: string | null - phần custom của displayName
  *
  * Lưu ý:

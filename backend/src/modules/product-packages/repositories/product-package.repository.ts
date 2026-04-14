@@ -22,8 +22,6 @@ const productPackageResponseSelect = {
   displayName: true,
   importPrice: true,
   sellingPrice: true,
-  barcodeValue: true,
-  barcodeType: true,
   createdAt: true,
   unit: {
     select: {
@@ -69,8 +67,6 @@ export class ProductPackageRepository {
       displayName: productPackage.displayName,
       importPrice: productPackage.importPrice?.toNumber() ?? null,
       sellingPrice: productPackage.sellingPrice?.toNumber() ?? null,
-      barcodeValue: productPackage.barcodeValue,
-      barcodeType: productPackage.barcodeType,
       createdAt: productPackage.createdAt,
       unit: productPackage.unit,
       category: productPackage.product.category,
@@ -187,8 +183,6 @@ export class ProductPackageRepository {
         displayName: true,
         importPrice: true,
         sellingPrice: true,
-        barcodeValue: true,
-        barcodeType: true,
         unitId: true,
         productId: true,
       },
@@ -301,24 +295,24 @@ export class ProductPackageRepository {
     });
   }
 
-  async findActiveByBarcodeValueInStore(
-    storeId: string,
-    barcodeValue: string,
-  ): Promise<{ productPackageId: string } | null> {
-    return await this.db.productPackage.findFirst({
-      where: {
-        barcodeValue,
-        activeStatus: 'active',
-        product: {
-          storeId,
-          activeStatus: 'active',
-        },
-      },
-      select: {
-        productPackageId: true,
-      },
-    });
-  }
+  // async findActiveByBarcodeValueInStore(
+  //   storeId: string,
+  //   barcodeValue: string,
+  // ): Promise<{ productPackageId: string } | null> {
+  //   return await this.db.productPackage.findFirst({
+  //     where: {
+  //       barcodeValue,
+  //       activeStatus: 'active',
+  //       product: {
+  //         storeId,
+  //         activeStatus: 'active',
+  //       },
+  //     },
+  //     select: {
+  //       productPackageId: true,
+  //     },
+  //   });
+  // }
 
   async createOneAndInventory(
     packageData: CreateProductPackageData,
@@ -336,8 +330,6 @@ export class ProductPackageRepository {
         displayName: true,
         importPrice: true,
         sellingPrice: true,
-        barcodeValue: true,
-        barcodeType: true,
         createdAt: true,
         productId: true,
         unitId: true,
@@ -374,20 +366,12 @@ export class ProductPackageRepository {
         ...(data.sellingPrice !== undefined && {
           sellingPrice: data.sellingPrice,
         }),
-        ...(data.barcodeValue !== undefined && {
-          barcodeValue: data.barcodeValue,
-        }),
-        ...(data.barcodeType !== undefined && {
-          barcodeType: data.barcodeType,
-        }),
       },
       select: {
         productPackageId: true,
         displayName: true,
         importPrice: true,
         sellingPrice: true,
-        barcodeValue: true,
-        barcodeType: true,
         unitId: true,
         productId: true,
       },

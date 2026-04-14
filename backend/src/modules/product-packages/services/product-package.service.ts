@@ -202,20 +202,7 @@ export class ProductPackageService {
     productId: string,
     data: CreateProductPackageAndInventoryDto,
   ): Promise<CreatePackageAndInventoryResponseDto> {
-    if (data.package.barcodeValue) {
-      const existingPackageSameBarcode =
-        await this.productPackageRepository.findActiveByBarcodeValueInStore(
-          storeId,
-          data.package.barcodeValue,
-        );
-
-      if (existingPackageSameBarcode) {
-        throw new CustomError({
-          message: 'Barcode already exists',
-          status: StatusCodes.CONFLICT,
-        });
-      }
-    }
+    // NOTE: Ở đây từng có check barcode đã tồn tại
 
     const { displayNameSuffix, ...packageBaseData } = data.package;
 
@@ -258,8 +245,6 @@ export class ProductPackageService {
           unitId: createdPackageInventory.unitId,
           importPrice: createdPackageInventory.importPrice,
           sellingPrice: createdPackageInventory.sellingPrice,
-          barcodeValue: createdPackageInventory.barcodeValue,
-          barcodeType: createdPackageInventory.barcodeType,
         } as Prisma.InputJsonObject,
       });
 
@@ -292,34 +277,9 @@ export class ProductPackageService {
       productPackageId,
     );
 
-    if (data.barcodeValue) {
-      const existingPackageSameBarcode =
-        await this.productPackageRepository.findActiveByBarcodeValueInStore(
-          storeId,
-          data.barcodeValue,
-        );
+    // NOTE: Ở đây từng có check barcode đã tồn tại
 
-      if (
-        existingPackageSameBarcode &&
-        existingPackageSameBarcode.productPackageId !== productPackageId
-      ) {
-        throw new CustomError({
-          message: 'Barcode already exists',
-          status: StatusCodes.CONFLICT,
-        });
-      }
-    }
-
-    if (
-      data.barcodeType !== undefined &&
-      data.barcodeType !== null &&
-      !((data.barcodeValue ?? existingProductPackage.barcodeValue) !== null)
-    ) {
-      throw new CustomError({
-        message: 'barcodeType requires barcodeValue',
-        status: StatusCodes.BAD_REQUEST,
-      });
-    }
+    // NOTE: Ở đây từng có check 'barcodeType requires barcodeValue'
 
     const updateData: UpdateProductPackageData = {};
 
@@ -329,22 +289,6 @@ export class ProductPackageService {
 
     if (data.sellingPrice !== undefined) {
       updateData.sellingPrice = data.sellingPrice;
-    }
-
-    if (data.barcodeValue !== undefined) {
-      updateData.barcodeValue = data.barcodeValue;
-    }
-
-    if (data.barcodeType !== undefined) {
-      updateData.barcodeType = data.barcodeType;
-    }
-
-    if (
-      data.barcodeValue !== undefined &&
-      data.barcodeValue === null &&
-      data.barcodeType === undefined
-    ) {
-      updateData.barcodeType = null;
     }
 
     if (data.displayNameSuffix !== undefined) {
@@ -368,8 +312,6 @@ export class ProductPackageService {
         displayName: existingProductPackage.displayName,
         importPrice: existingProductPackage.importPrice,
         sellingPrice: existingProductPackage.sellingPrice,
-        barcodeValue: existingProductPackage.barcodeValue,
-        barcodeType: existingProductPackage.barcodeType,
       },
       updateData,
     );

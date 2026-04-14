@@ -134,8 +134,6 @@ export class ProductRepository {
             displayName: true,
             importPrice: true,
             sellingPrice: true,
-            barcodeValue: true,
-            barcodeType: true,
             unit: {
               select: {
                 unitId: true,
