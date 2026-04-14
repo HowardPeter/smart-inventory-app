@@ -67,7 +67,9 @@ final Map<String, String> enProfile = {
   TTexts.editStoreTitle: 'My Stores',
   TTexts.editStoreSubtitle: 'Manage and Edit your stores',
   TTexts.editStoreNameLabel: 'Store Name',
-  TTexts.editStoreAddress: 'Store Address',
+  TTexts.editStoreNameHint: 'Enter store name',
+  TTexts.editStoreAddressLabel: 'Address',
+  TTexts.editStoreAddressHint: 'Enter store address',
   TTexts.editStoreAmountMember: 'Members',
   TTexts.editStoreBtnEdit: 'Edit',
   TTexts.profileUpdateSuccess: 'Profile updated successfully',
@@ -77,6 +79,9 @@ final Map<String, String> enProfile = {
   TTexts.profileUpdateErrorTitle: 'Profile Update Failed',
   TTexts.loggingOut: 'Logging out...',
   TTexts.logoutErrorTitle: 'Logout Failed',
+  TTexts.editStoreTitleDialog: 'Edit Store',
+  TTexts.editStoreSubtitleDialog: 'You can update the store information here.',
+  // TTexts.editStoreDescriptionDialog: 'Are you sure you want to update store information?',
 
   //Assign Role
   TTexts.assignsRoleTitle: 'Assigns Role',
