@@ -7,7 +7,7 @@ export const initCronJobs = () => {
   // Cú pháp: 8-22/2 (Trong khoảng từ 8 đến 22, bước nhảy là 2)
   cron.schedule(
     '0 8-22/2 * * *',
-    //'*/1 * * * *',
+    // '*/1 * * * *',
     async () => {
       console.info('[Cron] Đang chạy kiểm tra tồn kho tự động...');
       await smartAlertService.scanAllStoresForLowStock();

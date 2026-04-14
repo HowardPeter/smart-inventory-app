@@ -15,14 +15,14 @@ export class SmartAlertService {
       (payload: {
         inventoryId: string;
         storeId: string;
-        oldQuantity?: number; // <--- Đón nhận thêm oldQuantity
+        oldQuantity?: number;
         newQuantity?: number;
       }) => {
         this.checkLowStockRule(
           payload.inventoryId,
           payload.storeId,
           payload.newQuantity,
-          payload.oldQuantity, // <--- Truyền xuống hàm check
+          payload.oldQuantity,
         ).catch((err) => console.error('Lỗi khi check rules:', err));
       },
     );
@@ -33,7 +33,7 @@ export class SmartAlertService {
     inventoryId: string,
     providedStoreId?: string,
     newQuantity?: number,
-    oldQuantity?: number, // <--- Nhận tham số mới
+    oldQuantity?: number,
   ) {
     const inventory = await prisma.inventory.findUnique({
       where: { inventoryId: inventoryId },
@@ -93,7 +93,10 @@ export class SmartAlertService {
       return;
     }
 
-    const productName = inventory.productPackage?.product?.name ?? 'Sản phẩm';
+    // Lấy tên của từng product package để gửi thông báo chính xác!
+    const productName =
+      inventory.productPackage?.displayName ??
+      'The product package name has not been updated.';
 
     // Dùng Promise.all để gửi đồng loạt không bị nghẽn
     await Promise.all(
@@ -102,7 +105,7 @@ export class SmartAlertService {
           member.userId,
           storeId,
           '⚠️ Tồn kho ở mức báo động',
-          `${productName} chỉ còn ${currentQty} đơn vị. Hãy nhập thêm!`,
+          `${productName} chỉ còn ${currentQty} sản phẩm.\nHãy nhập thêm!`,
           'LOW_STOCK',
           inventory.productPackageId,
         ),
@@ -125,16 +128,99 @@ export class SmartAlertService {
       },
     });
 
+    if (lowInventories.length === 0) {
+      console.info(
+        '[Cron] Không phát hiện sản phẩm nào có tồn kho thấp. Đã dừng quy trình quét.',
+      );
+
+      return;
+    }
+
+    // Sử dụng interface đã định nghĩa thay vì Record<string, any[]>
+    const storeDeficits: Record<string, LowStockInventoryItem[]> = {};
+
     for (const inv of lowInventories) {
       const storeId = inv.productPackage?.product?.storeId;
 
       if (storeId) {
-        await this.checkLowStockRule(inv.inventoryId, storeId);
+        if (!storeDeficits[storeId]) {
+          storeDeficits[storeId] = [];
+        }
+        storeDeficits[storeId].push(inv as LowStockInventoryItem);
       }
     }
+
+    // Duyệt qua từng storeId và gửi 1 thông báo tổng hợp
+    for (const [storeId, inventories] of Object.entries(storeDeficits)) {
+      await this.processBatchNotification(storeId, inventories);
+    }
+  }
+
+  // Hàm mới xử lý gửi thông báo gộp (Không đụng chạm tới checkLowStockRule)
+  private async processBatchNotification(
+    storeId: string,
+    inventories: LowStockInventoryItem[],
+  ) {
+    const targetMembers = await prisma.storeMember.findMany({
+      where: {
+        storeId: storeId,
+        role: { in: ['owner', 'manager'] },
+        activeStatus: 'active',
+      },
+      select: { userId: true },
+    });
+
+    if (targetMembers.length === 0) {
+      return;
+    }
+
+    const totalLowStock = inventories.length;
+
+    // Lấy mảng tên các sản phẩm hợp lệ
+    const sampleNamesArray = inventories
+      .map((inv) => inv.productPackage?.displayName)
+      .filter(Boolean);
+
+    let bodyText = '';
+
+    // Phân loại nội dung thông báo dựa trên số lượng
+    if (totalLowStock === 1) {
+      bodyText = `Sản phẩm ${sampleNamesArray[0]} đang ở mức báo động.\nHãy kiểm tra và nhập thêm!`;
+    } else if (totalLowStock === 2) {
+      bodyText = `Các sản phẩm ${sampleNamesArray.join(', ')} đang ở mức báo động.\nHãy kiểm tra và nhập thêm!`;
+    } else {
+      // Từ 3 sản phẩm trở lên mới dùng chữ "VD" và dấu "..."
+      const sampleNames = sampleNamesArray.slice(0, 2).join(', ');
+
+      bodyText = `Có ${totalLowStock} sản phẩm đang ở mức báo động (VD: ${sampleNames},...).\nHãy kiểm tra và nhập thêm!`;
+    }
+
+    await Promise.all(
+      targetMembers.map((member) =>
+        this.notificationService.createAndSendNotification(
+          member.userId,
+          storeId,
+          '⚠️ Báo cáo Tồn kho thấp',
+          bodyText,
+          appEvents.BATCH_LOW_STOCK,
+          undefined,
+        ),
+      ),
+    );
   }
 }
 
 export const smartAlertService = new SmartAlertService(
   new NotificationService(new NotificationRepository()),
 );
+
+interface LowStockInventoryItem {
+  inventoryId: string;
+  quantity: number;
+  productPackage?: {
+    displayName: string | null;
+    product?: {
+      storeId: string | null;
+    } | null;
+  } | null;
+}
