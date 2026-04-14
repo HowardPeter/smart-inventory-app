@@ -1,8 +1,14 @@
+import 'dotenv/config';
 import { StatusCodes } from 'http-status-codes';
 
 import { TransactionDetailRepository } from './repositories/transaction-detail.repository.js';
 import { TransactionRepository } from './repositories/transaction.repository.js';
 import { CustomError } from '../../common/errors/index.js';
+import { StorageService } from '../../common/utils/index.js';
+import {
+  normalizePagination,
+  buildPaginatedResponse,
+} from '../../common/utils/index.js';
 import { prisma } from '../../db/prismaClient.js';
 import { Prisma } from '../../generated/prisma/client.js';
 import { AuditLogRepository } from '../audit-log/index.js';
@@ -16,11 +22,15 @@ import type {
   CreateExportTransactionResponseDto,
   CreateTransactionItemDto,
   ProductPackageData,
+  ListTransactionsQueryDto,
+  ListTransactionsResponseDto,
+  DetailTransactionResponseDto,
 } from './transaction.dto.js';
 import type { DbClient } from '../../common/types/db.type.js';
 
 export class TransactionService {
   constructor(
+    private readonly transactionRepository: TransactionRepository,
     private readonly productPackageService: ProductPackageService,
     private readonly inventoryService: InventoryService,
   ) {}
@@ -158,6 +168,54 @@ export class TransactionService {
     }
   }
 
+  async getTransactionsByStoreId(
+    storeId: string,
+    query: ListTransactionsQueryDto,
+  ): Promise<ListTransactionsResponseDto> {
+    const normalizedPagination = normalizePagination(query);
+
+    const { items, totalItems } =
+      await this.transactionRepository.findManyByStoreId(storeId, {
+        ...query,
+        ...normalizedPagination,
+      });
+
+    return buildPaginatedResponse(items, totalItems, normalizedPagination);
+  }
+
+  async getTransactionById(
+    storeId: string,
+    transactionId: string,
+  ): Promise<DetailTransactionResponseDto> {
+    const transaction = await this.transactionRepository.findOne(
+      storeId,
+      transactionId,
+    );
+
+    if (!transaction) {
+      throw new CustomError({
+        message: 'Transaction not found',
+        status: StatusCodes.NOT_FOUND,
+      });
+    }
+
+    // Tạo Signed URL cho imageUrl
+    const itemsWithSignedUrls = await Promise.all(
+      transaction.items.map(async (item) => ({
+        ...item,
+        imageUrl: await StorageService.getSignedUrl(
+          process.env.STORAGE_BUCKET ?? 'images',
+          item.imageUrl,
+        ),
+      })),
+    );
+
+    return {
+      ...transaction,
+      items: itemsWithSignedUrls,
+    };
+  }
+
   async createImportTransaction(
     storeId: string,
     userId: string,
@@ -234,12 +292,12 @@ export class TransactionService {
       await auditLogRepositoryTx.createLog({
         actionType: 'create',
         entityType: 'Transaction',
+        entityId: transaction.transactionId,
         userId,
         storeId,
         note: null,
         oldValue: null,
         newValue: {
-          transactionId: transaction.transactionId,
           type: transaction.type,
           status: transaction.status,
           note: transaction.note,
@@ -332,12 +390,12 @@ export class TransactionService {
       await auditLogRepositoryTx.createLog({
         actionType: 'create',
         entityType: 'Transaction',
+        entityId: transaction.transactionId,
         userId,
         storeId,
         note: null,
         oldValue: null,
         newValue: {
-          transactionId: transaction.transactionId,
           type: transaction.type,
           status: transaction.status,
           note: transaction.note,

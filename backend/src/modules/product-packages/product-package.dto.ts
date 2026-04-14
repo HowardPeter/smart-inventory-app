@@ -11,11 +11,21 @@ export type UnitResponseDto = Unit;
 
 export type ProductPackageResponseDto = Omit<
   ProductPackage,
-  'unitId' | 'productId'
+  'activeStatus' | 'createdAt' | 'updatedAt'
+>;
+
+export type ProductPackageSimpleResponseDto = Pick<
+  ProductPackage,
+  'productPackageId' | 'displayName'
+>;
+
+export type ProductPackageDetailResponseDto = Omit<
+  ProductPackage,
+  'unitId' | 'productId' | 'activeStatus' | 'updatedAt'
 > & {
   unit: Unit;
   category: Pick<Category, 'categoryId' | 'name'>;
-  product: Pick<Product, 'productId' | 'name' | 'storeId'>;
+  product: Pick<Product, 'productId' | 'imageUrl'>;
   inventory: Pick<
     Inventory,
     'inventoryId' | 'quantity' | 'reorderThreshold'
@@ -27,7 +37,7 @@ export type ProductPackageResponseForTransaction = Pick<
   'productPackageId' | 'displayName' | 'importPrice' | 'sellingPrice'
 >;
 
-export type CreateProductPackageDto = Pick<ProductPackage, 'unitId'> &
+type CreateProductPackageDto = Pick<ProductPackage, 'unitId'> &
   Partial<
     Pick<
       ProductPackage,
@@ -35,10 +45,8 @@ export type CreateProductPackageDto = Pick<ProductPackage, 'unitId'> &
     >
   >;
 
-export type CreateProductPackageData = CreateProductPackageDto & {
-  productId: string;
-  displayName: string;
-};
+export type CreateProductPackageData = CreateProductPackageDto &
+  Pick<ProductPackage, 'productId' | 'displayName'>;
 
 export type CreateInventoryData = Pick<
   CreateInventoryDto,
@@ -46,11 +54,32 @@ export type CreateInventoryData = Pick<
 >;
 
 export type CreateProductPackageAndInventoryDto = {
-  package: CreateProductPackageDto;
+  package: CreateProductPackageDto & {
+    displayNameSuffix: string | null;
+  };
   inventory: CreateInventoryDto;
 };
 
+/* Response của hàm create Package&Inventory để tránh warning DeprecationWarning
+Calling client.query() when the client is already executing a query
+is deprecated and will be removed in pg@9.0.
+Use async/await or an external async flow control mechanism instead. */
+export type CreatePackageAndInventoryResponseDto = Omit<
+  ProductPackageDetailResponseDto,
+  'unit' | 'category' | 'product'
+> &
+  Pick<ProductPackage, 'productId' | 'unitId'>;
+
 export type UpdateProductPackageDto = Partial<
+  Pick<
+    ProductPackage,
+    'importPrice' | 'sellingPrice' | 'barcodeValue' | 'barcodeType'
+  >
+> & {
+  displayNameSuffix?: string | null;
+};
+
+export type UpdateProductPackageData = Partial<
   Pick<
     ProductPackage,
     | 'displayName'
@@ -73,4 +102,4 @@ type PackageQueryDto = {
 export type PackageQueryDto = z.infer<typeof listPackageQuerySchema>;
 
 export type ListProductPackagesResponseDto =
-  PaginationResponseDto<ProductPackageResponseDto>;
+  PaginationResponseDto<ProductPackageDetailResponseDto>;

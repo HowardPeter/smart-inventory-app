@@ -76,7 +76,7 @@ class StockAdjustmentController extends GetxController with TErrorHandler {
       allItems.where((item) => item.isChecked.value).length;
   bool get canSave => checkedItemsCount > 0;
 
-  // 🟢 GỘP TẤT CẢ CÁC NOTE LẺ TẺ THÀNH 1 LIST CHUỖI
+  // GỘP TẤT CẢ CÁC NOTE LẺ TẺ THÀNH 1 LIST CHUỖI
   String get combinedItemNotes {
     List<String> notes = [];
     for (var item in allItems) {
@@ -91,7 +91,7 @@ class StockAdjustmentController extends GetxController with TErrorHandler {
     Get.toNamed(AppRoutes.stockAdjustmentItem, arguments: item);
   }
 
-  // 🟢 NÚT FAB: CHECK ALL (Chỉ Check những món chưa làm)
+  // NÚT FAB: CHECK ALL (Chỉ Check những món chưa làm)
   void checkAllUncheckedItems() {
     Get.dialog(
       TCustomDialogWidget(
@@ -116,7 +116,7 @@ class StockAdjustmentController extends GetxController with TErrorHandler {
     );
   }
 
-  // 🟢 NÚT FAB: UNCHECK ALL (Reset lại toàn bộ thẻ)
+  // NÚT FAB: UNCHECK ALL (Reset lại toàn bộ thẻ)
   void uncheckAllItems() {
     Get.dialog(
       TCustomDialogWidget(
@@ -139,7 +139,7 @@ class StockAdjustmentController extends GetxController with TErrorHandler {
     );
   }
 
-  // 🟢 BẪY LỖI THOÁT TRANG KHI ĐANG KIỂM KHO GIANG DỞ
+  // BẪY LỖI THOÁT TRANG KHI ĐANG KIỂM KHO GIANG DỞ
   void handleExit() {
     if (checkedItemsCount > 0) {
       Get.dialog(
@@ -160,7 +160,7 @@ class StockAdjustmentController extends GetxController with TErrorHandler {
     }
   }
 
-  // 🟢 GOM CHUNG LẠI: CHỈ XÁC NHẬN VÀ BẮN API
+  // GOM CHUNG LẠI: CHỈ XÁC NHẬN VÀ BẮN API
   void handleSaveAdjustment() {
     if (!canSave) return;
 
@@ -195,7 +195,7 @@ class StockAdjustmentController extends GetxController with TErrorHandler {
     }
   }
 
-  // 🟢 EXECUTE SAVE: CHUYỂN GIAO TOÀN BỘ LOGIC CHO BACKEND
+  // EXECUTE SAVE: CHUYỂN GIAO TOÀN BỘ LOGIC CHO BACKEND
   Future<void> executeSave() async {
     try {
       FullScreenLoaderUtils.openLoadingDialog(TTexts.saving.tr);
@@ -217,7 +217,7 @@ class StockAdjustmentController extends GetxController with TErrorHandler {
       double totalAdjustmentValue = 0.0;
       List<Map<String, dynamic>> itemsPayload = [];
 
-      // 🟢 TẠO LIST TRANSACTION DETAIL MODEL ĐỂ TRUYỀN SANG TRANG SUMMARY
+      // TẠO LIST TRANSACTION DETAIL MODEL ĐỂ TRUYỀN SANG TRANG SUMMARY
       List<TransactionDetailModel> summaryDetails = [];
 
       for (var item in itemsToUpdate) {
@@ -268,7 +268,7 @@ class StockAdjustmentController extends GetxController with TErrorHandler {
       // MÔ PHỎNG CALL API: await _provider.createAdjustmentTransaction(payload);
       await Future.delayed(const Duration(seconds: 1));
 
-      // 🟢 TẠO TRANSACTION MODEL ĐỂ ĐIỀU HƯỚNG SANG SUMMARY
+      // TẠO TRANSACTION MODEL ĐỂ ĐIỀU HƯỚNG SANG SUMMARY
       final summaryTransaction = TransactionModel(
         transactionId:
             "ADJ-${DateTime.now().millisecondsSinceEpoch.toString().substring(7)}", // Fake ID tạm
@@ -290,7 +290,7 @@ class StockAdjustmentController extends GetxController with TErrorHandler {
     } catch (e) {
       FullScreenLoaderUtils.stopLoading();
 
-      // 🟢 BẪY LỖI 409 CONFLICT TỪ BACKEND TRẢ VỀ
+      // BẪY LỖI 409 CONFLICT TỪ BACKEND TRẢ VỀ
       if (e is DioException && e.response?.statusCode == 409) {
         final List<dynamic> conflicts = e.response?.data['conflicts'] ?? [];
         List<String> conflictedNames = [];

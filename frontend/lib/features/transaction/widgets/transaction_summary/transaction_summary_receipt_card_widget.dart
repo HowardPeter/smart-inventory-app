@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:frontend/core/infrastructure/constants/text_strings.dart';
 import 'package:frontend/core/ui/theme/app_colors.dart';
+import 'package:frontend/core/ui/theme/app_sizes.dart';
 import 'package:frontend/features/transaction/controllers/transaction_summary_controller.dart';
 import 'package:get/get.dart';
 import 'package:iconsax_flutter/iconsax_flutter.dart';
@@ -28,7 +29,6 @@ class TransactionSummaryReceiptCardWidget
         children: [
           _buildRow(
             TTexts.transactionNumber.tr,
-            // 🟢 THAY TEXT CỨNG N/A
             controller.transaction.transactionId ?? TTexts.na.tr,
             rightWidget: _buildFakeBarcode(),
           ),
@@ -92,24 +92,33 @@ class TransactionSummaryReceiptCardWidget
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       crossAxisAlignment: CrossAxisAlignment.center,
       children: [
-        Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(leftTitle,
-                style: const TextStyle(
-                    fontSize: 10,
-                    fontWeight: FontWeight.w500,
-                    color: AppColors.subText)),
-            const SizedBox(height: 4),
-            customLeftWidget ??
-                Text(leftValue,
+        Expanded(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(leftTitle,
+                  style: const TextStyle(
+                      fontSize: 10,
+                      fontWeight: FontWeight.w500,
+                      color: AppColors.subText)),
+              const SizedBox(height: 4),
+              customLeftWidget ??
+                  Text(
+                    leftValue,
                     style: const TextStyle(
                         fontSize: 13,
                         fontWeight: FontWeight.w400,
-                        color: AppColors.primaryText)),
-          ],
+                        color: AppColors.primaryText),
+                    overflow: TextOverflow.ellipsis,
+                    maxLines: 1,
+                  ),
+            ],
+          ),
         ),
-        if (rightWidget != null) rightWidget,
+        if (rightWidget != null) ...[
+          const SizedBox(width: AppSizes.p24),
+          rightWidget,
+        ],
       ],
     );
   }

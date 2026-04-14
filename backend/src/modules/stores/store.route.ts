@@ -7,6 +7,7 @@ import {
   validateGetStoreById,
   validateDeleteStore,
   validateUpdateStore,
+  validateJoinStore,
 } from './store.validator.js';
 import { asyncWrapper } from '../../common/middlewares/index.js';
 import { requirePermission, PERMISSION } from '../access-control/index.js';
@@ -27,11 +28,26 @@ storeRouter.use(authenticate);
  *  - name: string (required) - tên cửa hàng
  *  - address?: string | null - địa chỉ cửa hàng
  *  - timezone?: string | null - múi giờ của cửa hàng
+ *
+ * API endpoint: PATCH /api/stores/
+ * Cập nhật thông tin cửa hàng
+ *
+ * Body:
+ *  - name?: string - tên cửa hàng
+ *  - address?: string | null - địa chỉ cửa hàng
+ *  - timezone?: string | null - múi giờ của cửa hàng
+ *
  */
 storeRouter
   .route('/')
   .get(asyncWrapper(storeController.getStores))
-  .post(validateCreateStore, asyncWrapper(storeController.createStore));
+  .post(validateCreateStore, asyncWrapper(storeController.createStore))
+  .patch(
+    requireStoreContext,
+    requirePermission(PERMISSION.STORE_WRITE),
+    validateUpdateStore,
+    asyncWrapper(storeController.updateStore),
+  );
 
 /**
  * API endpoint: GET /api/stores/:storeId
@@ -39,17 +55,6 @@ storeRouter
  *
  * Path params:
  *  - storeId: string (UUID, required)
- *
- * API endpoint: PATCH /api/stores/:storeId
- * Cập nhật thông tin cửa hàng
- *
- * Path params:
- *  - storeId: string (UUID, required)
- *
- * Body:
- *  - name?: string - tên cửa hàng
- *  - address?: string | null - địa chỉ cửa hàng
- *  - timezone?: string | null - múi giờ của cửa hàng
  *
  * API endpoint: DELETE /api/stores/:storeId
  * Xóa mềm cửa hàng theo id
@@ -65,12 +70,7 @@ storeRouter
     validateGetStoreById,
     asyncWrapper(storeController.getStoreById),
   )
-  .patch(
-    requireStoreContext,
-    requirePermission(PERMISSION.STORE_WRITE),
-    validateUpdateStore,
-    asyncWrapper(storeController.updateStore),
-  )
+
   .delete(
     requireStoreContext,
     requirePermission(PERMISSION.STORE_WRITE),
@@ -78,4 +78,29 @@ storeRouter
     asyncWrapper(storeController.softDeleteStore),
   );
 
+/**
+ * API endpoint: POST /api/stores/refresh-invite-code
+ * Tạo mới (refresh) mã mời cho cửa hàng
+ *
+ * Path params:
+ * - storeId: string (UUID, required)
+ */
+storeRouter.post(
+  '/refresh-invite-code',
+  requireStoreContext,
+  requirePermission(PERMISSION.STORE_WRITE),
+  asyncWrapper(storeController.refreshInviteCode),
+);
+
+/**
+ * API endpoint: POST /api/stores/join
+ * Tham gia vào cửa hàng bằng mã mời
+ * * Body:
+ * - inviteCode: string (required)
+ */
+storeRouter.post(
+  '/join',
+  validateJoinStore,
+  asyncWrapper(storeController.joinStore),
+);
 export { storeRouter };

@@ -3,7 +3,7 @@ import { StatusCodes } from 'http-status-codes';
 
 import { ProductRepository } from './product.repository.js';
 import { CustomError } from '../../common/errors/index.js';
-import { StorageService } from '../../common/services/storage.service.js';
+import { StorageService } from '../../common/utils/index.js';
 import {
   normalizePagination,
   buildPaginatedResponse,
@@ -24,11 +24,11 @@ import type {
   ListProductsResponseDto,
   ProductsByCategoryDto,
 } from './product.dto.js';
-import type { DbClient } from '../../common/types/db.type.js';
+import type { DbClient } from '../../common/types/index.js';
 import type { Prisma } from '../../generated/prisma/client.js';
 
 // Khai báo tên bucket dạng hằng số để dễ quản lý và tái sử dụng
-const STORAGE_BUCKET = 'images';
+const STORAGE_BUCKET = process.env.STORAGE_BUCKET ?? 'images';
 
 export class ProductService {
   constructor(private readonly productRepository: ProductRepository) {}
@@ -39,10 +39,10 @@ export class ProductService {
     auditLogRepositoryTx: new AuditLogRepository(db),
   });
 
-  private async checkProductExisted(
+  private async checkAndGetExistedProduct(
     storeId: string,
     productId: string,
-  ): Promise<ProductSimpleResponseDto | null> {
+  ): Promise<ProductSimpleResponseDto> {
     const existingProduct = await this.productRepository.findOne(
       storeId,
       productId,
@@ -55,14 +55,7 @@ export class ProductService {
       });
     }
 
-    return {
-      categoryId: existingProduct.productId,
-      productId: existingProduct.productId,
-      name: existingProduct.name,
-      imageUrl: existingProduct.imageUrl,
-      brand: existingProduct.brand,
-      storeId: existingProduct.storeId,
-    };
+    return existingProduct;
   }
 
   private async checkCategoryExisted(categoryId: string): Promise<void> {
@@ -111,7 +104,10 @@ export class ProductService {
     storeId: string,
     productId: string,
   ): Promise<DetailProductResponseDto> {
-    const product = await this.productRepository.findOne(storeId, productId);
+    const product = await this.productRepository.findDetailOne(
+      storeId,
+      productId,
+    );
 
     if (!product) {
       throw new CustomError({
@@ -177,11 +173,11 @@ export class ProductService {
       await auditLogRepositoryTx.createLog({
         actionType: 'create',
         entityType: 'Product',
+        entityId: newProduct.productId,
         userId,
         storeId,
         oldValue: null,
         newValue: {
-          productId: newProduct.productId,
           productName: newProduct.name,
           brand: newProduct.brand,
           category: newProduct.category,
@@ -200,13 +196,65 @@ export class ProductService {
     return newProduct;
   }
 
+  // đồng bộ product-package display name khi update product name
+  async syncDisplayNameWithProductName(
+    storeId: string,
+    productId: string,
+    oldProductName: string,
+    newProductName: string,
+    db: DbClient,
+  ): Promise<{ productPackageId: string; displayName: string | null }[]> {
+    const { productPackageRepositoryTx: productPackageRepository } =
+      this.createTxRepositories(db);
+
+    const oldPackages =
+      await productPackageRepository.findManyByProductIdForNameSync(
+        storeId,
+        productId,
+      );
+
+    const updatedPackages: {
+      productPackageId: string;
+      displayName: string | null;
+    }[] = [];
+
+    for (const item of oldPackages) {
+      const currentDisplayName = item.displayName;
+
+      if (!currentDisplayName) {
+        throw new CustomError({
+          message: 'Product package displayName not found',
+          status: StatusCodes.BAD_REQUEST,
+        });
+      }
+
+      const newDisplayName = currentDisplayName.replace(
+        oldProductName,
+        newProductName,
+      );
+
+      const updated =
+        await productPackageRepository.updateDisplayNameWithProduct(
+          item.productPackageId,
+          newDisplayName,
+        );
+
+      updatedPackages.push(updated);
+    }
+
+    return updatedPackages;
+  }
+
   async updateProduct(
     storeId: string,
     userId: string,
     productId: string,
     data: UpdateProductDto,
   ): Promise<ProductResponseDto> {
-    const existingProduct = await this.checkProductExisted(storeId, productId);
+    const existingProduct = await this.checkAndGetExistedProduct(
+      storeId,
+      productId,
+    );
 
     if (data.categoryId) {
       await this.checkCategoryExisted(data.categoryId);
@@ -228,16 +276,33 @@ export class ProductService {
 
       const product = await productRepositoryTx.updateOne(productId, data);
 
+      let syncedPackagesCount = 0;
+
+      if (data.name !== undefined && data.name !== existingProduct.name) {
+        const syncedPackages = await this.syncDisplayNameWithProductName(
+          storeId,
+          productId,
+          existingProduct.name,
+          data.name,
+          tx,
+        );
+
+        syncedPackagesCount = syncedPackages.length;
+      }
+
       // chỉ log khi có thay đổi thực sự
       if (Object.keys(newValue).length > 0) {
         await auditLogRepositoryTx.createLog({
           actionType: 'update',
           entityType: 'Product',
+          entityId: existingProduct.productId,
           userId,
           storeId,
-          note: null,
           oldValue: oldValue as Prisma.InputJsonObject,
-          newValue: newValue as Prisma.InputJsonObject,
+          newValue: {
+            ...newValue,
+            packageNameSyncedCount: syncedPackagesCount,
+          } as Prisma.InputJsonObject,
         });
       }
 
@@ -258,7 +323,7 @@ export class ProductService {
     userId: string,
     productId: string,
   ): Promise<void> {
-    await this.checkProductExisted(storeId, productId);
+    await this.checkAndGetExistedProduct(storeId, productId);
 
     await prisma.$transaction(async (tx) => {
       const {
@@ -270,23 +335,23 @@ export class ProductService {
       const softDeletedProduct =
         await productRepositoryTx.softDeleteOne(productId);
 
+      const deletedPackages =
+        await productPackageRepositoryTx.softDeleteManyByProductId(productId);
+
       await auditLogRepositoryTx.createLog({
         actionType: 'delete',
         entityType: 'Product',
+        entityId: softDeletedProduct.productId,
         userId,
         storeId,
-        note: null,
         oldValue: {
-          productId: softDeletedProduct.productId,
           activeStatus: 'active',
         } as Prisma.InputJsonObject,
         newValue: {
-          productId: softDeletedProduct.productId,
           activeStatus: 'inactive',
+          deletedPackageCount: deletedPackages,
         } as Prisma.InputJsonObject,
       });
-
-      await productPackageRepositoryTx.softDeleteManyByProductId(productId);
     });
   }
 }

@@ -1,6 +1,10 @@
 import { StatusCodes } from 'http-status-codes';
 
-import { requireReqUser, sendResponse } from '../../../common/utils/index.js';
+import {
+  requireReqStoreContext,
+  requireReqUser,
+  sendResponse,
+} from '../../../common/utils/index.js';
 import { StoreService } from '../services/store.service.js';
 
 import type { ApiResponse } from '../../../common/types/index.js';
@@ -59,8 +63,8 @@ export class StoreController {
     res: Response<ApiResponse<StoreResponseDto>>,
   ): Promise<void> => {
     const userId = requireReqUser(req).userId;
+    const storeId = requireReqStoreContext(req).storeId;
 
-    const { storeId } = req.params;
     const payload = req.body as UpdateStoreDto;
 
     const updatedStore = await this.storeService.updateStore(
@@ -83,5 +87,35 @@ export class StoreController {
     await this.storeService.softDeleteStore(storeId as string, userId);
 
     sendResponse.success(res, null, { status: StatusCodes.OK });
+  };
+
+  refreshInviteCode = async (
+    req: Request,
+    res: Response<ApiResponse<StoreResponseDto>>,
+  ): Promise<void> => {
+    const userId = requireReqUser(req).userId;
+    const storeId = requireReqStoreContext(req).storeId;
+
+    const updatedStore = await this.storeService.refreshInviteCode(
+      storeId as string,
+      userId,
+    );
+
+    sendResponse.success(res, updatedStore, { status: StatusCodes.OK });
+  };
+
+  joinStore = async (
+    req: Request,
+    res: Response<ApiResponse<StoreResponseDto>>,
+  ): Promise<void> => {
+    const userId = requireReqUser(req).userId;
+    const { inviteCode } = req.body; // Lấy từ body do ta dùng POST
+
+    const store = await this.storeService.joinStoreByInviteCode(
+      userId,
+      inviteCode,
+    );
+
+    sendResponse.success(res, store, { status: StatusCodes.OK });
   };
 }

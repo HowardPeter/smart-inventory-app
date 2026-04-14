@@ -115,5 +115,20 @@ class ProfileController extends GetxController {
   void goToEditProfile() => Get.toNamed(AppRoutes.editProfile);
   void goToChangePasswordProfile() => Get.toNamed(AppRoutes.changePassword);
   void goToEditStoreProfile() => Get.toNamed(AppRoutes.editStore);
-  void goToAssignsRoleProfile() => Get.toNamed(AppRoutes.assignsRole);
+  void goToAssignsRoleProfile() {
+    // 1. Lấy storeId hiện tại từ RAM
+    final currentStoreId = storeService.currentStoreId.value;
+
+    // 2. Kiểm tra nếu chưa có storeId thì chặn lại và báo lỗi
+    if (currentStoreId.isEmpty) {
+      TSnackbarsWidget.warning(
+        title: TTexts.warningTitle.tr,
+        message: TTexts.profileNoStoreSelected.tr,
+      );
+      return;
+    }
+
+    // 3. Nếu đã có storeId hợp lệ thì mới cho chuyển trang
+    Get.toNamed(AppRoutes.addMembers);
+  }
 }

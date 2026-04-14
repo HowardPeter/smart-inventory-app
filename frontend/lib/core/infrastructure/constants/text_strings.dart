@@ -41,7 +41,26 @@ class TTexts {
   static const String searchItemsPackages = "search_items_packages";
   static const String searchEverything = "search_everything";
   static const String noResultsFound = "no_results_found";
-  static const String didYouMean = "didYouMean";
+  static const String didYouMean = "did_you_mean";
+  static const String transactionType = "transaction_type";
+  static const String transactionStatus = "transaction_status";
+  static const String applyFilters = "apply_filters";
+  static const String resetFilters = "reset_filters";
+  static const String filterInbound = "filter_inbound";
+  static const String filterOutbound = "filter_outbound";
+  static const String filterAdjustment = "filter_adjustment";
+  static const String filterCompleted = "filter_completed";
+  static const String filterPending = "filter_pending";
+  static const String filterCancelled = "filter_cancelled";
+  static const String searchTransactionHint = "search_transaction_hint";
+  static const String noTransactionsFound = "no_transactions_found";
+  static const String dateRange = "date_range";
+  static const String selectDateRange = "select_date_range";
+  static const String createdByUser = "created_by_user";
+  static const String enterUsernameOrId = "enter_username_or_id";
+  static const String activeFilters = "active_filters";
+  static const String userLabel = "user_label";
+  static const String me = "me";
 
   // -- Network Error Dialog
   static const String netErrorTitle = "net_error_title";
@@ -254,6 +273,7 @@ class TTexts {
   static const String addMembersSubtitle = "add_members_subtitle";
   static const String membersCount = "members_count";
   static const String roleManager = "role_manager";
+  static const String roleOwner = "role_owner";
   static const String roleStaff = "role_staff";
   static const String youBadge = "you_badge";
   static const String generateInviteCodeBtn = "generate_invite_code_btn";
@@ -267,8 +287,18 @@ class TTexts {
   static const String activeInviteCodeTitle = "active_invite_code_title";
   static const String emptyMemberTitle = "empty_member_title";
   static const String emptyMemberSubtitle = "empty_member_subtitle";
+  static const String confirmChangeRoleTitle = "confirm_change_role_title";
+  static const String confirmChangeRoleMessage = "confirm_change_role_message";
+  static const String updatingRole = "updating_role";
+  static const String roleUpdatedSuccess = "role_updated_success";
+  static const String inviteCodeGeneratedSuccess = "invite_code_generated_success";
+  static const String plsGenerateNewCode = "pls_generate_new_code";
+  static const String copyTooltip = "copy_tooltip";
+  static const String shareTooltip = "share_tooltip";
+  static const String generateNewCodeTooltip = "generate_new_code_tooltip";
 
   // -- Home
+  static const String homeRoleOwnerTooltip = "home_role_owner_tooltip";
   static const String homeRoleManagerTooltip = "home_role_manager_tooltip";
   static const String homeRoleStaffTooltip = "home_role_staff_tooltip";
   static const String goodMorning = "goodMorning";
@@ -330,6 +360,17 @@ class TTexts {
   static const String inventoryHealth = 'inventory_health';
   static const String topCategories = 'top_categories';
   static const String inventoryFlow = 'inventory_flow';
+
+  // -- Chatbot AI
+  static const String chatbotName = "chatbot_name";
+  static const String chatbotOnline = "chatbot_online";
+  static const String chatbotInputHint = "chatbot_input_hint";
+  static const String chatbotWelcomeMsg = "chatbot_welcome_msg";
+  static const String chatbotErrorTitle = "chatbot_error_title";
+  static const String chatbotErrorMsg = "chatbot_error_msg";
+  static const String chatbotTyping = "chatbot_typing";
+  static const String chatbotEmptyInputWarning = "chatbot_empty_input_warning";
+  static const String chatbotMockResponse = "chatbot_mock_response";
 
   // -- Customize Catalog
   static const String customizeCatalog = "customize_catalog";
@@ -671,7 +712,6 @@ class TTexts {
   static const String transactionSuccessSub = "transaction_success_sub";
   static const String transactionNumber = "transaction_number";
   static const String transactionDate = "transaction_date";
-  static const String transactionType = "transaction_type";
   static const String totalItemsTransaction = "total_items_transaction";
   static const String checkDetails = "check_details";
   static const String transactionDetails = "transaction_details";
@@ -791,6 +831,7 @@ class TTexts {
   static const String filterAlerts = "filter_alerts";
   static const String filterTransactions = "filter_transactions";
   static const String filterSystem = "filter_system";
+
   //--Profile
   static const String profileTitle = 'profile_title';
   static const String profileNameUser = 'profile_name_user';

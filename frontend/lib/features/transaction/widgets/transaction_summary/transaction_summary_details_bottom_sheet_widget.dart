@@ -24,7 +24,7 @@ class TransactionSummaryDetailsBottomSheetWidget
         const SizedBox(height: 16),
 
         // ==========================================
-        // 🟢 NẾU LÀ ADJUSTMENT -> HIỂN THỊ VẮN TẮT
+        // NẾU LÀ ADJUSTMENT -> HIỂN THỊ VẮN TẮT
         // ==========================================
         if (controller.isAdjustment)
           Container(
@@ -54,7 +54,7 @@ class TransactionSummaryDetailsBottomSheetWidget
           )
         else
           // ==========================================
-          // 🟢 INBOUND/OUTBOUND -> HIỂN THỊ LIST CHI TIẾT
+          // INBOUND/OUTBOUND -> HIỂN THỊ LIST CHI TIẾT
           // ==========================================
           ListView.separated(
             shrinkWrap: true,
@@ -185,11 +185,16 @@ class TransactionSummaryDetailsBottomSheetWidget
       children: [
         Text(label,
             style: const TextStyle(fontSize: 12, color: AppColors.subText)),
-        Text(value,
+        Expanded(
+          child: Text(
+            value,
+            textAlign: TextAlign.right, 
             style: const TextStyle(
                 fontSize: 12,
                 fontWeight: FontWeight.w500,
-                color: AppColors.primaryText)),
+                color: AppColors.primaryText),
+          ),
+        ),
       ],
     );
   }

@@ -1,14 +1,17 @@
+import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:frontend/core/infrastructure/constants/text_strings.dart';
+import 'package:frontend/core/infrastructure/utils/error_handler_utils.dart';
 import 'package:frontend/core/state/services/store_service.dart';
 import 'package:frontend/features/workspace/provider/workspace_provider.dart';
 import 'package:get/get.dart';
 import 'package:frontend/core/ui/widgets/t_snackbars_widget.dart';
-import 'package:frontend/core/infrastructure/utils/full_screen_loader_utils.dart';
 import 'package:frontend/routes/app_routes.dart';
 
-class JoinStoreController extends GetxController {
+class JoinStoreController extends GetxController with TErrorHandler {
   final inviteCodeController = TextEditingController();
+
+  // Biến này giờ đây chỉ dùng để điều khiển Nút Bấm
   final isLoading = false.obs;
 
   late final WorkspaceProvider _workspaceProvider;
@@ -21,7 +24,14 @@ class JoinStoreController extends GetxController {
   }
 
   Future<void> onJoinWorkspace() async {
-    final code = inviteCodeController.text.trim().toUpperCase();
+    // 1. Nếu đang xoay loading trên nút rồi thì không cho bấm nữa
+    if (isLoading.value) return;
+
+    // Đóng snackbar cũ nếu có cho gọn mắt
+    Get.closeAllSnackbars();
+
+    final code = inviteCodeController.text.trim();
+    debugPrint('MÃ CHUẨN BỊ GỬI LÊN SERVER LÀ: "$code"');
 
     if (code.isEmpty || code.length < 6) {
       TSnackbarsWidget.warning(
@@ -31,33 +41,37 @@ class JoinStoreController extends GetxController {
     }
 
     try {
+      // 2. Kích hoạt Loading trên nút bấm (Vô hiệu hóa nút, đổi text)
       isLoading.value = true;
-      FullScreenLoaderUtils.openLoadingDialog(TTexts.checkingInviteCode.tr);
 
-      // --- GỌI API THẬT ĐỂ JOIN STORE ---
-      // Nếu user đã có trong store hoặc mã sai, Backend Node.js của bạn
-      // sẽ quăng lỗi 400/404 và nhảy thẳng xuống khối catch (e) bên dưới.
+      // --- GỌI API THẬT ---
       final joinedStore = await _workspaceProvider.joinStore(code);
 
-      FullScreenLoaderUtils.stopLoading();
-
-      // Hiện thông báo thành công
       TSnackbarsWidget.success(
           title: TTexts.joinSuccessTitle.tr,
           message: TTexts.joinSuccessMessage.tr);
 
-      // Lưu ID và Tên cửa hàng vừa join được vào bộ nhớ máy
-      await _storeService.saveSelectedStore(
-          joinedStore.storeId, joinedStore.name, joinedStore.role);
+      await _storeService.saveSelectedStore(joinedStore.storeId,
+          joinedStore.name, joinedStore.role, joinedStore.inviteCode ?? '');
 
-      // Chuyển thẳng vào Home
       Get.offAllNamed(AppRoutes.main);
+    } on DioException catch (e) {
+      // Bắt lỗi rành mạch
+      if (e.response?.statusCode == 409) {
+        TSnackbarsWidget.error(
+            title: TTexts.joinAlreadyMemberTitle.tr,
+            message: TTexts.joinAlreadyMemberMessage.tr);
+      } else if (e.response?.statusCode == 404) {
+        TSnackbarsWidget.error(
+            title: TTexts.joinInvalidCodeTitle.tr,
+            message: TTexts.joinInvalidCodeMessage.tr);
+      } else {
+        handleError(e);
+      }
     } catch (e) {
-      FullScreenLoaderUtils.stopLoading();
-
-      TSnackbarsWidget.error(
-          title: TTexts.errorTitle.tr, message: e.toString());
+      handleError(e);
     } finally {
+      // 3. API chạy xong (dù lỗi hay thành công), trả nút bấm về trạng thái bình thường
       isLoading.value = false;
     }
   }

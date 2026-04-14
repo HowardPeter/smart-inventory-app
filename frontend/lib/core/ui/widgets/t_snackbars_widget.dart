@@ -93,7 +93,7 @@ class TSnackbarsWidget {
 
           // 4. Nút X (Close)
           IconButton(
-            onPressed: () => Get.back(),
+            onPressed: () => Get.closeCurrentSnackbar(),
             icon: const Icon(Icons.close, color: Color(0xFF9CA3AF), size: 20),
             padding: EdgeInsets.zero,
             constraints: const BoxConstraints(),

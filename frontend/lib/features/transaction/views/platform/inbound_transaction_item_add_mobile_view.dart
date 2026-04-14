@@ -53,8 +53,7 @@ class InboundTransactionItemAddMobileView
                     padding: const EdgeInsets.symmetric(
                         horizontal: AppSizes.p20, vertical: 16),
                     child: TTextFormFieldWidget(
-                      label:
-                          TTexts.importPriceLot.tr, // 🟢 HIỆN CHỮ IMPORT PRICE
+                      label: TTexts.importPriceLot.tr, // HIỆN CHỮ IMPORT PRICE
                       hintText: '0.00',
                       controller: controller.priceController,
                       keyboardType:

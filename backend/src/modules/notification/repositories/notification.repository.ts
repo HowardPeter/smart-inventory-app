@@ -21,7 +21,7 @@ export class NotificationRepository {
   // --- XỬ LÝ IN-APP NOTIFICATION ---
   async createNotification(
     userId: string,
-    storeId: string, // 👉 Thêm storeId
+    storeId: string,
     title: string,
     body: string,
     type: string,
@@ -44,7 +44,7 @@ export class NotificationRepository {
     storeId: string,
     page: number,
     size: number,
-    type?: string, // 👉 Bổ sung param type
+    type?: string,
   ) {
     const skip = (page - 1) * size;
 

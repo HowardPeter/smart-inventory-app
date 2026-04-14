@@ -76,14 +76,13 @@ class InboundTransactionController extends GetxController with TErrorHandler {
     }
   }
 
-  // 🟢 XÓA SẢN PHẨM (Dùng Emoji Icon)
+  // XÓA SẢN PHẨM (Dùng Emoji Icon)
   void removeItem(int index) {
     Get.dialog(
       TCustomDialogWidget(
         title: TTexts.removeItem.tr,
         description: TTexts.confirmRemoveItemTransaction.tr,
-        icon:
-            const Text('🗑️', style: TextStyle(fontSize: 40)), // 🟢 EMOJI ICON
+        icon: const Text('🗑️', style: TextStyle(fontSize: 40)),
         primaryButtonText: TTexts.remove.tr,
         onPrimaryPressed: () {
           cartItems.removeAt(index);
@@ -96,7 +95,7 @@ class InboundTransactionController extends GetxController with TErrorHandler {
     );
   }
 
-  // 🟢 1. KIỂM TRA THAY ĐỔI GIÁ (IMPORT PRICE)
+  // 1. KIỂM TRA THAY ĐỔI GIÁ (IMPORT PRICE)
   void handleImportWithPriceCheck() {
     if (cartItems.isEmpty) {
       TSnackbarsWidget.warning(
@@ -115,8 +114,7 @@ class InboundTransactionController extends GetxController with TErrorHandler {
         TCustomDialogWidget(
           title: TTexts.priceChangeDetected.tr,
           description: TTexts.priceChangeMessage.tr,
-          icon:
-              const Text('💰', style: TextStyle(fontSize: 40)), // 🟢 EMOJI ICON
+          icon: const Text('💰', style: TextStyle(fontSize: 40)),
           content: Column(
             mainAxisSize: MainAxisSize.min,
             children: changedPriceItems.map((item) {
@@ -149,13 +147,13 @@ class InboundTransactionController extends GetxController with TErrorHandler {
     }
   }
 
-  // 🟢 2. XÁC NHẬN NHẬP KHO CHÍNH THỨC
+  // 2. XÁC NHẬN NHẬP KHO CHÍNH THỨC
   void _showConfirmImportDialog({required bool updatePrice}) {
     Get.dialog(
       TCustomDialogWidget(
         title: TTexts.confirmImportTitle.tr,
         description: TTexts.confirmImportDescription.tr,
-        icon: const Text('📦', style: TextStyle(fontSize: 40)), // 🟢 EMOJI ICON
+        icon: const Text('📦', style: TextStyle(fontSize: 40)), 
         primaryButtonText: TTexts.proceedImport.tr,
         onPrimaryPressed: () {
           Get.back();
@@ -168,7 +166,7 @@ class InboundTransactionController extends GetxController with TErrorHandler {
     );
   }
 
-  // 🟢 3. THỰC THI API CÓ BẪY LỖI
+  // Hoàn thiện import
   Future<void> completeImport({required bool updatePrice}) async {
     try {
       FullScreenLoaderUtils.openLoadingDialog(TTexts.creatingImportTicket.tr);
@@ -177,60 +175,56 @@ class InboundTransactionController extends GetxController with TErrorHandler {
           ? noteController.text.trim()
           : TTexts.manualImport.tr;
 
-      // 1. Tạo Transaction Model
-      final transaction = TransactionModel(
-        totalPrice: totalFunds,
-        type: 'INBOUND',
-        status: 'COMPLETED',
+      // 1. Format dữ liệu giỏ hàng chuẩn theo yêu cầu của Backend
+      // Backend cần: productPackageId, quantity, unitPrice
+      final List<Map<String, dynamic>> itemsPayload = cartItems.map((item) {
+        return {
+          'productPackageId': item.productPackageId,
+          'quantity': item.quantity,
+          'unitPrice': item.unitPrice,
+        };
+      }).toList();
+
+      // 2. GỌI API
+      final response = await _provider.createImportTransaction(
         note: finalNote,
-        items: cartItems.toList(),
+        items: itemsPayload,
       );
 
-      await _provider.createTransaction(transaction);
+      // 3. NẾU CHỌN CẬP NHẬT GIÁ MỚI -> BẮN API ĐỔI IMPORT PRICE
+      // Vì API import không tự đổi giá gốc (như mô tả trong backend là trả về Suggestions)
+      // Nên nếu user đồng ý, ta tự động bắn update.
+      if (updatePrice) {
+        final validItems = cartItems.where((item) =>
+            item.productPackageId != null && item.productPackageId!.isNotEmpty);
 
-      // =========================================================================
-      // 🚧 TODO (BACKEND INTEGRATION):
-      // Khi Backend làm xong API Transaction (VD: POST /api/transactions),
-      // hãy xóa vòng lặp phía dưới đi. Frontend chỉ việc gọi đúng 1 API tạo Transaction.
-      // Backend sẽ dùng CƠ CHẾ DATABASE TRANSACTION ($transaction trong Prisma) để:
-      //  - 1. Tạo bản ghi Transaction & Transaction Details.
-      //  - 2. Tự động UPDATE `importPrice` của ProductPackage.
-      //  - 3. Tự động INCREASE `quantity` trong bảng Inventory.
-      // Việc này đảm bảo tính nhất quán (All or Nothing), Frontend không nên tự gọi 3 API.
-      // =========================================================================
-
-      // 2. Cập nhật kho và cập nhật giá (Nếu updatePrice = true)
-      final validItems = cartItems.where((item) =>
-          item.productPackageId != null && item.productPackageId!.isNotEmpty);
-
-      List<Future<void>> updateTasks = [];
-
-      for (var item in validItems) {
-        final pkgId = item.productPackageId!;
-
-        // Tăng tồn kho
-        updateTasks.add(_provider.adjustInventory(
-          pkgId,
-          type: 'increase',
-          quantity: item.quantity,
-          note: finalNote,
-        ));
-
-        // 🟢 NẾU CHỌN CẬP NHẬT GIÁ -> BẮN API ĐỔI IMPORT PRICE
-        if (updatePrice) {
-          updateTasks.add(_provider
-              .updateProductPackage(pkgId, {'importPrice': item.unitPrice}));
+        List<Future<void>> updateTasks = [];
+        for (var item in validItems) {
+          updateTasks.add(_provider.updateProductPackage(
+              item.productPackageId!, {'importPrice': item.unitPrice}));
         }
+        await Future.wait(updateTasks);
       }
-
-      await Future.wait(updateTasks);
 
       FullScreenLoaderUtils.stopLoading();
 
-      // Reset dữ liệu
+      // 4. Tạo Object để truyền sang trang Summary hiển thị
+      final transaction = TransactionModel(
+        transactionId: response['transactionId'] ?? 'NEW-TX',
+        totalPrice: totalFunds,
+        type: 'INBOUND', // UI cần chữ hoa INBOUND
+        status: 'COMPLETED',
+        note: finalNote,
+        createdAt:
+            DateTime.now(), // Hoặc lấy DateTime.parse(response['createdAt'])
+        items: cartItems.toList(),
+      );
+
+      // Reset dữ liệu màn hình cũ
       cartItems.clear();
       noteController.clear();
 
+      // Chuyển hướng sang hóa đơn thành công
       Get.offNamed(AppRoutes.transactionSummary, arguments: transaction);
 
       TSnackbarsWidget.success(

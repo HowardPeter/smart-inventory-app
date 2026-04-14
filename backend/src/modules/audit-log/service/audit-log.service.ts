@@ -9,10 +9,6 @@ import type {
   ListAuditLogsResponseDto,
 } from '../dto/audit-log.dto.js';
 
-/* Service xử lý business logic cho module Audit Log.
-Đóng vai trò trung gian giữa Controller và Repository, chịu trách nhiệm
-chuẩn hóa các tham số đầu vào và định dạng
-kết quả trả về theo chuẩn hệ thống. */
 export class AuditLogService {
   constructor(private readonly auditLogRepository: AuditLogRepository) {}
 

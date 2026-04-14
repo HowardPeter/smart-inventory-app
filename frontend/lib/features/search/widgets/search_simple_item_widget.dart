@@ -20,6 +20,29 @@ class SearchSimpleItemWidget extends StatelessWidget {
     final package = displayItem.inventory.productPackage;
     final product = displayItem.product;
 
+    final bool isCategory = product != null && product.productId.isEmpty;
+    final bool isBaseProduct =
+        product != null && product.productId.isNotEmpty && package == null;
+    final bool isPackage = package != null;
+
+    IconData leadingIcon = Iconsax.box_copy;
+    String title = TTexts.unknownProduct.tr;
+    String subtitle = '';
+
+    if (isPackage) {
+      leadingIcon = Iconsax.box_copy;
+      title = package.displayName;
+      subtitle = "${TTexts.barcodeLabel.tr}: ${package.barcodeValue ?? '---'}";
+    } else if (isBaseProduct) {
+      leadingIcon = Iconsax.box_tick_copy;
+      title = product.name;
+      subtitle = "${TTexts.brand.tr}: ${product.brand ?? '---'}";
+    } else if (isCategory) {
+      leadingIcon = Iconsax.folder_2_copy;
+      title = product.name;
+      subtitle = TTexts.categoryCatalog.tr;
+    }
+
     return ListTile(
       onTap: onTap,
       contentPadding: const EdgeInsets.symmetric(horizontal: 20, vertical: 4),
@@ -30,11 +53,10 @@ class SearchSimpleItemWidget extends StatelessWidget {
           color: AppColors.softGrey.withOpacity(0.1),
           borderRadius: BorderRadius.circular(8),
         ),
-        child:
-            const Icon(Iconsax.box_copy, color: AppColors.softGrey, size: 22),
+        child: Icon(leadingIcon, color: AppColors.softGrey, size: 22),
       ),
       title: Text(
-        package?.displayName ?? product?.name ?? TTexts.unknownProduct.tr,
+        title,
         style: const TextStyle(
           fontWeight: FontWeight.w600,
           fontSize: 14,
@@ -44,7 +66,7 @@ class SearchSimpleItemWidget extends StatelessWidget {
         overflow: TextOverflow.ellipsis,
       ),
       subtitle: Text(
-        "${TTexts.barcodeLabel.tr}: ${package?.barcodeValue ?? '---'}",
+        subtitle,
         style: const TextStyle(fontSize: 12, color: AppColors.subText),
       ),
       trailing:

@@ -49,7 +49,7 @@ class _TExpandableFabWidgetState extends State<TExpandableFabWidget>
   @override
   Widget build(BuildContext context) {
     // ==============================================================
-    // 🟢 NẾU LÀ STAFF: HIỆN NÚT ĐƠN ĐỂ QUÉT BÌNH THƯỜNG
+    // NẾU LÀ STAFF: HIỆN NÚT ĐƠN ĐỂ QUÉT BÌNH THƯỜNG
     // ==============================================================
     if (widget.isStaffMode) {
       return SizedBox(
@@ -68,7 +68,7 @@ class _TExpandableFabWidgetState extends State<TExpandableFabWidget>
     }
 
     // ==============================================================
-    // 🟢 NẾU LÀ MANAGER: HIỆN FAB EXPANDABLE CÓ TEXT
+    // NẾU LÀ MANAGER: HIỆN FAB EXPANDABLE CÓ TEXT
     // ==============================================================
     return SizedBox(
       width: 250, // Mở rộng chiều ngang để chứa chữ

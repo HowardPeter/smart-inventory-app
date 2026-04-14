@@ -333,7 +333,7 @@ class ProductCatalogDetailController extends GetxController with TErrorHandler {
           title: TTexts.successTitle.tr,
           message: TTexts.packageDeletedSuccess.tr);
 
-      // 🟢 BÁO CHO CÁC TRANG KIA TỰ ĐỘNG CẬP NHẬT KHI XÓA THÀNH CÔNG 🟢
+      // BÁO CHO CÁC TRANG KIA TỰ ĐỘNG CẬP NHẬT KHI XÓA THÀNH CÔNG 🟢
       if (Get.isRegistered<InventoryController>()) {
         Get.find<InventoryController>().fetchDashboardData(isRefresh: true);
       }

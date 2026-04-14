@@ -6,7 +6,6 @@ import 'package:frontend/features/inventory/controllers/inventory_controller.dar
 import 'package:frontend/core/ui/widgets/t_snackbars_widget.dart';
 import 'package:frontend/core/infrastructure/models/inventory_model.dart';
 import 'package:frontend/features/inventory/models/inventory_insight_display_model.dart';
-import 'package:frontend/core/infrastructure/models/transaction_model.dart';
 import 'package:frontend/core/infrastructure/utils/error_handler_utils.dart';
 import 'package:frontend/core/infrastructure/utils/full_screen_loader_utils.dart';
 import 'package:frontend/core/infrastructure/constants/text_strings.dart';
@@ -21,11 +20,12 @@ class OutboundTransactionItemAddController extends GetxController
   final Rxn<InventoryModel> freshInventoryData = Rxn<InventoryModel>();
   final RxBool isLoadingFreshData = true.obs;
 
+  final TextEditingController quantityController =
+      TextEditingController(text: '1');
   final TextEditingController priceController = TextEditingController();
-  final RxDouble totalPrice = 0.0.obs;
 
-  final RxList<TransactionModel> availableInboundTxs = <TransactionModel>[].obs;
-  final RxMap<String, int> selectedBatchesQty = <String, int>{}.obs;
+  final RxInt itemQuantity = 1.obs;
+  final RxDouble totalPrice = 0.0.obs;
 
   @override
   void onInit() {
@@ -42,6 +42,7 @@ class OutboundTransactionItemAddController extends GetxController
       TSnackbarsWidget.error(
           title: TTexts.errorTitle.tr, message: TTexts.errorUnknownMessage.tr);
     }
+    quantityController.addListener(_calculateSubtotal);
     priceController.addListener(_calculateSubtotal);
   }
 
@@ -86,13 +87,13 @@ class OutboundTransactionItemAddController extends GetxController
   bool get isProductActive =>
       initialItem.product?.activeStatus.toLowerCase() == 'active';
 
-  int get totalQuantity {
-    return selectedBatchesQty.values.fold(0, (sum, qty) => sum + qty);
-  }
-
+  // =========================================================
+  // LOGIC TÍNH TOÁN
+  // =========================================================
   void _calculateSubtotal() {
+    itemQuantity.value = int.tryParse(quantityController.text) ?? 1;
     final price = double.tryParse(priceController.text) ?? 0.0;
-    totalPrice.value = totalQuantity * price;
+    totalPrice.value = itemQuantity.value * price;
   }
 
   Future<void> fetchFreshData(String packageId) async {
@@ -101,15 +102,6 @@ class OutboundTransactionItemAddController extends GetxController
       isLoadingFreshData.value = true;
       final data = await _provider.getInventoryDetailByPackageId(packageId);
       freshInventoryData.value = InventoryModel.fromJson(data);
-
-      final txs = await _provider.getInboundTransactionsForPackage(packageId);
-      txs.sort((a, b) => a.createdAt!.compareTo(b.createdAt!)); // FIFO
-      availableInboundTxs.assignAll(txs);
-
-      selectedBatchesQty.clear();
-      for (var tx in txs) {
-        selectedBatchesQty[tx.transactionId!] = 0;
-      }
     } catch (e) {
       debugPrint('Lỗi fetch data: $e');
     } finally {
@@ -117,31 +109,31 @@ class OutboundTransactionItemAddController extends GetxController
     }
   }
 
-  // 🟢 HÀM NÀY ĐÃ ĐƯỢC FIX LỖI "CỨNG ĐƠ" UI
-  void updateBatchQty(String batchId, int newQty, int maxStock) {
-    if (newQty < 0) newQty = 0;
-    if (newQty > maxStock) {
-      newQty = maxStock;
+  void incrementQuantity() {
+    int current = int.tryParse(quantityController.text) ?? 1;
+    if (current < currentStock) {
+      quantityController.text = (current + 1).toString();
+    } else {
       TSnackbarsWidget.warning(
           title: TTexts.warningTitle.tr, message: TTexts.batchExceedsStock.tr);
     }
+  }
 
-    selectedBatchesQty[batchId] = newQty;
-
-    // 🟢 DÒNG CỐT LÕI: Đánh thức GetX render lại UI cho RxMap
-    selectedBatchesQty.refresh();
-
-    _calculateSubtotal();
+  void decrementQuantity() {
+    int current = int.tryParse(quantityController.text) ?? 1;
+    if (current > 1) {
+      quantityController.text = (current - 1).toString();
+    }
   }
 
   Future<void> confirmAndAddToCart() async {
     try {
-      final totalQty = totalQuantity;
+      final qty = int.tryParse(quantityController.text) ?? 1;
 
-      if (totalQty <= 0) {
+      if (qty > currentStock) {
         TSnackbarsWidget.warning(
             title: TTexts.warningTitle.tr,
-            message: TTexts.specifyBatchQuantity.tr); // 🟢 Sửa text cứng
+            message: TTexts.batchExceedsStock.tr);
         return;
       }
 
@@ -165,8 +157,7 @@ class OutboundTransactionItemAddController extends GetxController
       };
 
       Get.find<OutboundTransactionController>().addToCart(cartData,
-          quantity: totalQty,
-          customPrice: double.tryParse(priceController.text));
+          quantity: qty, customPrice: double.tryParse(priceController.text));
 
       FullScreenLoaderUtils.stopLoading();
       Get.until(
@@ -179,6 +170,7 @@ class OutboundTransactionItemAddController extends GetxController
 
   @override
   void onClose() {
+    quantityController.dispose();
     priceController.dispose();
     super.onClose();
   }

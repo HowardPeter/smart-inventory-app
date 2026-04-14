@@ -365,6 +365,7 @@ export class SearchRepository {
         productId: true,
         name: true,
         brand: true,
+        imageUrl: true,
       },
       orderBy: [
         {

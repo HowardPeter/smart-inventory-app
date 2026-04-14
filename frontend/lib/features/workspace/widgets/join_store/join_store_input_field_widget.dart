@@ -1,6 +1,5 @@
-// lib/features/workspace/widgets/join_store/join_store_input_field_widget.dart
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart'; // Thêm import này
+import 'package:flutter/services.dart';
 import 'package:get/get.dart';
 import 'package:frontend/core/ui/theme/app_colors.dart';
 import 'package:frontend/core/ui/theme/app_sizes.dart';
@@ -15,7 +14,6 @@ class JoinStoreInputFieldWidget extends GetView<JoinStoreController> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        // NHÃN CHO Ô NHẬP MÃ
         Text(
           TTexts.enterInviteCodeLabel.tr,
           style: const TextStyle(
@@ -24,8 +22,6 @@ class JoinStoreInputFieldWidget extends GetView<JoinStoreController> {
               color: AppColors.primaryText),
         ),
         const SizedBox(height: AppSizes.p12),
-
-        // Ô NHẬP MÃ MỜI ĐƯỢC LÀM ĐẸP (CÓ ĐỔ BÓNG NỔI LÊN)
         Container(
           decoration: BoxDecoration(
             color: AppColors.white,
@@ -35,22 +31,17 @@ class JoinStoreInputFieldWidget extends GetView<JoinStoreController> {
                 color: Colors.black.withOpacity(0.05),
                 blurRadius: 15,
                 spreadRadius: 2,
-                offset: const Offset(0, 8), // Đổ bóng nhẹ xuống dưới
+                offset: const Offset(0, 8),
               ),
             ],
           ),
           child: TextFormField(
             controller: controller.inviteCodeController,
             textAlign: TextAlign.center,
-            maxLength: 6,
-            textCapitalization: TextCapitalization.characters,
-            inputFormatters: [
-              UpperCaseTextFormatter(),
-            ],
             style: const TextStyle(
-                fontSize: 32, // Chữ to hơn một chút
-                fontWeight: FontWeight.w900,
-                letterSpacing: 10.0, // Khoảng cách xa ra cho giống OTP
+                fontSize: 16,
+                fontWeight: FontWeight.w500,
+                letterSpacing: 4.0,
                 color: AppColors.primaryText),
             decoration: InputDecoration(
               hintText: TTexts.enterInviteCodeHint.tr,
@@ -59,13 +50,11 @@ class JoinStoreInputFieldWidget extends GetView<JoinStoreController> {
                   fontWeight: FontWeight.normal,
                   color: AppColors.softGrey.withOpacity(0.5),
                   letterSpacing: 2.0),
-              counterText: "", // Ẩn biến đếm độ dài
+              counterText: "",
               filled: true,
-              fillColor: Colors
-                  .transparent, // Nền trong suốt để Container bọc ngoài lo
+              fillColor: Colors.transparent,
               contentPadding:
                   const EdgeInsets.symmetric(vertical: AppSizes.p24),
-              // Xóa viền mặc định để nhường chỗ cho bóng đổ
               border: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(AppSizes.radius16),
                 borderSide: BorderSide.none,
@@ -74,7 +63,6 @@ class JoinStoreInputFieldWidget extends GetView<JoinStoreController> {
                 borderRadius: BorderRadius.circular(AppSizes.radius16),
                 borderSide: BorderSide.none,
               ),
-              // Khi nhấp vào thì hiện viền màu cam xịn xò
               focusedBorder: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(AppSizes.radius16),
                 borderSide:
@@ -88,13 +76,12 @@ class JoinStoreInputFieldWidget extends GetView<JoinStoreController> {
   }
 }
 
-// Bổ trợ: Ép chữ hoa khi người dùng nhập từ bàn phím
 class UpperCaseTextFormatter extends TextInputFormatter {
   @override
   TextEditingValue formatEditUpdate(
       TextEditingValue oldValue, TextEditingValue newValue) {
     return TextEditingValue(
-      text: newValue.text.toUpperCase(),
+      text: newValue.text,
       selection: newValue.selection,
     );
   }

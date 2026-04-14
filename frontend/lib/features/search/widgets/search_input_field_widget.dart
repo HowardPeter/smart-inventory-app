@@ -30,20 +30,26 @@ class SearchInputFieldWidget extends GetView<TSearchController> {
                   const EdgeInsets.symmetric(horizontal: 0, vertical: 14),
               prefixIcon: const Icon(Iconsax.search_normal_copy,
                   color: AppColors.softGrey, size: 20),
-
-              // Nếu đang có chữ -> Hiện nút Xóa. Nếu rỗng -> Hiện nút Quét mã.
               suffixIcon: controller.currentSearchQuery.value.isNotEmpty
                   ? IconButton(
                       icon: const Icon(Icons.close,
                           color: AppColors.softGrey, size: 20),
                       onPressed: controller.clearSearch,
                     )
-                  : IconButton(
-                      icon: const Icon(Iconsax.scan_barcode_copy,
-                          color: AppColors.primary, size: 20),
-                      onPressed: () =>
-                          Get.off(() => const TBarcodeScannerLayout()),
-                    ),
+                  : (controller.isTransactionSearch
+                      ? IconButton(
+                          // Nếu là Transaction Search -> Hiện Nút Lọc (Filter)
+                          icon: const Icon(Iconsax.setting_4_copy,
+                              color: AppColors.primary, size: 20),
+                          onPressed: controller.openTransactionFilterSheet,
+                        )
+                      : IconButton(
+                          // Nếu là Inventory Search -> Hiện Nút Quét Barcode
+                          icon: const Icon(Iconsax.scan_barcode_copy,
+                              color: AppColors.primary, size: 20),
+                          onPressed: () =>
+                              Get.off(() => const TBarcodeScannerLayout()),
+                        )),
             ),
           )),
     );

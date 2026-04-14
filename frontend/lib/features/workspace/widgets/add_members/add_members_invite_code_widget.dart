@@ -35,37 +35,55 @@ class AddMembersInviteCodeWidget extends GetView<AddMembersController> {
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  Text(
-                    controller.activeInviteCode.value,
-                    style: const TextStyle(
-                        fontFamily: 'Poppins',
-                        fontSize: 32,
-                        fontWeight: FontWeight.w900,
-                        letterSpacing: 8.0,
-                        color: AppColors.primary),
+                  // 1. Text Mã mời
+                  Expanded(
+                    child: Text(
+                      controller.activeInviteCode.value,
+                      style: const TextStyle(
+                          fontFamily: 'Poppins',
+                          fontSize: 22,
+                          fontWeight: FontWeight.w900,
+                          letterSpacing: 2.0,
+                          color: AppColors.primary),
+                    ),
                   ),
-                  IconButton(
-                    onPressed: controller.copyCode,
-                    icon:
-                        const Icon(Iconsax.copy_copy, color: AppColors.primary),
-                    style: IconButton.styleFrom(
-                        backgroundColor: AppColors.white,
-                        shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(8))),
+
+                  // 2. Dãy nút Action (Không nền trắng)
+                  Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      // Nút Copy
+                      IconButton(
+                        onPressed: controller.copyCode,
+                        tooltip: TTexts.copyTooltip.tr, // ĐÃ FIX
+                        icon: const Icon(Iconsax.copy_copy,
+                            color: AppColors.primary, size: 22),
+                      ),
+                      // Nút Share
+                      IconButton(
+                        onPressed: controller.shareCode,
+                        tooltip: TTexts.shareTooltip.tr, // ĐÃ FIX
+                        icon: const Icon(Icons.share_outlined,
+                            color: AppColors.primary, size: 22),
+                      ),
+                      // Nút Refresh (Tạo mới qua Dialog)
+                      IconButton(
+                        onPressed: controller.onGenerateCodeTapped,
+                        tooltip: TTexts.generateNewCodeTooltip.tr, // ĐÃ FIX
+                        icon: const Icon(Iconsax.refresh_copy,
+                            color: AppColors.primary, size: 22),
+                      ),
+                    ],
                   )
                 ],
               ),
               const SizedBox(height: 12),
-              Text(
-                  "${TTexts.generatedAt.tr}${controller.generatedTimeStr.value}",
-                  style:
-                      const TextStyle(fontSize: 12, color: AppColors.subText)),
-              const SizedBox(height: 4),
-              Text(TTexts.expiresAt.tr,
-                  style: const TextStyle(
-                      fontSize: 12,
-                      color: Colors.redAccent,
-                      fontWeight: FontWeight.bold)),
+              Obx(() => controller.generatedTimeStr.value.isNotEmpty
+                  ? Text(
+                      "${TTexts.generatedAt.tr}${controller.generatedTimeStr.value}",
+                      style: const TextStyle(
+                          fontSize: 12, color: AppColors.subText))
+                  : const SizedBox.shrink()),
             ],
           ),
         );

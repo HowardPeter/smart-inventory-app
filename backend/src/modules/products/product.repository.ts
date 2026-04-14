@@ -8,6 +8,7 @@ import type {
   ListProductsQueryDto,
   ProductListItemDto,
   ProductsByCategoryDto,
+  ProductSimpleResponseDto,
 } from './product.dto.js';
 import type { Prisma } from '../../../src/generated/prisma/client.js';
 import type {
@@ -78,8 +79,29 @@ export class ProductRepository {
   async findOne(
     storeId: string,
     productId: string,
+  ): Promise<ProductSimpleResponseDto | null> {
+    return await this.db.product.findUnique({
+      where: {
+        productId,
+        storeId,
+        activeStatus: 'active',
+      },
+      select: {
+        productId: true,
+        name: true,
+        imageUrl: true,
+        brand: true,
+        storeId: true,
+        categoryId: true,
+      },
+    });
+  }
+
+  async findDetailOne(
+    storeId: string,
+    productId: string,
   ): Promise<DetailProductResponseDto | null> {
-    const detailProduct = await this.db.product.findFirst({
+    const detailProduct = await this.db.product.findUnique({
       where: {
         productId,
         storeId,

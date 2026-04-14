@@ -1,10 +1,12 @@
 import 'package:frontend/features/inventory/controllers/inventory_controller.dart';
+import 'package:frontend/features/navigation/controllers/chatbot_ui_controller.dart';
 import 'package:frontend/features/notification/controller/notification_controller.dart';
+import 'package:frontend/features/report/controllers/report_controller.dart';
+import 'package:frontend/features/report/controllers/report_export_controller.dart';
 import 'package:get/get.dart';
 import 'package:frontend/features/navigation/controllers/navigation_controller.dart';
 import 'package:frontend/features/home/controllers/home_controller.dart';
 import 'package:frontend/features/profile/controllers/profile_controller.dart';
-// import các controller khác của các tab...
 
 class NavigationBinding extends Bindings {
   @override
@@ -18,6 +20,10 @@ class NavigationBinding extends Bindings {
     Get.lazyPut(() => HomeController(), fenix: true);
     Get.lazyPut(() => InventoryController(), fenix: true);
     Get.lazyPut(() => ProfileController(), fenix: true);
-    // Get.lazyPut(() => ReportsController());
+    Get.lazyPut(() => ReportController(), fenix: true);
+
+    // 3. Các Controller phụ của Tab.
+    Get.lazyPut(() => ChatbotUiController(), fenix: true);
+    Get.lazyPut(() => ReportExportController(), fenix: true);
   }
 }
