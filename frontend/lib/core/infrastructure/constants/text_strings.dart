@@ -347,6 +347,15 @@ class TTexts {
   static const String yesterday = 'yesterday';
   static const String note = 'note';
   static const String productName = 'product_name';
+  static const String overviewInfoTitle = 'overview_info_title';
+  static const String inboundDesc = 'inbound_desc';
+  static const String outboundDesc = 'outbound_desc';
+  static const String adjustmentDesc = 'adjustment_desc';
+  static const String totalInDesc = 'total_in_desc';
+  static const String totalOutDesc = 'total_out_desc';
+  static const String adjust = 'adjust';
+  static const String totalIn = 'total_in';
+  static const String totalOut = 'total_out';
 
   // -- Inventory
   static const String inventoryHub = "inventory_hub";

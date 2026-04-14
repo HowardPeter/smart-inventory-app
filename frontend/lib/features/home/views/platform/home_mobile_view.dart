@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:frontend/core/ui/widgets/t_bottom_nav_spacer_widget.dart';
 import 'package:frontend/core/ui/widgets/t_custom_fade_overlay_widget.dart';
 import 'package:frontend/core/ui/widgets/t_refresh_indicator_widget.dart'; // ĐÃ IMPORT
+import 'package:frontend/features/home/widgets/home/home_adjustment_stats_widget.dart';
+import 'package:frontend/features/navigation/controllers/navigation_controller.dart';
 import 'package:get/get.dart';
 import 'package:frontend/core/ui/theme/app_colors.dart';
 import 'package:frontend/core/ui/theme/app_sizes.dart';
@@ -11,10 +13,9 @@ import 'package:frontend/features/home/widgets/home/home_header_widget.dart';
 import 'package:frontend/features/home/widgets/home/home_quick_actions_widget.dart';
 import 'package:frontend/features/home/widgets/home/home_revenue_chart_widget.dart';
 import 'package:frontend/features/home/widgets/home/home_daily_summary_widget.dart';
-import 'package:frontend/features/home/widgets/home/home_adjustment_stats_widget.dart';
 import 'package:frontend/features/home/widgets/home/home_low_stock_alerts_widget.dart';
 import 'package:frontend/features/home/widgets/home/home_transaction_list_widget.dart';
-import 'package:frontend/features/home/widgets/home/home_shimmer_widget.dart'; // ĐÃ IMPORT
+import 'package:frontend/features/home/widgets/home/home_shimmer_widget.dart';
 
 class HomeMobileScreen extends GetView<HomeController> {
   const HomeMobileScreen({super.key});
@@ -97,18 +98,18 @@ class HomeMobileScreen extends GetView<HomeController> {
                                     top: AppSizes.p20,
                                     right: AppSizes.p20,
                                     bottom:
-                                        controller.todayTransactions.length > 3
+                                        controller.recentTransactions.length > 3
                                             ? 60
                                             : AppSizes.p20,
                                   ),
                                   child: const HomeTransactionListWidget(),
                                 ),
-                                // ĐÃ FIX: CHỈ HIỆN KHI CÓ HƠN 3 GIAO DỊCH
-                                if (controller.todayTransactions.length > 3)
+                                if (controller.recentTransactions.length > 3)
                                   TCustomFadeOverlayWidget(
                                     text: TTexts.homeTapToViewMoreHistory.tr,
                                     onTap: () {
-                                      // TODO: Chuyển sang Lịch sử giao dịch
+                                      Get.find<NavigationController>()
+                                          .changeIndex(3);
                                     },
                                   ),
                               ],

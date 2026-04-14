@@ -55,6 +55,17 @@ final Map<String, String> enHome = {
   TTexts.homeTapToViewAll: "Tap to view all",
   TTexts.homeInStock: "In stock",
   TTexts.homeOutOfStock: "Ouf of stock",
+  TTexts.overviewInfoTitle: "Overview Metrics Guide",
+  TTexts.inboundDesc: "Total number of Inbound transactions created today.",
+  TTexts.outboundDesc: "Total number of Outbound transactions created today.",
+  TTexts.adjustmentDesc: "Number of unique items adjusted in the system today.",
+  TTexts.totalInDesc:
+      "Total QUANTITY of items added to inventory (Inbound + Positive Adjustments).",
+  TTexts.totalOutDesc:
+      "Total QUANTITY of items removed from inventory (Outbound + Negative Adjustments).",
+  TTexts.adjust: "Adjust",
+  TTexts.totalIn: "TOTAL IN",
+  TTexts.totalOut: "TOTAL OUT",
 
   // Adjustment History
   TTexts.adjustmentHistoryTitle: "Adjustment History",

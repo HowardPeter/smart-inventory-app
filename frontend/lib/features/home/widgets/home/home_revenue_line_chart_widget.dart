@@ -51,8 +51,9 @@ class _HomeRevenueLineChartWidgetState extends State<HomeRevenueLineChartWidget>
 
           return LineChart(
             LineChartData(
-              minX: spots.first.x,
-              maxX: spots.last.x,
+              // ĐÃ FIX: Khóa cứng trục X là 24 tiếng để biểu đồ không bị dãn ngang
+              minX: 0.0,
+              maxX: 24.0,
               minY: limits['min'],
               maxY: limits['max'],
 
@@ -93,14 +94,15 @@ class _HomeRevenueLineChartWidgetState extends State<HomeRevenueLineChartWidget>
                     reservedSize: 45,
                     getTitlesWidget: (v, _) => Text(
                       '${v.toStringAsFixed(1)}k\$',
-                      style: const TextStyle(fontSize: 10),
+                      style: const TextStyle(
+                          fontSize: 10, color: AppColors.softGrey),
                     ),
                   ),
                 ),
                 bottomTitles: AxisTitles(
                   sideTitles: SideTitles(
                     showTitles: true,
-                    interval: 4,
+                    interval: 6, // Hiển thị các mốc cách nhau 6 tiếng
                     reservedSize: 25,
                     getTitlesWidget: _bottomTitles,
                   ),
@@ -121,7 +123,7 @@ class _HomeRevenueLineChartWidgetState extends State<HomeRevenueLineChartWidget>
               ],
             ),
 
-            // 🔥 QUAN TRỌNG: tắt animation của fl_chart
+            // 🔥 QUAN TRỌNG: tắt animation của fl_chart để xài animation gốc của bạn
             duration: Duration.zero,
           );
         },
@@ -129,7 +131,7 @@ class _HomeRevenueLineChartWidgetState extends State<HomeRevenueLineChartWidget>
     });
   }
 
-  // 🔥 CORE LOGIC: vẽ từng đoạn
+  // 🔥 CORE LOGIC: vẽ từng đoạn (Giữ nguyên 100% code của bạn)
   List<FlSpot> _buildSegmentSpots(List<FlSpot> spots, double progress) {
     final totalSegments = spots.length - 1;
     final segmentProgress = progress * totalSegments;
@@ -168,18 +170,21 @@ class _HomeRevenueLineChartWidgetState extends State<HomeRevenueLineChartWidget>
     return result;
   }
 
+  // ĐÃ FIX: Tự động vẽ các mốc 00:00, 06:00, 12:00, 18:00
   Widget _bottomTitles(double val, TitleMeta meta) {
-    final labels = {0.0: '08:00', 4.0: '12:00', 8.0: '16:00', 12.0: '20:00'};
-
-    if (!labels.containsKey(val)) return const SizedBox();
-
-    return SideTitleWidget(
-      meta: meta,
-      space: 10,
-      child: Text(
-        labels[val]!,
-        style: const TextStyle(fontSize: 11),
-      ),
-    );
+    if (val % 6 == 0 && val <= 24) {
+      // Đổi 24h thành 00h cho chuẩn định dạng đồng hồ
+      final hourStr =
+          val.toInt() == 24 ? '00' : val.toInt().toString().padLeft(2, '0');
+      return SideTitleWidget(
+        meta: meta,
+        space: 10,
+        child: Text(
+          '$hourStr:00',
+          style: const TextStyle(fontSize: 10, color: AppColors.softGrey),
+        ),
+      );
+    }
+    return const SizedBox();
   }
 }

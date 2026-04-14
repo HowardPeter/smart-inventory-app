@@ -25,7 +25,7 @@ class HomeTransactionListWidget extends GetView<HomeController> {
         ),
         const SizedBox(height: 16),
         Obx(() {
-          final todayList = controller.todayTransactions;
+          final todayList = controller.recentTransactions;
 
           if (todayList.isEmpty) {
             return TEmptyStateWidget(
