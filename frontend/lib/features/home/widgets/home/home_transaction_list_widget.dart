@@ -25,16 +25,9 @@ class HomeTransactionListWidget extends GetView<HomeController> {
         ),
         const SizedBox(height: 16),
         Obx(() {
-          // code cũ của m nè
-          // if (controller.recentTransactions.isEmpty) {
-          //   return TEmptyStateWidget(
-          //     icon: Icons.receipt_long_outlined,
-          //     title: TTexts.emptyTransactionTitle.tr,
-          //     subtitle: TTexts.emptyTransactionSubtitle.tr,
-          //   );
-          // }
-// Lắng nghe trực tiếp vào transactions.obs
-          if (controller.transactions.isEmpty) {
+          final todayList = controller.recentTransactions;
+
+          if (todayList.isEmpty) {
             return TEmptyStateWidget(
               icon: Icons.receipt_long_outlined,
               title: TTexts.emptyTransactionTitle.tr,
@@ -42,59 +35,40 @@ class HomeTransactionListWidget extends GetView<HomeController> {
             );
           }
 
-          // Sau đó mới dùng getter để lấy 3 item gần nhất để hiển thị
-          final recentList = controller.recentTransactions;
+          final recentList = todayList.take(3).toList();
 
           return Column(
-            // children: controller.recentTransactions.map((t) {
             children: recentList.map((t) {
-              // 1. SỬ DỤNG TRỰC TIẾP THUỘC TÍNH TỪ MODEL
-              final type = t.type;
-              final date = t.createdAt;
-              final formattedTime = DateFormat('hh:mm a').format(date);
-
-              final details = t.details;
-
-              // Tính tổng số lượng từ List<HomeTransactionDetailModel>
-              int totalQuantity = 0;
-              for (var detail in details) {
-                // detail.quantity đã là int từ Model, chỉ cần gọi .abs()
-                totalQuantity += detail.quantity.abs();
-              }
+              final type = t.type.toLowerCase();
+              final date = t.createdAt ?? DateTime.now();
+              final formattedTime =
+                  DateFormat('hh:mm a').format(date.toLocal());
 
               IconData icon;
               Color color;
               String title;
               bool isPositive;
-              String displayAmount = totalQuantity.toString();
+              String displayAmount = '\$${t.totalPrice.toStringAsFixed(2)}';
 
-              // 2. LOGIC XUẤT/NHẬP KHO (INVENTORY FLOW)
-              if (type == 'sale') {
+              if (type == 'export') {
                 icon = Icons.upload_rounded;
                 color = AppColors.stockOut;
                 title = TTexts.homeOutboundDelivery.tr;
-                isPositive = false;
-                displayAmount = "-$displayAmount";
-              } else if (type == 'refund' || type == 'import') {
+                isPositive = true;
+                displayAmount = "+$displayAmount";
+              } else if (type == 'import') {
                 icon = Icons.download_rounded;
                 color = AppColors.stockIn;
                 title = TTexts.homeInboundShipment.tr;
-                isPositive = true;
-                displayAmount = "+$displayAmount";
+                isPositive = false;
+                displayAmount = "-$displayAmount";
               } else {
                 icon = Icons.sync_alt_rounded;
                 color = AppColors.primary;
                 title = TTexts.homeStockAdjustment.tr;
 
-                // Tính tổng quantity giữ nguyên dấu để biết là điều chỉnh âm hay dương
-                int rawQuantitySum = 0;
-                for (var detail in details) {
-                  rawQuantitySum += detail.quantity;
-                }
-
-                isPositive = rawQuantitySum >= 0;
-                displayAmount =
-                    isPositive ? "+$displayAmount" : "-$displayAmount";
+                isPositive = t.totalPrice >= 0;
+                displayAmount = "${t.totalPrice > 0 ? '+' : ''}$displayAmount";
               }
 
               return HomeTransactionItemWidget(

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:frontend/core/ui/widgets/t_custom_fade_overlay_widget.dart';
+import 'package:frontend/routes/app_routes.dart'; // ĐÃ IMPORT ROUTES
 import 'package:get/get.dart';
 import 'package:frontend/core/infrastructure/constants/text_strings.dart';
 import 'package:frontend/core/ui/theme/app_colors.dart';
@@ -11,11 +12,9 @@ class HomeLowStockAlertsWidget extends GetView<HomeController> {
 
   @override
   Widget build(BuildContext context) {
-    // Bọc Obx để tự động cập nhật khi kho hàng thay đổi
     return Obx(() {
       final items = controller.lowStockItems;
 
-      // Ẩn hẳn widget nếu không có cảnh báo nào
       if (items.isEmpty) return const SizedBox.shrink();
 
       return Container(
@@ -26,7 +25,12 @@ class HomeLowStockAlertsWidget extends GetView<HomeController> {
         child: Stack(
           children: [
             Padding(
-              padding: const EdgeInsets.all(AppSizes.p20),
+              padding: EdgeInsets.only(
+                left: AppSizes.p20,
+                top: AppSizes.p20,
+                right: AppSizes.p20,
+                bottom: items.length > 3 ? 60 : AppSizes.p20,
+              ),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
@@ -49,7 +53,6 @@ class HomeLowStockAlertsWidget extends GetView<HomeController> {
                             borderRadius:
                                 BorderRadius.circular(AppSizes.radius12)),
                         child: Text(
-                          // Cập nhật số lượng item động
                           '${items.length} ${TTexts.homeItems.tr}',
                           style: const TextStyle(
                               fontFamily: 'Poppins',
@@ -61,32 +64,39 @@ class HomeLowStockAlertsWidget extends GetView<HomeController> {
                     ],
                   ),
                   const SizedBox(height: AppSizes.p16),
-
-                  // DUYỆT QUA DANH SÁCH CẢNH BÁO
-                  // Lấy tối đa 3-4 item để không làm thẻ bị quá dài, phần còn lại xem ở trang chi tiết
                   ...items.take(3).map((item) {
+                    final pkg = item.productPackage;
+
+                    final name = pkg?.displayName ??
+                        pkg?.product?.name ??
+                        TTexts.unknownProduct.tr;
+                    final barcode = pkg?.barcodeValue ?? '';
+                    final String displaySubtitle = barcode.isNotEmpty
+                        ? '${TTexts.barcodeLabel.tr}: $barcode'
+                        : (pkg?.product?.brand ?? 'Product');
+
                     return Padding(
                       padding: const EdgeInsets.only(bottom: AppSizes.p12),
-                      child: _buildAlertItem(
-                        // Gọi an toàn ?. để tránh lỗi null
-                        name: item.productPackageId,
-                        // Tạm gán Category (bạn có thể bổ sung category vào Model sau)
-                        category: 'Product',
-                        quantityLeft: item.quantity,
+                      child: GestureDetector(
+                        onTap: () => Get.toNamed(AppRoutes.lowStock),
+                        child: _buildAlertItem(
+                          name: name,
+                          category: displaySubtitle,
+                          quantityLeft: item.quantity,
+                        ),
                       ),
                     );
                   }),
-
-                  const SizedBox(height: 30),
                 ],
               ),
             ),
-            TCustomFadeOverlayWidget(
-              text: TTexts.homeTapToViewAll.tr,
-              onTap: () {
-                // TODO: Xử lý chuyển sang trang danh sách Alert
-              },
-            ),
+            if (items.length > 3)
+              TCustomFadeOverlayWidget(
+                text: TTexts.homeTapToViewAll.tr,
+                onTap: () {
+                  Get.toNamed(AppRoutes.lowStock); // ĐÃ LINK ROUTE
+                },
+              ),
           ],
         ),
       );
@@ -97,8 +107,8 @@ class HomeLowStockAlertsWidget extends GetView<HomeController> {
       {required String name,
       required String category,
       required int quantityLeft}) {
-    String quantityText = quantityLeft == 0
-        ? TTexts.homeOutOfStock.tr // Thêm check nếu = 0 thì báo HẾT HÀNG
+    String quantityText = quantityLeft <= 0
+        ? TTexts.homeOutOfStock.tr
         : TTexts.homeOnlyLeft.tr
             .replaceAll('@quantity', quantityLeft.toString());
 
@@ -115,7 +125,8 @@ class HomeLowStockAlertsWidget extends GetView<HomeController> {
             decoration: BoxDecoration(
                 color: AppColors.surface,
                 borderRadius: BorderRadius.circular(AppSizes.radius8)),
-            child: const Icon(Icons.image_outlined, color: AppColors.softGrey),
+            child: const Icon(Icons.warning_amber_rounded,
+                color: AppColors.toastErrorGradientEnd),
           ),
           const SizedBox(width: AppSizes.p12),
           Expanded(

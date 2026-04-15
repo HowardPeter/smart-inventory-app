@@ -1,6 +1,6 @@
 import 'dart:io';
 
-class UrlHelper {
+class UrlHelperUtils {
   static String? normalizeImageUrl(dynamic imageUrl) {
     if (imageUrl == null) return null;
 

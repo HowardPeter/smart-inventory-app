@@ -10,6 +10,8 @@ final Map<String, String> enInventory = {
   TTexts.inventoryInsights: 'Inventory Insights',
   TTexts.manageData: 'Manage Data',
   TTexts.productCatalog: 'Product Catalog',
+TTexts.chartTooltipIn: 'In',
+TTexts.chartTooltipOut: 'Out',
 
   // -- Inventory Header & Health
   TTexts.stockValue: 'Stock Value',
