@@ -1,5 +1,6 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
+import 'package:frontend/core/infrastructure/constants/text_strings.dart'; 
 import 'package:frontend/core/infrastructure/models/transaction_model.dart';
 import 'package:frontend/core/state/services/store_service.dart';
 import 'package:frontend/core/state/services/user_service.dart';
@@ -18,34 +19,30 @@ class ReportTransactionDetailInfoCardWidget extends StatelessWidget {
     final storeService = Get.find<StoreService>();
 
     final String userName =
-        userService.currentUser.value?.fullName ?? 'Unknown User';
+        userService.currentUser.value?.fullName ?? TTexts.unknownUser.tr;
 
     const String? realAvatarUrl = null;
 
     final String displayRole =
-        storeService.currentRole.value.capitalizeFirst ?? 'Staff';
+        storeService.currentRole.value.capitalizeFirst ?? TTexts.staff.tr;
     final String storeName = storeService.currentStoreName.value.isNotEmpty
         ? storeService.currentStoreName.value
-        : 'Main HQ Store';
+        : TTexts.mainHQStore.tr;
 
-    // ĐÃ FIX: Đồng bộ check type theo "import" và "export"
     Color typeColor = AppColors.primaryText;
     final String typeLower = tx.type.toLowerCase();
+    String displayType = _capitalize(tx.type);
 
-    if (typeLower == 'import') typeColor = AppColors.stockIn;
-    if (typeLower == 'export') typeColor = AppColors.stockOut;
-    if (typeLower == 'adjustment') typeColor = const Color(0xFFFF9900);
-
-    Color statusColor = AppColors.stockIn;
-    if (tx.status.toUpperCase() == 'PENDING') {
-      statusColor = const Color(0xFFFF9900);
+    if (typeLower == 'import') {
+      typeColor = AppColors.stockIn;
+      displayType = TTexts.inbound.tr;
+    } else if (typeLower == 'export') {
+      typeColor = AppColors.stockOut;
+      displayType = TTexts.outbound.tr;
+    } else if (typeLower == 'adjustment') {
+      typeColor = AppColors.primary;
+      displayType = TTexts.stockAdjustment.tr;
     }
-    if (tx.status.toUpperCase() == 'CANCELLED') {
-      statusColor = AppColors.stockOut;
-    }
-
-    final dateFormatted =
-        DateFormat('dd MMM yyyy, HH:mm').format(tx.createdAt ?? DateTime.now());
 
     return Container(
       padding: const EdgeInsets.all(20),
@@ -54,23 +51,21 @@ class ReportTransactionDetailInfoCardWidget extends StatelessWidget {
         borderRadius: BorderRadius.circular(20),
         boxShadow: [
           BoxShadow(
-              color: Colors.black.withOpacity(0.03),
-              blurRadius: 15,
+              color: Colors.black.withOpacity(0.02),
+              blurRadius: 10,
               offset: const Offset(0, 4))
         ],
+        border: Border.all(color: AppColors.softGrey.withOpacity(0.1)),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // --- HEADER: USER INFO ---
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            crossAxisAlignment: CrossAxisAlignment.center,
             children: [
               Row(
                 children: [
-                  // --- GỌI WIDGET AVATAR (Có xử lý logic fallback) ---
-                  _buildUserAvatar(realAvatarUrl),
+                  _buildAvatar(realAvatarUrl),
                   const SizedBox(width: 12),
                   Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
@@ -78,76 +73,74 @@ class ReportTransactionDetailInfoCardWidget extends StatelessWidget {
                       Text(userName,
                           style: const TextStyle(
                               fontFamily: 'Poppins',
-                              fontSize: 14,
-                              fontWeight: FontWeight.bold,
+                              fontSize: 16,
+                              fontWeight: FontWeight.w600,
                               color: AppColors.primaryText)),
                       Text(displayRole,
-                          style: TextStyle(
-                              fontSize: 11,
-                              fontWeight: FontWeight.w500,
-                              color: AppColors.subText.withOpacity(0.8))),
+                          style: const TextStyle(
+                              fontSize: 12, color: AppColors.subText)),
                     ],
-                  ),
+                  )
                 ],
               ),
               Container(
                 padding:
-                    const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+                    const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
                 decoration: BoxDecoration(
-                    color: statusColor.withOpacity(0.1),
-                    borderRadius: BorderRadius.circular(20)),
-                child: Text(tx.status,
-                    style: TextStyle(
-                        fontFamily: 'Poppins',
-                        fontSize: 10,
-                        fontWeight: FontWeight.w700,
-                        color: statusColor,
-                        letterSpacing: 0.5)),
-              ),
+                  color: typeColor.withOpacity(0.1),
+                  borderRadius: BorderRadius.circular(20),
+                ),
+                child: Text(
+                  displayType,
+                  style: TextStyle(
+                      fontSize: 12,
+                      fontWeight: FontWeight.w600,
+                      color: typeColor),
+                ),
+              )
             ],
           ),
-
+          const SizedBox(height: 20),
+          const Divider(color: AppColors.divider),
           const SizedBox(height: 16),
-          Divider(color: AppColors.softGrey.withOpacity(0.15), thickness: 1),
-          const SizedBox(height: 16),
-
-          // --- DETAILS ---
-          _buildInfoRow('Transaction ID', tx.transactionId ?? 'N/A',
+          _buildInfoRow(
+              TTexts.transactionId.tr, tx.transactionId ?? TTexts.na.tr,
               isBold: true),
           const SizedBox(height: 12),
-
-          // Dùng hàm _capitalize để in hoa chữ cái đầu: import -> Import
-          _buildInfoRow('Type', _capitalize(tx.type),
-              valueColor: typeColor, isBold: true),
-
+          _buildInfoRow(
+              TTexts.dateAndTime.tr,
+              DateFormat('dd MMM yyyy, HH:mm')
+                  .format(tx.createdAt ?? DateTime.now())),
           const SizedBox(height: 12),
-          _buildInfoRow('Date', dateFormatted),
+          _buildInfoRow(TTexts.cashier.tr, userName),
           const SizedBox(height: 12),
-          _buildInfoRow('Store', storeName),
-          if (tx.note != null && tx.note!.isNotEmpty) ...[
-            const SizedBox(height: 12),
-            _buildInfoRow('Note', tx.note!),
-          ],
+          _buildInfoRow(TTexts.role.tr, displayRole),
+          const SizedBox(height: 12),
+          _buildInfoRow(TTexts.store.tr, storeName),
+          const SizedBox(height: 12),
+          _buildInfoRow(
+            TTexts.note.tr,
+            (tx.note == null || tx.note!.isEmpty) ? TTexts.na.tr : tx.note!,
+          ),
         ],
       ),
     );
   }
 
-  Widget _buildUserAvatar(String? imageUrl) {
-    if (imageUrl != null && imageUrl.isNotEmpty) {
-      return ClipRRect(
-        borderRadius: BorderRadius.circular(20),
+  Widget _buildAvatar(String? url) {
+    if (url != null && url.isNotEmpty) {
+      return ClipOval(
         child: CachedNetworkImage(
-          imageUrl: imageUrl,
+          imageUrl: url,
           width: 40,
           height: 40,
           fit: BoxFit.cover,
           placeholder: (context, url) => Container(
-            color: AppColors.softGrey.withOpacity(0.2),
+            color: AppColors.softGrey.withOpacity(0.1),
             child: const Center(
                 child: SizedBox(
-                    width: 16,
-                    height: 16,
+                    width: 20,
+                    height: 20,
                     child: CircularProgressIndicator(
                         strokeWidth: 2, color: AppColors.primary))),
           ),
@@ -190,9 +183,7 @@ class ReportTransactionDetailInfoCardWidget extends StatelessWidget {
                 style: TextStyle(
                     fontSize: 13,
                     fontWeight: isBold ? FontWeight.bold : FontWeight.w500,
-                    color: valueColor,
-                    fontFamily: 'Poppins'),
-                textAlign: TextAlign.right)),
+                    color: valueColor))),
       ],
     );
   }

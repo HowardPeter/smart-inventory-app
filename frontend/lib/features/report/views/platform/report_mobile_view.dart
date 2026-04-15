@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:frontend/core/infrastructure/constants/text_strings.dart';
 import 'package:frontend/core/infrastructure/utils/day_formatter_utils.dart';
 import 'package:frontend/core/ui/theme/app_colors.dart';
 import 'package:frontend/core/ui/theme/app_sizes.dart';
@@ -69,13 +70,12 @@ class ReportMobileView extends GetView<ReportController> {
                   ),
                   const SizedBox(height: 24),
                   if (displayList.isEmpty)
-                    const Padding(
-                      padding: EdgeInsets.only(top: 20),
+                    Padding(
+                      padding: const EdgeInsets.only(top: 20),
                       child: TEmptyStateWidget(
                         icon: Iconsax.document_text_1_copy,
-                        title: 'No Transactions',
-                        subtitle:
-                            'There are no activities recorded for this date.',
+                        title: TTexts.reportEmptyTitle.tr,
+                        subtitle: TTexts.reportEmptySubtitle.tr,
                       ),
                     )
                   else
@@ -85,12 +85,11 @@ class ReportMobileView extends GetView<ReportController> {
                       child: Column(
                         children: displayList.map((tx) {
                           Color themeColor = AppColors.primaryText;
-                          String bottomLabel = 'Total Items / Transaction';
+                          String bottomLabel = TTexts.totalItemsTransaction.tr;
 
                           // Lấy type nguyên bản để check
                           final String typeLower = tx.type.toLowerCase();
 
-                          // ĐÃ FIX: Check theo đúng data thật từ DB
                           if (typeLower == 'import') {
                             themeColor = AppColors.stockIn; // XANH LÁ TOÀN TẬP
                           } else if (typeLower == 'export') {
@@ -100,7 +99,7 @@ class ReportMobileView extends GetView<ReportController> {
                           // Viết hoa chữ cái đầu cho đẹp UI (import -> Import)
                           final String displayType = tx.type.isNotEmpty
                               ? '${tx.type[0].toUpperCase()}${tx.type.substring(1).toLowerCase()}'
-                              : 'Unknown';
+                              : TTexts.unknownProduct.tr;
 
                           final String itemCountDisplay = tx.itemCount > 0
                               ? tx.itemCount.toString()
@@ -116,7 +115,7 @@ class ReportMobileView extends GetView<ReportController> {
                               );
                             },
                             child: ReportTransactionCardWidget(
-                              transactionId: tx.transactionId ?? 'N/A',
+                              transactionId: tx.transactionId ?? TTexts.na.tr,
                               dateStr:
                                   DayFormatterUtils.formatDate(tx.createdAt),
                               typeDisplay: displayType,

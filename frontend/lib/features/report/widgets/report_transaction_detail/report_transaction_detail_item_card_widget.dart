@@ -1,11 +1,16 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:frontend/core/infrastructure/models/transaction_detail_model.dart';
+import 'package:frontend/core/infrastructure/utils/url_helper_utils.dart';
 import 'package:frontend/core/ui/theme/app_colors.dart';
+import 'package:frontend/core/ui/widgets/t_no_image_widget.dart';
 import 'package:frontend/routes/app_routes.dart';
 import 'package:get/get.dart';
-import 'package:iconsax_flutter/iconsax_flutter.dart';
 import 'package:intl/intl.dart';
+import 'package:frontend/features/transaction/providers/transaction_provider.dart';
+import 'package:frontend/core/infrastructure/utils/full_screen_loader_utils.dart';
+import 'package:frontend/core/ui/widgets/t_snackbars_widget.dart';
+import 'package:frontend/core/infrastructure/constants/text_strings.dart';
 
 class ReportTransactionDetailItemCardWidget extends StatelessWidget {
   final TransactionDetailModel item;
@@ -17,7 +22,8 @@ class ReportTransactionDetailItemCardWidget extends StatelessWidget {
     final priceStr = NumberFormat.currency(locale: 'en_US', symbol: '\$')
         .format(item.unitPrice);
 
-    final String? imageUrl = item.packageInfo?.product?.imageUrl;
+    final String? imageUrl =
+        UrlHelperUtils.normalizeImageUrl(item.packageInfo?.product?.imageUrl);
 
     return Container(
       margin: const EdgeInsets.only(bottom: 12),
@@ -35,20 +41,59 @@ class ReportTransactionDetailItemCardWidget extends StatelessWidget {
         color: Colors.transparent,
         child: InkWell(
           borderRadius: BorderRadius.circular(16),
-          onTap: () {
-            if (item.productPackageId != null &&
-                item.productPackageId!.isNotEmpty) {
+          onTap: () async {
+            final pkgId =
+                item.productPackageId ?? item.packageInfo?.productPackageId;
+            final barcode = item.packageInfo?.barcodeValue ?? '';
+
+            String? productId = item.packageInfo?.productId ??
+                item.packageInfo?.product?.productId;
+
+            if (productId != null && productId.isNotEmpty) {
               Get.toNamed(
                 AppRoutes.inventoryDetail,
-                arguments: item.productPackageId,
+                arguments: productId.toString(),
+                parameters: {'barcode': barcode},
               );
+              return;
+            }
+
+            if (pkgId != null && pkgId.isNotEmpty) {
+              try {
+                FullScreenLoaderUtils.openLoadingDialog(TTexts.loadingTitle.tr);
+
+                final provider = TransactionProvider();
+                final detail =
+                    await provider.getInventoryDetailByPackageId(pkgId);
+
+                FullScreenLoaderUtils.stopLoading();
+
+                productId = detail['productPackage']?['productId'] ??
+                    detail['productPackage']?['product']?['productId'];
+
+                if (productId != null && productId.isNotEmpty) {
+                  Get.toNamed(
+                    AppRoutes.inventoryDetail,
+                    arguments: productId.toString(),
+                    parameters: {'barcode': barcode},
+                  );
+                } else {
+                  TSnackbarsWidget.error(
+                      title: TTexts.errorTitle.tr,
+                      message: TTexts.productDataMissing.tr);
+                }
+              } catch (e) {
+                FullScreenLoaderUtils.stopLoading();
+                TSnackbarsWidget.error(
+                    title: TTexts.errorTitle.tr,
+                    message: TTexts.itemDeletedOrUnavailable.tr); 
+              }
             }
           },
           child: Padding(
             padding: const EdgeInsets.all(16),
             child: Row(
               children: [
-                // --- PRODUCT IMAGE ---
                 Container(
                   width: 52,
                   height: 52,
@@ -69,23 +114,30 @@ class ReportTransactionDetailItemCardWidget extends StatelessWidget {
                               child: CircularProgressIndicator(
                                   strokeWidth: 2, color: AppColors.primary),
                             ),
-                            errorWidget: (context, url, error) => const Icon(
-                                Iconsax.box_1_copy,
-                                color: AppColors.softGrey,
-                                size: 24),
+                            errorWidget: (context, url, error) =>
+                                const TNoImageWidget(
+                              width: 52,
+                              height: 52,
+                              borderRadius: 11,
+                              iconSize: 24,
+                            ),
                           )
-                        : const Icon(Iconsax.box_1_copy,
-                            color: AppColors.softGrey, size: 24),
+                        : const TNoImageWidget(
+                            width: 52,
+                            height: 52,
+                            borderRadius: 11,
+                            iconSize: 24,
+                          ),
                   ),
                 ),
                 const SizedBox(width: 16),
-
-                // --- PRODUCT INFO ---
                 Expanded(
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Text(item.packageInfo?.displayName ?? 'Unknown Product',
+                      Text(
+                          item.packageInfo?.displayName ??
+                              TTexts.unknownProduct.tr, 
                           style: const TextStyle(
                               fontFamily: 'Poppins',
                               fontSize: 14,
@@ -95,7 +147,7 @@ class ReportTransactionDetailItemCardWidget extends StatelessWidget {
                           overflow: TextOverflow.ellipsis),
                       const SizedBox(height: 4),
                       Text(
-                          'Barcode: ${item.packageInfo?.barcodeValue ?? "N/A"}',
+                          '${TTexts.barcodeLabel.tr}: ${item.packageInfo?.barcodeValue ?? TTexts.na.tr}', // 🔥 Đã đổi
                           style: const TextStyle(
                               fontSize: 11, color: AppColors.subText)),
                       const SizedBox(height: 8),

@@ -15,13 +15,18 @@ class ReportController extends GetxController with TErrorHandler {
   final Rx<DateTime> focusedDay = DateTime.now().obs;
   final Rx<DateTime> selectedDay = DateTime.now().obs;
 
+  // Chỉ thêm 2 phần này để UI Filter hết báo lỗi
+  final RxString activeFilterType = 'All'.obs;
+  void changeFilterType(String type) => activeFilterType.value = type;
+
   @override
   void onInit() {
     super.onInit();
     _provider = ReportProvider();
     activeTab.value = _box.read('report_active_tab') ?? 'Today';
 
-    fetchTransactions(); // ĐÃ FIX: Gọi hàm gọi API thật
+    // Giữ nguyên tên gốc của bạn
+    fetchTransactions();
   }
 
   void changeTab(String tab) {
@@ -35,17 +40,21 @@ class ReportController extends GetxController with TErrorHandler {
     focusedDay.value = focused;
   }
 
-  Future<void> fetchTransactions() async {
-    try {
+  // Trả lại nguyên tên fetchTransactions và thêm param để không bị lỗi ở View
+  Future<void> fetchTransactions({bool isRefresh = false}) async {
+    if (isRefresh) {
       isLoading.value = true;
+    }
 
+    try {
       final now = DateTime.now();
+      final startDate = DateTime(now.year, now.month - 2, 1);
+      final endDate = DateTime(now.year, now.month + 2, 0);
 
-      // ĐÃ FIX: Dùng Helper ép cứng ra định dạng "2026-03-01", không còn lỗi Zod!
       final startDateStr =
-          DayFormatterUtils.formatApiDate(DateTime(now.year, now.month - 1, 1));
+          "${startDate.year}-${startDate.month.toString().padLeft(2, '0')}-${startDate.day.toString().padLeft(2, '0')}";
       final endDateStr =
-          DayFormatterUtils.formatApiDate(DateTime(now.year, now.month + 1, 0));
+          "${endDate.year}-${endDate.month.toString().padLeft(2, '0')}-${endDate.day.toString().padLeft(2, '0')}";
 
       final data = await _provider.getTransactions(queryParams: {
         'limit': 100,
@@ -70,10 +79,21 @@ class ReportController extends GetxController with TErrorHandler {
     }).toList();
   }
 
+  // Lọc thêm theo filter để View hiển thị đúng
   List<TransactionModel> get filteredTransactions {
     final targetDay =
         activeTab.value == 'Today' ? DateTime.now() : selectedDay.value;
-    return getTransactionsForDay(targetDay);
+
+    final dayTransactions = getTransactionsForDay(targetDay);
+
+    if (activeFilterType.value == 'All') {
+      return dayTransactions;
+    }
+
+    return dayTransactions
+        .where((tx) =>
+            tx.type.toLowerCase() == activeFilterType.value.toLowerCase())
+        .toList();
   }
 
   bool isSameDay(DateTime a, DateTime b) {
@@ -96,20 +116,19 @@ class ReportController extends GetxController with TErrorHandler {
       'November',
       'December'
     ];
-    return '${months[now.month - 1]} ${now.day},';
+    final targetDay = activeTab.value == 'Today' ? now : selectedDay.value;
+
+    return '${months[targetDay.month - 1]} ${targetDay.day}, ${targetDay.year}';
   }
 
   String get currentDayStr {
     final now = DateTime.now();
-    final days = [
-      'Monday',
-      'Tuesday',
-      'Wednesday',
-      'Thursday',
-      'Friday',
-      'Saturday',
-      'Sunday'
-    ];
-    return days[now.weekday - 1];
+    final targetDay = activeTab.value == 'Today' ? now : selectedDay.value;
+    if (isSameDay(now, targetDay)) return 'Today';
+    if (isSameDay(now.subtract(const Duration(days: 1)), targetDay)) {
+      return 'Yesterday';
+    }
+
+    return DayFormatterUtils.formatDate(targetDay, format: 'EEEE');
   }
 }

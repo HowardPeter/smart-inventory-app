@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:frontend/core/infrastructure/constants/text_strings.dart';
 import 'package:frontend/core/infrastructure/models/inventory_model.dart';
-import 'package:frontend/core/infrastructure/utils/url_helper.dart';
+import 'package:frontend/core/infrastructure/utils/url_helper_utils.dart';
 import 'package:frontend/core/ui/theme/app_colors.dart';
 import 'package:frontend/core/ui/theme/app_sizes.dart';
 import 'package:frontend/core/ui/widgets/t_no_image_widget.dart';
@@ -25,7 +25,7 @@ class LowStockItemWidget extends StatelessWidget {
         pkg?.displayName ?? pkg?.product?.name ?? TTexts.unknownProduct.tr;
 
     final String? imageUrl =
-        UrlHelper.normalizeImageUrl(pkg?.product?.imageUrl);
+        UrlHelperUtils.normalizeImageUrl(pkg?.product?.imageUrl);
 
     final int qty = model.quantity;
     final bool isOutOfStock = qty <= 0;

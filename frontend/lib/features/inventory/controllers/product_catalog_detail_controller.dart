@@ -168,13 +168,63 @@ class ProductCatalogDetailController extends GetxController with TErrorHandler {
     });
   }
 
-  void deleteProduct() {
+  void deleteProduct() async {
     if (packages.isNotEmpty) {
-      TSnackbarsWidget.error(
-          title: TTexts.errorTitle.tr, message: TTexts.productNotEmptyError.tr);
-      return;
+      // Kiểm tra tồn kho của packages bên trong
+      try {
+        FullScreenLoaderUtils.openLoadingDialog(TTexts.loading.tr);
+        final allInvs = await _provider.getInventories();
+        final packageIds = packages.map((p) => p.productPackageId).toSet();
+
+        final remainingStockInvs = allInvs
+            .where((inv) =>
+                packageIds.contains(inv.productPackageId) && inv.quantity > 0)
+            .toList();
+
+        FullScreenLoaderUtils.stopLoading();
+
+        if (remainingStockInvs.isNotEmpty) {
+          // Nếu còn tồn kho thì chuyển sang outbound
+          Get.dialog(TCustomDialogWidget(
+              title: TTexts.inventoryNotEmptyTitle.tr,
+              description: TTexts.productHasRemainingStock.tr,
+              icon: const Text('📦', style: TextStyle(fontSize: 40)),
+              primaryButtonText: TTexts.clearAllStock.tr,
+              secondaryButtonText: TTexts.cancel.tr,
+              onSecondaryPressed: () => Get.back(),
+              onPrimaryPressed: () {
+                Get.back();
+                // Gom toàn bộ Data
+                final itemsToAdd = remainingStockInvs.map((inv) {
+                  final pkg = packages.firstWhere(
+                      (p) => p.productPackageId == inv.productPackageId);
+                  return {
+                    'package': pkg,
+                    'inventory': inv,
+                    'quantity': inv.quantity,
+                  };
+                }).toList();
+
+                // Đẩy sang Outbound
+                Get.toNamed(AppRoutes.outboundTransaction,
+                    arguments: {'autoAddItems': itemsToAdd});
+              }));
+          return;
+        } else {
+          // Nếu packages trống thì xóa package trước rồi mới đi xóa product
+          TSnackbarsWidget.error(
+              title: TTexts.errorTitle.tr,
+              message: TTexts.productNotEmptyError.tr);
+          return;
+        }
+      } catch (e) {
+        FullScreenLoaderUtils.stopLoading();
+        handleError(e);
+        return;
+      }
     }
 
+    // Logic xóa Product bình thường (như cũ)
     Get.dialog(
       TCustomDialogWidget(
         title: TTexts.deleteProduct.tr,
@@ -187,16 +237,13 @@ class ProductCatalogDetailController extends GetxController with TErrorHandler {
           Get.back();
           try {
             FullScreenLoaderUtils.openLoadingDialog(TTexts.deletingProduct.tr);
-
             await _provider.deleteProduct(product.productId);
-
             FullScreenLoaderUtils.stopLoading();
 
             if (Get.isRegistered<CategoryDetailController>()) {
               Get.find<CategoryDetailController>()
                   .fetchProducts(isRefresh: true);
             }
-
             if (Get.isRegistered<InventoryController>()) {
               Get.find<InventoryController>()
                   .fetchDashboardData(isRefresh: true);
@@ -242,6 +289,9 @@ class ProductCatalogDetailController extends GetxController with TErrorHandler {
     });
   }
 
+  // ==========================================
+  // XÓA 1 PACKAGE CỤ THỂ
+  // ==========================================
   void deletePackage(ProductPackageModel package) async {
     if (_isDeleteDialogShowing) return;
 
@@ -268,14 +318,20 @@ class ProductCatalogDetailController extends GetxController with TErrorHandler {
                   'count': currentQuantity.toString()
                 })})',
             icon: const Text('📦', style: TextStyle(fontSize: 40)),
-            primaryButtonText: TTexts.makeTransaction.tr,
+            primaryButtonText: TTexts.clearStock.tr, // Text mới
             secondaryButtonText: TTexts.cancel.tr,
             onSecondaryPressed: () => Get.back(),
             onPrimaryPressed: () {
-              // TODO: Điều hướng sang trang tạo Transaction
               Get.back();
-              TSnackbarsWidget.info(
-                  title: 'Info', message: 'Navigate to Transaction page');
+              Get.toNamed(AppRoutes.outboundTransaction, arguments: {
+                'autoAddItems': [
+                  {
+                    'package': package,
+                    'inventory': inv,
+                    'quantity': currentQuantity,
+                  }
+                ]
+              });
             },
           ),
           barrierDismissible: false,
@@ -283,6 +339,7 @@ class ProductCatalogDetailController extends GetxController with TErrorHandler {
         return;
       }
 
+      // Logic xóa Package bình thường
       final bool? shouldDelete = await Get.dialog<bool>(
         TCustomDialogWidget(
           title: TTexts.deletePackage.tr,

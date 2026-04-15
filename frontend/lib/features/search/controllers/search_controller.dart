@@ -5,7 +5,7 @@ import 'package:frontend/core/infrastructure/models/transaction_model.dart';
 import 'package:frontend/core/infrastructure/models/unit_model.dart';
 import 'package:frontend/core/infrastructure/utils/day_formatter_utils.dart';
 import 'package:frontend/core/infrastructure/utils/error_handler_utils.dart';
-import 'package:frontend/core/infrastructure/utils/url_helper.dart';
+import 'package:frontend/core/infrastructure/utils/url_helper_utils.dart';
 import 'package:frontend/core/state/services/store_service.dart';
 import 'package:frontend/core/state/services/user_service.dart';
 import 'package:frontend/core/ui/widgets/t_bottom_sheet_widget.dart';
@@ -434,7 +434,7 @@ class TSearchController extends GetxController with TErrorHandler {
       product: ProductModel(
           productId: s.productId,
           name: isCategoryOnly ? s.categoryName : s.productName,
-          imageUrl: UrlHelper.normalizeImageUrl(s.imageUrl),
+          imageUrl: UrlHelperUtils.normalizeImageUrl(s.imageUrl),
           brand: s.brand,
           categoryId: s.categoryId,
           storeId: '',
