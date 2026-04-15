@@ -2,12 +2,12 @@ class AppConstants {
   // Dùng String.fromEnvironment thay cho dotenv
   static const String baseUrl = String.fromEnvironment(
     'API_BASE_URL',
-    defaultValue: 'http://192.168.1.2:3000',
+    defaultValue: 'http://10.0.2.2:3000',
   );
 
   static const String supabaseUrl = String.fromEnvironment(
     'SUPABASE_URL',
-    defaultValue: 'http://192.168.1.2:54321',
+    defaultValue: 'http://10.0.2.2:54321',
   );
 
   static const String supabaseAnonKey = String.fromEnvironment(

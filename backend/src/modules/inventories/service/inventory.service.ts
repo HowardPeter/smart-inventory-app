@@ -211,9 +211,9 @@ export class InventoryService {
       inventoryId: existingInventory.inventoryId,
       storeId,
       oldQuantity: result.previousQuantity,
-      // 👉 Truyền số lượng cũ để check lọc SPAM
+      // Truyền số lượng cũ để check lọc SPAM
       newQuantity: result.currentQuantity,
-      // 👉 Truyền số lượng mới
+      // Truyền số lượng mới
     });
 
     return result;
@@ -472,7 +472,8 @@ export class InventoryService {
       eventBus.emit(appEvents.INVENTORY_CHANGED, {
         inventoryId: item.inventoryId,
         storeId,
-        newQuantity: newQuantity, // Gửi luôn số lượng mới đã tính toán
+        oldQuantity: item.quantity,
+        newQuantity: newQuantity,
       });
     }
   }
