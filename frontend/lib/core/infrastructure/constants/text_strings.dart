@@ -291,7 +291,8 @@ class TTexts {
   static const String confirmChangeRoleMessage = "confirm_change_role_message";
   static const String updatingRole = "updating_role";
   static const String roleUpdatedSuccess = "role_updated_success";
-  static const String inviteCodeGeneratedSuccess = "invite_code_generated_success";
+  static const String inviteCodeGeneratedSuccess =
+      "invite_code_generated_success";
   static const String plsGenerateNewCode = "pls_generate_new_code";
   static const String copyTooltip = "copy_tooltip";
   static const String shareTooltip = "share_tooltip";
@@ -925,6 +926,7 @@ class TTexts {
   static const String editStoreSubtitleDialog = 'edit_store_subtitle_dialog';
   static const String editStoreAddressLabel = 'edit_store_address_label';
   static const String editStoreAddressHint = 'edit_store_address_hint';
+  static const String profileUpdateError = 'profile_update_error';
 
   // --Assigns role
   static const String assignsRoleTitle = 'assigns_role_title';

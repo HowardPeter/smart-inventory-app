@@ -10,6 +10,7 @@ import 'package:frontend/core/infrastructure/utils/full_screen_loader_utils.dart
 import 'package:frontend/core/state/services/store_service.dart';
 import 'package:frontend/core/ui/widgets/t_snackbars_widget.dart';
 import 'package:frontend/features/profile/providers/store_provider.dart';
+import 'package:frontend/features/profile/providers/store_member_provider.dart';
 
 class ProfileEditStoreController extends GetxController {
   static ProfileEditStoreController get instance => Get.find();
@@ -17,6 +18,7 @@ class ProfileEditStoreController extends GetxController {
   // Services & Providers
   final _storeService = Get.find<StoreService>();
   final _storeProvider = StoreProvider();
+  final _storeMemberProvider = StoreMemberProvider();
 
   // Controllers cho các ô nhập liệu (TextField)
   final nameController = TextEditingController();
@@ -42,6 +44,7 @@ class ProfileEditStoreController extends GetxController {
   void onInit() {
     super.onInit();
     _initializeFields();
+    loadStoreExtraData();
   }
 
   /// Nạp dữ liệu cũ vào các ô nhập liệu khi vừa mở dialog
@@ -50,9 +53,35 @@ class ProfileEditStoreController extends GetxController {
 
     if (_storeService.currentStoreAddress.value.isNotEmpty) {
       addressController.text = _storeService.currentStoreAddress.value;
+      storeAddress.value = _storeService.currentStoreAddress.value;
     }
   }
 
+  /// Load địa chỉ thật + số member thật từ database
+  Future<void> loadStoreExtraData() async {
+    try {
+      final storeId = _storeService.currentStoreId.value;
+      if (storeId.isEmpty) return;
+
+      /// 1. Lấy chi tiết store
+      final store = await _storeProvider.getStoreDetail(storeId);
+      final fetchedAddress = (store['address'] ?? '').toString();
+
+      storeAddress.value = fetchedAddress;
+
+      /// sync luôn vào form + service nếu cần
+      if (fetchedAddress.isNotEmpty) {
+        addressController.text = fetchedAddress;
+        await _storeService.saveStoreAddress(fetchedAddress);
+      }
+
+      /// 2. Lấy danh sách thành viên
+      final members = await _storeMemberProvider.getStoreMembers(storeId);
+      memberCount.value = members.length;
+    } catch (e) {
+      debugPrint("Load store extra data error: $e");
+    }
+  }
 
   /// Bật / tắt mode chỉnh sửa
   void toggleEditing() {
@@ -188,15 +217,10 @@ class ProfileEditStoreController extends GetxController {
     return currentName != originalName || currentAddress != originalAddress;
   }
 
-  /// Chỉ khi:
-  /// - nhập đầy đủ thông tin
-  /// - có thay đổi
-  /// thì mới được mở dialog xác nhận
   bool shouldShowConfirmDialog() {
     return hasAllRequiredFields && hasChanged;
   }
 
-  /// Wrapper để button gọi đúng tên hàm
   Future<void> updateStore() async {
     await updateStoreDetails();
   }
@@ -211,12 +235,12 @@ class ProfileEditStoreController extends GetxController {
       if (!hasAllRequiredFields) {
         TSnackbarsWidget.warning(
           title: TTexts.errorTitle.tr,
-          message: "Vui lòng nhập đầy đủ thông tin",
+          message: TTexts.fillAllFields.tr,
         );
         return;
       }
 
-      // 3. Nếu không có thay đổi thì thoát mode edit
+      // 3. Nếu không có thay đổi thì thoát edit
       if (!hasChanged) {
         isEditing.value = false;
         return;
@@ -243,21 +267,29 @@ class ProfileEditStoreController extends GetxController {
         address: currentAddress,
       );
 
-      // 8. Tắt Loading & Thông báo thành công
-      FullScreenLoaderUtils.stopLoading();
-      TSnackbarsWidget.success(
-        title: TTexts.successTitle.tr,
-        message: TTexts.profileUpdateSuccess.tr,
-      );
+      /// Cập nhật lại state hiển thị card ngay
+      storeAddress.value = currentAddress;
 
-      // 9. Trở về readonly
+      // 8. Tắt Loading
+      FullScreenLoaderUtils.stopLoading();
+
+      // 9. Trở về readonly + đóng dialog trước
       isEditing.value = false;
       Get.back();
+
+      // 10. Hiện snackbar sau khi dialog đã đóng
+      Future.delayed(const Duration(milliseconds: 100), () {
+        TSnackbarsWidget.success(
+          title: TTexts.successTitle.tr,
+          message: TTexts.profileUpdateSuccess.tr,
+        );
+      });
     } catch (e) {
+      debugPrint("Update Store Error: $e");
       FullScreenLoaderUtils.stopLoading();
       TSnackbarsWidget.error(
         title: TTexts.errorTitle.tr,
-        message: e.toString(),
+        message: TTexts.profileUpdateError.tr,
       );
     } finally {
       isLoading.value = false;
