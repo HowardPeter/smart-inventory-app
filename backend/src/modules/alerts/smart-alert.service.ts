@@ -1,3 +1,4 @@
+import { getRandomMessage } from './utils/message.util.js';
 import { appEvents, eventBus } from '../../common/events/event-bus.js';
 import { prisma } from '../../db/prismaClient.js';
 import { NotificationRepository } from '../notification/repositories/notification.repository.js';
@@ -104,8 +105,16 @@ export class SmartAlertService {
 
     // Lấy tên của từng product package để gửi thông báo chính xác!
     const productName =
-      inventory.productPackage?.displayName ??
-      'The product package name has not been updated.';
+      inventory.productPackage?.displayName ?? 'An unnamed product';
+
+    const bodyTemplates = [
+      `${productName} is running low! Only ${currentQty} left in stock.`,
+      `Action required: ${productName} has dropped to ${currentQty} units.`,
+      `Restock reminder: You have ${currentQty} units of ${productName} remaining.`,
+      `Heads up! ${productName} has reached its reorder threshold (${currentQty} left).`,
+    ];
+
+    const bodyText = getRandomMessage(bodyTemplates);
 
     // Dùng Promise.all để gửi đồng loạt không bị nghẽn
     await Promise.all(
@@ -113,8 +122,8 @@ export class SmartAlertService {
         this.notificationService.createAndSendNotification(
           member.userId,
           storeId,
-          '⚠️ Tồn kho ở mức báo động',
-          `${productName} chỉ còn ${currentQty} sản phẩm.\nHãy nhập thêm!`,
+          '⚠️ Low Stock Alert',
+          bodyText,
           'LOW_STOCK',
           inventory.productPackageId,
         ),
@@ -184,25 +193,43 @@ export class SmartAlertService {
       .filter(Boolean);
 
     let bodyText = '';
+    let bodyTemplates: string[] = [];
 
-    // Phân loại nội dung thông báo dựa trên số lượng
+    // Phân loại nội dung thông báo dựa trên số lượng & tạo mảng templates
     if (totalLowStock === 1) {
-      bodyText = `Sản phẩm ${sampleNamesArray[0]} đang ở mức báo động.\nHãy kiểm tra và nhập thêm!`;
-    } else if (totalLowStock === 2) {
-      bodyText = `Các sản phẩm ${sampleNamesArray.join(', ')} đang ở mức báo động.\nHãy kiểm tra và nhập thêm!`;
-    } else {
-      // Từ 3 sản phẩm trở lên mới dùng chữ "VD" và dấu "..."
-      const sampleNames = sampleNamesArray.slice(0, 2).join(', ');
+      const name = sampleNamesArray[0] || 'A product';
 
-      bodyText = `Có ${totalLowStock} sản phẩm đang ở mức báo động (VD: ${sampleNames},...).\nHãy kiểm tra và nhập thêm!`;
+      bodyTemplates = [
+        `The item ${name} is critically low. Please restock soon!`,
+        `Inventory alert: ${name} is almost out of stock.`,
+        `Restock needed: ${name} has dropped below the safe limit.`,
+      ];
+    } else if (totalLowStock === 2) {
+      const names = sampleNamesArray.join(' and ');
+
+      bodyTemplates = [
+        `${names} are running low on stock. Please review.`,
+        `Action required: Stock is low for both ${names}.`,
+        `Restock reminder: It's time to order more ${names}.`,
+      ];
+    } else {
+      const names = sampleNamesArray.slice(0, 2).join(', ');
+
+      bodyTemplates = [
+        `${totalLowStock} items need restocking (e.g., ${names}, ...).`,
+        `Multiple items are low on stock! (${totalLowStock} total, including ${names}, ...).`,
+        `Inventory warning: ${totalLowStock} products have hit their reorder point (like ${names}, ...).`,
+      ];
     }
+
+    bodyText = getRandomMessage(bodyTemplates);
 
     await Promise.all(
       targetMembers.map((member) =>
         this.notificationService.createAndSendNotification(
           member.userId,
           storeId,
-          '⚠️ Báo cáo Tồn kho thấp',
+          '⚠️ Inventory Warning',
           bodyText,
           appEvents.BATCH_LOW_STOCK,
           undefined,

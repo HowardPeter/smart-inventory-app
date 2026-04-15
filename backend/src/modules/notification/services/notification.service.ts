@@ -27,7 +27,7 @@ export class NotificationService {
   ): Promise<void> {
     const storeName =
       await this.notificationRepository.getStoreNameById(storeId);
-    const displayTitle = `[${storeName}]\n${title}`;
+    const displayTitle = `${storeName}\n${title}`;
 
     // 2. Lưu vào Database
     const newNoti = await this.notificationRepository.createNotification(
