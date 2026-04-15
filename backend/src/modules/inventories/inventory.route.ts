@@ -5,13 +5,13 @@ import { PERMISSION, requirePermission } from '../access-control/index.js';
 import { authenticate } from '../auth/index.js';
 import { inventoryController } from '../inventories/inventory.module.js';
 import {
-  validateAdjustInventory,
   validateCreateInventory,
   validateDeleteInventory,
   validateGetInventories,
   validateGetInventoryByProductPackageId,
   validateGetLowStockInventories,
   validateUpdateInventory,
+  validateBatchAdjustInventory,
 } from '../inventories/validator/inventory.validator.js';
 import { requireStoreContext } from '../stores/index.js';
 
@@ -126,24 +126,23 @@ inventoryRouter
   );
 
 /**
- * API endpoint:
- *   POST /api/inventories/product-packages/:productPackageId/adjustments
- * Điều chỉnh số lượng tồn kho của một product package
- *
- * Path params:
- *  - productPackageId: string (UUID, required)
+ * API endpoint: POST /api/inventories/adjustments
+ * Điều chỉnh số lượng tồn kho hàng loạt (Batch)
+ * cho một hoặc nhiều product package
  *
  * Body:
- *  - type: 'set' | 'increase' | 'decrease' (required) - kiểu điều chỉnh tồn kho
- *  - quantity: number (required) - số lượng áp dụng cho thao tác điều chỉnh
- *  - reason?: string | null - lý do điều chỉnh
- *  - note?: string | null - ghi chú thêm
+ * - items: Mảng (array) chứa các đối tượng cần điều chỉnh. Mỗi đối tượng gồm:
+ * + productPackageId: string (UUID, required) - ID của sản phẩm
+ * + type: 'set' | 'increase' | 'decrease' (required) - kiểu điều chỉnh tồn kho
+ * + quantity: number (required) - số lượng áp dụng cho thao tác điều chỉnh
+ * + reason?: string | null - lý do điều chỉnh (không bắt buộc)
+ * + note?: string | null - ghi chú thêm (không bắt buộc)
  */
 inventoryRouter.post(
-  '/product-packages/:productPackageId/adjustments',
+  '/adjustments',
   requirePermission(PERMISSION.INVENTORY_WRITE),
-  validateAdjustInventory,
-  asyncWrapper(inventoryController.adjustInventory),
+  validateBatchAdjustInventory,
+  asyncWrapper(inventoryController.adjustInventories),
 );
 
 export { inventoryRouter };

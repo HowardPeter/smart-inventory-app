@@ -40,13 +40,6 @@ const updateInventoryBodySchema = z
     'Request body cannot be empty',
   );
 
-const adjustInventoryBodySchema = z.object({
-  type: z.enum(['set', 'increase', 'decrease']),
-  quantity: z.number().int().min(0),
-  reason: z.string().trim().min(1).max(255).nullable().optional(),
-  note: z.string().trim().min(1).max(500).nullable().optional(),
-});
-
 const createInventoryBodySchema = z.object({
   productPackageId: z.string(),
   quantity: z.number().int().min(0).default(0),
@@ -103,13 +96,12 @@ export const validateUpdateInventory = (
   next();
 };
 
-export const validateAdjustInventory = (
+export const validateBatchAdjustInventory = (
   req: Request,
   _res: Response,
   next: NextFunction,
 ): void => {
-  req.params = validateSchema(paramsSchema, req.params);
-  req.body = validateSchema(adjustInventoryBodySchema, req.body);
+  req.body = validateSchema(batchAdjustInventoryBodySchema, req.body);
 
   next();
 };
@@ -133,3 +125,17 @@ export const validateDeleteInventory = (
 
   next();
 };
+
+export const batchAdjustInventoryBodySchema = z.object({
+  items: z
+    .array(
+      z.object({
+        productPackageId: z.string().uuid('ID sản phẩm phải là định dạng UUID'),
+        type: z.enum(['set', 'increase', 'decrease']),
+        quantity: z.number().min(0, 'Số lượng không được nhỏ hơn 0'),
+        reason: z.string().nullish(),
+        note: z.string().nullish(),
+      }),
+    )
+    .min(1, 'Danh sách điều chỉnh phải có ít nhất 1 sản phẩm'),
+});

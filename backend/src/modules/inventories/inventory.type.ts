@@ -1,9 +1,3 @@
-/* Định nghĩa các kiểu dữ liệu gốc (Domain Types) cho module Inventory.
-Mô phỏng chính xác cấu trúc dữ liệu từ cơ sở dữ liệu
-(Prisma) hoặc các nghiệp vụ cốt lõi.
-Đây là nền tảng base để dẫn xuất ra các DTO
-(sử dụng Pick, Omit, Partial,...) nhằm tránh lặp code. */
-
 export type InventoryStatus = 'inStock' | 'lowStock' | 'outOfStock';
 
 export type AdjustmentType = 'set' | 'increase' | 'decrease';
