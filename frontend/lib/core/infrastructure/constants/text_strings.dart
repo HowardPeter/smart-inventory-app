@@ -607,7 +607,12 @@ class TTexts {
   static const String cropImage = 'crop_image';
   static const String reorderThresholdLabel = 'reorder_threshold_label';
   static const String reorderThresholdHint = 'reorder_threshold_hint';
-  static const String zeroMeansNoLimit = 'zero_means_no_limit';
+  static const String unitLockedMessage = "unit_locked_message";
+  static const String thresholdMustBeGreaterThanZero =
+      "threshold_must_be_greater_than_zero";
+  static const String leaveEmptyForNoLimit = "leave_empty_for_no_limit";
+  static const String displayNameSuffixLabel = "display_name_suffix_label";
+  static const String displayNameSuffixHint = "display_name_suffix_hint";
   static const String fieldRequired = 'field_required';
   static const String invalidNumber = 'invalid_number';
   static const String suggestedNames = 'suggested_names';

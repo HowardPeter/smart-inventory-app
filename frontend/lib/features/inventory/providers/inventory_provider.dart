@@ -96,10 +96,15 @@ class InventoryProvider {
     return response.data['data'] ?? response.data;
   }
 
-  Future<Map<String, dynamic>> createProductPackage(
-      String productId, Map<String, dynamic> data) async {
-    final response =
-        await _apiClient.post('/api/products/$productId/packages', data: data);
+Future<Map<String, dynamic>> createProductPackage(
+      String productId, Map<String, dynamic> packageData, Map<String, dynamic> inventoryData) async {
+    final response = await _apiClient.post(
+      '/api/products/$productId/packages', 
+      data: {
+        'package': packageData,
+        'inventory': inventoryData,
+      }
+    );
     return response.data['data'] ?? response.data;
   }
 
