@@ -385,7 +385,8 @@ class TSearchController extends GetxController with TErrorHandler {
       if (pkg != null) {
         // Có Package -> Tới trang Inventory Detail
         Get.toNamed(AppRoutes.inventoryDetail,
-            arguments: prod?.productId ?? pkg.productId);
+            arguments: prod?.productId ?? pkg.productId,
+            parameters: {'packageId': pkg.productPackageId});
       } else if (prod != null && prod.productId.isNotEmpty) {
         // Có Product nhưng chưa có Package -> Tới Product Catalog
         Get.toNamed(AppRoutes.productCatalogDetail, arguments: prod);

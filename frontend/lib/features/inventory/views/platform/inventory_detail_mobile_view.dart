@@ -86,7 +86,13 @@ class InventoryDetailMobileView extends GetView<InventoryDetailController> {
                                     FadeTransition(opacity: fade, child: child),
                               );
                             },
-                            child: _DetailContent(key: ValueKey(ctrl.barcode)),
+                            child: _DetailContent(
+                              key: ValueKey(
+                                ctrl.currentDisplayItem.value?.inventory
+                                        .productPackageId ??
+                                    '',
+                              ),
+                            ),
                           ),
                         )),
             ));

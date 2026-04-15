@@ -118,16 +118,20 @@ class LowStockMobileView extends GetView<LowStockController> {
                 return LowStockItemWidget(
                   model: item,
                   onTap: () {
-                    // Chuyển sang trang Inventory Detail
                     final pkg = item.productPackage;
                     final productId = pkg?.productId ?? pkg?.product?.productId;
+                    final packageId =
+                        pkg?.productPackageId ?? item.productPackageId;
                     final barcode = pkg?.barcodeValue ?? '';
 
-                    if (productId != null) {
+                    if (productId != null || packageId.isNotEmpty) {
                       Get.toNamed(
                         AppRoutes.inventoryDetail,
-                        arguments: productId.toString(),
-                        parameters: {'barcode': barcode},
+                        arguments: productId?.toString(), 
+                        parameters: {
+                          if (packageId.isNotEmpty) 'packageId': packageId,
+                          if (barcode.isNotEmpty) 'barcode': barcode,
+                        },
                       );
                     }
                   },

@@ -7,8 +7,6 @@ import 'package:frontend/core/ui/widgets/t_no_image_widget.dart';
 import 'package:frontend/routes/app_routes.dart';
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';
-import 'package:frontend/features/transaction/providers/transaction_provider.dart';
-import 'package:frontend/core/infrastructure/utils/full_screen_loader_utils.dart';
 import 'package:frontend/core/ui/widgets/t_snackbars_widget.dart';
 import 'package:frontend/core/infrastructure/constants/text_strings.dart';
 
@@ -41,54 +39,28 @@ class ReportTransactionDetailItemCardWidget extends StatelessWidget {
         color: Colors.transparent,
         child: InkWell(
           borderRadius: BorderRadius.circular(16),
-          onTap: () async {
+          onTap: () {
             final pkgId =
                 item.productPackageId ?? item.packageInfo?.productPackageId;
+            final String? productId = item.packageInfo?.productId ??
+                item.packageInfo?.product?.productId;
             final barcode = item.packageInfo?.barcodeValue ?? '';
 
-            String? productId = item.packageInfo?.productId ??
-                item.packageInfo?.product?.productId;
-
-            if (productId != null && productId.isNotEmpty) {
-              Get.toNamed(
-                AppRoutes.inventoryDetail,
-                arguments: productId.toString(),
-                parameters: {'barcode': barcode},
-              );
+            if (pkgId == null || pkgId.isEmpty) {
+              TSnackbarsWidget.error(
+                  title: TTexts.errorTitle.tr,
+                  message: TTexts.itemDeletedOrUnavailable.tr);
               return;
             }
 
-            if (pkgId != null && pkgId.isNotEmpty) {
-              try {
-                FullScreenLoaderUtils.openLoadingDialog(TTexts.loadingTitle.tr);
-
-                final provider = TransactionProvider();
-                final detail =
-                    await provider.getInventoryDetailByPackageId(pkgId);
-
-                FullScreenLoaderUtils.stopLoading();
-
-                productId = detail['productPackage']?['productId'] ??
-                    detail['productPackage']?['product']?['productId'];
-
-                if (productId != null && productId.isNotEmpty) {
-                  Get.toNamed(
-                    AppRoutes.inventoryDetail,
-                    arguments: productId.toString(),
-                    parameters: {'barcode': barcode},
-                  );
-                } else {
-                  TSnackbarsWidget.error(
-                      title: TTexts.errorTitle.tr,
-                      message: TTexts.productDataMissing.tr);
-                }
-              } catch (e) {
-                FullScreenLoaderUtils.stopLoading();
-                TSnackbarsWidget.error(
-                    title: TTexts.errorTitle.tr,
-                    message: TTexts.itemDeletedOrUnavailable.tr); 
-              }
-            }
+            Get.toNamed(
+              AppRoutes.inventoryDetail,
+              arguments: productId,
+              parameters: {
+                'packageId': pkgId,
+                if (barcode.isNotEmpty) 'barcode': barcode,
+              },
+            );
           },
           child: Padding(
             padding: const EdgeInsets.all(16),
@@ -137,7 +109,7 @@ class ReportTransactionDetailItemCardWidget extends StatelessWidget {
                     children: [
                       Text(
                           item.packageInfo?.displayName ??
-                              TTexts.unknownProduct.tr, 
+                              TTexts.unknownProduct.tr,
                           style: const TextStyle(
                               fontFamily: 'Poppins',
                               fontSize: 14,
@@ -147,7 +119,7 @@ class ReportTransactionDetailItemCardWidget extends StatelessWidget {
                           overflow: TextOverflow.ellipsis),
                       const SizedBox(height: 4),
                       Text(
-                          '${TTexts.barcodeLabel.tr}: ${item.packageInfo?.barcodeValue ?? TTexts.na.tr}', // 🔥 Đã đổi
+                          '${TTexts.barcodeLabel.tr}: ${item.packageInfo?.barcodeValue ?? TTexts.na.tr}',
                           style: const TextStyle(
                               fontSize: 11, color: AppColors.subText)),
                       const SizedBox(height: 8),

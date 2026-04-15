@@ -113,6 +113,23 @@ class InventoryProvider {
     await _apiClient.delete('/api/product-packages/$packageId');
   }
 
+  Future<List<dynamic>> getPackagesByProductId(String productId) async {
+    try {
+      final response = await _apiClient.get('/api/products/$productId/packages',
+          queryParameters: {'limit': 100});
+
+      final responseData = response.data['data'] ?? response.data;
+      if (responseData is Map && responseData.containsKey('items')) {
+        return responseData['items'] as List<dynamic>;
+      } else if (responseData is List) {
+        return responseData;
+      }
+      return [];
+    } catch (e) {
+      return [];
+    }
+  }
+
   // ==========================================
   // INVENTORIES & TRANSACTIONS
   // ==========================================
@@ -187,6 +204,6 @@ class InventoryProvider {
       {Map<String, dynamic>? queryParams}) async {
     final listData = await _apiClient.getList('/api/audit-logs',
         queryParameters: queryParams ?? {'limit': 100});
-    return listData; 
+    return listData;
   }
 }
