@@ -3,11 +3,10 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:frontend/core/infrastructure/constants/text_strings.dart';
 import 'package:frontend/core/infrastructure/utils/error_handler_utils.dart';
-import 'package:frontend/core/ui/theme/app_sizes.dart';
 import 'package:frontend/features/home/model/adjustment_history_model.dart';
 import 'package:frontend/features/home/providers/home_provider.dart';
 import 'package:frontend/core/ui/widgets/t_bottom_sheet_widget.dart';
-import 'package:frontend/core/ui/theme/app_colors.dart';
+import 'package:frontend/features/home/widgets/shared/home_adjustment_details_bottom_sheet.dart';
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';
 
@@ -238,71 +237,15 @@ class AdjustmentHistoryController extends GetxController with TErrorHandler {
 
   void openDetails(AdjustmentHistoryModel model) {
     TBottomSheetWidget.show(
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          // 1. Icon Header To Tròn
-          Container(
-            width: 72,
-            height: 72,
-            decoration: BoxDecoration(
-              color: AppColors.softGrey.withOpacity(0.1),
-              borderRadius: BorderRadius.circular(AppSizes.radius16),
-            ),
-            child: const Center(
-              child: Text("🚙", style: TextStyle(fontSize: 36)),
-            ),
-          ),
-          const SizedBox(height: AppSizes.p16),
-
-          // 2. Title
-          Text(
-            TTexts.checkDetails.tr,
-            style: const TextStyle(
-              fontSize: 18,
-              fontWeight: FontWeight.bold,
-              color: AppColors.primaryText,
-              fontFamily: 'Poppins',
-            ),
-          ),
-          const SizedBox(height: 32),
-
-          // 3. Nội dung tối giản như cũ
-          _buildInfoRow(TTexts.productName.tr, model.productName),
-          const SizedBox(height: 12),
-          _buildInfoRow(TTexts.transactionDate.tr,
-              DateFormat('dd MMM yyyy, HH:mm').format(model.performedAt)),
-          const SizedBox(height: 12),
-          _buildInfoRow(TTexts.qty.tr,
-              "${model.oldQuantity} → ${model.newQuantity} (${model.difference > 0 ? '+' : ''}${model.difference})"),
-          const SizedBox(height: 12),
-          _buildInfoRow(
-              TTexts.note.tr, model.note.isEmpty ? TTexts.na.tr : model.note),
-          const SizedBox(height: 16),
-        ],
+      child: HomeAdjustmentDetailsBottomSheet(
+        icon: "📦",
+        productName: model.productName,
+        date: model.performedAt,
+        oldQty: model.oldQuantity,
+        newQty: model.newQuantity,
+        difference: model.difference,
+        note: model.note,
       ),
-    );
-  }
-
-  Widget _buildInfoRow(String label, String value) {
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text(label,
-            style: const TextStyle(fontSize: 14, color: AppColors.subText)),
-        const SizedBox(width: 16),
-        Expanded(
-          child: Text(
-            value,
-            textAlign: TextAlign.right,
-            style: const TextStyle(
-                fontSize: 14,
-                fontWeight: FontWeight.w600,
-                color: AppColors.primaryText),
-          ),
-        ),
-      ],
     );
   }
 }

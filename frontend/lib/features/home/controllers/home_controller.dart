@@ -4,12 +4,12 @@ import 'package:flutter/material.dart';
 import 'package:frontend/core/infrastructure/utils/error_handler_utils.dart';
 import 'package:frontend/features/home/model/home_adjustment_model.dart';
 import 'package:frontend/features/home/providers/home_provider.dart';
+import 'package:frontend/features/home/widgets/shared/home_adjustment_details_bottom_sheet.dart';
 import 'package:frontend/features/notification/controller/notification_controller.dart';
 import 'package:frontend/routes/app_routes.dart';
 import 'package:frontend/core/ui/widgets/t_bottom_sheet_widget.dart';
 import 'package:get/get.dart';
 import 'package:fl_chart/fl_chart.dart';
-import 'package:intl/intl.dart';
 import 'package:frontend/core/infrastructure/constants/text_strings.dart';
 import 'package:frontend/core/infrastructure/models/inventory_model.dart';
 import 'package:frontend/core/infrastructure/models/transaction_model.dart';
@@ -436,44 +436,14 @@ class HomeController extends GetxController with TErrorHandler {
 
   void openDetails(HomeAdjustmentModel model) {
     TBottomSheetWidget.show(
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Container(
-            width: 72,
-            height: 72,
-            decoration: BoxDecoration(
-              color: AppColors.softGrey.withOpacity(0.1),
-              borderRadius: BorderRadius.circular(AppSizes.radius16),
-            ),
-            child: const Center(
-              child: Text("📦",
-                  style: TextStyle(fontSize: 36)), // Đã trả lại Emoji
-            ),
-          ),
-          const SizedBox(height: AppSizes.p16),
-          Text(
-            TTexts.checkDetails.tr,
-            style: const TextStyle(
-              fontSize: 18,
-              fontWeight: FontWeight.bold,
-              color: AppColors.primaryText,
-              fontFamily: 'Poppins',
-            ),
-          ),
-          const SizedBox(height: 32),
-          _buildInfoRow(TTexts.productName.tr, model.productName),
-          const SizedBox(height: 12),
-          _buildInfoRow(TTexts.transactionDate.tr,
-              DateFormat('dd MMM yyyy, HH:mm').format(model.time)),
-          const SizedBox(height: 12),
-          _buildInfoRow(TTexts.qty.tr,
-              "${model.oldQuantity} → ${model.newQuantity} (${model.difference > 0 ? '+' : ''}${model.difference})"),
-          const SizedBox(height: 12),
-          _buildInfoRow(TTexts.noteLabel.tr,
-              model.note.isEmpty ? TTexts.na.tr : model.note),
-          const SizedBox(height: 16),
-        ],
+      child: HomeAdjustmentDetailsBottomSheet(
+        icon: "📦",
+        productName: model.productName,
+        date: model.time,
+        oldQty: model.oldQuantity,
+        newQty: model.newQuantity,
+        difference: model.difference,
+        note: model.note,
       ),
     );
   }
