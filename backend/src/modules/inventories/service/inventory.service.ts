@@ -4,6 +4,7 @@ import { CustomError } from '../../../common/errors/index.js';
 import {
   buildPaginatedResponse,
   normalizePagination,
+  StorageService,
 } from '../../../common/utils/index.js';
 import { prisma } from '../../../db/prismaClient.js';
 import { TransactionType } from '../../../generated/prisma/enums.js';
@@ -23,8 +24,8 @@ import type {
   LowStockInventoriesResponseDto,
   UpdateInventoryDto,
   InventoryForTransactionData,
+  InventoryListItemDto,
 } from '../dto/inventory.dto.js';
-import { SupabaseProvider } from '../../../config/supabaseClient.js';
 
 export class InventoryService {
   constructor(
@@ -36,6 +37,27 @@ export class InventoryService {
     inventoryRepositoryTx: new InventoryRepository(db),
     auditLogRepositoryTx: new AuditLogRepository(db),
   });
+
+  private async getSignedUrlForItemImageUrl(
+    items: InventoryListItemDto[],
+  ): Promise<InventoryListItemDto[]> {
+    return await Promise.all(
+      items.map(async (item) => ({
+        ...item,
+        productPackage: {
+          ...item.productPackage,
+          product: {
+            ...item.productPackage.product,
+            imageUrl: await StorageService.getSignedUrl(
+              process.env.STORAGE_BUCKET ?? 'images',
+              item.productPackage.product.imageUrl,
+            ),
+          }
+          
+        },
+      })),
+    );
+  }
 
   // Hàm helper dùng chung để kiểm tra sự tồn tại của kho hàng,
   // ném lỗi 404 nếu không tìm thấy
@@ -70,14 +92,15 @@ export class InventoryService {
         ...normalizedPagination,
       });
 
-    return buildPaginatedResponse(items, totalItems, normalizedPagination);
+    const itemsWithSignedUrl = await this.getSignedUrlForItemImageUrl(items);
+
+    return buildPaginatedResponse(itemsWithSignedUrl, totalItems, normalizedPagination);
   }
 
   async getLowStockInventoriesByStoreId(
     storeId: string,
     query: ListInventoriesQueryDto,
   ): Promise<LowStockInventoriesResponseDto> {
-    const supabase = SupabaseProvider.getClient();
     const normalizedPagination = normalizePagination(query);
 
     const { items, totalItems } =
@@ -85,26 +108,10 @@ export class InventoryService {
         ...query,
         ...normalizedPagination,
       });
+    
+    const itemsWithSignedUrl = await this.getSignedUrlForItemImageUrl(items);
 
-    for (const item of items) {
-      if (item.productPackage?.product?.imageUrl) {
-        const rawPath = item.productPackage.product.imageUrl;
-        
-        try {
-          const { data } = await supabase.storage
-            .from('images') 
-            .createSignedUrl(rawPath, 3600); 
-            
-          if (data?.signedUrl) {
-            item.productPackage.product.imageUrl = data.signedUrl;
-          }
-        } catch (err) {
-          console.error('Lỗi tạo signed URL cho Low Stock:', err);
-        }
-      }
-    }
-
-    return buildPaginatedResponse(items, totalItems, normalizedPagination);
+    return buildPaginatedResponse(itemsWithSignedUrl, totalItems, normalizedPagination);
   }
 
   async getInventoryByProductPackageId(
