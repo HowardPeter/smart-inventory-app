@@ -52,8 +52,7 @@ export class InventoryService {
               process.env.STORAGE_BUCKET ?? 'images',
               item.productPackage.product.imageUrl,
             ),
-          }
-          
+          },
         },
       })),
     );
@@ -94,7 +93,11 @@ export class InventoryService {
 
     const itemsWithSignedUrl = await this.getSignedUrlForItemImageUrl(items);
 
-    return buildPaginatedResponse(itemsWithSignedUrl, totalItems, normalizedPagination);
+    return buildPaginatedResponse(
+      itemsWithSignedUrl,
+      totalItems,
+      normalizedPagination,
+    );
   }
 
   async getLowStockInventoriesByStoreId(
@@ -108,10 +111,14 @@ export class InventoryService {
         ...query,
         ...normalizedPagination,
       });
-    
+
     const itemsWithSignedUrl = await this.getSignedUrlForItemImageUrl(items);
 
-    return buildPaginatedResponse(itemsWithSignedUrl, totalItems, normalizedPagination);
+    return buildPaginatedResponse(
+      itemsWithSignedUrl,
+      totalItems,
+      normalizedPagination,
+    );
   }
 
   async getInventoryByProductPackageId(
