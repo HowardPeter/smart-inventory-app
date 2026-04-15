@@ -134,12 +134,9 @@ class HomeDailySummaryWidget extends GetView<HomeController> {
           children: [
             Row(
               children: [
-                const Icon(Iconsax.arrow_bottom_copy,
-                    color: AppColors.stockIn, size: 14),
-                const SizedBox(width: 4),
                 Text(TTexts.totalIn.tr.toUpperCase(),
                     style: const TextStyle(
-                        fontSize: 11,
+                        fontSize: 10,
                         fontWeight: FontWeight.bold,
                         color: AppColors.stockIn)),
               ],
@@ -148,12 +145,9 @@ class HomeDailySummaryWidget extends GetView<HomeController> {
               children: [
                 Text(TTexts.totalOut.tr.toUpperCase(),
                     style: const TextStyle(
-                        fontSize: 11,
+                        fontSize: 10,
                         fontWeight: FontWeight.bold,
                         color: AppColors.stockOut)),
-                const SizedBox(width: 4),
-                const Icon(Iconsax.arrow_copy,
-                    color: AppColors.stockOut, size: 14),
               ],
             ),
           ],
@@ -202,15 +196,15 @@ class HomeDailySummaryWidget extends GetView<HomeController> {
               inQty.toString(),
               style: const TextStyle(
                   fontFamily: 'Poppins',
-                  fontSize: 20, // GIẢM TỪ 24 XUỐNG 20
-                  fontWeight: FontWeight.w600, // GIẢM TỪ BOLD XUỐNG W600
+                  fontSize: 18,
+                  fontWeight: FontWeight.w600,
                   color: AppColors.stockIn),
             ),
             Text(
               outQty.toString(),
               style: const TextStyle(
                   fontFamily: 'Poppins',
-                  fontSize: 20,
+                  fontSize: 18,
                   fontWeight: FontWeight.w600,
                   color: AppColors.stockOut),
             ),

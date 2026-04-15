@@ -401,6 +401,8 @@ class TTexts {
   static const String inventoryHealth = 'inventory_health';
   static const String topCategories = 'top_categories';
   static const String inventoryFlow = 'inventory_flow';
+  static const String chartTooltipIn = 'chart_tooltip_in';
+  static const String chartTooltipOut = 'chart_tooltip_out';
 
   // -- Chatbot AI
   static const String chatbotName = "chatbot_name";
@@ -872,14 +874,16 @@ class TTexts {
   static const String reportEmptyTitle = 'report_empty_title';
   static const String reportEmptySubtitle = 'report_empty_subtitle';
   static const String reportHistory = 'report_history';
-  static const String reportTransactionsOverview = 'report_transactions_overview';
+  static const String reportTransactionsOverview =
+      'report_transactions_overview';
   static const String exportFailedTitle = 'export_failed_title';
   static const String exportFailedMessage = 'export_failed_message';
 
   // -- Report Transaction Detail
   static const String totalItems = 'total_items';
   static const String totalAmount = 'total_amount';
-  static const String transactionDetailsNotFound = 'transaction_details_not_found';
+  static const String transactionDetailsNotFound =
+      'transaction_details_not_found';
   static const String unknownUser = 'unknown_user';
   static const String staff = 'staff';
   static const String mainHQStore = 'main_hq_store';
@@ -892,7 +896,8 @@ class TTexts {
   static const String exportTransaction = 'export_transaction';
   static const String exportDailyReport = 'export_daily_report';
   static const String exportDailyReportDesc = 'export_daily_report_desc';
-  static const String exportSingleTransactionDesc = 'export_single_transaction_desc';
+  static const String exportSingleTransactionDesc =
+      'export_single_transaction_desc';
 
   // -- Notifications
   static const String notificationTitle = "notification_title";

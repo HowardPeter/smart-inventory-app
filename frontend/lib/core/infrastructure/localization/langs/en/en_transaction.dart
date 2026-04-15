@@ -90,7 +90,7 @@ final Map<String, String> enTransaction = {
   TTexts.transactionNumber: 'Transaction Number',
   TTexts.transactionDate: 'Transaction Date',
   TTexts.transactionType: 'Transaction Type',
-  TTexts.totalItemsTransaction: 'Total Items / Transaction',
+  TTexts.totalItemsTransaction: 'Total Items',
   TTexts.checkDetails: 'Check Details',
   TTexts.transactionDetails: 'Transaction Details',
   TTexts.selectExportType: "Select Export Types:",
@@ -105,7 +105,6 @@ final Map<String, String> enTransaction = {
   TTexts.reasonIncome: 'Income (+)',
   TTexts.reasonNeutral: 'No Revenue (0)',
   TTexts.reasonExpense: 'Expense / Loss (-)',
-
 
   TTexts.selectBatchFIFO: 'Select batches',
   TTexts.batchRemaining: 'left',

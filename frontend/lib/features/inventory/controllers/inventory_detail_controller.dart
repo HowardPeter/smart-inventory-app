@@ -60,7 +60,6 @@ class InventoryDetailController extends GetxController with TErrorHandler {
   Future<void> _fetchDetailData(String productId,
       {bool isRefresh = false}) async {
     try {
-      // FIX LỖI 2 (SHIMMER): Luôn bật Loading để hiện Shimmer, bất kể là refresh hay vào lần đầu
       isLoading.value = true;
       update(); // Báo GetBuilder vẽ lại để hiện Shimmer
 
@@ -84,14 +83,10 @@ class InventoryDetailController extends GetxController with TErrorHandler {
             Map<String, dynamic>.from(pkgJson['inventory'] ?? {});
 
         // 2. Nhét thẳng gói pkgJson vào trong inventory json
-        // (Lưu ý: key 'productPackage' này phải đúng với key mà hàm InventoryModel.fromJson của bạn đang đọc)
         invJsonMap['productPackage'] = pkgJson;
 
         // 3. Parse Model từ cục JSON đã được nhét đủ data
         final invModel = InventoryModel.fromJson(invJsonMap);
-
-        // XÓA dòng này đi vì data đã được parse ở trên:
-        // invModel.productPackage = pkgModel;
 
         final mappedItem = InventoryInsightDisplayModel(
           product: parentProduct,
@@ -120,9 +115,8 @@ class InventoryDetailController extends GetxController with TErrorHandler {
     } catch (e) {
       handleError(e);
     } finally {
-      // Kết thúc tải dữ liệu
       isLoading.value = false;
-      update(); // Vẽ lại để tắt Shimmer hiện nội dung
+      update();
     }
   }
 
@@ -143,7 +137,6 @@ class InventoryDetailController extends GetxController with TErrorHandler {
     if (currentDisplayItem.value != null) {
       final targetBarcode = newItem.inventory.productPackage?.barcodeValue;
 
-      // FIX LỖI 1 (HISTORY): Kiểm tra xem item chuẩn bị vào đã có trong lịch sử chưa
       final existingIndex = historyStack.indexWhere((element) =>
           element.inventory.productPackage?.barcodeValue == targetBarcode);
 
@@ -159,7 +152,7 @@ class InventoryDetailController extends GetxController with TErrorHandler {
       currentDisplayItem.value = newItem;
       targetBarcodeToFocus = targetBarcode;
 
-      // 3. Gọi fetch dữ liệu mới (đã sửa ở trên để hiện Shimmer)
+      // 3. Gọi fetch dữ liệu mới
       final productId = newItem.product?.productId;
       if (productId != null) {
         _fetchDetailData(productId, isRefresh: true);
@@ -170,7 +163,7 @@ class InventoryDetailController extends GetxController with TErrorHandler {
   }
 
   // ==========================================
-  // HÀM BACK CHUẨN (RÚT ITEM KHỎI STACK)
+  // HÀM BACK CHUẨN 
   // ==========================================
   void goBack() {
     if (historyStack.isNotEmpty) {

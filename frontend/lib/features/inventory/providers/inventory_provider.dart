@@ -1,4 +1,5 @@
 import 'package:frontend/core/infrastructure/models/product_package_model.dart';
+import 'package:frontend/core/infrastructure/models/transaction_model.dart';
 import 'package:frontend/core/infrastructure/network/app_client.dart';
 import 'package:frontend/core/infrastructure/models/category_model.dart';
 import 'package:frontend/core/infrastructure/models/product_model.dart';
@@ -170,5 +171,22 @@ class InventoryProvider {
 
   Future<void> deleteInventory(String packageId) async {
     await _apiClient.delete('/api/inventories/product-packages/$packageId');
+  }
+
+  // ==========================================
+  // TRANSACTIONS FLOW CHARTS
+  // ==========================================
+  Future<List<TransactionModel>> getTransactions(
+      {Map<String, dynamic>? queryParams}) async {
+    final listData = await _apiClient.getList('/api/transactions',
+        queryParameters: queryParams ?? {'limit': 100});
+    return listData.map((json) => TransactionModel.fromJson(json)).toList();
+  }
+
+  Future<List<dynamic>> getAuditLogs(
+      {Map<String, dynamic>? queryParams}) async {
+    final listData = await _apiClient.getList('/api/audit-logs',
+        queryParameters: queryParams ?? {'limit': 100});
+    return listData; 
   }
 }
