@@ -1,7 +1,6 @@
 import { StatusCodes } from 'http-status-codes';
 
 import { CustomError } from '../../../common/errors/index.js';
-import { appEvents, eventBus } from '../../../common/events/event-bus.js';
 import {
   buildPaginatedResponse,
   normalizePagination,
@@ -13,6 +12,7 @@ import { InventoryRepository } from '../repository/inventory.repository.js';
 
 import type { DbClient } from '../../../common/types/index.js';
 import type { Prisma } from '../../../generated/prisma/client.js';
+import type { InventoryEventPublisher } from '../../alerts/inventory-event.publisher.js';
 import type {
   CreateInventoryDto,
   InventoryAdjustmentDto,
@@ -25,14 +25,10 @@ import type {
   InventoryForTransactionData,
 } from '../dto/inventory.dto.js';
 
-/* Service xử lý business logic cho module Inventory.
-Chịu trách nhiệm kiểm tra tính hợp lệ của dữ liệu,
-áp dụng các ràng buộc nghiệp vụ
-trước khi gọi Repository để thao tác với cơ sở dữ liệu. */
 export class InventoryService {
   constructor(
     private readonly inventoryRepository: InventoryRepository,
-    private readonly auditLogRepository: AuditLogRepository,
+    private readonly inventoryEventPublisher: InventoryEventPublisher,
   ) {}
 
   createTxRepositories = (db: DbClient) => ({
@@ -206,14 +202,11 @@ export class InventoryService {
       };
     });
 
-    // PHÁT TÍN HIỆU NGAY BÊN NGOÀI TRANSACTION (ĐÃ BỔ SUNG OLD_QUANTITY)
-    eventBus.emit(appEvents.INVENTORY_CHANGED, {
+    this.inventoryEventPublisher.emitInventoryChanged({
       inventoryId: existingInventory.inventoryId,
       storeId,
       oldQuantity: result.previousQuantity,
-      // 👉 Truyền số lượng cũ để check lọc SPAM
       newQuantity: result.currentQuantity,
-      // 👉 Truyền số lượng mới
     });
 
     return result;
@@ -459,22 +452,26 @@ export class InventoryService {
             status: StatusCodes.BAD_REQUEST,
           });
       }
-    }); // <--- TRANSACTION THỰC SỰ KẾT THÚC TẠI ĐÂY
+    });
 
-    // 2. PHÁT TÍN HIỆU NGAY TẠI ĐÂY (HOÀN TOÀN BÊN NGOÀI TRANSACTION)
-    // Đảm bảo dữ liệu đã được lưu thành công vào DB mới phát tín hiệu
-    for (const item of inventoryItems) {
+    // 2. PHÁT TÍN HIỆU NGAY TẠI ĐÂY
+    const changedItems = inventoryItems.map((item) => {
       const newQuantity =
         transactionType === 'import'
           ? item.quantity + item.transactionQuantity
           : item.quantity - item.transactionQuantity;
 
-      eventBus.emit(appEvents.INVENTORY_CHANGED, {
+      return {
         inventoryId: item.inventoryId,
-        storeId,
-        newQuantity: newQuantity, // Gửi luôn số lượng mới đã tính toán
-      });
-    }
+        oldQuantity: item.quantity,
+        newQuantity: newQuantity,
+      };
+    });
+
+    this.inventoryEventPublisher.emitBatchInventoryChanged({
+      storeId,
+      items: changedItems,
+    });
   }
 
   async deleteInventory(
