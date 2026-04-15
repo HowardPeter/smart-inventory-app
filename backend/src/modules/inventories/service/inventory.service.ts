@@ -4,6 +4,7 @@ import { CustomError } from '../../../common/errors/index.js';
 import {
   buildPaginatedResponse,
   normalizePagination,
+  StorageService,
 } from '../../../common/utils/index.js';
 import { prisma } from '../../../db/prismaClient.js';
 import { TransactionType } from '../../../generated/prisma/enums.js';
@@ -23,6 +24,7 @@ import type {
   UpdateInventoryDto,
   InventoryForTransactionData,
   BatchInventoryAdjustmentDto,
+  InventoryListItemDto,
 } from '../dto/inventory.dto.js';
 
 export class InventoryService {
@@ -35,6 +37,27 @@ export class InventoryService {
     inventoryRepositoryTx: new InventoryRepository(db),
     auditLogRepositoryTx: new AuditLogRepository(db),
   });
+
+  private async getSignedUrlForItemImageUrl(
+    items: InventoryListItemDto[],
+  ): Promise<InventoryListItemDto[]> {
+    return await Promise.all(
+      items.map(async (item) => ({
+        ...item,
+        productPackage: {
+          ...item.productPackage,
+          product: {
+            ...item.productPackage.product,
+            imageUrl: await StorageService.getSignedUrl(
+              process.env.STORAGE_BUCKET ?? 'images',
+              item.productPackage.product.imageUrl,
+            ),
+          }
+          
+        },
+      })),
+    );
+  }
 
   // Hàm helper dùng chung để kiểm tra sự tồn tại của kho hàng,
   // ném lỗi 404 nếu không tìm thấy
@@ -69,7 +92,9 @@ export class InventoryService {
         ...normalizedPagination,
       });
 
-    return buildPaginatedResponse(items, totalItems, normalizedPagination);
+    const itemsWithSignedUrl = await this.getSignedUrlForItemImageUrl(items);
+
+    return buildPaginatedResponse(itemsWithSignedUrl, totalItems, normalizedPagination);
   }
 
   async getLowStockInventoriesByStoreId(
@@ -83,8 +108,10 @@ export class InventoryService {
         ...query,
         ...normalizedPagination,
       });
+    
+    const itemsWithSignedUrl = await this.getSignedUrlForItemImageUrl(items);
 
-    return buildPaginatedResponse(items, totalItems, normalizedPagination);
+    return buildPaginatedResponse(itemsWithSignedUrl, totalItems, normalizedPagination);
   }
 
   async getInventoryByProductPackageId(

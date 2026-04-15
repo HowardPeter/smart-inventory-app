@@ -16,7 +16,11 @@ class AppRoutes {
 
   static const main = '/main';
   static const search = '/search';
+
   static const home = '/home';
+  static const adjustmentHistory = '/adjustment_history';
+  static const lowStock = '/low-stock';
+  
   static const inventory = '/inventory';
   static const inventorySight = '/inventory_insight';
   static const inventoryDetail = '/inventory_detail';

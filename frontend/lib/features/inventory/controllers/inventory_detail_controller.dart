@@ -16,7 +16,7 @@ import 'package:frontend/core/infrastructure/models/product_package_model.dart';
 import 'package:frontend/core/infrastructure/models/inventory_model.dart';
 
 class InventoryDetailController extends GetxController with TErrorHandler {
-  Rx<InventoryInsightDisplayModel?> currentDisplayItem =
+  final Rx<InventoryInsightDisplayModel?> currentDisplayItem =
       Rx<InventoryInsightDisplayModel?>(null);
 
   final RxBool isLoading = true.obs;
@@ -24,16 +24,16 @@ class InventoryDetailController extends GetxController with TErrorHandler {
   final RxBool isChartMode = false.obs;
 
   final List<InventoryInsightDisplayModel> historyStack = [];
-  String cachedCategoryName = 'Uncategorized';
-  List<InventoryInsightDisplayModel> cachedRelatedPackages = [];
+
+  final RxString categoryNameObs = 'Uncategorized'.obs;
+  final RxList<InventoryInsightDisplayModel> relatedPackagesList =
+      <InventoryInsightDisplayModel>[].obs;
 
   final InventoryProvider _provider = InventoryProvider();
-  String? targetBarcodeToFocus;
 
   @override
   void onInit() {
     super.onInit();
-
     try {
       final storeService = Get.find<StoreService>();
       final role = storeService.currentRole.value.toLowerCase();
@@ -43,55 +43,90 @@ class InventoryDetailController extends GetxController with TErrorHandler {
       canManageInventory = false;
     }
 
-    final productId = Get.arguments as String?;
-    targetBarcodeToFocus = Get.parameters['barcode'];
-
-    if (productId != null) {
-      _fetchDetailData(productId);
-    } else {
-      isLoading.value = false;
-      handleError("Product ID is missing");
-    }
+    // 🔥 FIX SHIMMER FREEZE: Dùng microtask để nhường 1 nhịp cho giao diện vẽ xong khung
+    // Tránh xung đột luồng render Obx của Flutter
+    Future.microtask(() => _initData());
   }
 
-  // ==========================================
-  // GỌI API LẤY TOÀN BỘ DATA (HỖ TRỢ REFRESH)
-  // ==========================================
-  Future<void> _fetchDetailData(String productId,
-      {bool isRefresh = false}) async {
+  void _initData() {
+    final arg = Get.arguments;
+    String? productId;
+
+    if (arg is String) {
+      productId = arg;
+    } else if (arg is Map) {
+      productId = arg['productId'];
+    }
+
+    final packageId = Get.parameters['packageId'];
+    final barcode = Get.parameters['barcode'];
+
+    _fetchDetailData(
+        productId: productId, packageId: packageId, barcode: barcode);
+  }
+
+  Future<void> _fetchDetailData(
+      {String? productId,
+      String? packageId,
+      String? barcode,
+      bool isRefresh = false}) async {
     try {
-      // FIX LỖI 2 (SHIMMER): Luôn bật Loading để hiện Shimmer, bất kể là refresh hay vào lần đầu
-      isLoading.value = true;
-      update(); // Báo GetBuilder vẽ lại để hiện Shimmer
+      if (isRefresh) {
+        await Future.delayed(const Duration(milliseconds: 300));
+      } else {
+        isLoading.value = true;
+      }
 
-      // Giữ độ trễ để User nhìn thấy Shimmer (chỉ dùng khi test ngầm, thật thì xóa đi)
-      await Future.delayed(const Duration(milliseconds: 1500));
+      String? finalProductId = productId;
 
-      final rawData = await _provider.getProductDetail(productId);
+      if ((finalProductId == null || finalProductId.isEmpty) &&
+          packageId != null &&
+          packageId.isNotEmpty) {
+        try {
+          final pkgData = await _provider.getProductPackageDetail(packageId);
+          finalProductId =
+              pkgData['productId'] ?? pkgData['product']?['productId'];
+        } catch (e) {
+          debugPrint("Lỗi móc productId: $e");
+        }
+      }
 
-      cachedCategoryName = rawData['category']?['name'] ?? 'Uncategorized';
-      final parentProduct = ProductModel.fromJson(rawData);
-      final packagesList = rawData['productPackages'] as List<dynamic>? ?? [];
+      if (finalProductId == null || finalProductId.isEmpty) {
+        throw Exception("Product ID or Package ID is missing");
+      }
+
+      final results = await Future.wait([
+        _provider.getProductDetail(finalProductId),
+        _provider.getPackagesByProductId(finalProductId),
+      ]);
+
+      final rawProduct = results[0] as Map<String, dynamic>;
+      final rawPackages = results[1] as List<dynamic>;
+
+      categoryNameObs.value =
+          rawProduct['category']?['name'] ?? 'Uncategorized';
+      final parentProduct = ProductModel.fromJson(rawProduct);
 
       List<InventoryInsightDisplayModel> related = [];
       InventoryInsightDisplayModel? initialItem;
 
-      for (var pkgJson in packagesList) {
+      for (var pkgJson in rawPackages) {
         final pkgModel = ProductPackageModel.fromJson(pkgJson);
 
-        // 1. Tạo một bản sao JSON của inventory có thể chỉnh sửa
         final invJsonMap =
             Map<String, dynamic>.from(pkgJson['inventory'] ?? {});
 
-        // 2. Nhét thẳng gói pkgJson vào trong inventory json
-        // (Lưu ý: key 'productPackage' này phải đúng với key mà hàm InventoryModel.fromJson của bạn đang đọc)
+        // 🔥 FIX CỐT LÕI (LỖI 0 RELATED): Bơm dữ liệu chống Null Exception
         invJsonMap['productPackage'] = pkgJson;
+        invJsonMap['productPackageId'] = pkgModel.productPackageId;
+        if (invJsonMap['inventoryId'] == null) {
+          invJsonMap['inventoryId'] = 'INV_MOCK_${pkgModel.productPackageId}';
+        }
+        if (invJsonMap['quantity'] == null) {
+          invJsonMap['quantity'] = 0;
+        }
 
-        // 3. Parse Model từ cục JSON đã được nhét đủ data
         final invModel = InventoryModel.fromJson(invJsonMap);
-
-        // XÓA dòng này đi vì data đã được parse ở trên:
-        // invModel.productPackage = pkgModel;
 
         final mappedItem = InventoryInsightDisplayModel(
           product: parentProduct,
@@ -100,91 +135,81 @@ class InventoryDetailController extends GetxController with TErrorHandler {
 
         related.add(mappedItem);
 
-        if (targetBarcodeToFocus != null &&
-            pkgModel.barcodeValue == targetBarcodeToFocus) {
+        if (packageId != null && pkgModel.productPackageId == packageId) {
+          initialItem = mappedItem;
+        } else if (initialItem == null &&
+            barcode != null &&
+            pkgModel.barcodeValue == barcode) {
           initialItem = mappedItem;
         }
       }
 
-      if (initialItem != null) {
-        related.removeWhere((item) =>
-            item.inventory.productPackage?.barcodeValue ==
-            targetBarcodeToFocus);
-      } else if (related.isNotEmpty) {
+      if (initialItem == null && related.isNotEmpty) {
         initialItem = related.first;
-        related.removeAt(0);
       }
 
-      cachedRelatedPackages = related;
+      if (initialItem != null &&
+          initialItem.inventory.productPackageId.isNotEmpty) {
+        // Giờ các Item đã có ID đàng hoàng, removeWhere sẽ chỉ xóa đúng 1 dòng!
+        related.removeWhere((item) =>
+            item.inventory.productPackageId ==
+            initialItem!.inventory.productPackageId);
+      }
+
+      relatedPackagesList.assignAll(related);
       currentDisplayItem.value = initialItem;
     } catch (e) {
+      print('👉 [ERROR LÚC FETCH]: $e');
       handleError(e);
     } finally {
-      // Kết thúc tải dữ liệu
+      // 🔥 XÓA HÀM update() - CHỈ DÙNG Rx ĐỂ OBX TỰ XỬ LÝ!
       isLoading.value = false;
-      update(); // Vẽ lại để tắt Shimmer hiện nội dung
     }
   }
 
-  // ==========================================
-  // PULL TO REFRESH ACTION
-  // ==========================================
   Future<void> refreshData() async {
     final currentProductId = currentDisplayItem.value?.product?.productId;
+    final currentPkgId = currentDisplayItem.value?.inventory.productPackageId;
     if (currentProductId != null) {
-      await _fetchDetailData(currentProductId, isRefresh: true);
+      await _fetchDetailData(
+          productId: currentProductId,
+          packageId: currentPkgId,
+          isRefresh: true);
     }
   }
 
-  // ==========================================
-  // XỬ LÝ CHUYỂN TRANG (RELATED PACKAGES)
-  // ==========================================
   void pushRelatedItem(InventoryInsightDisplayModel newItem) {
     if (currentDisplayItem.value != null) {
-      final targetBarcode = newItem.inventory.productPackage?.barcodeValue;
+      final targetPkgId = newItem.inventory.productPackageId;
 
-      // FIX LỖI 1 (HISTORY): Kiểm tra xem item chuẩn bị vào đã có trong lịch sử chưa
-      final existingIndex = historyStack.indexWhere((element) =>
-          element.inventory.productPackage?.barcodeValue == targetBarcode);
+      final existingIndex = historyStack.indexWhere(
+          (element) => element.inventory.productPackageId == targetPkgId);
 
       if (existingIndex != -1) {
-        // Nếu đã có trong lịch sử -> Xóa toàn bộ các trang phía trên nó để quay ngược lại (Pop to)
         historyStack.removeRange(existingIndex, historyStack.length);
       } else {
-        // Nếu chưa có -> Thêm trang hiện tại vào lịch sử
         historyStack.add(currentDisplayItem.value!);
       }
 
-      // 2. Chuyển Item mới thành Item chính
       currentDisplayItem.value = newItem;
-      targetBarcodeToFocus = targetBarcode;
 
-      // 3. Gọi fetch dữ liệu mới (đã sửa ở trên để hiện Shimmer)
       final productId = newItem.product?.productId;
       if (productId != null) {
-        _fetchDetailData(productId, isRefresh: true);
-      } else {
-        update();
+        _fetchDetailData(
+            productId: productId, packageId: targetPkgId, isRefresh: true);
       }
     }
   }
 
-  // ==========================================
-  // HÀM BACK CHUẨN (RÚT ITEM KHỎI STACK)
-  // ==========================================
   void goBack() {
     if (historyStack.isNotEmpty) {
       final oldItem = historyStack.removeLast();
       currentDisplayItem.value = oldItem;
-      targetBarcodeToFocus = oldItem.inventory.productPackage?.barcodeValue;
-      update(); // Update UI
     } else {
-      // Nếu Stack rỗng thì mới thoát trang Detail
       Get.back();
     }
   }
 
-  // ... Các hàm toggleStatsMode và getters bên dưới giữ nguyên không đổi ...
   void toggleStatsMode(bool isChart) {
     isChartMode.value = isChart;
   }
@@ -204,9 +229,8 @@ class InventoryDetailController extends GetxController with TErrorHandler {
   String get activeStatus =>
       _item?.inventory.productPackage?.activeStatus ?? 'active';
 
-  String get categoryName => cachedCategoryName;
-  List<InventoryInsightDisplayModel> get relatedPackages =>
-      cachedRelatedPackages;
+  String get categoryName => categoryNameObs.value;
+  List<InventoryInsightDisplayModel> get relatedPackages => relatedPackagesList;
 
   List<String> get tags {
     List<String> result = [categoryName, statusText];
@@ -231,7 +255,6 @@ class InventoryDetailController extends GetxController with TErrorHandler {
 
   double get stockHealthRatio {
     if (quantity <= 0) return 0.0;
-
     if (threshold <= 0) return 1.0;
     final ratio = quantity / (threshold * 2);
     return ratio > 1.0 ? 1.0 : ratio;
@@ -244,7 +267,6 @@ class InventoryDetailController extends GetxController with TErrorHandler {
   }
 
   String get statusText {
-    // ĐÃ FIX: Bắt chặt điều kiện <= 0
     if (quantity <= 0) return TTexts.tabOutStock.tr;
     if (quantity <= threshold) return TTexts.tabLowStock.tr;
     return TTexts.tabHealthy.tr;
@@ -260,14 +282,11 @@ class InventoryDetailController extends GetxController with TErrorHandler {
 
   void handleMenuAction(String actionKey) {
     if (actionKey == TTexts.viewProductInfo) {
-      // Lấy dữ liệu product từ item đang hiển thị trên màn hình
       final product = currentDisplayItem.value?.product;
 
       if (product != null) {
-        // Điều hướng sang trang Catalog Detail và truyền Model sản phẩm sang
         Get.toNamed(AppRoutes.productCatalogDetail, arguments: product)
             ?.then((_) {
-          // Hàm này sẽ tự động chạy ngầm NGAY KHI màn hình Catalog đóng lại, cap nhat data ngay lap tuc o 2 trang duoi
           if (Get.isRegistered<InventoryController>()) {
             Get.find<InventoryController>().fetchDashboardData(isRefresh: true);
           }
@@ -276,7 +295,6 @@ class InventoryDetailController extends GetxController with TErrorHandler {
           }
         });
       } else {
-        // Báo lỗi nếu dữ liệu sản phẩm bị null
         TSnackbarsWidget.error(
           title: TTexts.errorTitle.tr,
           message: TTexts.productDataMissing.tr,
@@ -285,7 +303,6 @@ class InventoryDetailController extends GetxController with TErrorHandler {
     }
   }
 
-  // TODO: Doi data that cho bieu do, can Transaction
   List<Map<String, dynamic>> get stockMovementData => [
         {'day': 'Mon', 'in': 120, 'out': 45},
         {'day': 'Tue', 'in': 80, 'out': 60},

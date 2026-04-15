@@ -38,10 +38,8 @@ class HomeQuickActionsWidget extends StatelessWidget {
               // 1. THẺ SCAN
               _buildPremiumCard(
                 icon: Iconsax.scan_barcode_copy,
-                title:
-                    TTexts.homeScanBarcode.tr, // Đã đổi sang biến đa ngôn ngữ
-                subtitle: TTexts
-                    .homeScanBarcodeSub.tr, // Đã đổi sang biến đa ngôn ngữ
+                title: TTexts.homeScanBarcode.tr,
+                subtitle: TTexts.homeScanBarcodeSub.tr,
                 gradient: const LinearGradient(
                   begin: Alignment.topLeft,
                   end: Alignment.bottomRight,
@@ -62,8 +60,8 @@ class HomeQuickActionsWidget extends StatelessWidget {
                 const SizedBox(width: AppSizes.p16),
                 _buildPremiumCard(
                   icon: Iconsax.box_1_copy,
-                  title: TTexts.homeAddProduct.tr, // 🟢
-                  subtitle: TTexts.homeAddProductSub.tr, // 🟢
+                  title: TTexts.homeAddProduct.tr,
+                  subtitle: TTexts.homeAddProductSub.tr,
                   gradient: const LinearGradient(
                     begin: Alignment.topLeft,
                     end: Alignment.bottomRight,
@@ -77,15 +75,50 @@ class HomeQuickActionsWidget extends StatelessWidget {
               const SizedBox(width: AppSizes.p16),
               _buildPremiumCard(
                 icon: Iconsax.chart_square_copy,
-                title: TTexts.homeViewReports.tr, // 🟢
-                subtitle: TTexts.homeViewReportsSub.tr, // 🟢
+                title: TTexts.homeViewReports.tr,
+                subtitle: TTexts.homeViewReportsSub.tr,
                 gradient: const LinearGradient(
                   begin: Alignment.topLeft,
                   end: Alignment.bottomRight,
                   colors: [Color(0xFF7B61FF), Color(0xFF5835E5)],
                 ),
                 onTap: () {
-                  // TODO: Chuyển sang màn hình báo cáo
+                  // TODO: Toi man hinh report
+                },
+              ),
+
+              // 4. THẺ VIEW ADJUSTMENTS (ĐÃ ĐỔI SANG MÀU XANH TEAL TRÁNH TRÙNG MÀU APP)
+              const SizedBox(width: AppSizes.p16),
+              _buildPremiumCard(
+                icon: Iconsax.setting_2_copy,
+                title: TTexts.homeViewAdjustments.tr,
+                subtitle: TTexts.homeViewAdjustmentsSub.tr,
+                gradient: const LinearGradient(
+                  begin: Alignment.topLeft,
+                  end: Alignment.bottomRight,
+                  colors: [
+                    Color(0xFF11998E),
+                    Color(0xFF1F7B6B)
+                  ], // Cyan/Teal Gradient
+                ),
+                onTap: () {
+                  Get.toNamed(AppRoutes.adjustmentHistory);
+                },
+              ),
+
+              // 5. THẺ LOW STOCK ALERTS (MÀU ĐỎ)
+              const SizedBox(width: AppSizes.p16),
+              _buildPremiumCard(
+                icon: Iconsax.warning_2_copy,
+                title: TTexts.homeLowStock.tr,
+                subtitle: TTexts.homeLowStockSub.tr,
+                gradient: const LinearGradient(
+                  begin: Alignment.topLeft,
+                  end: Alignment.bottomRight,
+                  colors: [Color(0xFFFF4B4B), Color(0xFFE52323)],
+                ),
+                onTap: () {
+                  Get.toNamed(AppRoutes.lowStock); // ĐÃ LINK ROUTE
                 },
               ),
 
@@ -140,7 +173,7 @@ class HomeQuickActionsWidget extends StatelessWidget {
                 fontFamily: 'Poppins',
                 color: Colors.white,
                 fontWeight: FontWeight.bold,
-                fontSize: 17,
+                fontSize: 16,
                 height: 1.1,
               ),
             ),
