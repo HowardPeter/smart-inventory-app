@@ -53,6 +53,7 @@ export class NotificationService {
         notificationId: newNoti.notificationId,
         type: newNoti.type,
         referenceId: newNoti.referenceId ?? '',
+        storeId: storeId,
       },
       tokens: tokens.map((t) => t.token),
       android: {
