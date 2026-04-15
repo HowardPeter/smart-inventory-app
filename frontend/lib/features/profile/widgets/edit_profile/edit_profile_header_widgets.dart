@@ -37,12 +37,12 @@ class EditProfileHeaderWidget extends StatelessWidget {
               child: Padding(
                 padding: const EdgeInsets.only(top: AppSizes.p8),
                 child: SizedBox(
-                  height: 48,
+                  height: AppSizes.p48,
                   child: Stack(
                     alignment: Alignment.center,
                     children: [
                       Positioned(
-                        left: 8,
+                        left: AppSizes.p8,
                         child: IconButton(
                           icon: const Icon(
                             Icons.arrow_back_ios_new,
@@ -58,7 +58,7 @@ class EditProfileHeaderWidget extends StatelessWidget {
                         textAlign: TextAlign.center,
                         style: const TextStyle(
                           color: AppColors.whiteText,
-                          fontSize: 22,
+                          fontSize: AppSizes.p22,
                           fontWeight: FontWeight.bold,
                         ),
                       ),
@@ -68,55 +68,29 @@ class EditProfileHeaderWidget extends StatelessWidget {
               ),
             ),
           ),
+
+          /// AVATAR
           Positioned(
             top: 125,
-            child: Stack(
-              clipBehavior: Clip.none,
-              children: [
-                Container(
-                  padding: const EdgeInsets.all(4),
-                  decoration: BoxDecoration(
-                    shape: BoxShape.circle,
-                    color: AppColors.white,
-                    boxShadow: [
-                      BoxShadow(
-                        color: AppColors.gradientBlackStart.withOpacity(0.08),
-                        blurRadius: 15,
-                        offset: const Offset(0, 8),
-                      )
-                    ],
-                  ),
-                  child: CircleAvatar(
-                    radius: 55,
-                    backgroundImage: AssetImage(
-                      TImages.profileImages.profileImageUser,
-                    ),
-                  ),
+            child: Container(
+              padding: const EdgeInsets.all(4),
+              decoration: BoxDecoration(
+                shape: BoxShape.circle,
+                color: AppColors.white,
+                boxShadow: [
+                  BoxShadow(
+                    color: AppColors.gradientBlackStart.withOpacity(0.08),
+                    blurRadius: AppSizes.radius15,
+                    offset: const Offset(0, AppSizes.p8),
+                  )
+                ],
+              ),
+              child: CircleAvatar(
+                radius: AppSizes.radius55,
+                backgroundImage: AssetImage(
+                  TImages.profileImages.profileImageUser,
                 ),
-
-                // icon
-                Positioned(
-                  right: 0,
-                  bottom: 0,
-                  child: GestureDetector(
-                    onTap: () {
-                      // TODO: xử lý chọn ảnh
-                    },
-                    child: Container(
-                      padding: const EdgeInsets.all(6),
-                      decoration: const BoxDecoration(
-                        color: AppColors.primary,
-                        shape: BoxShape.circle,
-                      ),
-                      child: const Icon(
-                        Icons.camera_alt,
-                        size: 16,
-                        color: Colors.white,
-                      ),
-                    ),
-                  ),
-                ),
-              ],
+              ),
             ),
           ),
         ],

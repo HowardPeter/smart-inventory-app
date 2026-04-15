@@ -2,9 +2,11 @@ import 'package:flutter/material.dart';
 import 'package:frontend/core/infrastructure/constants/text_strings.dart';
 import 'package:frontend/core/ui/theme/app_colors.dart';
 import 'package:frontend/core/ui/theme/app_sizes.dart';
+import 'package:frontend/features/profile/widgets/edit_store/t_edit_custom_dialog_widgets.dart/t_edit_store_custom_dialog_widgets.dart';
 import 'package:get/get.dart';
 import 'package:iconsax_flutter/iconsax_flutter.dart';
 import 'package:frontend/features/profile/controllers/profile_controller.dart';
+import 'package:frontend/features/profile/controllers/profile_edit_store_controller.dart';
 
 class EditStoreCardWidgets extends StatelessWidget {
   const EditStoreCardWidgets({super.key});
@@ -42,33 +44,45 @@ class EditStoreCardWidgets extends StatelessWidget {
                 ),
                 const SizedBox(width: 12),
                 Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      // Hiển thị tên cửa hàng thực tế và tự động cập nhật
-                      Obx(() => Text(
+                  child: Obx(() => Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          // Hiển thị tên cửa hàng thực tế và tự động cập nhật
+                          Text(
                             controller.storeName.value,
                             style: const TextStyle(
                               fontWeight: FontWeight.bold,
                               fontSize: 16,
                             ),
-                          )),
-                      const SizedBox(height: 4),
-                      const Text(
-                        "23 Nguyen Hue, HCM1", // todo: Thay bằng địa chỉ thật của cửa hàng khi có API lấy chi tiết store
-                        style: TextStyle(fontSize: 13, color: Colors.black54),
-                      ),
-                      // GIỮ LẠI SỐ MEMBER TẠI ĐÂY
-                      const Text(
-                        "12 members", //todo: Thay bằng số member thật của cửa hàng khi có API lấy chi tiết store
-                        style: TextStyle(fontSize: 13, color: Colors.black54),
-                      ),
-                    ],
-                  ),
+                          ),
+                          const SizedBox(height: 4),
+                          const Text(
+                            "23 Nguyen Hue, HCM1", // todo: Thay bằng địa chỉ thật của cửa hàng khi có API lấy chi tiết store
+                            style:
+                                TextStyle(fontSize: 13, color: Colors.black54),
+                          ),
+                          // GIỮ LẠI SỐ MEMBER TẠI ĐÂY
+                          const Text(
+                            "12 members", //todo: Thay bằng số member thật của cửa hàng khi có API lấy chi tiết store
+                            style:
+                                TextStyle(fontSize: 13, color: Colors.black54),
+                          ),
+                        ],
+                      )),
                 ),
+
                 // Nút Edit
                 GestureDetector(
-                  onTap: () => controller.goToEditStoreProfile(),
+                  onTap: () {
+                    // Đảm bảo controller edit store đã được khởi tạo
+                    if (!Get.isRegistered<ProfileEditStoreController>()) {
+                      Get.put(ProfileEditStoreController());
+                    }
+                    Get.dialog(
+                      const TEditStoreCustomDialogWidgets(),
+                      barrierDismissible: false,
+                    );
+                  },
                   child: Container(
                     padding:
                         const EdgeInsets.symmetric(horizontal: 12, vertical: 6),

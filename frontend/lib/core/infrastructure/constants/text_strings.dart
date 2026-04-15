@@ -800,6 +800,7 @@ class TTexts {
   static const String noItemsFoundDesc = "no_items_found_desc";
   static const String discardTransactionTitle = "discard_transaction_title";
   static const String discardTransactionDesc = "discard_transaction_desc";
+  static const String profileEmailUser = "profile_email_user";
 
   // -- Transaction Summary
   static const String qty = "qty";
@@ -834,7 +835,7 @@ class TTexts {
   //--Profile
   static const String profileTitle = 'profile_title';
   static const String profileNameUser = 'profile_name_user';
-  static const String profileEmaiUser = 'profile_mail_user';
+  static const String profilePhoneNumber = 'profile_phone_number';
   static const String profileNameStore = 'profile_name_store';
   static const String profileBtnSwitchStore = 'profile_btn_switch_store';
   static const String profileAccount = 'profile_account';
@@ -869,6 +870,16 @@ class TTexts {
   static const String editHintName = 'edit_hint_name';
   static const String editHintEmail = 'edit_hint_email';
   static const String editUpdate = 'edit_update';
+  static const String editPhoneNumberEmpty = 'edit_phone_number_empty';
+  static const String editPhoneNumberInvalid = 'edit_phone_number_invalid';
+  static const String editPhoneNumber = 'edit_phone_number';
+  static const String editPhoneNumberHint = 'edit_phone_number_hint';
+  static const String editErrorEmptyFieldsTitle =
+      'edit_error_empty_fields_title';
+  static const String editErrorEmptyFieldsMessage =
+      'edit_error_empty_fields_message';
+  static const String confirmUpdateDescription = 'confirm_update_description';
+  static const String confirmUpdate = 'confirm_update';
 
   //--Change password
   static const String changePasswordTitle = "change_password_title";
@@ -892,12 +903,15 @@ class TTexts {
   static const String authSessionExpired = "auth_session_expired";
   static const String systemError = "system_error";
   static const String authError = "auth_error";
+  static const String changePasswordDialogDescription =
+      "change_password_dialog_description";
+  static const String fillAllFields = "fill_all_fields";
 
   //--Edit store
   static const String editStoreTitle = 'edit_store_title';
   static const String editStoreSubtitle = 'edit_store_subtitle';
   static const String editStoreNameLabel = 'edit_store_name_label';
-  static const String editStoreAddress = 'edit_store_address';
+  static const String editStoreNameHint = 'edit_store_name_hint';
   static const String editStoreAmountMember = 'edit_store_amount_member';
   static const String editStoreBtnEdit = 'edit_store_btn_edit';
   static const String profileUpdateSuccess = 'profile_update_success';
@@ -907,6 +921,10 @@ class TTexts {
   static const String profileUpdateErrorTitle = 'profile_update_error_title';
   static const String loggingOut = 'logging_out';
   static const String logoutErrorTitle = 'logout_error_title';
+  static const String editStoreTitleDialog = 'edit_store_title_dialog';
+  static const String editStoreSubtitleDialog = 'edit_store_subtitle_dialog';
+  static const String editStoreAddressLabel = 'edit_store_address_label';
+  static const String editStoreAddressHint = 'edit_store_address_hint';
 
   // --Assigns role
   static const String assignsRoleTitle = 'assigns_role_title';
