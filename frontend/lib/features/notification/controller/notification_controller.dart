@@ -271,7 +271,6 @@ class NotificationController extends GetxController {
     if (!item.isRead) {
       markAsRead(item.notificationId);
     }
-
     NotificationRouter.navigate(item.type, item.referenceId, item.storeId);
   }
 

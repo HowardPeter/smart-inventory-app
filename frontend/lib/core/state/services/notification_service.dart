@@ -15,6 +15,8 @@ class NotificationService {
   // Khởi tạo ApiClient (Đã tự động lấy token Supabase gắn vào header)
   static final ApiClient _apiClient = ApiClient();
 
+  static RemoteMessage? pendingInitialMessage;
+
   static Future<void> initialize() async {
     // 1. XIN QUYỀN (Bắt buộc cho iOS & Android 13+)
     await _messaging.requestPermission(
@@ -88,16 +90,13 @@ class NotificationService {
 
     // 4. XỬ LÝ CLICK VÀO THÔNG BÁO TỪ TRẠNG THÁI NGẦM (Background)
     FirebaseMessaging.onMessageOpenedApp.listen((RemoteMessage message) {
-      _handleNotificationTap(message);
+      handleNotificationTap(message); // Nhớ bỏ dấu gạch dưới
     });
 
     // 5. XỬ LÝ CLICK VÀO THÔNG BÁO TỪ TRẠNG THÁI TẮT HOÀN TOÀN (Terminated)
-    RemoteMessage? initialMessage =
-        await FirebaseMessaging.instance.getInitialMessage();
+    RemoteMessage? initialMessage = await FirebaseMessaging.instance.getInitialMessage();
     if (initialMessage != null) {
-      Future.delayed(const Duration(milliseconds: 500), () {
-        _handleNotificationTap(initialMessage);
-      });
+      pendingInitialMessage = initialMessage; // Cất vào đây cho Splash xử lý
     }
 
     // 6. LẮNG NGHE ĐỔI TOKEN (Firebase tự đổi định kỳ)
@@ -106,8 +105,7 @@ class NotificationService {
     });
   }
 
-  // Trong notification_service.dart
-  static void _handleNotificationTap(RemoteMessage message) {
+  static void handleNotificationTap(RemoteMessage message) {
     final data = message.data;
 
     final String type = data['type'] ?? 'UNKNOWN';
@@ -116,17 +114,14 @@ class NotificationService {
     final String storeId = data['storeId'] ?? '';
 
     debugPrint(
-        "🔔 [FCM] Tap Push: type=$type, refId=$referenceId, storeId=$storeId");
+        "🔔 [FCM] User click thông báo: type=$type, refId=$referenceId, storeId=$storeId");
 
     if (notificationId.isNotEmpty) {
       () async {
         try {
-          await _apiClient.patch('/api/notification/$notificationId/read');
-          if (Get.isRegistered<NotificationController>()) {
-            Get.find<NotificationController>().fetchNotifications();
-          }
+          await _apiClient.patch('api/notification/$notificationId/read');
         } catch (e) {
-          debugPrint("⚠️ [FCM] Lỗi: $e");
+          debugPrint("⚠️ [FCM] Lỗi update trạng thái read: $e");
         }
       }();
     }
