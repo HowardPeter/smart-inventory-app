@@ -12,71 +12,86 @@ class NotificationRouter {
     if (type.isEmpty) return;
 
     debugPrint(
-        "🚀 [NotificationRouter] Điều hướng: type=$type, refId=$referenceId, storeId=$notificationStoreId");
+        "🚀 [Router] Bắt đầu điều hướng: $type | StoreId: $notificationStoreId");
 
-    // Xác định xem lệnh này có phải do Splash vừa bàn giao không
+    // ==========================================
+    // 1. DỌN DẸP UI (Cực kỳ quan trọng để chống kẹt)
+    // ==========================================
+    // Nếu user đang mở Dialog / BottomSheet thì phải tắt nó trước
+    if (Get.isDialogOpen == true || Get.isBottomSheetOpen == true) {
+      Get.back();
+      // Chờ 300ms cho animation đóng popup hoàn tất để tránh xung đột GetX
+      await Future.delayed(const Duration(milliseconds: 300));
+    }
+
+    final storeService = Get.find<StoreService>();
     bool isFromSplash =
         Get.currentRoute == AppRoutes.splash || Get.currentRoute.isEmpty;
+    bool needsSwitchStore = notificationStoreId != null &&
+        notificationStoreId.isNotEmpty &&
+        notificationStoreId != storeService.currentStoreId.value;
+
     bool didSwitchStore = false;
 
     // ==========================================
-    // 1. XỬ LÝ SWITCH STORE
+    // 2. XỬ LÝ SWITCH STORE VỚI CƠ CHẾ CHỐNG KẸT
     // ==========================================
-    if (notificationStoreId != null && notificationStoreId.isNotEmpty) {
-      final storeService = Get.find<StoreService>();
+    if (needsSwitchStore) {
+      try {
+        final workspaceProvider = WorkspaceProvider();
+        final List<StoreModel> myStores = await workspaceProvider.getMyStores();
 
-      if (notificationStoreId != storeService.currentStoreId.value) {
-        debugPrint("🔄 [NotificationRouter] Đang thực hiện Switch Store...");
-        try {
-          final workspaceProvider = WorkspaceProvider();
-          final List<StoreModel> myStores =
-              await workspaceProvider.getMyStores();
+        final targetStore = myStores.firstWhere(
+          (store) => store.storeId == notificationStoreId,
+          orElse: () => throw Exception('Không tìm thấy cửa hàng.'),
+        );
 
-          final targetStore = myStores.firstWhere(
-            (store) => store.storeId == notificationStoreId,
-            orElse: () => throw Exception('Không tìm thấy cửa hàng.'),
-          );
+        await storeService.saveSelectedStore(targetStore.storeId,
+            targetStore.name, targetStore.role, targetStore.inviteCode ?? '');
 
-          await storeService.saveSelectedStore(
-            targetStore.storeId,
-            targetStore.name,
-            targetStore.role,
-            targetStore.inviteCode ?? '',
-          );
+        // Đẩy một màn hình Loading lên trước để đổi Route Context.
+        // Vừa giúp người dùng biết app đang tải dữ liệu Store mới, vừa chống lỗi kẹt của GetX.
+        Get.to(
+          () => const Scaffold(
+            body: Center(child: CircularProgressIndicator()),
+          ),
+          transition: Transition.noTransition, // Không cần animation
+        );
 
-          didSwitchStore = true;
-          debugPrint("✅ [NotificationRouter] Đổi Store thành công.");
-        } catch (e) {
-          debugPrint("⚠️ [NotificationRouter] Lỗi Switch Store: $e");
-          TSnackbarsWidget.error(
-              title: 'Lỗi', message: 'Không thể truy cập cửa hàng.');
+        // Đợi màn hình tạm hiện ra hoàn tất
+        await Future.delayed(const Duration(milliseconds: 300));
 
-          // Cứu cánh: Nếu lỗi switch mà đang ở Splash thì đẩy vào Home của Store hiện tại
-          if (isFromSplash) Get.offAllNamed(AppRoutes.main);
-          return;
-        }
+        didSwitchStore = true;
+        debugPrint("✅ [Router] Cập nhật Database sang Store A thành công.");
+      } catch (e) {
+        debugPrint("⚠️ [Router] Lỗi Switch Store: $e");
+        TSnackbarsWidget.error(
+            title: 'Lỗi', message: 'Không thể truy cập cửa hàng.');
+        if (isFromSplash) Get.offAllNamed(AppRoutes.main);
+        return;
       }
     }
 
-    // Tắt dialog nếu có
-    if (Get.isDialogOpen == true || Get.isBottomSheetOpen == true) {
-      Get.back();
-    }
-
     // ==========================================
-    // 2. KHỞI TẠO MÔI TRƯỜNG CHUẨN
+    // 3. RESET APP & KHỞI TẠO LẠI BỘ ĐIỀU KHIỂN
     // ==========================================
-    // BẮT BUỘC reset về Main khi: Đã đổi Store HOẶC App vừa khởi động từ Splash
     if (didSwitchStore || isFromSplash) {
+      // Lúc này Get.currentRoute đang là màn hình Loading, lệnh offAllNamed sẽ chạy hoàn hảo 100%
       Get.offAllNamed(AppRoutes.main);
-      await Future.delayed(
-          const Duration(milliseconds: 500)); // Chờ Main build xong layout
+
+      // Đợi MainScreen build xong các Tab và Controller (Tăng thời gian an toàn)
+      await Future.delayed(const Duration(milliseconds: 600));
     }
 
     // ==========================================
-    // 3. ĐIỀU HƯỚNG VÀO TRANG CHI TIẾT
+    // 4. JUMP VÀO MÀN HÌNH ĐÍCH
     // ==========================================
-    debugPrint("🎯 [NotificationRouter] Mở trang chi tiết: $type");
+    _performFinalNavigation(type, referenceId);
+  }
+
+  static void _performFinalNavigation(String type, String? referenceId) {
+    debugPrint("🎯 [Router] Đang nhảy vào màn chi tiết: $type");
+
     switch (type) {
       case 'LOW_STOCK':
       case 'INVENTORY_CHANGED':

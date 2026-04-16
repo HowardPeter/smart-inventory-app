@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:dio/dio.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
@@ -39,7 +41,36 @@ class NotificationService {
     await _localNotificationsPlugin.initialize(
       settings: initSettings,
       onDidReceiveNotificationResponse: (NotificationResponse response) {
-        // (Tùy chọn nâng cao) Xử lý khi user click vào popup Local Notification lúc app ĐANG MỞ
+        if (response.payload != null) {
+          try {
+            final Map<String, dynamic> data = jsonDecode(response.payload!);
+            final String type = data['type'] ?? 'UNKNOWN';
+            final String referenceId = data['referenceId'] ?? '';
+            final String storeId = data['storeId'] ?? '';
+
+            debugPrint(
+                "🔔 [Local Noti] Click lúc app đang mở: type=$type, storeId=$storeId");
+
+            // Xử lý báo đã đọc ngầm nếu có notificationId
+            final String notiId = data['notificationId'] ?? '';
+
+            if (notiId.isNotEmpty) {
+              // Dùng hàm ẩn danh (IIFE) để không block luồng chính
+              () async {
+                try {
+                  await _apiClient.patch('/api/notification/$notiId/read');
+                } catch (e) {
+                  debugPrint("Lỗi xử lý đã đọc thông báo: $e");
+                }
+              }();
+            }
+
+            // Giao cho Router điều hướng và Switch Store
+            NotificationRouter.navigate(type, referenceId, storeId);
+          } catch (e) {
+            debugPrint("⚠️ Lỗi parse payload local notification: $e");
+          }
+        }
       },
     );
 
@@ -78,6 +109,7 @@ class NotificationService {
               priority: Priority.high,
             ),
           ),
+          payload: jsonEncode(message.data),
         );
 
         // 👉 THÊM MỚI TẠI ĐÂY: TRIGGER REAL-TIME UI UPDATE
@@ -94,7 +126,8 @@ class NotificationService {
     });
 
     // 5. XỬ LÝ CLICK VÀO THÔNG BÁO TỪ TRẠNG THÁI TẮT HOÀN TOÀN (Terminated)
-    RemoteMessage? initialMessage = await FirebaseMessaging.instance.getInitialMessage();
+    RemoteMessage? initialMessage =
+        await FirebaseMessaging.instance.getInitialMessage();
     if (initialMessage != null) {
       pendingInitialMessage = initialMessage; // Cất vào đây cho Splash xử lý
     }
@@ -119,7 +152,7 @@ class NotificationService {
     if (notificationId.isNotEmpty) {
       () async {
         try {
-          await _apiClient.patch('api/notification/$notificationId/read');
+          await _apiClient.patch('/api/notification/$notificationId/read');
         } catch (e) {
           debugPrint("⚠️ [FCM] Lỗi update trạng thái read: $e");
         }
