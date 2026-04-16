@@ -46,6 +46,13 @@ export class NotificationService {
       return;
     }
 
+    let fcmPriority: 'high' | 'normal' = 'normal';
+    const sound: string = 'default';
+
+    if (['DISCREPANCY_ALERT', 'LOW_STOCK', 'CRITICAL_STOCK'].includes(type)) {
+      fcmPriority = 'high';
+    }
+
     // 4. Đóng gói Payload chuẩn
     const message: MulticastMessage = {
       notification: { title: displayTitle, body },
@@ -57,13 +64,20 @@ export class NotificationService {
       },
       tokens: tokens.map((t) => t.token),
       android: {
-        priority: 'high',
+        priority: fcmPriority,
         notification: {
-          sound: 'default',
-          channelId: 'high_importance_channel',
+          sound: sound,
+          channelId:
+            fcmPriority === 'high'
+              ? 'high_importance_channel'
+              : 'normal_channel',
         },
       },
-      apns: { payload: { aps: { sound: 'default' } } },
+      apns: {
+        payload: {
+          aps: { sound: sound, priority: fcmPriority === 'high' ? 10 : 5 },
+        },
+      },
     };
 
     // 4. Bắn qua Firebase và Dọn dẹp Token rác
