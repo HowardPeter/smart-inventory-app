@@ -9,7 +9,6 @@ export class SmartAlertService {
     this.initEventListeners();
   }
 
-  // 1. LẮNG NGHE SỰ KIỆN REAL-TIME
   private initEventListeners() {
     eventBus.on(
       appEvents.INVENTORY_CHANGED,
@@ -45,7 +44,6 @@ export class SmartAlertService {
     );
   }
 
-  // 2. LOGIC KIỂM TRA CHỐNG SPAM & GỬI ĐÚNG NGƯỜI
   public async checkLowStockRule(
     inventoryId: string,
     providedStoreId?: string,
@@ -131,7 +129,6 @@ export class SmartAlertService {
     );
   }
 
-  // 3. HÀM DÀNH CHO CRON JOB QUÉT ĐỊNH KỲ (Giữ nguyên như của bạn)
   public async scanAllStoresForLowStock() {
     console.info('[Cron] Đang quét toàn hệ thống tìm hàng tồn kho thấp...');
 
@@ -154,7 +151,6 @@ export class SmartAlertService {
       return;
     }
 
-    // Sử dụng interface đã định nghĩa thay vì Record<string, any[]>
     const storeDeficits: Record<string, LowStockInventoryItem[]> = {};
 
     for (const inv of lowInventories) {
@@ -246,7 +242,6 @@ export class SmartAlertService {
       newQuantity: number;
     }>;
   }) {
-    // 1. Query 1 lần lấy thông tin chi tiết của tất cả sản phẩm trong giao dịch
     const inventoryIds = payload.items.map((item) => item.inventoryId);
 
     const inventories = await prisma.inventory.findMany({
@@ -279,12 +274,10 @@ export class SmartAlertService {
       }
     }
 
-    // 3. Nếu không có sản phẩm nào chạm ngưỡng, kết thúc!
     if (lowStockItems.length === 0) {
       return;
     }
 
-    // 4. Nếu có, tái sử dụng hàm gộp để bắn 1 thông báo duy nhất
     await this.processBatchNotification(payload.storeId, lowStockItems);
   }
 

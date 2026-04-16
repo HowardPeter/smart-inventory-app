@@ -14,9 +14,6 @@ class NotificationRouter {
     debugPrint(
         "🚀 [Router] Bắt đầu điều hướng: $type | StoreId: $notificationStoreId");
 
-    // ==========================================
-    // 1. DỌN DẸP UI (Cực kỳ quan trọng để chống kẹt)
-    // ==========================================
     // Nếu user đang mở Dialog / BottomSheet thì phải tắt nó trước
     if (Get.isDialogOpen == true || Get.isBottomSheetOpen == true) {
       Get.back();
@@ -33,9 +30,6 @@ class NotificationRouter {
 
     bool didSwitchStore = false;
 
-    // ==========================================
-    // 2. XỬ LÝ SWITCH STORE VỚI CƠ CHẾ CHỐNG KẸT
-    // ==========================================
     if (needsSwitchStore) {
       try {
         final workspaceProvider = WorkspaceProvider();
@@ -55,7 +49,7 @@ class NotificationRouter {
           () => const Scaffold(
             body: Center(child: CircularProgressIndicator()),
           ),
-          transition: Transition.noTransition, // Không cần animation
+          transition: Transition.noTransition,
         );
 
         // Đợi màn hình tạm hiện ra hoàn tất
@@ -72,9 +66,6 @@ class NotificationRouter {
       }
     }
 
-    // ==========================================
-    // 3. RESET APP & KHỞI TẠO LẠI BỘ ĐIỀU KHIỂN
-    // ==========================================
     if (didSwitchStore || isFromSplash) {
       // Lúc này Get.currentRoute đang là màn hình Loading, lệnh offAllNamed sẽ chạy hoàn hảo 100%
       Get.offAllNamed(AppRoutes.main);
@@ -83,9 +74,6 @@ class NotificationRouter {
       await Future.delayed(const Duration(milliseconds: 600));
     }
 
-    // ==========================================
-    // 4. JUMP VÀO MÀN HÌNH ĐÍCH
-    // ==========================================
     _performFinalNavigation(type, referenceId);
   }
 

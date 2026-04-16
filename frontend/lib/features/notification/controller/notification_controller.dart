@@ -100,9 +100,6 @@ class NotificationController extends GetxController {
   //       .subscribe();
   // }
 
-  // ==========================================
-  // PHÂN TRANG
-  // ==========================================
   void _setupPagination() {
     scrollController.addListener(() {
       if (scrollController.position.pixels >=
@@ -172,9 +169,6 @@ class NotificationController extends GetxController {
     }
   }
 
-  // ==========================================
-  // 3. LOGIC XỬ LÝ DỮ LIỆU
-  // ==========================================
   void _updateUnreadCount() {
     unreadCount.value = notifications.where((n) => !n.isRead).length;
   }
@@ -210,9 +204,6 @@ class NotificationController extends GetxController {
     }
   }
 
-  // ==========================================
-  // XÓA THÔNG BÁO CÓ HỖ TRỢ HOÀN TÁC (UNDO)
-  // ==========================================
   void deleteNotificationWithUndo(NotificationModel item, int index) {
     final context = Get.context;
     if (context == null) return;
@@ -251,7 +242,6 @@ class NotificationController extends GetxController {
           notifications.insert(safeIndex, item);
           _updateUnreadCount();
 
-          // 🌐 DỊCH CHỮ TRONG SNACKBAR LỖI
           TSnackbarsWidget.error(
               title: TTexts.connectionError.tr,
               message: TTexts.cannotDeleteNotification.tr);
@@ -260,11 +250,10 @@ class NotificationController extends GetxController {
     });
   }
 
-  // Hàm chuyển Filter khi bấm nút
   void changeFilter(String newFilter) {
-    if (selectedFilter.value == newFilter) return; // Nếu bấm trùng thì bỏ qua
+    if (selectedFilter.value == newFilter) return;
     selectedFilter.value = newFilter;
-    fetchNotifications(); // Gọi lại API từ trang 1 với filter mới
+    fetchNotifications();
   }
 
   void handleNotificationClick(NotificationModel item) {
@@ -274,9 +263,6 @@ class NotificationController extends GetxController {
     NotificationRouter.navigate(item.type, item.referenceId, item.storeId);
   }
 
-  // ==========================================
-  // HÀM FORMAT THỜI GIAN
-  // ==========================================
   String formatTimeAgo(dynamic timeData) {
     if (timeData == null) return '';
     try {
@@ -285,7 +271,6 @@ class NotificationController extends GetxController {
           : DateTime.parse(timeData.toString()).toLocal();
       final difference = DateTime.now().difference(date);
 
-      // 🌐 DỊCH KHOẢNG THỜI GIAN
       if (difference.inDays > 7) {
         return '${date.day.toString().padLeft(2, '0')}/${date.month.toString().padLeft(2, '0')}/${date.year}';
       } else if (difference.inDays > 0) {
