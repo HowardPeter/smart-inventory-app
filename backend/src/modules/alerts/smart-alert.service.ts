@@ -125,7 +125,7 @@ export class SmartAlertService {
           '⚠️ Low Stock Alert',
           bodyText,
           'LOW_STOCK',
-          inventory.productPackageId,
+          inventory.productPackage?.productId,
         ),
       ),
     );

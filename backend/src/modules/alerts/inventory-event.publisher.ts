@@ -24,6 +24,7 @@ export class InventoryEventPublisher {
     );
     eventBus.emit(appEvents.INVENTORY_CHANGED, payload);
   }
+
   // Hàm phát sự kiện gộp
   public emitBatchInventoryChanged(payload: BatchInventoryPayload): void {
     console.info(

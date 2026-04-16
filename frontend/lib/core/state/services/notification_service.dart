@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:frontend/core/infrastructure/network/app_client.dart';
 import 'package:frontend/features/notification/controller/notification_controller.dart';
+import 'package:frontend/features/notification/utils/notification_router.dart';
 import 'package:get/get.dart';
 
 class NotificationService {
@@ -105,58 +106,33 @@ class NotificationService {
     });
   }
 
-  // --- BỘ ĐỊNH TUYẾN THÔNG MINH ---
+  // Trong notification_service.dart
   static void _handleNotificationTap(RemoteMessage message) {
     final data = message.data;
 
-    // Trích xuất data payload chuẩn
     final String type = data['type'] ?? 'UNKNOWN';
     final String referenceId = data['referenceId'] ?? '';
     final String notificationId = data['notificationId'] ?? '';
+    final String storeId = data['storeId'] ?? '';
 
     debugPrint(
-        "🔔 [FCM] User click thông báo: type=$type, refId=$referenceId, notiId=$notificationId");
+        "🔔 [FCM] Tap Push: type=$type, refId=$referenceId, storeId=$storeId");
 
-    // Gọi API báo đã đọc chạy ngầm (Dùng PATCH)
     if (notificationId.isNotEmpty) {
-      // Dùng async/await lồng trong một Future không chặn (fire-and-forget)
       () async {
         try {
-          await _apiClient.patch('api/notification/$notificationId/read');
+          await _apiClient.patch('/api/notification/$notificationId/read');
+          if (Get.isRegistered<NotificationController>()) {
+            Get.find<NotificationController>().fetchNotifications();
+          }
         } catch (e) {
-          debugPrint("⚠️ [FCM] Lỗi update trạng thái read: $e");
+          debugPrint("⚠️ [FCM] Lỗi: $e");
         }
       }();
     }
 
-    // TODO: Điều hướng GetX dựa theo Use Case
-    switch (type) {
-      case 'LOW_STOCK': // Cảnh báo sắp hết hàng
-      case 'REORDER_SUGGESTION': // Gợi ý nhập hàng
-        if (referenceId.isNotEmpty) {
-          // Bạn nhớ đổi tên route này cho khớp với app của bạn nhé
-          // Get.toNamed('/product-detail', arguments: referenceId);
-        } else {
-          // Get.toNamed('/notification-center');
-        }
-        break;
-
-      case 'ABNORMAL_DISCREPANCY': // Cảnh báo biến động tồn kho bất thường
-        if (referenceId.isNotEmpty) {
-          //Get.toNamed('/inventory-adjustment-history', arguments: referenceId);
-        } else {
-          // Get.toNamed('/notification-center');
-        }
-        break;
-
-      default:
-        // Các thông báo chung (Ví dụ tin tức, update hệ thống...)
-        //  Get.toNamed('/notification-center');
-        break;
-    }
+    NotificationRouter.navigate(type, referenceId, storeId);
   }
-
-  // --- CÁC HÀM GỌI API ĐẾN NODE.JS ---
 
   static Future<void> registerTokenWithBackend() async {
     try {

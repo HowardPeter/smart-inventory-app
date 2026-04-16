@@ -112,7 +112,7 @@ class NotificationMobileScreen extends StatelessWidget {
                           onLongPress: () =>
                               controller.markAsRead(item.notificationId),
                           onTap: () {
-                            // TODO: Xử lý chuyển đến các screen tương ứng dựa trên thông báo
+                            controller.handleNotificationClick(item);
                           },
                         ),
                       ),
