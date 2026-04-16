@@ -16,6 +16,14 @@ interface SingleInventoryPayload {
   newQuantity: number;
 }
 
+interface DiscrepancyPayload {
+  storeId: string;
+  adjustmentId: string;
+  productName: string;
+  systemQuantity: number;
+  actualQuantity: number;
+}
+
 export class InventoryEventPublisher {
   // Phát sự kiện đơn lẻ
   public emitInventoryChanged(payload: SingleInventoryPayload): void {
@@ -31,5 +39,12 @@ export class InventoryEventPublisher {
       `[Event Publisher] Bắn sự kiện BATCH_INVENTORY_CHANGED cho cửa hàng ${payload.storeId} với ${payload.items.length} sản phẩm.`,
     );
     eventBus.emit(appEvents.BATCH_INVENTORY_CHANGED, payload);
+  }
+
+  public emitInventoryDiscrepancy(payload: DiscrepancyPayload): void {
+    console.info(
+      `[Event Publisher] Bắn sự kiện Lệch kho cho ${payload.productName}. Hệ thống: ${payload.systemQuantity}, Thực tế: ${payload.actualQuantity}`,
+    );
+    eventBus.emit(appEvents.INVENTORY_DISCREPANCY, payload);
   }
 }

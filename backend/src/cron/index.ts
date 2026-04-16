@@ -10,6 +10,9 @@ export const initCronJobs = () => {
     async () => {
       console.info('[Cron] Đang chạy kiểm tra tồn kho tự động...');
       await smartAlertService.scanAllStoresForLowStock();
+
+      console.info('[Cron] Đang phân tích gợi ý nhập hàng...');
+      // await smartDecisionService.generateReorderSuggestions();
     },
     {
       timezone: 'Asia/Ho_Chi_Minh',

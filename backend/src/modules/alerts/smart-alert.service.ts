@@ -42,6 +42,21 @@ export class SmartAlertService {
         );
       },
     );
+
+    eventBus.on(
+      appEvents.INVENTORY_DISCREPANCY,
+      (payload: {
+        storeId: string;
+        adjustmentId: string;
+        productName: string;
+        systemQuantity: number;
+        actualQuantity: number;
+      }) => {
+        this.checkDiscrepancyRule(payload).catch((err) =>
+          console.error('Lỗi khi check discrepancy rules:', err),
+        );
+      },
+    );
   }
 
   public async checkLowStockRule(
@@ -290,6 +305,52 @@ export class SmartAlertService {
       },
       select: { userId: true },
     });
+  }
+
+  public async checkDiscrepancyRule(payload: {
+    storeId: string;
+    adjustmentId: string;
+    productName: string;
+    systemQuantity: number;
+    actualQuantity: number;
+  }) {
+    const {
+      storeId,
+      adjustmentId,
+      productName,
+      systemQuantity,
+      actualQuantity,
+    } = payload;
+
+    // Logic Ngưỡng thông minh (Ví dụ: Chỉ báo khi lệch trên 5 sản phẩm)
+    const discrepancy = Math.abs(systemQuantity - actualQuantity);
+
+    if (discrepancy < 5) {
+      return; // Lệch xíu thì bỏ qua, không spam
+    }
+
+    const targetMembers = await this.getTargetMembers(storeId);
+
+    if (targetMembers.length === 0) {
+      return;
+    }
+
+    const actionWord =
+      actualQuantity < systemQuantity ? 'thất thoát' : 'dư thừa';
+    const bodyText = `Phát hiện ${actionWord} ${discrepancy} đơn vị đối với sản phẩm ${productName} trong đợt kiểm kho mới nhất.`;
+
+    await Promise.all(
+      targetMembers.map((member) =>
+        this.notificationService.createAndSendNotification(
+          member.userId,
+          storeId,
+          '⚠️ Cảnh báo Lệch Kho',
+          bodyText,
+          'DISCREPANCY_ALERT', // Khớp với Frontend Router
+          adjustmentId, // Truyền ID phiếu kiểm kho để Frontend điều hướng
+        ),
+      ),
+    );
   }
 }
 
