@@ -1,0 +1,115 @@
+import 'package:flutter/material.dart';
+import 'package:get/get.dart';
+import 'package:frontend/routes/app_routes.dart';
+import 'package:frontend/core/state/services/store_service.dart';
+import 'package:frontend/features/workspace/provider/workspace_provider.dart';
+import 'package:frontend/core/infrastructure/models/store_model.dart';
+import 'package:frontend/core/ui/widgets/t_snackbars_widget.dart';
+
+class NotificationRouter {
+  static Future<void> navigate(
+      String type, String? referenceId, String? notificationStoreId) async {
+    if (type.isEmpty) return;
+
+    debugPrint(
+        "🚀 [Router] Bắt đầu điều hướng: $type | StoreId: $notificationStoreId");
+
+    // Nếu user đang mở Dialog / BottomSheet thì phải tắt nó trước
+    if (Get.isDialogOpen == true || Get.isBottomSheetOpen == true) {
+      Get.back();
+      // Chờ 300ms cho animation đóng popup hoàn tất để tránh xung đột GetX
+      await Future.delayed(const Duration(milliseconds: 300));
+    }
+
+    final storeService = Get.find<StoreService>();
+    bool isFromSplash =
+        Get.currentRoute == AppRoutes.splash || Get.currentRoute.isEmpty;
+    bool needsSwitchStore = notificationStoreId != null &&
+        notificationStoreId.isNotEmpty &&
+        notificationStoreId != storeService.currentStoreId.value;
+
+    bool didSwitchStore = false;
+
+    if (needsSwitchStore) {
+      try {
+        final workspaceProvider = WorkspaceProvider();
+        final List<StoreModel> myStores = await workspaceProvider.getMyStores();
+
+        final targetStore = myStores.firstWhere(
+          (store) => store.storeId == notificationStoreId,
+          orElse: () => throw Exception('Không tìm thấy cửa hàng.'),
+        );
+
+        await storeService.saveSelectedStore(targetStore.storeId,
+            targetStore.name, targetStore.role, targetStore.inviteCode ?? '');
+
+        // Đẩy một màn hình Loading lên trước để đổi Route Context.
+        // Vừa giúp người dùng biết app đang tải dữ liệu Store mới, vừa chống lỗi kẹt của GetX.
+        Get.to(
+          () => const Scaffold(
+            body: Center(child: CircularProgressIndicator()),
+          ),
+          transition: Transition.noTransition,
+        );
+
+        // Đợi màn hình tạm hiện ra hoàn tất
+        await Future.delayed(const Duration(milliseconds: 300));
+
+        didSwitchStore = true;
+        debugPrint("✅ [Router] Cập nhật Database sang Store A thành công.");
+      } catch (e) {
+        debugPrint("⚠️ [Router] Lỗi Switch Store: $e");
+        TSnackbarsWidget.error(
+            title: 'Lỗi', message: 'Không thể truy cập cửa hàng.');
+        if (isFromSplash) Get.offAllNamed(AppRoutes.main);
+        return;
+      }
+    }
+
+    if (didSwitchStore || isFromSplash) {
+      // Lúc này Get.currentRoute đang là màn hình Loading, lệnh offAllNamed sẽ chạy hoàn hảo 100%
+      Get.offAllNamed(AppRoutes.main);
+
+      // Đợi MainScreen build xong các Tab và Controller (Tăng thời gian an toàn)
+      await Future.delayed(const Duration(milliseconds: 600));
+    }
+
+    _performFinalNavigation(type, referenceId);
+  }
+
+  static void _performFinalNavigation(String type, String? referenceId) {
+    debugPrint("🎯 [Router] Đang nhảy vào màn chi tiết: $type");
+
+    switch (type) {
+      case 'LOW_STOCK':
+      case 'INVENTORY_CHANGED':
+        if (referenceId != null && referenceId.isNotEmpty) {
+          Get.toNamed(AppRoutes.inventoryDetail, arguments: referenceId);
+        } else {
+          Get.toNamed(AppRoutes.lowStock);
+        }
+        break;
+
+      case 'BATCH_LOW_STOCK':
+        Get.toNamed(AppRoutes.lowStock);
+        break;
+
+      case 'ORDER_CREATED':
+      case 'IMPORT':
+      case 'EXPORT':
+        if (referenceId != null && referenceId.isNotEmpty) {
+          Get.toNamed(AppRoutes.transactionDetail,
+              arguments: {'id': referenceId});
+        } else {
+          Get.toNamed(AppRoutes.transactionSummary);
+        }
+        break;
+
+      default:
+        if (Get.currentRoute != AppRoutes.notification) {
+          Get.toNamed(AppRoutes.notification);
+        }
+        break;
+    }
+  }
+}

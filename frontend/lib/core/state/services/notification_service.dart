@@ -1,9 +1,12 @@
+import 'dart:convert';
+
 import 'package:dio/dio.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:frontend/core/infrastructure/network/app_client.dart';
 import 'package:frontend/features/notification/controller/notification_controller.dart';
+import 'package:frontend/features/notification/utils/notification_router.dart';
 import 'package:get/get.dart';
 
 class NotificationService {
@@ -13,6 +16,8 @@ class NotificationService {
 
   // Khởi tạo ApiClient (Đã tự động lấy token Supabase gắn vào header)
   static final ApiClient _apiClient = ApiClient();
+
+  static RemoteMessage? pendingInitialMessage;
 
   static Future<void> initialize() async {
     // 1. XIN QUYỀN (Bắt buộc cho iOS & Android 13+)
@@ -36,7 +41,36 @@ class NotificationService {
     await _localNotificationsPlugin.initialize(
       settings: initSettings,
       onDidReceiveNotificationResponse: (NotificationResponse response) {
-        // (Tùy chọn nâng cao) Xử lý khi user click vào popup Local Notification lúc app ĐANG MỞ
+        if (response.payload != null) {
+          try {
+            final Map<String, dynamic> data = jsonDecode(response.payload!);
+            final String type = data['type'] ?? 'UNKNOWN';
+            final String referenceId = data['referenceId'] ?? '';
+            final String storeId = data['storeId'] ?? '';
+
+            debugPrint(
+                "🔔 [Local Noti] Click lúc app đang mở: type=$type, storeId=$storeId");
+
+            // Xử lý báo đã đọc ngầm nếu có notificationId
+            final String notiId = data['notificationId'] ?? '';
+
+            if (notiId.isNotEmpty) {
+              // Dùng hàm ẩn danh (IIFE) để không block luồng chính
+              () async {
+                try {
+                  await _apiClient.patch('/api/notification/$notiId/read');
+                } catch (e) {
+                  debugPrint("Lỗi xử lý đã đọc thông báo: $e");
+                }
+              }();
+            }
+
+            // Giao cho Router điều hướng và Switch Store
+            NotificationRouter.navigate(type, referenceId, storeId);
+          } catch (e) {
+            debugPrint("⚠️ Lỗi parse payload local notification: $e");
+          }
+        }
       },
     );
 
@@ -75,6 +109,7 @@ class NotificationService {
               priority: Priority.high,
             ),
           ),
+          payload: jsonEncode(message.data),
         );
 
         // 👉 THÊM MỚI TẠI ĐÂY: TRIGGER REAL-TIME UI UPDATE
@@ -87,16 +122,14 @@ class NotificationService {
 
     // 4. XỬ LÝ CLICK VÀO THÔNG BÁO TỪ TRẠNG THÁI NGẦM (Background)
     FirebaseMessaging.onMessageOpenedApp.listen((RemoteMessage message) {
-      _handleNotificationTap(message);
+      handleNotificationTap(message); // Nhớ bỏ dấu gạch dưới
     });
 
     // 5. XỬ LÝ CLICK VÀO THÔNG BÁO TỪ TRẠNG THÁI TẮT HOÀN TOÀN (Terminated)
     RemoteMessage? initialMessage =
         await FirebaseMessaging.instance.getInitialMessage();
     if (initialMessage != null) {
-      Future.delayed(const Duration(milliseconds: 500), () {
-        _handleNotificationTap(initialMessage);
-      });
+      pendingInitialMessage = initialMessage; // Cất vào đây cho Splash xử lý
     }
 
     // 6. LẮNG NGHE ĐỔI TOKEN (Firebase tự đổi định kỳ)
@@ -105,58 +138,29 @@ class NotificationService {
     });
   }
 
-  // --- BỘ ĐỊNH TUYẾN THÔNG MINH ---
-  static void _handleNotificationTap(RemoteMessage message) {
+  static void handleNotificationTap(RemoteMessage message) {
     final data = message.data;
 
-    // Trích xuất data payload chuẩn
     final String type = data['type'] ?? 'UNKNOWN';
     final String referenceId = data['referenceId'] ?? '';
     final String notificationId = data['notificationId'] ?? '';
+    final String storeId = data['storeId'] ?? '';
 
     debugPrint(
-        "🔔 [FCM] User click thông báo: type=$type, refId=$referenceId, notiId=$notificationId");
+        "🔔 [FCM] User click thông báo: type=$type, refId=$referenceId, storeId=$storeId");
 
-    // Gọi API báo đã đọc chạy ngầm (Dùng PATCH)
     if (notificationId.isNotEmpty) {
-      // Dùng async/await lồng trong một Future không chặn (fire-and-forget)
       () async {
         try {
-          await _apiClient.patch('api/notification/$notificationId/read');
+          await _apiClient.patch('/api/notification/$notificationId/read');
         } catch (e) {
           debugPrint("⚠️ [FCM] Lỗi update trạng thái read: $e");
         }
       }();
     }
 
-    // TODO: Điều hướng GetX dựa theo Use Case
-    switch (type) {
-      case 'LOW_STOCK': // Cảnh báo sắp hết hàng
-      case 'REORDER_SUGGESTION': // Gợi ý nhập hàng
-        if (referenceId.isNotEmpty) {
-          // Bạn nhớ đổi tên route này cho khớp với app của bạn nhé
-          // Get.toNamed('/product-detail', arguments: referenceId);
-        } else {
-          // Get.toNamed('/notification-center');
-        }
-        break;
-
-      case 'ABNORMAL_DISCREPANCY': // Cảnh báo biến động tồn kho bất thường
-        if (referenceId.isNotEmpty) {
-          //Get.toNamed('/inventory-adjustment-history', arguments: referenceId);
-        } else {
-          // Get.toNamed('/notification-center');
-        }
-        break;
-
-      default:
-        // Các thông báo chung (Ví dụ tin tức, update hệ thống...)
-        //  Get.toNamed('/notification-center');
-        break;
-    }
+    NotificationRouter.navigate(type, referenceId, storeId);
   }
-
-  // --- CÁC HÀM GỌI API ĐẾN NODE.JS ---
 
   static Future<void> registerTokenWithBackend() async {
     try {

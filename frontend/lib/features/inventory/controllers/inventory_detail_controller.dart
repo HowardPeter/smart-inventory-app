@@ -159,7 +159,6 @@ class InventoryDetailController extends GetxController with TErrorHandler {
       relatedPackagesList.assignAll(related);
       currentDisplayItem.value = initialItem;
     } catch (e) {
-      print('👉 [ERROR LÚC FETCH]: $e');
       handleError(e);
     } finally {
       // 🔥 XÓA HÀM update() - CHỈ DÙNG Rx ĐỂ OBX TỰ XỬ LÝ!
