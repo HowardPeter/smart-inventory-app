@@ -81,6 +81,7 @@ class NotificationRouter {
     debugPrint("🎯 [Router] Đang nhảy vào màn chi tiết: $type");
 
     switch (type) {
+      // 1. Nhóm cảnh báo sắp hết hàng (UC-NA-01)
       case 'LOW_STOCK':
       case 'INVENTORY_CHANGED':
         if (referenceId != null && referenceId.isNotEmpty) {
@@ -94,10 +95,35 @@ class NotificationRouter {
         Get.toNamed(AppRoutes.lowStock);
         break;
 
+      // 2. Nhóm gợi ý nhập hàng (UC-NA-02 & UC-SDS-01) - MỚI THÊM
+      case 'REORDER_SUGGESTION':
+      case 'REORDER_REQUIRED':
+        if (referenceId != null && referenceId.isNotEmpty) {
+          // Có thể truyền thêm tham số báo cho màn hình Detail biết cần bật Popup gợi ý nhập hàng
+          Get.toNamed(AppRoutes.inventoryDetail,
+              arguments: referenceId, parameters: {'action': 'reorder'});
+        } else {
+          Get.toNamed(AppRoutes.lowStock);
+        }
+        break;
+
+      // 3. Nhóm Giao dịch (UC-ST-01 -> UC-ST-04)
       case 'ORDER_CREATED':
       case 'IMPORT':
       case 'EXPORT':
         if (referenceId != null && referenceId.isNotEmpty) {
+          Get.toNamed(AppRoutes.transactionDetail,
+              arguments: {'id': referenceId});
+        } else {
+          Get.toNamed(AppRoutes.transactionSummary);
+        }
+        break;
+
+      // 4. Nhóm Cảnh báo lệch kho (UC-NA-03 & UC-ST-05) - MỚI THÊM
+      case 'DISCREPANCY_ALERT':
+      case 'ADJUSTMENT':
+        if (referenceId != null && referenceId.isNotEmpty) {
+          // referenceId lúc này nên là ID của phiếu kiểm kho (Adjustment Transaction)
           Get.toNamed(AppRoutes.transactionDetail,
               arguments: {'id': referenceId});
         } else {
