@@ -102,6 +102,14 @@ final Map<String, String> enInventory = {
   TTexts.viewProductInfo: 'View Product Info',
   TTexts.productDataMissing: 'Product data is missing',
 
+  TTexts.noHistoryAvailable: 'No history available for this item.',
+  TTexts.importGoods: 'Import Goods',
+  TTexts.exportGoods: 'Export Goods',
+  TTexts.stockTake: 'Stock Take',
+  TTexts.stockAdjustmentOrCheck: 'Stock Take / Adjustment',
+  TTexts.currentQty: 'Current Qty',
+  TTexts.errorProductOrPackageIdMissing: 'Product ID or Package ID is missing.',
+
   // --- Transaction Bottom Sheet ở trang Detail ---
   TTexts.addToTransaction: 'Add to Transaction',
   TTexts.enterQuantityToAdd: 'Enter Quantity',

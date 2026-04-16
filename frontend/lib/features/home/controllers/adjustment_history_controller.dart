@@ -30,6 +30,13 @@ class AdjustmentHistoryController extends GetxController with TErrorHandler {
   @override
   void onInit() {
     super.onInit();
+
+    if (Get.arguments != null && Get.arguments is Map) {
+      if (Get.arguments['search'] != null) {
+        searchController.text = Get.arguments['search'];
+      }
+    }
+
     _initDictionaryAndFetchLogs();
   }
 

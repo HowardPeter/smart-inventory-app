@@ -403,6 +403,13 @@ class TTexts {
   static const String inventoryFlow = 'inventory_flow';
   static const String chartTooltipIn = 'chart_tooltip_in';
   static const String chartTooltipOut = 'chart_tooltip_out';
+  static const String noHistoryAvailable = "no_history_available";
+  static const String stockTake = "stock_take";
+  static const String importGoods = "import_goods";
+  static const String exportGoods = "export_goods";
+  static const String stockAdjustmentOrCheck = "stock_adjustment_or_check";
+  static const String currentQty = "current_qty";
+  static const String errorProductOrPackageIdMissing = "error_product_or_package_id_missing";
 
   // -- Chatbot AI
   static const String chatbotName = "chatbot_name";
