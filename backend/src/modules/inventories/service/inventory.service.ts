@@ -233,7 +233,8 @@ export class InventoryService {
           this.inventoryEventPublisher.emitInventoryDiscrepancy({
             storeId,
             adjustmentId: updated.inventoryId,
-            productName: updated.productPackage.displayName ?? 'Sản phẩm',
+            productName:
+              existingInventory.productPackage.displayName ?? 'Sản phẩm',
             systemQuantity: existingInventory.quantity,
             actualQuantity: updated.quantity,
           });

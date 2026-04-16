@@ -57,6 +57,21 @@ export class SmartAlertService {
         );
       },
     );
+
+    eventBus.on(
+      appEvents.LARGE_ORDER_CREATED,
+      (payload: {
+        storeId: string;
+        transactionId: string;
+        type: string;
+        totalPrice: number;
+        itemCount: number;
+      }) => {
+        this.checkTransactionRule(payload).catch((err) =>
+          console.error('Lỗi khi check rules giao dịch:', err),
+        );
+      },
+    );
   }
 
   public async checkLowStockRule(
@@ -293,7 +308,29 @@ export class SmartAlertService {
       return;
     }
 
-    await this.processBatchNotification(payload.storeId, lowStockItems);
+    if (lowStockItems.length === 1) {
+      const inv = lowStockItems[0]!;
+      const productName = inv.productPackage?.displayName ?? 'Product';
+
+      const bodyText = `${productName} is running low (${inv.quantity} units left). Please restock soon!`;
+
+      const targetMembers = await this.getTargetMembers(payload.storeId);
+
+      await Promise.all(
+        targetMembers.map((member) =>
+          this.notificationService.createAndSendNotification(
+            member.userId,
+            payload.storeId,
+            '⚠️ Low Stock Alert',
+            bodyText,
+            'LOW_STOCK',
+            inv.productPackage?.product?.productId,
+          ),
+        ),
+      );
+    } else {
+      await this.processBatchNotification(payload.storeId, lowStockItems);
+    }
   }
 
   private async getTargetMembers(storeId: string) {
@@ -335,19 +372,65 @@ export class SmartAlertService {
       return;
     }
 
-    const actionWord =
-      actualQuantity < systemQuantity ? 'thất thoát' : 'dư thừa';
-    const bodyText = `Phát hiện ${actionWord} ${discrepancy} đơn vị đối với sản phẩm ${productName} trong đợt kiểm kho mới nhất.`;
+    const actionWord = actualQuantity < systemQuantity ? 'loss' : 'surplus';
+    const bodyText = `Detected a ${actionWord} of ${discrepancy} units for ${productName} during the latest inventory adjustment.`;
+    const title = '⚠️ Inventory Discrepancy Alert';
 
     await Promise.all(
       targetMembers.map((member) =>
         this.notificationService.createAndSendNotification(
           member.userId,
           storeId,
-          '⚠️ Cảnh báo Lệch Kho',
+          title,
           bodyText,
-          'DISCREPANCY_ALERT', // Khớp với Frontend Router
-          adjustmentId, // Truyền ID phiếu kiểm kho để Frontend điều hướng
+          'DISCREPANCY_ALERT',
+          adjustmentId,
+        ),
+      ),
+    );
+  }
+
+  public async checkTransactionRule(payload: {
+    storeId: string;
+    transactionId: string;
+    type: string;
+    totalPrice: number;
+    itemCount: number;
+  }) {
+    // Tùy chọn: Nếu bạn không muốn spam đơn nhỏ, có thể bật logic dưới đây
+    // if (payload.totalPrice < 100000) return; // Chỉ báo khi đơn trên 100k
+
+    const targetMembers = await this.getTargetMembers(payload.storeId);
+
+    if (targetMembers.length === 0) {
+      return;
+    }
+
+    // Chuẩn bị nội dung
+    const isImport = payload.type === 'import';
+    const actionType = isImport ? 'import' : 'export';
+    const notiType = isImport ? 'IMPORT' : 'EXPORT';
+
+    const title = isImport
+      ? '📦 Stock Import Completed'
+      : '🚚 Stock Export Completed';
+
+    // Format tiền tệ VNĐ (thêm dấu phẩy)
+    const formattedPrice = new Intl.NumberFormat('en-US').format(
+      payload.totalPrice,
+    );
+    const bodyText = `A successful ${actionType} transaction was recorded. Total value: ${formattedPrice} VND (${payload.itemCount} items).`;
+
+    // Gửi thông báo
+    await Promise.all(
+      targetMembers.map((member) =>
+        this.notificationService.createAndSendNotification(
+          member.userId,
+          payload.storeId,
+          title,
+          bodyText,
+          notiType,
+          payload.transactionId,
         ),
       ),
     );
@@ -365,6 +448,7 @@ interface LowStockInventoryItem {
     displayName: string | null;
     product?: {
       storeId: string | null;
+      productId: string;
     } | null;
   } | null;
 }
