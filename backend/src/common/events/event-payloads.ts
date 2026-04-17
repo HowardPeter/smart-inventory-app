@@ -22,16 +22,6 @@ export interface DiscrepancyPayload {
   actualQuantity: number;
 }
 
-export interface ReorderSuggestionPayload {
-  storeId: string;
-  productId: string;
-  productName: string;
-  currentStock: number;
-  suggestedQuantity: number;
-  suggestedThreshold: number;
-  reason: string;
-}
-
 export interface LowStockInventoryItem {
   inventoryId: string;
   quantity: number;
@@ -42,4 +32,18 @@ export interface LowStockInventoryItem {
       productId: string;
     } | null;
   } | null;
+}
+
+export interface ReorderSuggestionItem {
+  productId: string;
+  productName: string;
+  currentStock: number;
+  suggestedQuantity: number;
+  suggestedThreshold: number;
+  reason: string;
+}
+
+export interface BatchReorderSuggestionPayload {
+  storeId: string;
+  suggestions: ReorderSuggestionItem[];
 }

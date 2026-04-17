@@ -1,7 +1,10 @@
 import { appEvents, eventBus } from '../../common/events/event-bus.js';
 import { prisma } from '../../db/prismaClient.js';
 
-import type { ReorderSuggestionPayload } from '../../common/events/event-payloads.js';
+import type {
+  BatchReorderSuggestionPayload,
+  ReorderSuggestionItem,
+} from '../../common/events/event-payloads.js';
 
 export class SmartDecisionService {
   public async generateReorderSuggestions() {
@@ -23,6 +26,8 @@ export class SmartDecisionService {
         },
       },
     });
+
+    const storeSuggestions: Record<string, ReorderSuggestionItem[]> = {};
 
     for (const inv of inventories) {
       const storeId = inv.productPackage.product.storeId;
@@ -100,18 +105,27 @@ export class SmartDecisionService {
         const suggestedQty = targetStock - inv.quantity;
 
         if (suggestedQty > 0) {
-          const payload: ReorderSuggestionPayload = {
-            storeId: storeId,
+          if (!storeSuggestions[storeId]) {
+            storeSuggestions[storeId] = [];
+          }
+
+          storeSuggestions[storeId].push({
             productId: inv.productPackage.productId,
             productName: inv.productPackage.displayName ?? 'Product',
             currentStock: inv.quantity,
             suggestedQuantity: suggestedQty,
             suggestedThreshold: reorderPoint,
             reason: `Based on sales velocity of ${ads.toFixed(1)} units/day.`,
-          };
-
-          eventBus.emit(appEvents.REORDER_SUGGESTION, payload);
+          });
         }
+      }
+    }
+
+    for (const [storeId, suggestions] of Object.entries(storeSuggestions)) {
+      if (suggestions.length > 0) {
+        const payload: BatchReorderSuggestionPayload = { storeId, suggestions };
+
+        eventBus.emit(appEvents.BATCH_REORDER_SUGGESTION, payload);
       }
     }
 

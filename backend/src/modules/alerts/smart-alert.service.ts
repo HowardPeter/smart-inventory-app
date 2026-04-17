@@ -5,8 +5,8 @@ import { NotificationRepository } from '../notification/repositories/notificatio
 import { NotificationService } from '../notification/services/notification.service.js';
 
 import type {
+  BatchReorderSuggestionPayload,
   LowStockInventoryItem,
-  ReorderSuggestionPayload,
 } from '../../common/events/event-payloads.js';
 
 export class SmartAlertService {
@@ -93,10 +93,10 @@ export class SmartAlertService {
     );
 
     eventBus.on(
-      appEvents.REORDER_SUGGESTION,
-      (payload: ReorderSuggestionPayload) => {
-        this.handleReorderSuggestion(payload).catch((err) =>
-          console.error('Error handling reorder suggestion:', err),
+      appEvents.BATCH_REORDER_SUGGESTION,
+      (payload: BatchReorderSuggestionPayload) => {
+        this.handleBatchReorderSuggestion(payload).catch((err) =>
+          console.error('Error handling batch reorder suggestion:', err),
         );
       },
     );
@@ -488,15 +488,37 @@ export class SmartAlertService {
     );
   }
 
-  private async handleReorderSuggestion(payload: ReorderSuggestionPayload) {
+  private async handleBatchReorderSuggestion(
+    payload: BatchReorderSuggestionPayload,
+  ) {
     const targetMembers = await this.getTargetMembers(payload.storeId);
 
     if (targetMembers.length === 0) {
       return;
     }
 
-    const title = '💡 Smart Reorder Suggestion';
-    const bodyText = `Recommendation: Restock ${payload.suggestedQuantity} units for ${payload.productName}. (Current: ${payload.currentStock}, Reason: ${payload.reason})`;
+    const totalSuggestions = payload.suggestions.length;
+    let title = '💡 Smart Reorder Suggestion';
+    let bodyText = '';
+
+    // Logic sinh văn bản thông minh chống Spam
+    if (totalSuggestions === 1) {
+      const item = payload.suggestions[0]!;
+
+      bodyText = `Recommendation: Restock ${item.suggestedQuantity} units for ${item.productName}.`;
+    } else if (totalSuggestions === 2) {
+      const names = payload.suggestions.map((s) => s.productName).join(' and ');
+
+      bodyText = `Recommendation: Restock required for ${names}. Tap to view details.`;
+    } else {
+      const names = payload.suggestions
+        .slice(0, 2)
+        .map((s) => s.productName)
+        .join(', ');
+
+      bodyText = `Recommendation: ${totalSuggestions} items need restocking (including ${names}...). Tap to view details.`;
+      title = '💡 Daily Reorder Summary';
+    }
 
     await Promise.all(
       targetMembers.map((member) =>
@@ -506,7 +528,7 @@ export class SmartAlertService {
           title,
           bodyText,
           'REORDER_SUGGESTION',
-          payload.productId,
+          undefined,
         ),
       ),
     );
