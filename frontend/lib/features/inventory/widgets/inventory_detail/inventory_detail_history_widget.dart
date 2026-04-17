@@ -15,54 +15,9 @@ class InventoryDetailHistoryWidget extends GetView<InventoryDetailController> {
   Widget build(BuildContext context) {
     return Obx(() {
       final history = controller.inventoryHistory;
-      final lastCount = controller.lastCount;
-      final currentQty = controller.quantity;
-
       return Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          if (lastCount > 0 || history.isNotEmpty)
-            Container(
-              margin: const EdgeInsets.symmetric(
-                  horizontal: AppSizes.p20, vertical: 8),
-              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-              decoration: BoxDecoration(
-                color: AppColors.softGrey.withOpacity(0.1),
-                borderRadius: BorderRadius.circular(AppSizes.radius8),
-                border: Border.all(color: AppColors.divider.withOpacity(0.5)),
-              ),
-              child: Row(
-                children: [
-                  const Icon(Iconsax.info_circle_copy,
-                      size: 18, color: AppColors.subText),
-                  const SizedBox(width: 12),
-                  Expanded(
-                    child: RichText(
-                      text: TextSpan(
-                        style: const TextStyle(
-                            fontSize: 13,
-                            color: AppColors.subText,
-                            fontFamily: 'Poppins'),
-                        children: [
-                          TextSpan(text: "${TTexts.latestInventoryCount.tr}: "),
-                          TextSpan(
-                              text: "$lastCount",
-                              style: const TextStyle(
-                                  fontWeight: FontWeight.bold,
-                                  color: AppColors.primaryText)),
-                          TextSpan(text: "  •  ${TTexts.currentQty.tr}: "),
-                          TextSpan(
-                              text: "$currentQty",
-                              style: const TextStyle(
-                                  fontWeight: FontWeight.bold,
-                                  color: AppColors.primaryText)),
-                        ],
-                      ),
-                    ),
-                  ),
-                ],
-              ),
-            ),
           if (history.isEmpty)
             Padding(
               padding: const EdgeInsets.symmetric(vertical: AppSizes.p16),
@@ -88,7 +43,7 @@ class InventoryDetailHistoryWidget extends GetView<InventoryDetailController> {
                     separatorBuilder: (_, __) => const SizedBox(height: 12),
                     itemBuilder: (context, index) {
                       final item = history[index];
-                      return _buildHistoryCard(item);
+                      return _buildHistoryCard(item, index);
                     },
                   ),
                 ),
@@ -104,73 +59,76 @@ class InventoryDetailHistoryWidget extends GetView<InventoryDetailController> {
     });
   }
 
-  Widget _buildHistoryCard(InventoryHistoryModel item) {
+  Widget _buildHistoryCard(InventoryHistoryModel item, int index) {
     final isOut = item.type == InventoryActionType.stockOut;
     final isAdjust = item.type == InventoryActionType.adjust;
 
+    // Logic xác định dấu và màu sắc dựa trên giá trị qty
     String displayQty = "";
     Color displayColor = AppColors.primary;
 
     if (isAdjust) {
-      // Nếu là điều chỉnh: dựa vào số âm/dương của qty
       displayQty = item.qty > 0 ? "+${item.qty}" : "${item.qty}";
       displayColor = item.qty > 0
           ? AppColors.stockIn
           : (item.qty < 0 ? AppColors.alertText : AppColors.primary);
     } else if (isOut) {
-      // Nếu là xuất kho: luôn hiển thị dấu trừ
       displayQty = "-${item.qty.abs()}";
       displayColor = AppColors.alertText;
     } else {
-      // Nếu là nhập kho: luôn hiển thị dấu cộng
       displayQty = "+${item.qty.abs()}";
       displayColor = AppColors.stockIn;
     }
 
-    return Container(
-      decoration: BoxDecoration(
-        color: AppColors.surface,
-        borderRadius: BorderRadius.circular(AppSizes.radius16),
-        border: Border.all(
-          color: isAdjust
-              ? AppColors.primary.withOpacity(0.3)
-              : AppColors.divider.withOpacity(0.5),
-          width: 1.0,
+    return GestureDetector(
+      onTap: () => controller.openHistoryDetails(index),
+      child: Container(
+        decoration: BoxDecoration(
+          color: AppColors.surface,
+          borderRadius: BorderRadius.circular(AppSizes.radius16),
+          border: Border.all(
+            color: isAdjust
+                ? AppColors.primary.withOpacity(0.3)
+                : AppColors.divider.withOpacity(0.5),
+            width: 1.0,
+          ),
         ),
-      ),
-      child: ListTile(
-        contentPadding:
-            const EdgeInsets.symmetric(horizontal: AppSizes.p16, vertical: 4),
-        leading: Container(
-          padding: const EdgeInsets.all(10),
-          decoration: BoxDecoration(
-              color: isAdjust
-                  ? AppColors.primary.withOpacity(0.1)
-                  : (isOut
-                      ? AppColors.toastWarningBg
-                      : AppColors.toastSuccessBg),
-              shape: BoxShape.circle),
-          child: Icon(
-              isAdjust
-                  ? Iconsax.clipboard_tick_copy
-                  : (isOut ? Iconsax.arrow_up_3_copy : Iconsax.arrow_down_copy),
-              color: isAdjust
-                  ? AppColors.primary
-                  : (isOut ? AppColors.alertText : AppColors.stockIn),
-              size: 18),
+        child: ListTile(
+          contentPadding:
+              const EdgeInsets.symmetric(horizontal: AppSizes.p16, vertical: 4),
+          leading: Container(
+            padding: const EdgeInsets.all(10),
+            decoration: BoxDecoration(
+                color: isAdjust
+                    ? AppColors.primary.withOpacity(0.1)
+                    : (isOut
+                        ? AppColors.toastWarningBg
+                        : AppColors.toastSuccessBg),
+                shape: BoxShape.circle),
+            child: Icon(
+                isAdjust
+                    ? Icons.sync_alt_rounded
+                    : (isOut
+                        ? Iconsax.arrow_up_3_copy
+                        : Iconsax.arrow_down_copy),
+                color: isAdjust
+                    ? AppColors.primary
+                    : (isOut ? AppColors.alertText : AppColors.stockIn),
+                size: 18),
+          ),
+          title: Text(item.note,
+              style: TextStyle(
+                  fontSize: 14,
+                  fontWeight: isAdjust ? FontWeight.bold : FontWeight.w600)),
+          subtitle: Text(item.date,
+              style: const TextStyle(fontSize: 12, color: AppColors.subText)),
+          trailing: Text(displayQty,
+              style: TextStyle(
+                  fontSize: 16,
+                  fontWeight: FontWeight.bold,
+                  color: displayColor,
+                  fontFamily: 'Poppins')),
         ),
-        title: Text(item.note,
-            style: TextStyle(
-                fontSize: 14,
-                fontWeight: isAdjust ? FontWeight.bold : FontWeight.w600)),
-        subtitle: Text(item.date,
-            style: const TextStyle(fontSize: 12, color: AppColors.subText)),
-        trailing: Text(displayQty,
-            style: TextStyle(
-                fontSize: 16,
-                fontWeight: FontWeight.bold,
-                color: displayColor,
-                fontFamily: 'Poppins')),
       ),
     );
   }

@@ -437,7 +437,7 @@ class HomeController extends GetxController with TErrorHandler {
   void openDetails(HomeAdjustmentModel model) {
     TBottomSheetWidget.show(
       child: HomeAdjustmentDetailsBottomSheet(
-        icon: "📦",
+        icon: "📝",
         productName: model.productName,
         date: model.time,
         oldQty: model.oldQuantity,

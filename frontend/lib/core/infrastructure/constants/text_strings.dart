@@ -365,6 +365,7 @@ class TTexts {
   static const String noLowStock = 'no_low_stock';
   static const String noLowStockDesc = 'no_low_stock_desc';
   static const String stockLeft = 'stock_left';
+  static const String qtyChange = "qty_change";
 
   // -- Low Stock
   static const String outOfStockSection = 'out_of_stock_section';
@@ -409,7 +410,8 @@ class TTexts {
   static const String exportGoods = "export_goods";
   static const String stockAdjustmentOrCheck = "stock_adjustment_or_check";
   static const String currentQty = "current_qty";
-  static const String errorProductOrPackageIdMissing = "error_product_or_package_id_missing";
+  static const String errorProductOrPackageIdMissing =
+      "error_product_or_package_id_missing";
 
   // -- Chatbot AI
   static const String chatbotName = "chatbot_name";
@@ -890,6 +892,7 @@ class TTexts {
       'report_transactions_overview';
   static const String exportFailedTitle = 'export_failed_title';
   static const String exportFailedMessage = 'export_failed_message';
+  static const String amount = "amount";
 
   // -- Report Transaction Detail
   static const String totalItems = 'total_items';

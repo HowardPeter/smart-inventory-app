@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:frontend/core/infrastructure/constants/text_strings.dart'; // ĐÃ THÊM
 import 'package:frontend/core/ui/theme/app_colors.dart';
 import 'package:frontend/core/ui/theme/app_sizes.dart';
+import 'package:get/get.dart'; // ĐÃ THÊM
 import 'package:iconsax_flutter/iconsax_flutter.dart';
 
 class ReportTransactionCardWidget extends StatelessWidget {
@@ -50,19 +52,19 @@ class ReportTransactionCardWidget extends StatelessWidget {
       child: Column(
         children: [
           _buildRow(
-            'Transaction Number',
+            TTexts.transactionId.tr,
             transactionId,
             rightWidget: _buildFakeBarcode(),
           ),
           const SizedBox(height: 20),
           _buildRow(
-            'Transaction Date',
+            TTexts.transactionDate.tr,
             dateStr,
             rightWidget: Column(
               crossAxisAlignment: CrossAxisAlignment.end,
               children: [
-                const Text('Transaction Type',
-                    style: TextStyle(
+                Text(TTexts.transactionType.tr,
+                    style: const TextStyle(
                         fontSize: 10,
                         fontWeight: FontWeight.w500,
                         color: AppColors.subText)),
@@ -113,7 +115,6 @@ class ReportTransactionCardWidget extends StatelessWidget {
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       crossAxisAlignment: CrossAxisAlignment.center,
       children: [
-        // ĐÃ FIX: Bọc Expanded và ép Ellipsis (...) để không bị tràn ID dài
         Expanded(
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
@@ -132,13 +133,11 @@ class ReportTransactionCardWidget extends StatelessWidget {
                           fontWeight: FontWeight.w400,
                           color: AppColors.primaryText,
                           fontFamily: 'Poppins'),
-                      overflow: TextOverflow.ellipsis, // Cắt "..."
+                      overflow: TextOverflow.ellipsis,
                       maxLines: 1),
             ],
           ),
         ),
-
-        // ĐÃ FIX: Thêm khoảng trắng để chữ không dính sát vào Barcode / Icon
         if (rightWidget != null) ...[
           const SizedBox(width: 24),
           rightWidget,

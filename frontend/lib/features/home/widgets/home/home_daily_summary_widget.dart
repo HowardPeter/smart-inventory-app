@@ -196,16 +196,16 @@ class HomeDailySummaryWidget extends GetView<HomeController> {
               inQty.toString(),
               style: const TextStyle(
                   fontFamily: 'Poppins',
-                  fontSize: 18,
-                  fontWeight: FontWeight.w600,
+                  fontSize: 16,
+                  fontWeight: FontWeight.w500,
                   color: AppColors.stockIn),
             ),
             Text(
               outQty.toString(),
               style: const TextStyle(
                   fontFamily: 'Poppins',
-                  fontSize: 18,
-                  fontWeight: FontWeight.w600,
+                  fontSize: 16,
+                  fontWeight: FontWeight.w500,
                   color: AppColors.stockOut),
             ),
           ],

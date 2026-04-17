@@ -4,7 +4,6 @@ import 'package:get/get.dart';
 import 'package:frontend/core/infrastructure/constants/text_strings.dart';
 import 'package:frontend/core/ui/theme/app_colors.dart';
 import 'package:frontend/features/home/controllers/home_controller.dart';
-import 'package:intl/intl.dart';
 import 'home_transaction_item_widget.dart';
 
 class HomeTransactionListWidget extends GetView<HomeController> {
@@ -40,9 +39,7 @@ class HomeTransactionListWidget extends GetView<HomeController> {
           return Column(
             children: recentList.map((t) {
               final type = t.type.toLowerCase();
-              final date = t.createdAt ?? DateTime.now();
-              final formattedTime =
-                  DateFormat('hh:mm a').format(date.toLocal());
+              final time = t.createdAt ?? DateTime.now();
 
               IconData icon;
               Color color;
@@ -75,7 +72,7 @@ class HomeTransactionListWidget extends GetView<HomeController> {
                 icon: icon,
                 iconColor: color,
                 title: title,
-                time: formattedTime,
+                time: time,
                 amount: displayAmount,
                 isPositive: isPositive,
               );

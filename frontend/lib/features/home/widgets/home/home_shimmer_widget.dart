@@ -10,7 +10,7 @@ class HomeShimmerWidget extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        // 1. KHUNG CHỜ CHO HEADER 
+        // 1. KHUNG CHỜ CHO HEADER
         Padding(
           padding: const EdgeInsets.fromLTRB(
               AppSizes.p16, AppSizes.p24, AppSizes.p16, AppSizes.p8),
@@ -27,13 +27,12 @@ class HomeShimmerWidget extends StatelessWidget {
                       height: 16, width: 140, radius: AppSizes.radius8),
                 ],
               ),
-              _buildSkeleton(
-                  height: 48, width: 48, radius: 16), // Khung Nút chuông
+              _buildSkeleton(height: 48, width: 48, radius: 16),
             ],
           ),
         ),
 
-        // 2. KHUNG CHỜ CHO BODY 
+        // 2. KHUNG CHỜ CHO BODY
         Padding(
           padding: const EdgeInsets.symmetric(horizontal: AppSizes.p16),
           child: Column(

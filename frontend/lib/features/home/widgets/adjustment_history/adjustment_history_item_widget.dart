@@ -1,14 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:frontend/core/infrastructure/constants/text_strings.dart';
+import 'package:frontend/core/infrastructure/utils/day_formatter_utils.dart';
 import 'package:frontend/core/ui/theme/app_colors.dart';
 import 'package:frontend/core/ui/theme/app_sizes.dart';
 import 'package:frontend/features/home/model/adjustment_history_model.dart';
 import 'package:get/get.dart';
-import 'package:intl/intl.dart';
 
 class AdjustmentHistoryItemWidget extends StatelessWidget {
   final AdjustmentHistoryModel model;
-  final VoidCallback onTap; // ĐÃ THÊM ONTAP
+  final VoidCallback onTap;
 
   const AdjustmentHistoryItemWidget({
     super.key,
@@ -18,13 +18,13 @@ class AdjustmentHistoryItemWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final timeStr = DateFormat('hh:mm a').format(model.performedAt);
+    final timeStr = DayFormatterUtils.formatTime(model.performedAt);
     final diffStr = model.difference == 0
         ? '0'
         : (model.isPositive ? '+${model.difference}' : '${model.difference}');
 
     return GestureDetector(
-      onTap: onTap, // GẮN HÀM MỞ BOTTOM SHEET
+      onTap: onTap,
       child: Container(
         margin: const EdgeInsets.only(bottom: AppSizes.p12),
         padding: const EdgeInsets.all(AppSizes.p16),
@@ -76,13 +76,17 @@ class AdjustmentHistoryItemWidget extends StatelessWidget {
                               fontSize: 13,
                               color: AppColors.softGrey)),
                       const SizedBox(width: 12),
-                      Text(
-                          "${TTexts.qty.tr}: ${model.oldQuantity} → ${model.newQuantity}",
-                          style: const TextStyle(
-                              fontFamily: 'Poppins',
-                              fontSize: 13,
-                              fontWeight: FontWeight.w500,
-                              color: AppColors.subText)),
+                      Expanded(
+                        child: Text(
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                            "${TTexts.qty.tr}: ${model.oldQuantity} → ${model.newQuantity}",
+                            style: const TextStyle(
+                                fontFamily: 'Poppins',
+                                fontSize: 13,
+                                fontWeight: FontWeight.w500,
+                                color: AppColors.subText)),
+                      ),
                     ],
                   ),
                 ],
@@ -93,8 +97,8 @@ class AdjustmentHistoryItemWidget extends StatelessWidget {
               diffStr,
               style: TextStyle(
                 fontFamily: 'Poppins',
-                fontSize: 18,
-                fontWeight: FontWeight.bold,
+                fontSize: 16,
+                fontWeight: FontWeight.w500,
                 color:
                     model.isPositive ? AppColors.stockIn : AppColors.stockOut,
               ),

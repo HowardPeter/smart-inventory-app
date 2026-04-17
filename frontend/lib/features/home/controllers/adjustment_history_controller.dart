@@ -245,7 +245,7 @@ class AdjustmentHistoryController extends GetxController with TErrorHandler {
   void openDetails(AdjustmentHistoryModel model) {
     TBottomSheetWidget.show(
       child: HomeAdjustmentDetailsBottomSheet(
-        icon: "📦",
+        icon: "📝",
         productName: model.productName,
         date: model.performedAt,
         oldQty: model.oldQuantity,
