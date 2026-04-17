@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:frontend/core/infrastructure/constants/text_strings.dart';
+// import 'package:frontend/core/infrastructure/constants/text_strings.dart';
 import 'package:frontend/core/ui/theme/app_colors.dart';
 import 'package:frontend/core/ui/theme/app_sizes.dart';
 import 'package:frontend/features/profile/controllers/profile_controller.dart';
@@ -19,14 +19,14 @@ class ProfileHeaderWidget extends StatelessWidget {
     const color = AppColors.gradientOrangeStart;
 
     return SizedBox(
-      height: 240,
+      height: 200,
       child: Stack(
         clipBehavior: Clip.none,
         alignment: Alignment.topCenter,
         children: [
           // header background
           Container(
-            height: 180,
+            height: 140,
             width: double.infinity,
             decoration: BoxDecoration(
               gradient: LinearGradient(
@@ -42,26 +42,17 @@ class ProfileHeaderWidget extends StatelessWidget {
                 bottomRight: Radius.circular(AppSizes.p48),
               ),
             ),
-            child: SafeArea(
+            child: const SafeArea(
               bottom: false,
               child: Padding(
-                padding: const EdgeInsets.only(top: AppSizes.p8),
-                child: Text(
-                  TTexts.profileTitle.tr,
-                  textAlign: TextAlign.center,
-                  style: const TextStyle(
-                    color: AppColors.whiteText,
-                    fontSize: 22,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
+                padding: EdgeInsets.only(top: AppSizes.p8),
               ),
             ),
           ),
 
           // avt
           Positioned(
-            top: 125,
+            top: 80,
             child: Obx(() {
               final name = controller.fullName.value;
               final initial = getInitial(name);
