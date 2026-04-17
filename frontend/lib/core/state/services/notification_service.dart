@@ -5,9 +5,14 @@ import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:frontend/core/infrastructure/network/app_client.dart';
+import 'package:frontend/core/ui/widgets/t_snackbars_widget.dart';
 import 'package:frontend/features/notification/controller/notification_controller.dart';
 import 'package:frontend/features/notification/utils/notification_router.dart';
+import 'package:frontend/routes/app_routes.dart';
 import 'package:get/get.dart';
+import 'package:get_storage/get_storage.dart';
+import 'package:google_sign_in/google_sign_in.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
 
 class NotificationService {
   static final FirebaseMessaging _messaging = FirebaseMessaging.instance;
@@ -19,7 +24,9 @@ class NotificationService {
 
   static RemoteMessage? pendingInitialMessage;
 
-  static Future<void> initialize() async {
+  final supabase = Supabase.instance.client;
+
+  static Future<void> initialize({SupabaseClient? supabase}) async {
     // 1. XIN QUYỀN (Bắt buộc cho iOS & Android 13+)
     await _messaging.requestPermission(
       alert: true,
@@ -87,9 +94,10 @@ class NotificationService {
         ?.createNotificationChannel(channel);
 
     // 3. LẮNG NGHE KHI APP ĐANG MỞ (Foreground) -> Hiển thị popup nổi
-    FirebaseMessaging.onMessage.listen((RemoteMessage message) {
+    FirebaseMessaging.onMessage.listen((RemoteMessage message) async {
       RemoteNotification? notification = message.notification;
       AndroidNotification? android = message.notification?.android;
+      final type = message.data['type'];
 
       if (notification != null && android != null) {
         _localNotificationsPlugin.show(
@@ -112,10 +120,26 @@ class NotificationService {
           payload: jsonEncode(message.data),
         );
 
-        // 👉 THÊM MỚI TẠI ĐÂY: TRIGGER REAL-TIME UI UPDATE
         // Cập nhật lại danh sách thông báo nếu user đang mở màn hình Notification
         if (Get.isRegistered<NotificationController>()) {
           Get.find<NotificationController>().fetchNotifications();
+        }
+
+        if (type == 'ROLE_UPDATED') {
+          TSnackbarsWidget.warning(
+              title: 'Quyền hạn thay đổi',
+              message: 'Vui lòng đăng nhập lại để cập nhật quyền hạn mới.');
+
+          await supabase!.auth.signOut();
+          // Đăng xuất Google để lần sau hiện lại popup chọn tài khoản
+          await GoogleSignIn.instance.signOut();
+
+          // 2. Xoá StoreID hoặc data local
+          GetStorage().remove('STORE_ID');
+
+          // 3. Điều hướng về màn Login
+          Get.offAllNamed(AppRoutes.login);
+          return;
         }
       }
     });

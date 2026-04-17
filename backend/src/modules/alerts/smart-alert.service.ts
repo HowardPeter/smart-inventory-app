@@ -72,6 +72,20 @@ export class SmartAlertService {
         );
       },
     );
+
+    eventBus.on(
+      appEvents.ROLE_UPDATED,
+      (payload: {
+        targetUserId: string;
+        storeId: string;
+        oldRole: string;
+        newRole: string;
+      }) => {
+        this.checkRoleUpdatedRule(payload).catch((err) =>
+          console.error('Lỗi khi xử lý thông báo đổi role:', err),
+        );
+      },
+    );
   }
 
   public async checkLowStockRule(
@@ -433,6 +447,30 @@ export class SmartAlertService {
           payload.transactionId,
         ),
       ),
+    );
+  }
+
+  public async checkRoleUpdatedRule(payload: {
+    targetUserId: string;
+    storeId: string;
+    oldRole: string;
+    newRole: string;
+  }) {
+    // Chữ in hoa cho đẹp (vd: từ 'staff' -> 'MANAGER')
+    const oldRoleCap = payload.oldRole.toUpperCase();
+    const newRoleCap = payload.newRole.toUpperCase();
+
+    const title = '🔒 Permissions Updated';
+    const bodyText = `Your role has been updated from ${oldRoleCap} to ${newRoleCap}. Please log in again to apply changes.`;
+
+    // Gửi thông báo đích danh cho người bị đổi quyền
+    await this.notificationService.createAndSendNotification(
+      payload.targetUserId, // Gửi đúng cho 1 người này
+      payload.storeId,
+      title,
+      bodyText,
+      'ROLE_UPDATED',
+      undefined,
     );
   }
 }
