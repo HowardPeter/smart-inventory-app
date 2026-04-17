@@ -58,33 +58,33 @@ class StoreItemWidget extends StatelessWidget {
 
     return Container(
       margin: const EdgeInsets.symmetric(
-        vertical: 7,
+        vertical: AppSizes.p7,
         horizontal: AppSizes.p16,
       ),
       child: Material(
         color: Colors.transparent,
         child: InkWell(
           onTap: onTap,
-          borderRadius: BorderRadius.circular(24),
+          borderRadius: BorderRadius.circular(AppSizes.radius24),
           child: Ink(
-            padding: const EdgeInsets.all(14),
+            padding: const EdgeInsets.all(AppSizes.p14),
             decoration: BoxDecoration(
               color: AppColors.white,
-              borderRadius: BorderRadius.circular(24),
+              borderRadius: BorderRadius.circular(AppSizes.radius24),
               border: Border.all(
                 color: roleColor.withOpacity(0.20),
-                width: 1.2,
+                width: AppSizes.p1_2,
               ),
               boxShadow: [
                 BoxShadow(
                   color: Colors.black.withOpacity(0.03),
-                  blurRadius: 16,
-                  offset: const Offset(0, 6),
+                  blurRadius: AppSizes.p16,
+                  offset: const Offset(0, AppSizes.p6),
                 ),
                 BoxShadow(
                   color: roleColor.withOpacity(0.08),
-                  blurRadius: 10,
-                  offset: const Offset(0, 4),
+                  blurRadius: AppSizes.p10,
+                  offset: const Offset(0, AppSizes.p4),
                 ),
               ],
             ),
@@ -92,9 +92,9 @@ class StoreItemWidget extends StatelessWidget {
               children: [
                 // AVATAR
                 Container(
-                  width: 58,
-                  height: 58,
-                  padding: const EdgeInsets.all(3),
+                  width: AppSizes.p58,
+                  height: AppSizes.p58,
+                  padding: const EdgeInsets.all(AppSizes.p3),
                   decoration: BoxDecoration(
                     shape: BoxShape.circle,
                     gradient: LinearGradient(
@@ -117,7 +117,7 @@ class StoreItemWidget extends StatelessWidget {
                   ),
                 ),
 
-                const SizedBox(width: 14),
+                const SizedBox(width: AppSizes.p14),
 
                 // TEXT
                 Expanded(
@@ -130,26 +130,26 @@ class StoreItemWidget extends StatelessWidget {
                         overflow: TextOverflow.ellipsis,
                         style: const TextStyle(
                           fontWeight: FontWeight.w800,
-                          fontSize: 16.5,
-                          color: Color(0xFF1A1C1E),
-                          letterSpacing: -0.3,
+                          fontSize: AppSizes.p16_5,
+                          color: AppColors.primaryText,
+                          letterSpacing: AppSizes.p0_3,
                         ),
                       ),
-                      const SizedBox(height: 6),
+                      const SizedBox(height: AppSizes.p6),
                       Row(
                         mainAxisSize: MainAxisSize.min,
                         children: [
                           Icon(
                             getRoleIcon(),
-                            size: 14,
+                            size: AppSizes.p14,
                             color: roleColor.withOpacity(0.85),
                           ),
-                          const SizedBox(width: 6),
+                          const SizedBox(width: AppSizes.p6),
                           Text(
                             displayRole,
                             style: TextStyle(
                               color: roleColor.withOpacity(0.85),
-                              fontSize: 13,
+                              fontSize: AppSizes.p13,
                               fontWeight: FontWeight.w600,
                             ),
                           ),
@@ -161,15 +161,15 @@ class StoreItemWidget extends StatelessWidget {
 
                 // ICON
                 Container(
-                  width: 32,
-                  height: 32,
+                  width: AppSizes.p32,
+                  height: AppSizes.p32,
                   decoration: BoxDecoration(
                     color: roleColor.withOpacity(0.08),
                     shape: BoxShape.circle,
                   ),
                   child: Icon(
                     Iconsax.arrow_down,
-                    size: 15,
+                    size: AppSizes.p15,
                     color: roleColor.withOpacity(0.7),
                   ),
                 ),

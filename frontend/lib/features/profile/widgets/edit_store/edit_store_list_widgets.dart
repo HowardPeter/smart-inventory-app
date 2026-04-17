@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:frontend/core/infrastructure/constants/text_strings.dart';
 import 'package:frontend/core/ui/widgets/t_empty_state_widget.dart';
 import 'package:frontend/features/profile/controllers/profile_edit_store_controller.dart';
 import 'package:frontend/features/profile/widgets/edit_store/t_form_item_skeleton_widget.dart';
@@ -29,7 +30,7 @@ class EditStoreListWidgets extends StatelessWidget {
               child: Text(
                 "Members",
                 style: TextStyle(
-                  fontSize: 16,
+                  fontSize: AppSizes.p16,
                   fontWeight: FontWeight.w700,
                   color: AppColors.primaryText,
                 ),
@@ -44,10 +45,10 @@ class EditStoreListWidgets extends StatelessWidget {
 
       // Đã load xong mà không có member thật
       if (controller.filteredMembers.isEmpty) {
-        return const TEmptyStateWidget(
+        return TEmptyStateWidget(
           icon: Icons.people_outline_rounded,
-          title: 'No members found',
-          subtitle: 'This store does not have any members yet.',
+          title: TTexts.profileNoMembers.tr,
+          subtitle: TTexts.profileNoMembersSubtitle.tr,
         );
       }
 
@@ -63,7 +64,7 @@ class EditStoreListWidgets extends StatelessWidget {
             child: Text(
               "Members (${controller.memberCount.value})",
               style: const TextStyle(
-                fontSize: 16,
+                fontSize: AppSizes.p16,
                 fontWeight: FontWeight.w700,
                 color: AppColors.primaryText,
               ),

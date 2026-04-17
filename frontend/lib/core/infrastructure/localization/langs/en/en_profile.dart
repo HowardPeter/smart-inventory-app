@@ -82,7 +82,8 @@ final Map<String, String> enProfile = {
   TTexts.logoutErrorTitle: 'Logout Failed',
   TTexts.editStoreTitleDialog: 'Edit Store',
   TTexts.editStoreSubtitleDialog: 'You can update the store information here.',
-  TTexts.editStoreDialogDescription: 'Are you sure you want to update your store profile?',
+  TTexts.editStoreDialogDescription:
+      'Are you sure you want to update your store profile?',
   TTexts.profileUpdateError: 'Failed to update profile',
 
   //Assign Role
@@ -94,4 +95,8 @@ final Map<String, String> enProfile = {
   TTexts.assignsRoleOwner: 'Owner',
   TTexts.assignsRoleManager: 'Manager',
   TTexts.assignsRoleStaff: 'Staff',
+
+  //Member List
+  TTexts.profileNoMembers: 'No members found',
+  TTexts.profileNoMembersSubtitle: 'There are no members in this store.',
 };

@@ -943,7 +943,13 @@ class TTexts {
   static const String assignsRoleOwner = 'assigns_role_owner';
   static const String assignsRoleSearchHint = 'assigns_role_search_hint';
 
+  //Member 
+  static const String profileNoMembers = 'profile_no_members';
+  static const String profileNoMembersSubtitle = 'profile_no_members_subtitle';
+
   //-- System
   static const String systemSnackbarTitle = "system_snackbar_title";
   static const String systemSnackbar403Error = "system_snackbar_403_error";
+
+ 
 }
