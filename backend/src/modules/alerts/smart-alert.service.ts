@@ -6,6 +6,7 @@ import { NotificationService } from '../notification/services/notification.servi
 
 import type {
   BatchReorderSuggestionPayload,
+  DiscrepancyPayload,
   LowStockInventoryItem,
 } from '../../common/events/event-payloads.js';
 
@@ -53,9 +54,11 @@ export class SmartAlertService {
       (payload: {
         storeId: string;
         adjustmentId: string;
-        productName: string;
-        systemQuantity: number;
-        actualQuantity: number;
+        items: Array<{
+          productName: string;
+          systemQuantity: number;
+          actualQuantity: number;
+        }>;
       }) => {
         this.checkDiscrepancyRule(payload).catch((err) =>
           console.error('Lỗi khi check discrepancy rules:', err),
@@ -372,26 +375,17 @@ export class SmartAlertService {
     });
   }
 
-  public async checkDiscrepancyRule(payload: {
-    storeId: string;
-    adjustmentId: string;
-    productName: string;
-    systemQuantity: number;
-    actualQuantity: number;
-  }) {
-    const {
-      storeId,
-      adjustmentId,
-      productName,
-      systemQuantity,
-      actualQuantity,
-    } = payload;
+  public async checkDiscrepancyRule(payload: DiscrepancyPayload) {
+    const { storeId, adjustmentId, items } = payload;
 
-    // Logic Ngưỡng thông minh (Ví dụ: Chỉ báo khi lệch trên 5 sản phẩm)
-    const discrepancy = Math.abs(systemQuantity - actualQuantity);
+    // Lọc ra các item có độ lệch bất thường (Ví dụ: lệch từ 5 đơn vị trở lên)
+    const abnormalItems = items.filter(
+      (item) => Math.abs(item.systemQuantity - item.actualQuantity) >= 5,
+    );
 
-    if (discrepancy < 5) {
-      return; // Lệch xíu thì bỏ qua, không spam
+    // Nếu không có sản phẩm nào lệch quá ngưỡng, dừng lại không báo
+    if (abnormalItems.length === 0) {
+      return;
     }
 
     const targetMembers = await this.getTargetMembers(storeId);
@@ -400,10 +394,32 @@ export class SmartAlertService {
       return;
     }
 
-    const actionWord = actualQuantity < systemQuantity ? 'loss' : 'surplus';
-    const bodyText = `Detected a ${actionWord} of ${discrepancy} units for ${productName} during the latest inventory adjustment.`;
+    const totalAbnormal = abnormalItems.length;
+    let bodyText = '';
     const title = '⚠️ Inventory Discrepancy Alert';
 
+    // Xử lý nội dung hiển thị: 1 sản phẩm vs Nhiều sản phẩm
+    if (totalAbnormal === 1) {
+      const item = abnormalItems[0]!;
+      const discrepancy = Math.abs(item.systemQuantity - item.actualQuantity);
+      const actionWord =
+        item.actualQuantity < item.systemQuantity ? 'loss' : 'surplus';
+
+      bodyText = `Detected a ${actionWord} of ${discrepancy} units for ${item.productName} during the latest inventory adjustment.`;
+    } else if (totalAbnormal === 2) {
+      const names = abnormalItems.map((i) => i.productName).join(' and ');
+
+      bodyText = `Detected abnormal discrepancies for ${names}. Please review the adjustment record.`;
+    } else {
+      const names = abnormalItems
+        .slice(0, 2)
+        .map((i) => i.productName)
+        .join(', ');
+
+      bodyText = `Detected abnormal discrepancies for ${totalAbnormal} items (including ${names}...). Please review the adjustment record.`;
+    }
+
+    // Bắn thông báo
     await Promise.all(
       targetMembers.map((member) =>
         this.notificationService.createAndSendNotification(
@@ -425,7 +441,7 @@ export class SmartAlertService {
     totalPrice: number;
     itemCount: number;
   }) {
-    if (payload.totalPrice < 100000) {
+    if (payload.totalPrice < 50) {
       return;
     }
 
