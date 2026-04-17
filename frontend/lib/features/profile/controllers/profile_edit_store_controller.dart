@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:frontend/core/infrastructure/models/store_member_model.dart';
 import 'package:get/get.dart';
 import 'package:dio/dio.dart';
 import 'package:geolocator/geolocator.dart';
@@ -32,8 +33,15 @@ class ProfileEditStoreController extends GetxController {
   final isLoading = false.obs;
   final isLoadingAddress = false.obs;
   final isEditing = false.obs;
+
   final storeAddress = ''.obs;
   final memberCount = 0.obs;
+
+  // Members states
+  final isLoadingMembers = false.obs;
+  final hasLoadedMembers = false.obs;
+  final members = <StoreMemberModel>[].obs;
+  final filteredMembers = <StoreMemberModel>[].obs;
 
   final selectedLocation = const LatLng(10.762622, 106.660172).obs;
   final addressPredictions = <dynamic>[].obs;
@@ -45,6 +53,7 @@ class ProfileEditStoreController extends GetxController {
     super.onInit();
     _initializeFields();
     loadStoreExtraData();
+    loadMembers(showLoading: true);
   }
 
   /// Nạp dữ liệu cũ vào các ô nhập liệu khi vừa mở dialog
@@ -57,33 +66,111 @@ class ProfileEditStoreController extends GetxController {
     }
   }
 
-  /// Load địa chỉ thật + số member thật từ database
+  /// Load địa chỉ thật từ database
   Future<void> loadStoreExtraData() async {
     try {
       final storeId = _storeService.currentStoreId.value;
       if (storeId.isEmpty) return;
 
-      /// 1. Lấy chi tiết store
       final store = await _storeProvider.getStoreDetail(storeId);
       final fetchedAddress = (store['address'] ?? '').toString();
 
       storeAddress.value = fetchedAddress;
 
-      /// sync luôn vào form + service nếu cần
       if (fetchedAddress.isNotEmpty) {
         addressController.text = fetchedAddress;
         await _storeService.saveStoreAddress(fetchedAddress);
       }
-
-      /// 2. Lấy danh sách thành viên
-      final members = await _storeMemberProvider.getStoreMembers(storeId);
-      memberCount.value = members.length;
     } catch (e) {
       debugPrint("Load store extra data error: $e");
     }
   }
 
-  /// Bật / tắt mode chỉnh sửa
+  /// Load danh sách nhân viên cửa hàng hiện tại
+  Future<void> loadMembers({bool showLoading = false}) async {
+    try {
+      final storeId = _storeService.currentStoreId.value;
+
+      if (storeId.isEmpty) {
+        debugPrint("StoreId đang rỗng, không thể load members");
+        members.clear();
+        filteredMembers.clear();
+        memberCount.value = 0;
+        hasLoadedMembers.value = true;
+        return;
+      }
+
+      if (showLoading) {
+        isLoadingMembers.value = true;
+      }
+
+      final data = await _storeMemberProvider.getStoreMembers(storeId);
+
+      final mappedMembers = data.map<StoreMemberModel>((item) {
+        return StoreMemberModel.fromJson(
+          Map<String, dynamic>.from(item as Map),
+        );
+      }).toList();
+
+      members.assignAll(mappedMembers);
+      filteredMembers.assignAll(mappedMembers);
+      memberCount.value = mappedMembers.length;
+    } catch (e) {
+      debugPrint("Lỗi load members: $e");
+
+      if (members.isEmpty) {
+        filteredMembers.clear();
+        memberCount.value = 0;
+      }
+    } finally {
+      isLoadingMembers.value = false;
+      hasLoadedMembers.value = true;
+    }
+  }
+
+  /// Refresh dữ liệu members
+  Future<void> refreshMembers() async {
+    await loadMembers(showLoading: false);
+  }
+
+  /// Thêm member mới vào list local để UI cập nhật ngay
+  void addMemberToList(StoreMemberModel newMember) {
+    final alreadyExists = members.any((m) => m.userId == newMember.userId);
+    if (alreadyExists) return;
+
+    members.add(newMember);
+    filteredMembers.add(newMember);
+    memberCount.value = members.length;
+  }
+
+  /// Xóa member local
+  void removeMemberFromList(String userId) {
+    members.removeWhere((m) => m.userId == userId);
+    filteredMembers.removeWhere((m) => m.userId == userId);
+    memberCount.value = members.length;
+  }
+
+  /// Update role local
+  void updateMemberRole({
+    required String userId,
+    required String newRole,
+  }) {
+    final memberIndex = members.indexWhere((m) => m.userId == userId);
+    if (memberIndex != -1) {
+      members[memberIndex] = members[memberIndex].copyWith(role: newRole);
+    }
+
+    final filteredIndex = filteredMembers.indexWhere((m) => m.userId == userId);
+    if (filteredIndex != -1) {
+      filteredMembers[filteredIndex] =
+          filteredMembers[filteredIndex].copyWith(role: newRole);
+    }
+
+    members.refresh();
+    filteredMembers.refresh();
+  }
+
+  /// Bật/tắt mode chỉnh sửa
   void toggleEditing() {
     if (isLoading.value) return;
     isEditing.value = !isEditing.value;
@@ -228,10 +315,8 @@ class ProfileEditStoreController extends GetxController {
   /// Logic cập nhật thông tin cửa hàng
   Future<void> updateStoreDetails() async {
     try {
-      // 1. Kiểm tra Validate Form (ô trống, định dạng...)
       if (!editStoreFormKey.currentState!.validate()) return;
 
-      // 2. Kiểm tra dữ liệu trống
       if (!hasAllRequiredFields) {
         TSnackbarsWidget.warning(
           title: TTexts.errorTitle.tr,
@@ -240,17 +325,14 @@ class ProfileEditStoreController extends GetxController {
         return;
       }
 
-      // 3. Nếu không có thay đổi thì thoát edit
       if (!hasChanged) {
         isEditing.value = false;
         return;
       }
 
-      // 4. Hiện Loading
       isLoading.value = true;
       FullScreenLoaderUtils.openLoadingDialog(TTexts.loadingTitle.tr);
 
-      // 5. Chuẩn bị dữ liệu gửi lên Backend
       final Map<String, dynamic> updateData = {
         'name': currentName,
         'address': currentAddress,
@@ -258,26 +340,23 @@ class ProfileEditStoreController extends GetxController {
         'longitude': selectedLocation.value.longitude,
       };
 
-      // 6. Gọi Provider để cập nhật vào Database
       await _storeProvider.updateStore(updateData);
 
-      // 7. Cập nhật lại RAM
       await _storeService.updateStoreInfo(
         name: currentName,
         address: currentAddress,
       );
 
-      /// Cập nhật lại state hiển thị card ngay
       storeAddress.value = currentAddress;
 
-      // 8. Tắt Loading
       FullScreenLoaderUtils.stopLoading();
 
-      // 9. Trở về readonly + đóng dialog trước
+      await loadStoreExtraData();
+      await loadMembers();
+
       isEditing.value = false;
       Get.back();
 
-      // 10. Hiện snackbar sau khi dialog đã đóng
       Future.delayed(const Duration(milliseconds: 100), () {
         TSnackbarsWidget.success(
           title: TTexts.successTitle.tr,

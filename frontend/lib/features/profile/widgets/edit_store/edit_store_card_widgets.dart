@@ -29,7 +29,7 @@ class EditStoreCardWidgets extends StatelessWidget {
             style: const TextStyle(
               color: AppColors.primary,
               fontWeight: FontWeight.w700,
-              fontSize: 15,
+              fontSize: 18,
             ),
           ),
           const SizedBox(height: 12),
@@ -37,10 +37,11 @@ class EditStoreCardWidgets extends StatelessWidget {
             () => Container(
               padding: const EdgeInsets.all(AppSizes.p16),
               decoration: BoxDecoration(
-                color: AppColors.white,
+                color: AppColors.primary.withOpacity(0.03),
                 borderRadius: BorderRadius.circular(AppSizes.radius16),
                 border: Border.all(
-                  color: AppColors.primary.withOpacity(0.12),
+                  color: AppColors.primary,
+                  width: 1.2,
                 ),
                 boxShadow: [
                   BoxShadow(
