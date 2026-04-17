@@ -25,7 +25,7 @@ class NotificationRouter {
     }
     final supabase = Supabase.instance.client;
     final storeService = Get.find<StoreService>();
-    
+
     bool isFromSplash =
         Get.currentRoute == AppRoutes.splash || Get.currentRoute.isEmpty;
     bool needsSwitchStore = notificationStoreId != null &&
@@ -124,13 +124,16 @@ class NotificationRouter {
         }
         break;
 
-      // 4. Nhóm Cảnh báo lệch kho (UC-NA-03 & UC-ST-05) - MỚI THÊM
+      // 4. Nhóm Cảnh báo lệch kho
       case 'DISCREPANCY_ALERT':
       case 'ADJUSTMENT':
         if (referenceId != null && referenceId.isNotEmpty) {
-          // referenceId lúc này nên là ID của phiếu kiểm kho (Adjustment Transaction)
-          Get.toNamed(AppRoutes.transactionDetail,
-              arguments: {'id': referenceId});
+          final searchQuery = '[Lô-$referenceId]';
+
+          Get.toNamed(
+            AppRoutes.adjustmentHistory,
+            arguments: {'batchId': searchQuery},
+          );
         } else {
           Get.toNamed(AppRoutes.transactionSummary);
         }
