@@ -35,7 +35,6 @@ class StoreProvider {
     try {
       await _apiClient.patch('/api/stores/', data: data);
     } catch (e) {
-      print('Lỗi khi cập nhật thông tin cửa hàng: $e');
       rethrow;
     }
   }

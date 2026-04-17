@@ -4,7 +4,6 @@ import 'package:frontend/core/ui/theme/app_colors.dart';
 import 'package:frontend/core/ui/theme/app_sizes.dart';
 import 'package:frontend/features/profile/controllers/profile_controller.dart';
 import 'package:get/get.dart';
-import 'package:get/get_utils/src/extensions/internacionalization.dart';
 
 class ChangePasswordHeaderWidget extends StatelessWidget {
   const ChangePasswordHeaderWidget({super.key});
