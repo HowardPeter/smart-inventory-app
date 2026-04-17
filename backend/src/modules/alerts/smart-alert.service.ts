@@ -4,6 +4,11 @@ import { prisma } from '../../db/prismaClient.js';
 import { NotificationRepository } from '../notification/repositories/notification.repository.js';
 import { NotificationService } from '../notification/services/notification.service.js';
 
+import type {
+  BatchReorderSuggestionPayload,
+  LowStockInventoryItem,
+} from '../../common/events/event-payloads.js';
+
 export class SmartAlertService {
   constructor(private readonly notificationService: NotificationService) {
     this.initEventListeners();
@@ -39,6 +44,59 @@ export class SmartAlertService {
       }) => {
         this.checkBatchLowStockRule(payload).catch((err) =>
           console.error('Lỗi khi check batch rules:', err),
+        );
+      },
+    );
+
+    eventBus.on(
+      appEvents.INVENTORY_DISCREPANCY,
+      (payload: {
+        storeId: string;
+        adjustmentId: string;
+        productName: string;
+        systemQuantity: number;
+        actualQuantity: number;
+      }) => {
+        this.checkDiscrepancyRule(payload).catch((err) =>
+          console.error('Lỗi khi check discrepancy rules:', err),
+        );
+      },
+    );
+
+    eventBus.on(
+      appEvents.LARGE_ORDER_CREATED,
+      (payload: {
+        storeId: string;
+        transactionId: string;
+        type: string;
+        totalPrice: number;
+        itemCount: number;
+      }) => {
+        this.checkTransactionRule(payload).catch((err) =>
+          console.error('Lỗi khi check rules giao dịch:', err),
+        );
+      },
+    );
+
+    eventBus.on(
+      appEvents.ROLE_UPDATED,
+      (payload: {
+        targetUserId: string;
+        storeId: string;
+        oldRole: string;
+        newRole: string;
+      }) => {
+        this.checkRoleUpdatedRule(payload).catch((err) =>
+          console.error('Lỗi khi xử lý thông báo đổi role:', err),
+        );
+      },
+    );
+
+    eventBus.on(
+      appEvents.BATCH_REORDER_SUGGESTION,
+      (payload: BatchReorderSuggestionPayload) => {
+        this.handleBatchReorderSuggestion(payload).catch((err) =>
+          console.error('Error handling batch reorder suggestion:', err),
         );
       },
     );
@@ -278,7 +336,29 @@ export class SmartAlertService {
       return;
     }
 
-    await this.processBatchNotification(payload.storeId, lowStockItems);
+    if (lowStockItems.length === 1) {
+      const inv = lowStockItems[0]!;
+      const productName = inv.productPackage?.displayName ?? 'Product';
+
+      const bodyText = `${productName} is running low (${inv.quantity} units left). Please restock soon!`;
+
+      const targetMembers = await this.getTargetMembers(payload.storeId);
+
+      await Promise.all(
+        targetMembers.map((member) =>
+          this.notificationService.createAndSendNotification(
+            member.userId,
+            payload.storeId,
+            '⚠️ Low Stock Alert',
+            bodyText,
+            'LOW_STOCK',
+            inv.productPackage?.product?.productId,
+          ),
+        ),
+      );
+    } else {
+      await this.processBatchNotification(payload.storeId, lowStockItems);
+    }
   }
 
   private async getTargetMembers(storeId: string) {
@@ -291,19 +371,170 @@ export class SmartAlertService {
       select: { userId: true },
     });
   }
+
+  public async checkDiscrepancyRule(payload: {
+    storeId: string;
+    adjustmentId: string;
+    productName: string;
+    systemQuantity: number;
+    actualQuantity: number;
+  }) {
+    const {
+      storeId,
+      adjustmentId,
+      productName,
+      systemQuantity,
+      actualQuantity,
+    } = payload;
+
+    // Logic Ngưỡng thông minh (Ví dụ: Chỉ báo khi lệch trên 5 sản phẩm)
+    const discrepancy = Math.abs(systemQuantity - actualQuantity);
+
+    if (discrepancy < 5) {
+      return; // Lệch xíu thì bỏ qua, không spam
+    }
+
+    const targetMembers = await this.getTargetMembers(storeId);
+
+    if (targetMembers.length === 0) {
+      return;
+    }
+
+    const actionWord = actualQuantity < systemQuantity ? 'loss' : 'surplus';
+    const bodyText = `Detected a ${actionWord} of ${discrepancy} units for ${productName} during the latest inventory adjustment.`;
+    const title = '⚠️ Inventory Discrepancy Alert';
+
+    await Promise.all(
+      targetMembers.map((member) =>
+        this.notificationService.createAndSendNotification(
+          member.userId,
+          storeId,
+          title,
+          bodyText,
+          'DISCREPANCY_ALERT',
+          adjustmentId,
+        ),
+      ),
+    );
+  }
+
+  public async checkTransactionRule(payload: {
+    storeId: string;
+    transactionId: string;
+    type: string;
+    totalPrice: number;
+    itemCount: number;
+  }) {
+    // Tùy chọn: Nếu bạn không muốn spam đơn nhỏ, có thể bật logic dưới đây
+    // if (payload.totalPrice < 100000) return; // Chỉ báo khi đơn trên 100k
+
+    const targetMembers = await this.getTargetMembers(payload.storeId);
+
+    if (targetMembers.length === 0) {
+      return;
+    }
+
+    // Chuẩn bị nội dung
+    const isImport = payload.type === 'import';
+    const actionType = isImport ? 'import' : 'export';
+    const notiType = isImport ? 'IMPORT' : 'EXPORT';
+
+    const title = isImport
+      ? '📦 Stock Import Completed'
+      : '🚚 Stock Export Completed';
+
+    // Format tiền tệ VNĐ (thêm dấu phẩy)
+    const formattedPrice = new Intl.NumberFormat('en-US').format(
+      payload.totalPrice,
+    );
+    const bodyText = `A successful ${actionType} transaction was recorded. Total value: ${formattedPrice} VND (${payload.itemCount} items).`;
+
+    // Gửi thông báo
+    await Promise.all(
+      targetMembers.map((member) =>
+        this.notificationService.createAndSendNotification(
+          member.userId,
+          payload.storeId,
+          title,
+          bodyText,
+          notiType,
+          payload.transactionId,
+        ),
+      ),
+    );
+  }
+
+  public async checkRoleUpdatedRule(payload: {
+    targetUserId: string;
+    storeId: string;
+    oldRole: string;
+    newRole: string;
+  }) {
+    // Chữ in hoa cho đẹp (vd: từ 'staff' -> 'MANAGER')
+    const oldRoleCap = payload.oldRole.toUpperCase();
+    const newRoleCap = payload.newRole.toUpperCase();
+
+    const title = '🔒 Permissions Updated';
+    const bodyText = `Your role has been updated from ${oldRoleCap} to ${newRoleCap}. Please log in again to apply changes.`;
+
+    // Gửi thông báo đích danh cho người bị đổi quyền
+    await this.notificationService.createAndSendNotification(
+      payload.targetUserId, // Gửi đúng cho 1 người này
+      payload.storeId,
+      title,
+      bodyText,
+      'ROLE_UPDATED',
+      undefined,
+    );
+  }
+
+  private async handleBatchReorderSuggestion(
+    payload: BatchReorderSuggestionPayload,
+  ) {
+    const targetMembers = await this.getTargetMembers(payload.storeId);
+
+    if (targetMembers.length === 0) {
+      return;
+    }
+
+    const totalSuggestions = payload.suggestions.length;
+    let title = '💡 Smart Reorder Suggestion';
+    let bodyText = '';
+
+    // Logic sinh văn bản thông minh chống Spam
+    if (totalSuggestions === 1) {
+      const item = payload.suggestions[0]!;
+
+      bodyText = `Recommendation: Restock ${item.suggestedQuantity} units for ${item.productName}.`;
+    } else if (totalSuggestions === 2) {
+      const names = payload.suggestions.map((s) => s.productName).join(' and ');
+
+      bodyText = `Recommendation: Restock required for ${names}. Tap to view details.`;
+    } else {
+      const names = payload.suggestions
+        .slice(0, 2)
+        .map((s) => s.productName)
+        .join(', ');
+
+      bodyText = `Recommendation: ${totalSuggestions} items need restocking (including ${names}...). Tap to view details.`;
+      title = '💡 Daily Reorder Summary';
+    }
+
+    await Promise.all(
+      targetMembers.map((member) =>
+        this.notificationService.createAndSendNotification(
+          member.userId,
+          payload.storeId,
+          title,
+          bodyText,
+          'REORDER_SUGGESTION',
+          undefined,
+        ),
+      ),
+    );
+  }
 }
 
 export const smartAlertService = new SmartAlertService(
   new NotificationService(new NotificationRepository()),
 );
-
-interface LowStockInventoryItem {
-  inventoryId: string;
-  quantity: number;
-  productPackage?: {
-    displayName: string | null;
-    product?: {
-      storeId: string | null;
-    } | null;
-  } | null;
-}

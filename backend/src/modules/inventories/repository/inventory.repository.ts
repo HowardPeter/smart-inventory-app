@@ -277,10 +277,14 @@ export class InventoryRepository {
     storeId: string,
     productPackageIds: string[],
   ): Promise<
-    Pick<
-      InventoryResponseDto,
-      'inventoryId' | 'quantity' | 'productPackageId'
-    >[]
+    Array<
+      Pick<
+        InventoryResponseDto,
+        'inventoryId' | 'quantity' | 'productPackageId'
+      > & {
+        productPackage: { displayName: string | null };
+      }
+    >
   > {
     if (productPackageIds.length === 0) {
       return [];
@@ -304,6 +308,11 @@ export class InventoryRepository {
         inventoryId: true,
         productPackageId: true,
         quantity: true,
+        productPackage: {
+          select: {
+            displayName: true,
+          },
+        },
       },
     });
   }

@@ -229,6 +229,17 @@ export class InventoryService {
 
         const changedQty = updated.quantity - existingInventory.quantity;
 
+        if (Math.abs(changedQty) >= 5) {
+          this.inventoryEventPublisher.emitInventoryDiscrepancy({
+            storeId,
+            adjustmentId: updated.inventoryId,
+            productName:
+              existingInventory.productPackage.displayName ?? 'Sản phẩm',
+            systemQuantity: existingInventory.quantity,
+            actualQuantity: updated.quantity,
+          });
+        }
+
         // Ghi AuditLog độc lập cho từng productPackageId
         await auditLogRepositoryTx.createLog({
           actionType: 'update',

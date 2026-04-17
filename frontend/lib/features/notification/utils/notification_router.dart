@@ -5,6 +5,9 @@ import 'package:frontend/core/state/services/store_service.dart';
 import 'package:frontend/features/workspace/provider/workspace_provider.dart';
 import 'package:frontend/core/infrastructure/models/store_model.dart';
 import 'package:frontend/core/ui/widgets/t_snackbars_widget.dart';
+import 'package:get_storage/get_storage.dart';
+import 'package:google_sign_in/google_sign_in.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
 
 class NotificationRouter {
   static Future<void> navigate(
@@ -20,8 +23,9 @@ class NotificationRouter {
       // Chờ 300ms cho animation đóng popup hoàn tất để tránh xung đột GetX
       await Future.delayed(const Duration(milliseconds: 300));
     }
-
+    final supabase = Supabase.instance.client;
     final storeService = Get.find<StoreService>();
+    
     bool isFromSplash =
         Get.currentRoute == AppRoutes.splash || Get.currentRoute.isEmpty;
     bool needsSwitchStore = notificationStoreId != null &&
@@ -74,13 +78,15 @@ class NotificationRouter {
       await Future.delayed(const Duration(milliseconds: 600));
     }
 
-    _performFinalNavigation(type, referenceId);
+    _performFinalNavigation(type, referenceId, supabase);
   }
 
-  static void _performFinalNavigation(String type, String? referenceId) {
+  static Future<void> _performFinalNavigation(
+      String type, String? referenceId, SupabaseClient? supabase) async {
     debugPrint("🎯 [Router] Đang nhảy vào màn chi tiết: $type");
 
     switch (type) {
+      // 1. Nhóm cảnh báo sắp hết hàng (UC-NA-01)
       case 'LOW_STOCK':
       case 'INVENTORY_CHANGED':
         if (referenceId != null && referenceId.isNotEmpty) {
@@ -94,6 +100,19 @@ class NotificationRouter {
         Get.toNamed(AppRoutes.lowStock);
         break;
 
+      // 2. Nhóm gợi ý nhập hàng (UC-NA-02 & UC-SDS-01) - MỚI THÊM
+      case 'REORDER_SUGGESTION':
+      case 'REORDER_REQUIRED':
+        if (referenceId != null && referenceId.isNotEmpty) {
+          // Có thể truyền thêm tham số báo cho màn hình Detail biết cần bật Popup gợi ý nhập hàng
+          Get.toNamed(AppRoutes.inventoryDetail,
+              arguments: referenceId, parameters: {'action': 'reorder'});
+        } else {
+          Get.toNamed(AppRoutes.lowStock);
+        }
+        break;
+
+      // 3. Nhóm Giao dịch (UC-ST-01 -> UC-ST-04)
       case 'ORDER_CREATED':
       case 'IMPORT':
       case 'EXPORT':
@@ -103,6 +122,35 @@ class NotificationRouter {
         } else {
           Get.toNamed(AppRoutes.transactionSummary);
         }
+        break;
+
+      // 4. Nhóm Cảnh báo lệch kho (UC-NA-03 & UC-ST-05) - MỚI THÊM
+      case 'DISCREPANCY_ALERT':
+      case 'ADJUSTMENT':
+        if (referenceId != null && referenceId.isNotEmpty) {
+          // referenceId lúc này nên là ID của phiếu kiểm kho (Adjustment Transaction)
+          Get.toNamed(AppRoutes.transactionDetail,
+              arguments: {'id': referenceId});
+        } else {
+          Get.toNamed(AppRoutes.transactionSummary);
+        }
+        break;
+
+      case 'ROLE_UPDATED':
+        TSnackbarsWidget.warning(
+            title: 'Phiên đăng nhập hết hạn',
+            message:
+                'Quyền hạn của bạn đã bị thay đổi, vui lòng đăng nhập lại.');
+
+        await supabase!.auth.signOut();
+        // Đăng xuất Google để lần sau hiện lại popup chọn tài khoản
+        await GoogleSignIn.instance.signOut();
+
+        // 2. Xoá StoreID hoặc data local
+        GetStorage().remove('STORE_ID');
+
+        // 3. Điều hướng về màn Login
+        Get.offAllNamed(AppRoutes.login);
         break;
 
       default:

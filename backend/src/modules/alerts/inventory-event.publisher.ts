@@ -1,20 +1,10 @@
 import { appEvents, eventBus } from '../../common/events/event-bus.js';
 
-interface BatchInventoryPayload {
-  storeId: string;
-  items: Array<{
-    inventoryId: string;
-    oldQuantity: number;
-    newQuantity: number;
-  }>;
-}
-
-interface SingleInventoryPayload {
-  inventoryId: string;
-  storeId: string;
-  oldQuantity: number;
-  newQuantity: number;
-}
+import type {
+  BatchInventoryPayload,
+  DiscrepancyPayload,
+  SingleInventoryPayload,
+} from '../../common/events/event-payloads.js';
 
 export class InventoryEventPublisher {
   // Phát sự kiện đơn lẻ
@@ -31,5 +21,12 @@ export class InventoryEventPublisher {
       `[Event Publisher] Bắn sự kiện BATCH_INVENTORY_CHANGED cho cửa hàng ${payload.storeId} với ${payload.items.length} sản phẩm.`,
     );
     eventBus.emit(appEvents.BATCH_INVENTORY_CHANGED, payload);
+  }
+
+  public emitInventoryDiscrepancy(payload: DiscrepancyPayload): void {
+    console.info(
+      `[Event Publisher] Bắn sự kiện Lệch kho cho ${payload.productName}. Hệ thống: ${payload.systemQuantity}, Thực tế: ${payload.actualQuantity}`,
+    );
+    eventBus.emit(appEvents.INVENTORY_DISCREPANCY, payload);
   }
 }
