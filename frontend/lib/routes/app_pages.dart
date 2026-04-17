@@ -160,7 +160,7 @@ class AppPages {
       name: AppRoutes.joinStore,
       page: () => const JoinStoreView(),
       binding: JoinStoreBinding(),
-      transition: Transition.rightToLeft,
+      transition: Transition.cupertino,
     ),
 
     // -- Add member
@@ -168,7 +168,7 @@ class AppPages {
       name: AppRoutes.addMembers,
       page: () => const AddMembersView(),
       binding: AddMembersBinding(),
-      transition: Transition.rightToLeft,
+      transition: Transition.cupertino,
     ),
 
     // -- Main (Navigation)

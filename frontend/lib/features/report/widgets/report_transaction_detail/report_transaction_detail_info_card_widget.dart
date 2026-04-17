@@ -1,12 +1,12 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
-import 'package:frontend/core/infrastructure/constants/text_strings.dart'; 
+import 'package:frontend/core/infrastructure/constants/text_strings.dart';
 import 'package:frontend/core/infrastructure/models/transaction_model.dart';
+import 'package:frontend/core/infrastructure/utils/day_formatter_utils.dart';
 import 'package:frontend/core/state/services/store_service.dart';
 import 'package:frontend/core/state/services/user_service.dart';
 import 'package:frontend/core/ui/theme/app_colors.dart';
 import 'package:get/get.dart';
-import 'package:intl/intl.dart';
 
 class ReportTransactionDetailInfoCardWidget extends StatelessWidget {
   final TransactionModel tx;
@@ -107,10 +107,8 @@ class ReportTransactionDetailInfoCardWidget extends StatelessWidget {
               TTexts.transactionId.tr, tx.transactionId ?? TTexts.na.tr,
               isBold: true),
           const SizedBox(height: 12),
-          _buildInfoRow(
-              TTexts.dateAndTime.tr,
-              DateFormat('dd MMM yyyy, HH:mm')
-                  .format(tx.createdAt ?? DateTime.now())),
+          _buildInfoRow(TTexts.dateAndTime.tr,
+              DayFormatterUtils.formatDateTime(tx.createdAt)),
           const SizedBox(height: 12),
           _buildInfoRow(TTexts.cashier.tr, userName),
           const SizedBox(height: 12),

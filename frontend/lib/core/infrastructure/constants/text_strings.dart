@@ -365,6 +365,7 @@ class TTexts {
   static const String noLowStock = 'no_low_stock';
   static const String noLowStockDesc = 'no_low_stock_desc';
   static const String stockLeft = 'stock_left';
+  static const String qtyChange = "qty_change";
 
   // -- Low Stock
   static const String outOfStockSection = 'out_of_stock_section';
@@ -403,6 +404,14 @@ class TTexts {
   static const String inventoryFlow = 'inventory_flow';
   static const String chartTooltipIn = 'chart_tooltip_in';
   static const String chartTooltipOut = 'chart_tooltip_out';
+  static const String noHistoryAvailable = "no_history_available";
+  static const String stockTake = "stock_take";
+  static const String importGoods = "import_goods";
+  static const String exportGoods = "export_goods";
+  static const String stockAdjustmentOrCheck = "stock_adjustment_or_check";
+  static const String currentQty = "current_qty";
+  static const String errorProductOrPackageIdMissing =
+      "error_product_or_package_id_missing";
 
   // -- Chatbot AI
   static const String chatbotName = "chatbot_name";
@@ -607,7 +616,12 @@ class TTexts {
   static const String cropImage = 'crop_image';
   static const String reorderThresholdLabel = 'reorder_threshold_label';
   static const String reorderThresholdHint = 'reorder_threshold_hint';
-  static const String zeroMeansNoLimit = 'zero_means_no_limit';
+  static const String unitLockedMessage = "unit_locked_message";
+  static const String thresholdMustBeGreaterThanZero =
+      "threshold_must_be_greater_than_zero";
+  static const String leaveEmptyForNoLimit = "leave_empty_for_no_limit";
+  static const String displayNameSuffixLabel = "display_name_suffix_label";
+  static const String displayNameSuffixHint = "display_name_suffix_hint";
   static const String fieldRequired = 'field_required';
   static const String invalidNumber = 'invalid_number';
   static const String suggestedNames = 'suggested_names';
@@ -878,6 +892,7 @@ class TTexts {
       'report_transactions_overview';
   static const String exportFailedTitle = 'export_failed_title';
   static const String exportFailedMessage = 'export_failed_message';
+  static const String amount = "amount";
 
   // -- Report Transaction Detail
   static const String totalItems = 'total_items';

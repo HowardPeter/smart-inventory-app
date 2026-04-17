@@ -216,24 +216,30 @@ class StockAdjustmentController extends GetxController with TErrorHandler {
 
       final addNote = additionalNoteController.text.trim();
 
-      await Future.wait(itemsToUpdate.map((item) {
+      // 1. Chuyển đổi data
+      final batchItems = itemsToUpdate.map((item) {
         String finalNote = item.note.value;
         if (addNote.isNotEmpty) {
           finalNote = finalNote.isNotEmpty ? "$finalNote - $addNote" : addNote;
         }
 
-        return _provider.adjustInventory(
-          item.packageId,
-          type: 'set',
-          quantity: item.actualQty.value,
-          reason: item.selectedReason.value.isNotEmpty
+        return {
+          "productPackageId": item.packageId,
+          "type": "set", 
+          "quantity": item.actualQty.value,
+          "reason": item.selectedReason.value.isNotEmpty
               ? item.selectedReason.value
               : 'Stock Take',
-          note: finalNote.isNotEmpty ? finalNote : null,
-        );
-      }));
+          "note": finalNote.isNotEmpty ? finalNote : null,
+        };
+      }).toList();
+
+      // 2. GỌI API ĐIỀU CHỈNH HÀNG LOẠT (1 LẦN DUY NHẤT)
+      await _provider.batchAdjustInventories(items: batchItems);
 
       FullScreenLoaderUtils.stopLoading();
+
+      // 3. XỬ LÝ TẠO SUMMARY ĐỂ CHUYỂN TRANG
       double totalAdjustmentValue = 0.0;
       List<TransactionDetailModel> summaryDetails = [];
 

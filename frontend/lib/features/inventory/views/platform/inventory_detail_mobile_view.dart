@@ -24,24 +24,21 @@ class InventoryDetailMobileView extends GetView<InventoryDetailController> {
 
   @override
   Widget build(BuildContext context) {
-    return GetBuilder<InventoryDetailController>(
-      builder: (ctrl) {
-        final hasData =
-            !ctrl.isLoading.value && ctrl.currentDisplayItem.value != null;
+    return Obx(
+      () {
+        final hasData = !controller.isLoading.value &&
+            controller.currentDisplayItem.value != null;
 
         return PopScope(
-            canPop: ctrl.historyStack.isEmpty,
+            canPop: controller.historyStack.isEmpty,
             onPopInvoked: (didPop) {
               if (!didPop) {
-                // Bấm back hệ thống thì gọi hàm back chuẩn của Controller
-                ctrl.goBack();
+                controller.goBack();
               }
             },
             child: Scaffold(
               backgroundColor: AppColors.background,
-
-              // APP BAR DỰ PHÒNG CHỈ HIỆN KHI BỊ LỖI
-              appBar: hasData || ctrl.isLoading.value
+              appBar: hasData || controller.isLoading.value
                   ? null
                   : AppBar(
                       backgroundColor: Colors.transparent,
@@ -49,26 +46,18 @@ class InventoryDetailMobileView extends GetView<InventoryDetailController> {
                       leading: IconButton(
                         icon: const Icon(Iconsax.arrow_left_2_copy,
                             color: AppColors.primaryText),
-                        onPressed: () => ctrl.goBack(),
+                        onPressed: () => controller.goBack(),
                       ),
                     ),
-
-              // MAIN BODY
-              body: ctrl.isLoading.value
-                  // 1. KHI ĐANG TẢI (KỂ CẢ VÀO LẦN ĐẦU HAY QUA RELATED) -> HIỂN THỊ SHIMMER
+              body: controller.isLoading.value
                   ? const InventoryDetailShimmerWidget()
-
-                  // 2. KHI ĐÃ TẢI XONG NHƯNG KHÔNG CÓ DỮ LIỆU HOẶC LỖI
                   : (!hasData
                       ? TDataErrorLayout(
                           onPressed: () => Get.back(),
                           message: TTexts.errorNotFoundMessage.tr,
                         )
-
-                      // 3. KHI CÓ DỮ LIỆU -> BỌC LẠI REFRESH INDICATOR Ở ĐÂY
                       : TRefreshIndicatorWidget(
-                          onRefresh:
-                              ctrl.refreshData, // ĐÃ TRẢ LẠI REFRESH INDICATOR
+                          onRefresh: controller.refreshData,
                           child: AnimatedSwitcher(
                             duration: const Duration(milliseconds: 300),
                             switchInCurve: Curves.easeOut,
@@ -88,7 +77,7 @@ class InventoryDetailMobileView extends GetView<InventoryDetailController> {
                             },
                             child: _DetailContent(
                               key: ValueKey(
-                                ctrl.currentDisplayItem.value?.inventory
+                                controller.currentDisplayItem.value?.inventory
                                         .productPackageId ??
                                     '',
                               ),

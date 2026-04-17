@@ -8,6 +8,7 @@ import 'package:frontend/core/ui/widgets/t_refresh_indicator_widget.dart';
 import 'package:frontend/features/home/controllers/low_stock_controller.dart';
 import 'package:frontend/features/home/widgets/low_stock/low_stock_item_widget.dart';
 import 'package:frontend/features/home/widgets/low_stock/low_stock_overview_widget.dart';
+import 'package:frontend/features/home/widgets/low_stock/low_stock_shimmer_widget.dart'; // ĐÃ THÊM IMPORT SHIMMER
 import 'package:frontend/routes/app_routes.dart';
 import 'package:get/get.dart';
 
@@ -22,50 +23,48 @@ class LowStockMobileView extends GetView<LowStockController> {
       appBar: TAppBarWidget(
         title: TTexts.lowStockTitle.tr,
       ),
-      body: Obx(() {
-        if (controller.isLoading.value) {
-          return Center(
-              child: TAnimationLoaderWidget(
-                  text: TTexts.loadingTitle.tr, showBackground: false));
-        }
+      body: TRefreshIndicatorWidget(
+        onRefresh: () => controller.fetchLowStock(isRefresh: true),
+        child: Obx(() {
+          // 1. TRẠNG THÁI LOADING -> HIỆN SHIMMER THAY VÌ VÒNG XOAY CŨ
+          if (controller.isLoading.value) {
+            return const LowStockShimmerWidget();
+          }
 
-        // Tách data ban đầu
-        final outOfStockData =
-            controller.lowStockItems.where((e) => e.quantity <= 0).toList();
-        final lowStockData =
-            controller.lowStockItems.where((e) => e.quantity > 0).toList();
+          // Tách data ban đầu
+          final outOfStockData =
+              controller.lowStockItems.where((e) => e.quantity <= 0).toList();
+          final lowStockData =
+              controller.lowStockItems.where((e) => e.quantity > 0).toList();
 
-        final List<dynamic> flattenedList = [];
+          final List<dynamic> flattenedList = [];
 
-        // 1. LUÔN HIỂN THỊ THẺ OVERVIEW VỚI TRẠNG THÁI CHỌN
-        flattenedList.add({
-          'type': 'HEADER_CARDS',
-          'outCount': outOfStockData.length,
-          'lowCount': lowStockData.length,
-          'filter': controller.activeFilter.value
-        });
+          // 1. LUÔN HIỂN THỊ THẺ OVERVIEW VỚI TRẠNG THÁI CHỌN
+          flattenedList.add({
+            'type': 'HEADER_CARDS',
+            'outCount': outOfStockData.length,
+            'lowCount': lowStockData.length,
+            'filter': controller.activeFilter.value
+          });
 
-        // 2. LOGIC LỌC DANH SÁCH THEO STATE
-        final String currentFilter = controller.activeFilter.value;
+          // 2. LOGIC LỌC DANH SÁCH THEO STATE
+          final String currentFilter = controller.activeFilter.value;
 
-        if ((currentFilter == '' || currentFilter == TTexts.tabOutStock) &&
-            outOfStockData.isNotEmpty) {
-          flattenedList.add('HEADER_OUT_OF_STOCK');
-          flattenedList.addAll(outOfStockData);
-        }
+          if ((currentFilter == '' || currentFilter == TTexts.tabOutStock) &&
+              outOfStockData.isNotEmpty) {
+            flattenedList.add('HEADER_OUT_OF_STOCK');
+            flattenedList.addAll(outOfStockData);
+          }
 
-        // 🔥 ĐÃ FIX: Bỏ .tr ở TTexts.tabLowStock để so sánh đúng State
-        if ((currentFilter == '' || currentFilter == TTexts.tabLowStock) &&
-            lowStockData.isNotEmpty) {
-          flattenedList.add('HEADER_LOW_STOCK');
-          flattenedList.addAll(lowStockData);
-        }
+          if ((currentFilter == '' || currentFilter == TTexts.tabLowStock) &&
+              lowStockData.isNotEmpty) {
+            flattenedList.add('HEADER_LOW_STOCK');
+            flattenedList.addAll(lowStockData);
+          }
 
-        if (controller.isLoadMore.value) flattenedList.add('LOADING');
+          if (controller.isLoadMore.value) flattenedList.add('LOADING');
 
-        return TRefreshIndicatorWidget(
-          onRefresh: () => controller.fetchLowStock(isRefresh: true),
-          child: NotificationListener<ScrollNotification>(
+          return NotificationListener<ScrollNotification>(
             onNotification: (ScrollNotification scrollInfo) {
               if (scrollInfo.metrics.pixels >=
                   scrollInfo.metrics.maxScrollExtent - 50) {
@@ -127,7 +126,7 @@ class LowStockMobileView extends GetView<LowStockController> {
                     if (productId != null || packageId.isNotEmpty) {
                       Get.toNamed(
                         AppRoutes.inventoryDetail,
-                        arguments: productId?.toString(), 
+                        arguments: productId?.toString(),
                         parameters: {
                           if (packageId.isNotEmpty) 'packageId': packageId,
                           if (barcode.isNotEmpty) 'barcode': barcode,
@@ -138,9 +137,9 @@ class LowStockMobileView extends GetView<LowStockController> {
                 );
               },
             ),
-          ),
-        );
-      }),
+          );
+        }),
+      ),
     );
   }
 

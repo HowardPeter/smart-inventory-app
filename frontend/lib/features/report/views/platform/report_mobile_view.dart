@@ -25,7 +25,7 @@ class ReportMobileView extends GetView<ReportController> {
       backgroundColor: AppColors.surface,
       body: SafeArea(
         child: TRefreshIndicatorWidget(
-          onRefresh: () => controller.fetchTransactions(),
+          onRefresh: () => controller.fetchTransactions(isRefresh: true),
           child: Obx(() {
             if (controller.isLoading.value) return const ReportShimmerWidget();
 
