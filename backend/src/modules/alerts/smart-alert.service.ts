@@ -173,7 +173,7 @@ export class SmartAlertService {
     const bodyText = getRandomMessage(bodyTemplates);
 
     // Dùng Promise.all để gửi đồng loạt không bị nghẽn
-    await Promise.all(
+    await Promise.allSettled(
       targetMembers.map((member) =>
         this.notificationService.createAndSendNotification(
           member.userId,
@@ -425,8 +425,9 @@ export class SmartAlertService {
     totalPrice: number;
     itemCount: number;
   }) {
-    // Tùy chọn: Nếu bạn không muốn spam đơn nhỏ, có thể bật logic dưới đây
-    // if (payload.totalPrice < 100000) return; // Chỉ báo khi đơn trên 100k
+    if (payload.totalPrice < 100000) {
+      return;
+    }
 
     const targetMembers = await this.getTargetMembers(payload.storeId);
 
