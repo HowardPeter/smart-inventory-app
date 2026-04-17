@@ -4,6 +4,11 @@ import { prisma } from '../../db/prismaClient.js';
 import { NotificationRepository } from '../notification/repositories/notification.repository.js';
 import { NotificationService } from '../notification/services/notification.service.js';
 
+import type {
+  LowStockInventoryItem,
+  ReorderSuggestionPayload,
+} from '../../common/events/event-payloads.js';
+
 export class SmartAlertService {
   constructor(private readonly notificationService: NotificationService) {
     this.initEventListeners();
@@ -83,6 +88,15 @@ export class SmartAlertService {
       }) => {
         this.checkRoleUpdatedRule(payload).catch((err) =>
           console.error('Lỗi khi xử lý thông báo đổi role:', err),
+        );
+      },
+    );
+
+    eventBus.on(
+      appEvents.REORDER_SUGGESTION,
+      (payload: ReorderSuggestionPayload) => {
+        this.handleReorderSuggestion(payload).catch((err) =>
+          console.error('Error handling reorder suggestion:', err),
         );
       },
     );
@@ -473,20 +487,32 @@ export class SmartAlertService {
       undefined,
     );
   }
+
+  private async handleReorderSuggestion(payload: ReorderSuggestionPayload) {
+    const targetMembers = await this.getTargetMembers(payload.storeId);
+
+    if (targetMembers.length === 0) {
+      return;
+    }
+
+    const title = '💡 Smart Reorder Suggestion';
+    const bodyText = `Recommendation: Restock ${payload.suggestedQuantity} units for ${payload.productName}. (Current: ${payload.currentStock}, Reason: ${payload.reason})`;
+
+    await Promise.all(
+      targetMembers.map((member) =>
+        this.notificationService.createAndSendNotification(
+          member.userId,
+          payload.storeId,
+          title,
+          bodyText,
+          'REORDER_SUGGESTION',
+          payload.productId,
+        ),
+      ),
+    );
+  }
 }
 
 export const smartAlertService = new SmartAlertService(
   new NotificationService(new NotificationRepository()),
 );
-
-interface LowStockInventoryItem {
-  inventoryId: string;
-  quantity: number;
-  productPackage?: {
-    displayName: string | null;
-    product?: {
-      storeId: string | null;
-      productId: string;
-    } | null;
-  } | null;
-}

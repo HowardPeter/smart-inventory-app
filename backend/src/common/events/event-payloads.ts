@@ -1,0 +1,45 @@
+export interface BatchInventoryPayload {
+  storeId: string;
+  items: Array<{
+    inventoryId: string;
+    oldQuantity: number;
+    newQuantity: number;
+  }>;
+}
+
+export interface SingleInventoryPayload {
+  inventoryId: string;
+  storeId: string;
+  oldQuantity: number;
+  newQuantity: number;
+}
+
+export interface DiscrepancyPayload {
+  storeId: string;
+  adjustmentId: string;
+  productName: string;
+  systemQuantity: number;
+  actualQuantity: number;
+}
+
+export interface ReorderSuggestionPayload {
+  storeId: string;
+  productId: string;
+  productName: string;
+  currentStock: number;
+  suggestedQuantity: number;
+  suggestedThreshold: number;
+  reason: string;
+}
+
+export interface LowStockInventoryItem {
+  inventoryId: string;
+  quantity: number;
+  productPackage?: {
+    displayName: string | null;
+    product?: {
+      storeId: string | null;
+      productId: string;
+    } | null;
+  } | null;
+}

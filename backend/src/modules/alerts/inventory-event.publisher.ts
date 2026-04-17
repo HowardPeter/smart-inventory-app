@@ -1,28 +1,10 @@
 import { appEvents, eventBus } from '../../common/events/event-bus.js';
 
-interface BatchInventoryPayload {
-  storeId: string;
-  items: Array<{
-    inventoryId: string;
-    oldQuantity: number;
-    newQuantity: number;
-  }>;
-}
-
-interface SingleInventoryPayload {
-  inventoryId: string;
-  storeId: string;
-  oldQuantity: number;
-  newQuantity: number;
-}
-
-interface DiscrepancyPayload {
-  storeId: string;
-  adjustmentId: string;
-  productName: string;
-  systemQuantity: number;
-  actualQuantity: number;
-}
+import type {
+  BatchInventoryPayload,
+  DiscrepancyPayload,
+  SingleInventoryPayload,
+} from '../../common/events/event-payloads.js';
 
 export class InventoryEventPublisher {
   // Phát sự kiện đơn lẻ
