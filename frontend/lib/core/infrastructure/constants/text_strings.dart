@@ -840,10 +840,10 @@ class TTexts {
   static const String profileNameStore = 'profile_name_store';
   static const String profileBtnSwitchStore = 'profile_btn_switch_store';
   static const String profileAccount = 'profile_account';
-  static const String profileSecurity = 'profile_security';
+  static const String profileManagement = 'profile_management';
   static const String profileMyAccount = 'profile_my_account';
   static const String profileChangePassword = 'profile_change_password';
-  static const String profileUserPermissions = 'proflie_user_permissions';
+  static const String profileUserManagement = 'profile_user_management';
   static const String profileBtnLogout = 'profile_btn_logout';
   static const String profileDialogTitleLogout = 'profile_dialog_title_logout';
   static const String profileDialogDescriptionLogout =

@@ -10,11 +10,11 @@ final Map<String, String> enProfile = {
   TTexts.profileNameStore: '',
   //--Section
   TTexts.profileAccount: "Account",
-  TTexts.profileSecurity: "security",
+  TTexts.profileManagement: "Management",
   //--Actions
   TTexts.profileChangePassword: 'Change password',
   TTexts.profileMyAccount: 'My profile',
-  TTexts.profileUserPermissions: 'User permissions',
+  TTexts.profileUserManagement: 'User management',
   //--Btn
   TTexts.profileBtnSwitchStore: "Switch store",
   TTexts.profileBtnLogout: "Logout",
