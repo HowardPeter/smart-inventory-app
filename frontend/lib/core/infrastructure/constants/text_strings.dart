@@ -947,10 +947,10 @@ class TTexts {
   static const String profileNameStore = 'profile_name_store';
   static const String profileBtnSwitchStore = 'profile_btn_switch_store';
   static const String profileAccount = 'profile_account';
-  static const String profileSecurity = 'profile_security';
+  static const String profileManagement = 'profile_management';
   static const String profileMyAccount = 'profile_my_account';
   static const String profileChangePassword = 'profile_change_password';
-  static const String profileUserPermissions = 'proflie_user_permissions';
+  static const String profileUserManagement = 'profile_user_management';
   static const String profileBtnLogout = 'profile_btn_logout';
   static const String profileDialogTitleLogout = 'profile_dialog_title_logout';
   static const String profileDialogDescriptionLogout =
@@ -1033,6 +1033,11 @@ class TTexts {
   static const String editStoreSubtitleDialog = 'edit_store_subtitle_dialog';
   static const String editStoreAddressLabel = 'edit_store_address_label';
   static const String editStoreAddressHint = 'edit_store_address_hint';
+  static const String profileUpdateError = 'profile_update_error';
+  static const String editStoreDialogDescription =
+      'edit_store_dialog_description';
+  static const String profileUpdateStoreSuccess =
+      'profile_update_store_success';
 
   // --Assigns role
   static const String assignsRoleTitle = 'assigns_role_title';
@@ -1045,7 +1050,13 @@ class TTexts {
   static const String assignsRoleOwner = 'assigns_role_owner';
   static const String assignsRoleSearchHint = 'assigns_role_search_hint';
 
+  //Member 
+  static const String profileNoMembers = 'profile_no_members';
+  static const String profileNoMembersSubtitle = 'profile_no_members_subtitle';
+
   //-- System
   static const String systemSnackbarTitle = "system_snackbar_title";
   static const String systemSnackbar403Error = "system_snackbar_403_error";
+
+ 
 }

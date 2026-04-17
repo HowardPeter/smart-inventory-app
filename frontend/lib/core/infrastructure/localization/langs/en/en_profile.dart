@@ -10,11 +10,11 @@ final Map<String, String> enProfile = {
   TTexts.profileNameStore: '',
   //--Section
   TTexts.profileAccount: "Account",
-  TTexts.profileSecurity: "security",
+  TTexts.profileManagement: "Management",
   //--Actions
   TTexts.profileChangePassword: 'Change password',
   TTexts.profileMyAccount: 'My profile',
-  TTexts.profileUserPermissions: 'User permissions',
+  TTexts.profileUserManagement: 'User management',
   //--Btn
   TTexts.profileBtnSwitchStore: "Switch store",
   TTexts.profileBtnLogout: "Logout",
@@ -68,10 +68,11 @@ final Map<String, String> enProfile = {
   TTexts.editStoreSubtitle: 'Manage and Edit your stores',
   TTexts.editStoreNameLabel: 'Store Name',
   TTexts.editStoreNameHint: 'Enter store name',
-  TTexts.editStoreAddressLabel: 'Address',
+  TTexts.editStoreAddressLabel: 'Address *',
   TTexts.editStoreAddressHint: 'Enter store address',
   TTexts.editStoreAmountMember: 'Members',
   TTexts.editStoreBtnEdit: 'Edit',
+  TTexts.profileUpdateStoreSuccess: 'Store updated successfully',
   TTexts.profileUpdateSuccess: 'Profile updated successfully',
   TTexts.loadingTitle: 'Loading',
   TTexts.editStoreCurrentStore: 'Current Store',
@@ -81,7 +82,9 @@ final Map<String, String> enProfile = {
   TTexts.logoutErrorTitle: 'Logout Failed',
   TTexts.editStoreTitleDialog: 'Edit Store',
   TTexts.editStoreSubtitleDialog: 'You can update the store information here.',
-  // TTexts.editStoreDescriptionDialog: 'Are you sure you want to update store information?',
+  TTexts.editStoreDialogDescription:
+      'Are you sure you want to update your store profile?',
+  TTexts.profileUpdateError: 'Failed to update profile',
 
   //Assign Role
   TTexts.assignsRoleTitle: 'Assigns Role',
@@ -92,4 +95,8 @@ final Map<String, String> enProfile = {
   TTexts.assignsRoleOwner: 'Owner',
   TTexts.assignsRoleManager: 'Manager',
   TTexts.assignsRoleStaff: 'Staff',
+
+  //Member List
+  TTexts.profileNoMembers: 'No members found',
+  TTexts.profileNoMembersSubtitle: 'There are no members in this store.',
 };

@@ -351,13 +351,28 @@ class ProfileEditController extends GetxController {
 
       // 3. Success
       FullScreenLoaderUtils.stopLoading();
+      isEditing.value = false;
+
       TSnackbarsWidget.success(
         title: TTexts.successTitle.tr,
         message: TTexts.profileUpdateSuccess.tr,
       );
+    } on DioError catch (e) {
+      FullScreenLoaderUtils.stopLoading();
 
-      isEditing.value = false;
-      Get.back(); // Quay lại trang Profile
+      String errorMessage = TTexts.profileUpdateError.tr;
+
+      if (e.response != null && e.response?.data != null) {
+        final data = e.response!.data;
+        if (data is Map<String, dynamic> && data['message'] != null) {
+          errorMessage = data['message'];
+        }
+      }
+
+      TSnackbarsWidget.error(
+        title: TTexts.errorTitle.tr,
+        message: errorMessage,
+      );
     }
 
     // 4. Error Handling
