@@ -38,7 +38,7 @@ class EditStoreSaveButtonWidgetDialog extends StatelessWidget {
                     Get.dialog(
                       TCustomDialogWidget(
                         title: TTexts.confirmUpdate.tr,
-                        description: TTexts.confirmUpdateDescription.tr,
+                        description: TTexts.editStoreDialogDescription.tr,
                         icon: const Text(
                           '📝',
                           style: TextStyle(fontSize: AppSizes.p40),

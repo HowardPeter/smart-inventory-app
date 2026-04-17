@@ -360,7 +360,7 @@ class ProfileEditStoreController extends GetxController {
       Future.delayed(const Duration(milliseconds: 100), () {
         TSnackbarsWidget.success(
           title: TTexts.successTitle.tr,
-          message: TTexts.profileUpdateSuccess.tr,
+          message: TTexts.profileUpdateStoreSuccess.tr,
         );
       });
     } catch (e) {

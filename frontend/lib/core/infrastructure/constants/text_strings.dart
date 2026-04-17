@@ -927,6 +927,10 @@ class TTexts {
   static const String editStoreAddressLabel = 'edit_store_address_label';
   static const String editStoreAddressHint = 'edit_store_address_hint';
   static const String profileUpdateError = 'profile_update_error';
+  static const String editStoreDialogDescription =
+      'edit_store_dialog_description';
+  static const String profileUpdateStoreSuccess =
+      'profile_update_store_success';
 
   // --Assigns role
   static const String assignsRoleTitle = 'assigns_role_title';
