@@ -939,6 +939,17 @@ class TTexts {
   static const String filterAlerts = "filter_alerts";
   static const String filterTransactions = "filter_transactions";
   static const String filterSystem = "filter_system";
+  static const String filterLowStock = "filter_low_stock";
+  static const String filterDiscrepancy = "filter_discrepancy";
+  static const String filterReorder = "filter_reorder";
+  static const String filterImport = "filter_import";
+  static const String filterExport = "filter_export";
+
+  // -- Notification Router & Errors
+  static const String storeNotFound = "store_not_found";
+  static const String cannotAccessStore = "cannot_access_store";
+  static const String sessionExpiredTitle = "session_expired_title";
+  static const String sessionExpiredMessage = "session_expired_message";
 
   //--Profile
   static const String profileTitle = 'profile_title';
@@ -1050,13 +1061,11 @@ class TTexts {
   static const String assignsRoleOwner = 'assigns_role_owner';
   static const String assignsRoleSearchHint = 'assigns_role_search_hint';
 
-  //Member 
+  //Member
   static const String profileNoMembers = 'profile_no_members';
   static const String profileNoMembersSubtitle = 'profile_no_members_subtitle';
 
   //-- System
   static const String systemSnackbarTitle = "system_snackbar_title";
   static const String systemSnackbar403Error = "system_snackbar_403_error";
-
- 
 }
