@@ -1,13 +1,10 @@
-import { appEvents, eventBus } from '../../common/events/event-bus.js';
-import { prisma } from '../../db/prismaClient.js';
+import { appEvents, eventBus } from '../../../common/events/event-bus.js';
+import { prisma } from '../../../db/prismaClient.js';
 
-import type { ReorderSuggestionItemDto } from './dto/smart-decision.dto.js';
-import type { BatchReorderSuggestionPayload } from '../../common/events/event-payloads.js';
+import type { BatchReorderSuggestionPayload } from '../../../common/events/event-payloads.js';
+import type { ReorderSuggestionItemDto } from '../dto/smart-decision.dto.js';
 
 export class SmartDecisionService {
-  // =====================================================================
-  // 1. HÀM CORE: TÍNH TOÁN GỢI Ý CHO 1 CỬA HÀNG (DÙNG CHO CẢ API & CRON)
-  // =====================================================================
   public async getStoreReorderSuggestions(
     storeId: string,
   ): Promise<ReorderSuggestionItemDto[]> {
@@ -51,7 +48,7 @@ export class SmartDecisionService {
       });
 
       const totalSold = salesData._sum.quantity ?? 0;
-      const ads = totalSold / 30; // Average Daily Sales
+      const ads = totalSold / 30;
 
       if (ads === 0) {
         continue;
@@ -112,11 +109,11 @@ export class SmartDecisionService {
         if (suggestedQty > 0) {
           suggestions.push({
             productId: inv.productPackage.productId,
-            productName: inv.productPackage.displayName ?? 'Sản phẩm',
+            productName: inv.productPackage.displayName ?? 'Product',
             currentStock: inv.quantity,
             suggestedQuantity: suggestedQty,
             suggestedThreshold: reorderPoint,
-            reason: `Dựa trên tốc độ bán trung bình ${ads.toFixed(1)} SP/ngày.`,
+            reason: `Based on an average sales velocity of ${ads.toFixed(1)} units/day.`,
           });
         }
       }
@@ -125,9 +122,6 @@ export class SmartDecisionService {
     return suggestions;
   }
 
-  // =====================================================================
-  // 2. HÀM CRON JOB: QUÉT TẤT CẢ CỬA HÀNG VÀ BẮN EVENT (DÙNG CHO BACKGROUND)
-  // =====================================================================
   public async generateReorderSuggestions() {
     console.info('[Smart Decision] Starting reorder analysis...');
 
@@ -154,6 +148,3 @@ export class SmartDecisionService {
     console.info('[Smart Decision] Analysis completed.');
   }
 }
-
-// Xóa instance global cũ đi nếu bạn định dùng Dependency Injection ở module.ts
-// export const smartDecisionService = new SmartDecisionService();
