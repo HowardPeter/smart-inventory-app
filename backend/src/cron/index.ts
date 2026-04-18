@@ -1,6 +1,6 @@
 import cron from 'node-cron';
 
-import { smartAlertService } from '../modules/alerts/smart-alert.service.js';
+import { smartAlertService } from '../modules/alerts/services/smart-alert.service.js';
 import { smartDecisionService } from '../modules/alerts/smart-decision.module.js';
 
 export const initCronJobs = () => {

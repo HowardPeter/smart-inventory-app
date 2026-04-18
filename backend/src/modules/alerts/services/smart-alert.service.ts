@@ -1,14 +1,14 @@
-import { getRandomMessage } from './utils/message.util.js';
-import { appEvents, eventBus } from '../../common/events/event-bus.js';
-import { prisma } from '../../db/prismaClient.js';
-import { NotificationRepository } from '../notification/repositories/notification.repository.js';
-import { NotificationService } from '../notification/services/notification.service.js';
+import { appEvents, eventBus } from '../../../common/events/event-bus.js';
+import { prisma } from '../../../db/prismaClient.js';
+import { NotificationRepository } from '../../notification/repositories/notification.repository.js';
+import { NotificationService } from '../../notification/services/notification.service.js';
+import { getRandomMessage } from '../utils/message.util.js';
 
 import type {
   BatchReorderSuggestionPayload,
   DiscrepancyPayload,
   LowStockInventoryItem,
-} from '../../common/events/event-payloads.js';
+} from '../../../common/events/event-payloads.js';
 
 export class SmartAlertService {
   constructor(private readonly notificationService: NotificationService) {
@@ -464,7 +464,7 @@ export class SmartAlertService {
     const formattedPrice = new Intl.NumberFormat('en-US').format(
       payload.totalPrice,
     );
-    const bodyText = `A successful ${actionType} transaction was recorded. Total value: ${formattedPrice} VND (${payload.itemCount} items).`;
+    const bodyText = `A successful ${actionType} transaction was recorded. Total value: ${formattedPrice} Dollar (${payload.itemCount} items).`;
 
     // Gửi thông báo
     await Promise.all(

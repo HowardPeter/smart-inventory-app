@@ -4,7 +4,7 @@ import {
   requireReqStoreContext,
   sendResponse,
 } from '../../../common/utils/index.js';
-import { SmartDecisionService } from '../smart-decision.service.js'; // Nhớ trỏ đúng đường dẫn
+import { SmartDecisionService } from '../services/smart-decision.service.js'; // Nhớ trỏ đúng đường dẫn
 
 import type { ApiResponse } from '../../../common/types/index.js';
 import type { ListReorderSuggestionResponseDto } from '../dto/smart-decision.dto.js';
