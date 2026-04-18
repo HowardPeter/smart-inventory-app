@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:frontend/core/infrastructure/constants/text_strings.dart';
 import 'package:get/get.dart';
 import 'package:frontend/routes/app_routes.dart';
 import 'package:frontend/core/state/services/store_service.dart';
@@ -64,7 +65,7 @@ class NotificationRouter {
       } catch (e) {
         debugPrint("⚠️ [Router] Lỗi Switch Store: $e");
         TSnackbarsWidget.error(
-            title: 'Lỗi', message: 'Không thể truy cập cửa hàng.');
+            title: TTexts.errorTitle.tr, message: TTexts.cannotAccessStore.tr);
         if (isFromSplash) Get.offAllNamed(AppRoutes.main);
         return;
       }
@@ -136,15 +137,12 @@ class NotificationRouter {
 
       case 'ROLE_UPDATED':
         TSnackbarsWidget.warning(
-            title: 'Phiên đăng nhập hết hạn',
-            message:
-                'Quyền hạn của bạn đã bị thay đổi, vui lòng đăng nhập lại.');
+            title: TTexts.sessionExpiredTitle.tr,
+            message: TTexts.sessionExpiredMessage.tr);
 
         await supabase!.auth.signOut();
-        // Đăng xuất Google để lần sau hiện lại popup chọn tài khoản
         await GoogleSignIn.instance.signOut();
 
-        // 2. Xoá StoreID hoặc data local
         GetStorage().remove('STORE_ID');
 
         // 3. Điều hướng về màn Login

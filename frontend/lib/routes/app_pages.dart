@@ -32,6 +32,7 @@ import 'package:frontend/features/inventory/views/product_catalog_view.dart';
 import 'package:frontend/features/inventory/views/product_form_view.dart';
 import 'package:frontend/features/navigation/bindings/navigation_binding.dart';
 import 'package:frontend/features/navigation/views/navigation_view.dart';
+import 'package:frontend/features/notification/bindings/reorder_suggestion_binding.dart';
 import 'package:frontend/features/notification/view/notification_view.dart';
 import 'package:frontend/features/notification/view/reorder_suggestion_view.dart';
 import 'package:frontend/features/onboarding/bindings/onboarding_binding.dart';
@@ -401,8 +402,8 @@ class AppPages {
 
     // -- Reorder suggestion
     GetPage(
-      name: AppRoutes.reorderSuggestion,
-      page: () => const ReorderSuggestionView(),
-    ),
+        name: AppRoutes.reorderSuggestion,
+        page: () => const ReorderSuggestionView(),
+        binding: ReorderSuggestionBinding()),
   ];
 }

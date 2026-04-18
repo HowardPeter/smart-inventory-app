@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:frontend/core/infrastructure/constants/text_strings.dart';
 import 'package:frontend/core/ui/theme/app_colors.dart';
 import 'package:frontend/core/ui/theme/app_sizes.dart';
 import 'package:frontend/features/notification/controller/notification_controller.dart';
@@ -23,26 +24,27 @@ class NotificationFilterTabWidget extends StatelessWidget {
         padding: const EdgeInsets.symmetric(horizontal: AppSizes.p16),
         physics: const BouncingScrollPhysics(),
         children: [
-          _buildFilterChip(
-              'Tất cả', 'ALL', controller), // Hoặc dùng TTexts.filterAll.tr
+          _buildFilterChip(TTexts.filterAll.tr, 'ALL', controller),
           const SizedBox(width: 8),
 
           // Nhóm Cảnh báo & Tồn kho
-          _buildFilterChip('Sắp hết hàng', 'LOW_STOCK', controller),
+          _buildFilterChip(TTexts.filterLowStock.tr, 'LOW_STOCK', controller),
           const SizedBox(width: 8),
-          _buildFilterChip('Lệch kho', 'DISCREPANCY_ALERT', controller),
+          _buildFilterChip(
+              TTexts.filterDiscrepancy.tr, 'DISCREPANCY_ALERT', controller),
           const SizedBox(width: 8),
-          _buildFilterChip('Gợi ý nhập', 'REORDER_SUGGESTION', controller),
+          _buildFilterChip(
+              TTexts.filterReorder.tr, 'REORDER_SUGGESTION', controller),
           const SizedBox(width: 8),
 
           // Nhóm Giao dịch
-          _buildFilterChip('Nhập kho', 'IMPORT', controller),
+          _buildFilterChip(TTexts.filterImport.tr, 'IMPORT', controller),
           const SizedBox(width: 8),
-          _buildFilterChip('Xuất kho', 'EXPORT', controller),
+          _buildFilterChip(TTexts.filterExport.tr, 'EXPORT', controller),
           const SizedBox(width: 8),
 
           // Nhóm Hệ thống
-          _buildFilterChip('Hệ thống', 'ROLE_UPDATED', controller),
+          _buildFilterChip(TTexts.filterSystem.tr, 'ROLE_UPDATED', controller),
         ],
       ),
     );

@@ -6,7 +6,7 @@ import 'package:frontend/core/ui/widgets/t_empty_state_widget.dart';
 import 'package:frontend/core/ui/widgets/t_animation_loader_widget.dart';
 import 'package:frontend/core/ui/widgets/t_refresh_indicator_widget.dart';
 import 'package:frontend/features/notification/controller/reorder_suggestion_controller.dart';
-import 'package:frontend/features/notification/widgets/reorder_insight_card_widget.dart';
+import 'package:frontend/features/notification/widgets/reorder_suggestion_card_widget.dart';
 import 'package:get/get.dart';
 import 'package:iconsax_flutter/iconsax_flutter.dart';
 
@@ -16,10 +16,6 @@ class ReorderSuggestionMobileScreen
 
   @override
   Widget build(BuildContext context) {
-    if (!Get.isRegistered<ReorderSuggestionController>()) {
-      Get.put(ReorderSuggestionController());
-    }
-
     return Scaffold(
       backgroundColor: AppColors.background,
       appBar: const TAppBarWidget(
@@ -65,7 +61,7 @@ class ReorderSuggestionMobileScreen
             itemBuilder: (context, index) {
               final item = controller.suggestions[index];
 
-              return ReorderInsightCardWidget(
+              return ReorderSuggestionCardWidget(
                 item: item,
                 onDismiss: () => controller.dismissSuggestion(item.productId),
               );

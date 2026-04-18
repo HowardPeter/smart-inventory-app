@@ -4,8 +4,8 @@ import 'package:frontend/core/ui/theme/app_colors.dart';
 import 'package:frontend/core/ui/theme/app_sizes.dart';
 import 'package:iconsax_flutter/iconsax_flutter.dart';
 
-class ReorderInsightCardWidget extends StatelessWidget {
-  const ReorderInsightCardWidget({
+class ReorderSuggestionCardWidget extends StatelessWidget {
+  const ReorderSuggestionCardWidget({
     super.key,
     required this.item,
     required this.onDismiss,
