@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:frontend/core/infrastructure/constants/text_strings.dart';
 import 'package:frontend/core/ui/theme/app_colors.dart';
 import 'package:frontend/core/ui/theme/app_sizes.dart';
 import 'package:frontend/core/ui/widgets/t_app_bar_widget.dart';
@@ -18,16 +19,16 @@ class ReorderSuggestionMobileScreen
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: AppColors.background,
-      appBar: const TAppBarWidget(
-        title: 'Báo cáo nhập hàng',
+      appBar: TAppBarWidget(
+        title: TTexts.reorderReportTitle.tr,
         showBackArrow: true,
         centerTitle: true,
       ),
       body: Obx(() {
         if (controller.isLoading.value) {
-          return const Center(
+          return Center(
             child: TAnimationLoaderWidget(
-              text: 'AI đang phân tích dữ liệu kho...',
+              text: TTexts.aiAnalyzingStock.tr,
               showBackground: false,
             ),
           );
@@ -40,11 +41,10 @@ class ReorderSuggestionMobileScreen
               physics: const AlwaysScrollableScrollPhysics(),
               child: SizedBox(
                 height: MediaQuery.of(context).size.height * 0.7,
-                child: const TEmptyStateWidget(
+                child: TEmptyStateWidget(
                   icon: Iconsax.health_copy,
-                  title: 'Kho hàng đang ở trạng thái tối ưu',
-                  subtitle:
-                      'Tuyệt vời! Không có sản phẩm nào chạm ngưỡng nguy hiểm hoặc cần đề xuất nhập thêm lúc này.',
+                  title: TTexts.optimalStockTitle.tr,
+                  subtitle: TTexts.optimalStockDesc.tr,
                 ),
               ),
             ),
