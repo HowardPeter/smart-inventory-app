@@ -16,7 +16,7 @@ export type ProductPackageResponseDto = Omit<
 
 export type ProductPackageSimpleResponseDto = Pick<
   ProductPackage,
-  'productPackageId' | 'displayName'
+  'productPackageId' | 'displayName' | 'variant'
 >;
 
 export type ProductPackageDetailResponseDto = Omit<
@@ -34,24 +34,26 @@ export type ProductPackageDetailResponseDto = Omit<
 
 export type ProductPackageResponseForTransaction = Pick<
   ProductPackage,
-  'productPackageId' | 'displayName' | 'importPrice' | 'sellingPrice'
+  | 'productPackageId'
+  | 'displayName'
+  | 'variant'
+  | 'importPrice'
+  | 'sellingPrice'
 >;
 
 type CreateProductPackageDto = Pick<ProductPackage, 'unitId'> &
-  Partial<Pick<ProductPackage, 'importPrice' | 'sellingPrice'>>;
+  Partial<Pick<ProductPackage, 'variant' | 'importPrice' | 'sellingPrice'>>;
 
-export type CreateProductPackageData = CreateProductPackageDto &
-  Pick<ProductPackage, 'productId' | 'displayName'>;
+export type CreateProductPackageInput = CreateProductPackageDto &
+  Pick<ProductPackage, 'displayName' | 'productId'>;
 
-export type CreateInventoryData = Pick<
+export type CreateInventoryInput = Pick<
   CreateInventoryDto,
   'quantity' | 'reorderThreshold'
 >;
 
 export type CreateProductPackageAndInventoryDto = {
-  package: CreateProductPackageDto & {
-    displayNameSuffix: string | null;
-  };
+  package: CreateProductPackageDto;
   inventory: CreateInventoryDto;
 };
 
@@ -65,14 +67,15 @@ export type CreatePackageAndInventoryResponseDto = Omit<
 > &
   Pick<ProductPackage, 'productId' | 'unitId'>;
 
-export type UpdateProductPackageDto = Partial<
-  Pick<ProductPackage, 'importPrice' | 'sellingPrice'>
-> & {
-  displayNameSuffix?: string | null;
-};
+export type UpdateProductPackageInput = Partial<
+  Pick<
+    ProductPackage,
+    'displayName' | 'variant' | 'importPrice' | 'sellingPrice' | 'unitId'
+  >
+>;
 
-export type UpdateProductPackageData = Partial<
-  Pick<ProductPackage, 'displayName' | 'importPrice' | 'sellingPrice'>
+export type UpdateProductPackageDto = Partial<
+  Pick<ProductPackage, 'variant' | 'importPrice' | 'sellingPrice' | 'unitId'>
 >;
 
 /* Thừa kế type dựa trên schema Zod listPackageQuerySchema
@@ -88,3 +91,10 @@ export type PackageQueryDto = z.infer<typeof listPackageQuerySchema>;
 
 export type ListProductPackagesResponseDto =
   PaginationResponseDto<ProductPackageDetailResponseDto>;
+
+// data trả về khi query barcode
+export type BarcodeCandidateRecord = {
+  productName: string;
+  brand: string | null;
+  productPackage: ProductPackageResponseDto;
+};

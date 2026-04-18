@@ -61,9 +61,6 @@ productPackageRouter.get(
  *  - inventory: object (required)
  *    - quantity: number (integer, default: 0) - số lượng tồn kho ban đầu
  *    - reorderThreshold?: number | null - ngưỡng cảnh báo
- *
- * Lưu ý:
- *  - Nếu truyền barcodeType thì cần truyền kèm barcodeValue
  */
 productPackageProductRouter
   .route('/:productId/packages')
@@ -95,9 +92,6 @@ productPackageProductRouter
  *  - importPrice?: number | null - giá nhập
  *  - sellingPrice?: number | null - giá bán
  *  - displayNameSuffix?: string | null - phần custom của displayName
- *
- * Lưu ý:
- *  - Nếu cập nhật barcodeType thì cần gửi kèm trường barcodeValue
  *
  * API endpoint: DELETE /api/product-packages/:productPackageId
  * Xóa mềm package theo id

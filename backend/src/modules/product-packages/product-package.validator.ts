@@ -26,18 +26,11 @@ const createProductPackageBodySchema = z
         .min(0, 'Selling price must be greater than or equal to 0')
         .nullable()
         .optional(),
-      barcodeValue: z
+      variant: z
         .string()
         .trim()
-        .min(1, 'Barcode value cannot be empty')
-        .max(255, 'Barcode value cannot exceed 255 characters')
-        .nullable()
-        .optional(),
-      displayNameSuffix: z
-        .string()
-        .trim()
-        .min(1, 'Display name suffix cannot be empty')
-        .max(255, 'Display name suffix cannot exceed 255 characters')
+        .min(1, 'Variant cannot be empty')
+        .max(255, 'Variant cannot exceed 255 characters')
         .optional()
         .default(''),
     }),
@@ -63,11 +56,12 @@ const createProductPackageBodySchema = z
 
 const updateProductPackageBodySchema = z
   .object({
-    displayNameSuffix: z
+    unitId: z.uuid('Invalid unitId'),
+    variant: z
       .string()
       .trim()
-      .min(1, 'Display name suffix cannot be empty')
-      .max(255, 'Display name suffix cannot exceed 255 characters')
+      .min(1, 'Variant cannot be empty')
+      .max(255, 'Variant cannot exceed 255 characters')
       .nullable()
       .optional(),
     importPrice: z.coerce
@@ -78,13 +72,6 @@ const updateProductPackageBodySchema = z
     sellingPrice: z.coerce
       .number()
       .min(0, 'Selling price must be greater than or equal to 0')
-      .nullable()
-      .optional(),
-    barcodeValue: z
-      .string()
-      .trim()
-      .min(1, 'Barcode value cannot be empty')
-      .max(255, 'Barcode value cannot exceed 255 characters')
       .nullable()
       .optional(),
   })

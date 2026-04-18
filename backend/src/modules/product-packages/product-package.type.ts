@@ -5,6 +5,7 @@ export type ProductPackage = {
   displayName: string | null;
   importPrice: number | null;
   sellingPrice: number | null;
+  variant: string | null;
   activeStatus: ActiveStatus;
   createdAt: Date;
   updatedAt: Date;

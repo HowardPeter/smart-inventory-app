@@ -19,14 +19,14 @@ import type { DbClient } from '../../../common/types/db.type.js';
 import type { Prisma } from '../../../generated/prisma/client.js';
 import type { ProductSimpleResponseDto } from '../../products/index.js';
 import type {
-  CreateProductPackageData,
+  CreateProductPackageInput,
   CreateProductPackageAndInventoryDto,
   ListProductPackagesResponseDto,
   PackageQueryDto,
   ProductPackageDetailResponseDto,
   ProductPackageResponseDto,
   UpdateProductPackageDto,
-  UpdateProductPackageData,
+  UpdateProductPackageInput,
   ProductPackageResponseForTransaction,
   CreatePackageAndInventoryResponseDto,
 } from '../product-package.dto.js';
@@ -204,20 +204,14 @@ export class ProductPackageService {
   ): Promise<CreatePackageAndInventoryResponseDto> {
     // NOTE: Ở đây từng có check barcode đã tồn tại
 
-    const { displayNameSuffix, ...packageBaseData } = data.package;
-
-    const defaultDisplayName = await this.getDefaultDisplayName(
+    const displayName = await this.getDefaultDisplayName(
       storeId,
       productId,
       data.package.unitId,
     );
 
-    const displayName = [defaultDisplayName, displayNameSuffix?.trim()]
-      .filter(Boolean)
-      .join(' ');
-
-    const createPackageData: CreateProductPackageData = {
-      ...packageBaseData,
+    const createPackageData: CreateProductPackageInput = {
+      ...data.package,
       productId,
       displayName,
     };
@@ -242,6 +236,7 @@ export class ProductPackageService {
         newValue: {
           productId: createdPackageInventory.productId,
           displayName: createdPackageInventory.displayName,
+          variant: createdPackageInventory.variant,
           unitId: createdPackageInventory.unitId,
           importPrice: createdPackageInventory.importPrice,
           sellingPrice: createdPackageInventory.sellingPrice,
@@ -277,11 +272,23 @@ export class ProductPackageService {
       productPackageId,
     );
 
-    // NOTE: Ở đây từng có check barcode đã tồn tại
+    const updateData: UpdateProductPackageInput = {};
 
-    // NOTE: Ở đây từng có check 'barcodeType requires barcodeValue'
+    if (data.unitId !== undefined) {
+      updateData.unitId = data.unitId;
 
-    const updateData: UpdateProductPackageData = {};
+      const newDisplayName = await this.getDefaultDisplayName(
+        storeId,
+        existingProductPackage.productId,
+        data.unitId,
+      );
+
+      updateData.displayName = newDisplayName;
+    }
+
+    if (data.variant !== undefined) {
+      updateData.variant = data.variant;
+    }
 
     if (data.importPrice !== undefined) {
       updateData.importPrice = data.importPrice;
@@ -291,27 +298,15 @@ export class ProductPackageService {
       updateData.sellingPrice = data.sellingPrice;
     }
 
-    if (data.displayNameSuffix !== undefined) {
-      const defaultDisplayName = await this.getDefaultDisplayName(
-        storeId,
-        existingProductPackage.productId,
-        existingProductPackage.unitId,
-      );
-
-      const suffix = data.displayNameSuffix?.trim();
-
-      updateData.displayName = [defaultDisplayName, suffix]
-        .filter(Boolean)
-        .join(' ');
-    }
-
     // detect các trường được update trước khi ghi vào log
     // tránh ghi log data không cần thiết
     const { oldValue, newValue } = buildAuditDiff(
       {
         displayName: existingProductPackage.displayName,
+        variant: existingProductPackage.variant,
         importPrice: existingProductPackage.importPrice,
         sellingPrice: existingProductPackage.sellingPrice,
+        unitId: existingProductPackage.unitId,
       },
       updateData,
     );
