@@ -164,6 +164,7 @@ model Unit {
 model ProductPackage {
   productPackageId String       @id @default(uuid()) @map("product_package_id")
   displayName      String?      @map("display_name")
+  variant          String?
   importPrice      Decimal?     @map("import_price") @db.Decimal(18, 2)
   sellingPrice     Decimal?     @map("selling_price") @db.Decimal(18, 2)
   activeStatus     ActiveStatus @default(active) @map("active_status")
