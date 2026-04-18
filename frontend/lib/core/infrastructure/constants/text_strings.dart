@@ -1068,4 +1068,14 @@ class TTexts {
   //-- System
   static const String systemSnackbarTitle = "system_snackbar_title";
   static const String systemSnackbar403Error = "system_snackbar_403_error";
+
+  // -- Smart Decision (Reorder Suggestion)
+  static const String reorderReportTitle = "reorder_report_title";
+  static const String aiAnalyzingStock = "ai_analyzing_stock";
+  static const String optimalStockTitle = "optimal_stock_title";
+  static const String optimalStockDesc = "optimal_stock_desc";
+  static const String productLabel = "product_label";
+  static const String currentStockLabel = "current_stock_label";
+  static const String alertThresholdLabel = "alert_threshold_label";
+  static const String suggestedImportLabel = "suggested_import_label";
 }

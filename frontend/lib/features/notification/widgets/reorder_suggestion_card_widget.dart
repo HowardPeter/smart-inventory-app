@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:frontend/core/infrastructure/constants/text_strings.dart';
 import 'package:frontend/core/infrastructure/models/reorder_suggestion_model.dart';
 import 'package:frontend/core/ui/theme/app_colors.dart';
 import 'package:frontend/core/ui/theme/app_sizes.dart';
+import 'package:get/get.dart';
 import 'package:iconsax_flutter/iconsax_flutter.dart';
 
 class ReorderSuggestionCardWidget extends StatelessWidget {
@@ -50,7 +52,7 @@ class ReorderSuggestionCardWidget extends StatelessWidget {
                               size: 16, color: AppColors.softGrey),
                           const SizedBox(width: 8),
                           Text(
-                            'SẢN PHẨM',
+                            TTexts.productLabel.tr.toUpperCase(),
                             style: TextStyle(
                               fontFamily: 'Poppins',
                               fontSize: 11,
@@ -101,11 +103,13 @@ class ReorderSuggestionCardWidget extends StatelessWidget {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      _buildMiniStat('Tồn hiện tại', '${item.currentStock}',
+                      _buildMiniStat(
+                          TTexts.currentStockLabel.tr,
+                          '${item.currentStock}',
                           AppColors.toastErrorGradientEnd),
                       const SizedBox(height: 12),
-                      _buildMiniStat('Ngưỡng báo', '${item.suggestedThreshold}',
-                          AppColors.subText),
+                      _buildMiniStat(TTexts.alertThresholdLabel.tr,
+                          '${item.suggestedThreshold}', AppColors.subText),
                     ],
                   ),
                 ),
@@ -120,9 +124,9 @@ class ReorderSuggestionCardWidget extends StatelessWidget {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.center,
                     children: [
-                      const Text(
-                        'Đề xuất nhập',
-                        style: TextStyle(
+                      Text(
+                        TTexts.suggestedImportLabel.tr,
+                        style: const TextStyle(
                           fontFamily: 'Poppins',
                           fontSize: 12,
                           fontWeight: FontWeight.w500,
