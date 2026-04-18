@@ -132,6 +132,7 @@ export class ProductRepository {
           select: {
             productPackageId: true,
             displayName: true,
+            variant: true,
             importPrice: true,
             sellingPrice: true,
             unit: {
