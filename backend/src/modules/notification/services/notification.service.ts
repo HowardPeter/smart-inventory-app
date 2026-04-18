@@ -53,7 +53,8 @@ export class NotificationService {
       [
         'DISCREPANCY_ALERT',
         'LOW_STOCK',
-        'BATCH_LOW_STOCK, REORDER_SUGGESTION',
+        'BATCH_LOW_STOCK',
+        'REORDER_SUGGESTION',
       ].includes(type)
     ) {
       fcmPriority = 'high';

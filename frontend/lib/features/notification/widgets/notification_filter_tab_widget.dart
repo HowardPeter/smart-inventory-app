@@ -28,13 +28,14 @@ class NotificationFilterTabWidget extends StatelessWidget {
           const SizedBox(width: 8),
 
           // Nhóm Cảnh báo & Tồn kho
-          _buildFilterChip(TTexts.filterLowStock.tr, 'LOW_STOCK', controller),
+          _buildFilterChip(TTexts.filterLowStock.tr,
+              'LOW_STOCK,BATCH_LOW_STOCK', controller),
           const SizedBox(width: 8),
           _buildFilterChip(
               TTexts.filterDiscrepancy.tr, 'DISCREPANCY_ALERT', controller),
           const SizedBox(width: 8),
-          _buildFilterChip(
-              TTexts.filterReorder.tr, 'REORDER_SUGGESTION', controller),
+          _buildFilterChip(TTexts.filterReorder.tr,
+              'REORDER_SUGGESTION,BATCH_REORDER_SUGGESTION', controller),
           const SizedBox(width: 8),
 
           // Nhóm Giao dịch
