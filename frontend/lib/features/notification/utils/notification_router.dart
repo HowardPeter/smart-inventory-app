@@ -100,16 +100,11 @@ class NotificationRouter {
         Get.toNamed(AppRoutes.lowStock);
         break;
 
-      // 2. Nhóm gợi ý nhập hàng (UC-NA-02 & UC-SDS-01) - MỚI THÊM
+      // 2. Nhóm gợi ý nhập hàng
       case 'REORDER_SUGGESTION':
+      case 'BATCH_REORDER_SUGGESTION':
       case 'REORDER_REQUIRED':
-        if (referenceId != null && referenceId.isNotEmpty) {
-          // Có thể truyền thêm tham số báo cho màn hình Detail biết cần bật Popup gợi ý nhập hàng
-          Get.toNamed(AppRoutes.inventoryDetail,
-              arguments: referenceId, parameters: {'action': 'reorder'});
-        } else {
-          Get.toNamed(AppRoutes.lowStock);
-        }
+        Get.toNamed(AppRoutes.reorderSuggestion);
         break;
 
       // 3. Nhóm Giao dịch (UC-ST-01 -> UC-ST-04)

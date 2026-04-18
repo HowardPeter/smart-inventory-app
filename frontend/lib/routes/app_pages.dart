@@ -32,7 +32,8 @@ import 'package:frontend/features/inventory/views/product_catalog_view.dart';
 import 'package:frontend/features/inventory/views/product_form_view.dart';
 import 'package:frontend/features/navigation/bindings/navigation_binding.dart';
 import 'package:frontend/features/navigation/views/navigation_view.dart';
-import 'package:frontend/features/notification/view/platform/notification_mobile_screen.dart';
+import 'package:frontend/features/notification/view/notification_view.dart';
+import 'package:frontend/features/notification/view/reorder_suggestion_view.dart';
 import 'package:frontend/features/onboarding/bindings/onboarding_binding.dart';
 import 'package:frontend/features/profile/bindings/profile_assigns_role_binding.dart';
 import 'package:frontend/features/profile/bindings/profile_binding.dart';
@@ -357,7 +358,7 @@ class AppPages {
     // -- Notification
     GetPage(
       name: AppRoutes.notification,
-      page: () => const NotificationMobileScreen(),
+      page: () => const NotificationView(),
     ),
 
     // -- Profile
@@ -396,6 +397,12 @@ class AppPages {
       page: () => const ProfileAssignsRoleView(),
       binding: ProfileAssignsRoleBinding(),
       transition: Transition.cupertino,
+    ),
+
+    // -- Reorder suggestion
+    GetPage(
+      name: AppRoutes.reorderSuggestion,
+      page: () => const ReorderSuggestionView(),
     ),
   ];
 }
