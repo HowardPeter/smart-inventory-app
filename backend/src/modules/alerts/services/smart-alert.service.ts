@@ -183,7 +183,7 @@ export class SmartAlertService {
           storeId,
           '⚠️ Low Stock Alert',
           bodyText,
-          'LOW_STOCK',
+          appEvents.LOW_STOCK,
           inventory.productPackage?.productId,
         ),
       ),
@@ -354,7 +354,7 @@ export class SmartAlertService {
             payload.storeId,
             '⚠️ Low Stock Alert',
             bodyText,
-            'LOW_STOCK',
+            appEvents.LOW_STOCK,
             inv.productPackage?.product?.productId,
           ),
         ),
@@ -427,7 +427,7 @@ export class SmartAlertService {
           storeId,
           title,
           bodyText,
-          'DISCREPANCY_ALERT',
+          appEvents.INVENTORY_DISCREPANCY,
           adjustmentId,
         ),
       ),
@@ -454,7 +454,7 @@ export class SmartAlertService {
     // Chuẩn bị nội dung
     const isImport = payload.type === 'import';
     const actionType = isImport ? 'import' : 'export';
-    const notiType = isImport ? 'IMPORT' : 'EXPORT';
+    const notiType = isImport ? appEvents.IMPORT : appEvents.EXPORT;
 
     const title = isImport
       ? '📦 Stock Import Completed'
@@ -500,7 +500,7 @@ export class SmartAlertService {
       payload.storeId,
       title,
       bodyText,
-      'ROLE_UPDATED',
+      appEvents.ROLE_UPDATED,
       undefined,
     );
   }
@@ -544,7 +544,7 @@ export class SmartAlertService {
           payload.storeId,
           title,
           bodyText,
-          'REORDER_SUGGESTION',
+          appEvents.REORDER_SUGGESTION,
           undefined,
         ),
       ),
