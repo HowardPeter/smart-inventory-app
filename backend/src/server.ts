@@ -6,7 +6,10 @@ import { initFirebaseAdmin } from './config/firebase.config.js';
 import { initCronJobs } from './cron/index.js';
 import { smartDecisionRouter } from './modules/alerts/index.js';
 import { auditLogRouter } from './modules/audit-log/audit-log.route.js';
-import { barcodeRouter } from './modules/barcode/index.js';
+import {
+  barcodeRouter,
+  productPackageBarcodeRouter,
+} from './modules/barcode/index.js';
 import { categoryRouter } from './modules/categories/index.js';
 import { inventoryRouter } from './modules/inventories/inventory.route.js';
 import notificationRouter from './modules/notification/notification.route.js';
@@ -47,7 +50,10 @@ app.use('/api/barcodes', barcodeRouter);
 app.use('/api/products', [productRouter, productPackageProductRouter]);
 app.use('/api/categories', categoryRouter);
 app.use('/api/auth', userProfileRouter);
-app.use('/api/product-packages', productPackageRouter);
+app.use('/api/product-packages', [
+  productPackageRouter,
+  productPackageBarcodeRouter,
+]);
 app.use('/api/inventories', inventoryRouter);
 app.use('/api/transactions', transactionRouter);
 app.use('/api/audit-logs', auditLogRouter);
