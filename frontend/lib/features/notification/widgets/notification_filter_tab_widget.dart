@@ -3,6 +3,7 @@ import 'package:frontend/core/infrastructure/constants/text_strings.dart';
 import 'package:frontend/core/ui/theme/app_colors.dart';
 import 'package:frontend/core/ui/theme/app_sizes.dart';
 import 'package:frontend/features/notification/controller/notification_controller.dart';
+import 'package:frontend/features/notification/utils/notification_constants.dart';
 import 'package:get/get.dart';
 
 class NotificationFilterTabWidget extends StatelessWidget {
@@ -26,26 +27,20 @@ class NotificationFilterTabWidget extends StatelessWidget {
         children: [
           _buildFilterChip(TTexts.filterAll.tr, 'ALL', controller),
           const SizedBox(width: 8),
-
-          // Nhóm Cảnh báo & Tồn kho
-          _buildFilterChip(TTexts.filterLowStock.tr,
-              'LOW_STOCK,BATCH_LOW_STOCK', controller),
-          const SizedBox(width: 8),
           _buildFilterChip(
-              TTexts.filterDiscrepancy.tr, 'DISCREPANCY_ALERT', controller),
+              TTexts.filterLowStock.tr, NotificationTypes.lowStock, controller),
+          const SizedBox(width: 8),
+          _buildFilterChip(TTexts.filterDiscrepancy.tr,
+              NotificationTypes.discrepancyAlert, controller),
           const SizedBox(width: 8),
           _buildFilterChip(TTexts.filterReorder.tr,
-              'REORDER_SUGGESTION,BATCH_REORDER_SUGGESTION', controller),
+              NotificationTypes.reorderSuggestion, controller),
           const SizedBox(width: 8),
-
-          // Nhóm Giao dịch
-          _buildFilterChip(TTexts.filterImport.tr, 'IMPORT', controller),
+          _buildFilterChip(
+              TTexts.filterImport.tr, NotificationTypes.import, controller),
           const SizedBox(width: 8),
-          _buildFilterChip(TTexts.filterExport.tr, 'EXPORT', controller),
-          const SizedBox(width: 8),
-
-          // Nhóm Hệ thống
-          _buildFilterChip(TTexts.filterSystem.tr, 'ROLE_UPDATED', controller),
+          _buildFilterChip(
+              TTexts.filterExport.tr, NotificationTypes.export, controller),
         ],
       ),
     );
