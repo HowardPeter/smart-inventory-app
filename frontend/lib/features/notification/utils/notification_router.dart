@@ -88,6 +88,7 @@ class NotificationRouter {
     switch (type) {
       // 1. Nhóm Cảnh báo Tồn kho
       case NotificationTypes.lowStock:
+      case NotificationTypes.batchLowStock:
         if (referenceId != null && referenceId.isNotEmpty) {
           Get.toNamed(AppRoutes.inventoryDetail, arguments: referenceId);
         } else {
@@ -112,7 +113,7 @@ class NotificationRouter {
         break;
 
       // 4. Nhóm Lệch kho
-      case NotificationTypes.discrepancyAlert:
+      case NotificationTypes.inventoryDiscrepancy:
         if (referenceId != null && referenceId.isNotEmpty) {
           Get.toNamed(AppRoutes.adjustmentHistory,
               arguments: {'batchId': '[Lô-$referenceId]'});

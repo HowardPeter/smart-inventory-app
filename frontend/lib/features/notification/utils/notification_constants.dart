@@ -1,7 +1,8 @@
 class NotificationTypes {
   // Cảnh báo & Tồn kho
+  static const String batchLowStock = 'BATCH_LOW_STOCK';
   static const String lowStock = 'LOW_STOCK';
-  static const String discrepancyAlert = 'DISCREPANCY_ALERT';
+  static const String inventoryDiscrepancy = 'INVENTORY_DISCREPANCY';
   static const String reorderSuggestion = 'REORDER_SUGGESTION';
 
   // Giao dịch
