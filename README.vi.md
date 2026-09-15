@@ -236,3 +236,7 @@ Giao diện mobile được chuẩn bị cho chatbot, hướng đến việc h�
 * Quản lý infrastructure thông qua Terraform
 * CI/CD tự động với GitHub Actions
 * Triển khai cloud-native sử dụng các dịch vụ AWS
+
+## Giấy phép
+
+Copyright © 2026 Storix. All rights reserved.
