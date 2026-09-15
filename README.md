@@ -230,3 +230,7 @@ Chatbot-ready mobile UI for future AI-assisted inventory queries and operational
 - Infrastructure managed through Terraform
 - Automated CI/CD with GitHub Actions
 - Cloud-native deployment using AWS services
+
+## License
+
+Copyright © 2026 Storix. All rights reserved.
