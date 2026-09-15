@@ -1,8 +1,27 @@
 # Smart Retail Store Assistant — Storix
 
+<p align="right">
+  🇬🇧 English | <a href="README.vi.md">🇻🇳 Tiếng Việt</a>
+</p>
+
 **Smart Retail Store Assistant (Storix)** is a mobile-first inventory management platform for small and medium retail stores.
 
-**Note:** This is an overview README for the project. The source code is not publicly available as this is a closed-source project.
+<p align="center">
+  <a href="https://play.google.com/store/apps/details?id=com.fourmonkeysstudio.storix">
+    <img src="https://img.shields.io/badge/Google_Play-Storix-0F9D58?logo=googleplay&logoColor=green"/>
+  </a>
+</p>
+
+<p align="center">
+  <img src="https://img.shields.io/badge/Flutter-02569B?logo=flutter&logoColor=white" alt="Flutter" />
+  <img src="https://img.shields.io/badge/Dart-0175C2?logo=dart&logoColor=white" alt="Dart" />
+  <img src="https://img.shields.io/badge/Node.js-339933?logo=node.js&logoColor=white" alt="Node.js" />
+  <img src="https://img.shields.io/badge/TypeScript-3178C6?logo=typescript&logoColor=white" alt="TypeScript" />
+  <img src="https://img.shields.io/badge/PostgreSQL-4169E1?logo=postgresql&logoColor=white" alt="PostgreSQL" />
+  <img src="https://img.shields.io/badge/AWS-232F3E?logo=amazonaws&logoColor=white" alt="AWS" />
+  <img src="https://img.shields.io/badge/Terraform-844FBA?logo=terraform&logoColor=white" alt="Terraform" />
+  <img src="https://img.shields.io/badge/GitHub_Actions-2088FF?logo=githubactions&logoColor=white" alt="GitHub Actions" />
+</p>
 
 ## Why Storix?
 
@@ -11,6 +30,20 @@ Managing inventory in small and medium-sized retail stores often involves repeti
 Storix brings these workflows together in a mobile-first platform, allowing store operators to manage products, track inventory, record stock transactions, and receive alerts from a single application.
 
 By combining barcode-first workflows, automated notifications, inventory insights, and AI-assisted features, Storix aims to make daily inventory operations faster, more consistent, and easier to manage.
+
+## Screenshots / Demo
+
+<p align="center">
+  <img src="docs/images/dashboard.jpg" width="18%" alt="Home Dashboard" />
+  <img src="docs/images/dashboard-2.jpg" width="18%" alt="Home Dashboard 2" />
+  <img src="docs/images/inventory-hub.jpg" width="18%" alt="Inventory Hub" />
+  <img src="docs/images/notifications.jpg" width="18%" alt="Inventory List" />
+  <img src="docs/images/transaction-history.jpg" width="18%" alt="Transaction History" />
+  <img src="docs/images/chatbot.jpg" width="18%" alt="Chatbot" />
+  <img src="docs/images/inventory.jpg" width="18%" alt="Inventory" />
+  <img src="docs/images/product.jpg" width="18%" alt="Product" />
+  <img src="docs/images/restock.jpg" width="18%" alt="Restock" />
+</p>
 
 ## Key Features
 
@@ -62,8 +95,7 @@ Chatbot-ready mobile UI for future AI-assisted inventory queries and operational
 | Mobile | Flutter, Dart |
 | Backend | Node.js, TypeScript, Express.js |
 | ORM | Prisma |
-| Database | PostgreSQL |
-| Backend Services | Supabase |
+| Database | PostgreSQL, Supabase |
 | Cache | Redis |
 | Authentication | Supabase Auth |
 | Push Notifications | Firebase Cloud Messaging |
@@ -75,13 +107,16 @@ Chatbot-ready mobile UI for future AI-assisted inventory queries and operational
 ## Deployment Infrastructure
 
 <p align="center">
-  <img src="images/infrastructure.jpg" width="75%"/>
+  <img src="docs/images/infrastructure.jpg" width="75%"/>
 </p>
 
 ## Project Structure
 
 ```text
 .
+├── .agents/                         # Prompts to chatbot agent
+│   ├── skills/
+│   └── AGENTS.md
 ├── backend/
 │   ├── src/
 │   │   ├── app.ts                   # Express app factory and middleware setup
