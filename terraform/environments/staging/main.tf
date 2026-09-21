@@ -159,65 +159,65 @@ module "sqs_dlq" {
   tags         = var.tags
 }
 
-module "cloudwatch" {
-  source = "../../modules/cloudwatch"
+# module "cloudwatch" {
+#   source = "../../modules/cloudwatch"
 
-  project_name = var.project_name
-  tags         = var.tags
-  region       = var.region
+#   project_name = var.project_name
+#   tags         = var.tags
+#   region       = var.region
 
-  sns_email = var.sns_email
+#   sns_email = var.sns_email
 
-  lambda_function_names = {
-    api_function  = module.lambda_api.function_name
-    cron_function = module.lambda_cron.function_name
-  }
+#   lambda_function_names = {
+#     api_function  = module.lambda_api.function_name
+#     cron_function = module.lambda_cron.function_name
+#   }
 
-  apigw = {
-    api_name  = module.apigw.api_name
-    api_id    = module.apigw.api_id
-    api_stage = module.apigw.stage_name
-  }
+#   apigw = {
+#     api_name  = module.apigw.api_name
+#     api_id    = module.apigw.api_id
+#     api_stage = module.apigw.stage_name
+#   }
 
-  notification_dlq_name = module.sqs_dlq.queue_name
-}
+#   notification_dlq_name = module.sqs_dlq.queue_name
+# }
 
-module "notification_schedule_08h" {
-  source = "../../modules/event_bridge"
+# module "notification_schedule_08h" {
+#   source = "../../modules/event_bridge"
 
-  project_name = var.project_name
-  name_suffix  = "08h"
-  tags         = var.tags
+#   project_name = var.project_name
+#   name_suffix  = "08h"
+#   tags         = var.tags
 
-  target_arn = module.lambda_cron.function_arn
-  role_arn   = module.iam.scheduler_role_arn
+#   target_arn = module.lambda_cron.function_arn
+#   role_arn   = module.iam.scheduler_role_arn
 
-  schedule_expression = "cron(0 8 * * ? *)"
+#   schedule_expression = "cron(0 8 * * ? *)"
 
-  input = jsonencode({
-    source = "sis.scheduler"
-    job    = "generate-reorder-suggestions"
-  })
+#   input = jsonencode({
+#     source = "sis.scheduler"
+#     job    = "generate-reorder-suggestions"
+#   })
 
-  dead_letter_arn = module.sqs_dlq.queue_arn
-}
+#   dead_letter_arn = module.sqs_dlq.queue_arn
+# }
 
-module "notification_schedule_20h" {
-  source = "../../modules/event_bridge"
+# module "notification_schedule_20h" {
+#   source = "../../modules/event_bridge"
 
-  project_name = var.project_name
-  name_suffix  = "20h"
-  tags         = var.tags
+#   project_name = var.project_name
+#   name_suffix  = "20h"
+#   tags         = var.tags
 
-  target_arn = module.lambda_cron.function_arn
-  role_arn   = module.iam.scheduler_role_arn
+#   target_arn = module.lambda_cron.function_arn
+#   role_arn   = module.iam.scheduler_role_arn
 
-  schedule_expression = "cron(0 20 * * ? *)"
+#   schedule_expression = "cron(0 20 * * ? *)"
 
-  input = jsonencode({
-    source = "sis.scheduler"
-    job    = "scan-low-stock"
-  })
+#   input = jsonencode({
+#     source = "sis.scheduler"
+#     job    = "scan-low-stock"
+#   })
 
-  dead_letter_arn = module.sqs_dlq.queue_arn
-}
+#   dead_letter_arn = module.sqs_dlq.queue_arn
+# }
