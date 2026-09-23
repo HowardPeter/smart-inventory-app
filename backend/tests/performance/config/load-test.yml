@@ -1,0 +1,74 @@
+# SIS - Phase 1 Load & Availability test configuration
+# IMPORTANT:
+# - Run against STAGING only.
+# - Do not put real access tokens/secrets in this file.
+# - JMeter receives runtime values through -J properties.
+
+target:
+  protocol: "https"
+  host: "REPLACE_WITH_STAGING_API_HOST"
+
+workload:
+  endpoint: "/REPLACE_WITH_READ_ONLY_ENDPOINT"
+  method: "GET"
+  timeout_ms: 10000
+
+auth:
+  # Pass the token at runtime:
+  # ./scripts/run-phase1.sh baseline --token "$SIS_TEST_TOKEN"
+  token_env: "SIS_TEST_TOKEN"
+
+scenarios:
+  baseline:
+    users: 10
+    ramp_up_seconds: 30
+    duration_seconds: 120
+
+  load_100:
+    users: 100
+    ramp_up_seconds: 60
+    duration_seconds: 300
+
+  load_200:
+    users: 200
+    ramp_up_seconds: 120
+    duration_seconds: 300
+
+  load_500:
+    users: 500
+    ramp_up_seconds: 180
+    duration_seconds: 300
+
+  load_1000:
+    users: 1000
+    ramp_up_seconds: 300
+    duration_seconds: 300
+
+  sustained:
+    users: 300
+    ramp_up_seconds: 180
+    duration_seconds: 1800
+
+  rps_100:
+    target_rps: 100
+    users: 100
+    ramp_up_seconds: 60
+    duration_seconds: 300
+
+  rps_200:
+    target_rps: 200
+    users: 200
+    ramp_up_seconds: 120
+    duration_seconds: 300
+
+  rps_500:
+    target_rps: 500
+    users: 500
+    ramp_up_seconds: 180
+    duration_seconds: 300
+
+  rps_1000:
+    target_rps: 1000
+    users: 1000
+    ramp_up_seconds: 300
+    duration_seconds: 300
