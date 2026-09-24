@@ -2,6 +2,23 @@
 
 set -euo pipefail
 
+# Usage:
+#   $0 --start <ISO8601> --end <ISO8601> --output <directory>
+
+# Example:
+#   $0 \\
+#     --start "2026-09-22T13:13:02Z" \\
+#     --end "2026-09-22T13:15:02Z" \\
+#     --output "./results/realistic-10-20260922-201302"
+
+# Environment variables:
+#   AWS_REGION
+#   LAMBDA_FUNCTION
+#   API_ID
+#   API_STAGE
+#   CLOUDWATCH_PERIOD
+#   CLOUDWATCH_BUFFER_SECONDS
+
 REGION="${AWS_REGION:-ap-southeast-1}"
 
 LAMBDA_FUNCTION="${LAMBDA_FUNCTION:-storix-staging-lambda-function-api}"
@@ -13,28 +30,6 @@ PERIOD="${CLOUDWATCH_PERIOD:-60}"
 
 # Buffer around test window to avoid CloudWatch period-boundary issues.
 BUFFER_SECONDS="${CLOUDWATCH_BUFFER_SECONDS:-60}"
-
-# Usage
-usage() {
-  cat <<EOF
-Usage:
-  $0 --start <ISO8601> --end <ISO8601> --output <directory>
-
-Example:
-  $0 \\
-    --start "2026-09-22T13:13:02Z" \\
-    --end "2026-09-22T13:15:02Z" \\
-    --output "./results/realistic-10-20260922-201302"
-
-Environment variables:
-  AWS_REGION
-  LAMBDA_FUNCTION
-  API_ID
-  API_STAGE
-  CLOUDWATCH_PERIOD
-  CLOUDWATCH_BUFFER_SECONDS
-EOF
-}
 
 # Parse arguments
 START_TIME=""
@@ -58,15 +53,9 @@ while [[ $# -gt 0 ]]; do
       shift 2
       ;;
 
-    -h|--help)
-      usage
-      exit 0
-      ;;
-
     *)
       echo "ERROR: Unknown argument: $1"
       echo
-      usage
       exit 1
       ;;
   esac
@@ -76,7 +65,6 @@ done
 if [[ -z "$START_TIME" || -z "$END_TIME" || -z "$OUTPUT_DIR" ]]; then
   echo "ERROR: --start, --end and --output are required."
   echo
-  usage
   exit 1
 fi
 

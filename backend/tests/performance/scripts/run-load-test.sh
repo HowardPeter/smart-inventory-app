@@ -25,8 +25,8 @@ HOST="${TEST_HOST:-qzze2vy50c.execute-api.ap-southeast-1.amazonaws.com}"
 ENDPOINT="${TEST_ENDPOINT:-/api/inventories}"
 
 THINK_TIME_MIN="${THINK_TIME_MIN:-10000}"
-THINK_TIME_RANDOM="${THINK_TIME_RANDOM:-5000}"
-THINK_TIME=$((($THINK_TIME_MIN + $THINK_TIME_RANDOM)/1000))
+THINK_TIME_RANDOM="${THINK_TIME_RANDOM:-15000}"
+THINK_TIME="$(($THINK_TIME_MIN / 1000))-$((($THINK_TIME_MIN + $THINK_TIME_RANDOM)/1000))"
 
 if [[ -z "$SCENARIO" ]]; then
   echo "Usage: $0 <scenario>"
@@ -44,7 +44,7 @@ case "$SCENARIO" in
     USERS=10; RAMPUP=30; DURATION=120; MODE="users"
     ;;
   load_100)
-    USERS=100; RAMPUP=60; DURATION=300; MODE="users"
+    USERS=100; RAMPUP=120; DURATION=300; MODE="users"
     ;;
   load_200)
     USERS=200; RAMPUP=120; DURATION=300; MODE="users"
@@ -53,22 +53,28 @@ case "$SCENARIO" in
     USERS=500; RAMPUP=180; DURATION=300; MODE="users"
     ;;
   load_1000)
-    USERS=1000; RAMPUP=300; DURATION=300; MODE="users"
+    USERS=1000; RAMPUP=300; DURATION=360; MODE="users"
     ;;
   sustained)
-    USERS=300; RAMPUP=180; DURATION=1800; MODE="users"
+    USERS=20; RAMPUP=120; DURATION=1800; MODE="users"
     ;;
-  rps_100)
-    USERS=100; RAMPUP=60; DURATION=300; TARGET_RPS=100; MODE="rps"
+  rps_20)
+    USERS=500; RAMPUP=180; DURATION=300; TPM=1200; MODE="rps"
     ;;
-  rps_200)
-    USERS=200; RAMPUP=120; DURATION=300; TARGET_RPS=200; MODE="rps"
+  rps_40)
+    USERS=500; RAMPUP=180; DURATION=300; TPM=2400; MODE="rps"
     ;;
-  rps_500)
-    USERS=500; RAMPUP=180; DURATION=300; TARGET_RPS=500; MODE="rps"
+  rps_45)
+    USERS=500; RAMPUP=180; DURATION=300; TPM=2700; MODE="rps"
     ;;
-  rps_1000)
-    USERS=1000; RAMPUP=300; DURATION=300; TARGET_RPS=1000; MODE="rps"
+  rps_50)
+    USERS=500; RAMPUP=180; DURATION=300; TPM=3000; MODE="rps"
+    ;;
+  rps_60)
+    USERS=500; RAMPUP=180; DURATION=300; TPM=3600; MODE="rps"
+    ;;
+  rps_70)
+    USERS=500; RAMPUP=180; DURATION=300; TPM=4200; MODE="rps"
     ;;
   *)
     echo "Unknown scenario: $SCENARIO"
@@ -77,6 +83,7 @@ case "$SCENARIO" in
 esac
 
 START_TIME="$(date -u +"%Y-%m-%dT%H:%M:%SZ")"
+
 TIMESTAMP="$(date +%Y%m%d-%H%M%S)"
 OUT_DIR="$RESULT_ROOT/$SCENARIO/$TIMESTAMP"
 mkdir -p "$OUT_DIR"
@@ -88,14 +95,14 @@ else
 fi
 
 echo "=========================================="
-echo "SIS Phase 1 Load & Availability"
+echo "Load & Availability Test"
 echo "Scenario : $SCENARIO"
 echo "Target   : $PROTOCOL://$HOST$ENDPOINT"
 echo "Users    : $USERS"
 echo "Ramp-up  : ${RAMPUP}s"
 echo "Duration : ${DURATION}s"
-echo "Think time: ${THINK_TIME}s"
-[[ "$MODE" == "rps" ]] && echo "Target RPS: $TARGET_RPS"
+[[ "$MODE" == "rps" ]] && echo "Target RPS: $(($TPM / 60))"
+[[ "$MODE" == "users" ]] && echo "Think time: ${THINK_TIME}s"
 echo "Output   : $OUT_DIR"
 echo "=========================================="
 
@@ -109,15 +116,16 @@ COMMON_ARGS=(
   -Jusers="$USERS"
   -Jrampup="$RAMPUP"
   -Jduration="$DURATION"
-  -Jthink_min="$THINK_TIME_MIN"
-  -Jthink_random="$THINK_TIME_RANDOM"
   -l "$OUT_DIR/results.jtl"
   -e
   -o "$OUT_DIR/html-report"
 )
 
 if [[ "$MODE" == "rps" ]]; then
-  COMMON_ARGS+=(-Jtarget_rps="$TARGET_RPS")
+  COMMON_ARGS+=(-Jthroughput_per_minute="$TPM")
+else
+  COMMON_ARGS+=(-Jthink_min="$THINK_TIME_MIN")
+  COMMON_ARGS+=(-Jthink_random="$THINK_TIME_RANDOM")
 fi
 
 jmeter "${COMMON_ARGS[@]}"
@@ -130,16 +138,17 @@ endpoint=$ENDPOINT
 users=$USERS
 ramp_up_seconds=$RAMPUP
 duration_seconds=$DURATION
-think_time_seconds=$THINK_TIME
 mode=$MODE
-$( [[ "$MODE" == "rps" ]] && echo "target_rps=$TARGET_RPS" )
+$( [[ "$MODE" == "rps" ]] && echo "throughput_per_minute=$TPM" )
+$( [[ "$MODE" == "users" ]] && echo "think_time_seconds=$THINK_TIME" )
 timestamp=$TIMESTAMP
 EOF
 
-echo
 END_TIME="$(date -u +"%Y-%m-%dT%H:%M:%SZ")"
+
+echo
 echo "Test completed."
 echo "HTML report: $OUT_DIR/html-report/index.html"
 echo "Raw results: $OUT_DIR/results.jtl"
 printf './scripts/collect-cloudwatch.sh --start "%s" --end "%s" --output "%s"\n' \
-  "$START_TIME" "$END_TIME" "$OUT_DIR/cloudwatch-metrics"
+  "$START_TIME" "$END_TIME" "$OUT_DIR"
