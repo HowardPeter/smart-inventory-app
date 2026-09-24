@@ -1,0 +1,35 @@
+{
+    "Label": "Throttles",
+    "Datapoints": [
+        {
+            "Timestamp": "2026-09-24T17:38:00+07:00",
+            "Sum": 0.0,
+            "Unit": "Count"
+        },
+        {
+            "Timestamp": "2026-09-24T17:37:00+07:00",
+            "Sum": 0.0,
+            "Unit": "Count"
+        },
+        {
+            "Timestamp": "2026-09-24T17:36:00+07:00",
+            "Sum": 0.0,
+            "Unit": "Count"
+        },
+        {
+            "Timestamp": "2026-09-24T17:35:00+07:00",
+            "Sum": 0.0,
+            "Unit": "Count"
+        },
+        {
+            "Timestamp": "2026-09-24T17:39:00+07:00",
+            "Sum": 0.0,
+            "Unit": "Count"
+        },
+        {
+            "Timestamp": "2026-09-24T17:34:00+07:00",
+            "Sum": 0.0,
+            "Unit": "Count"
+        }
+    ]
+}

@@ -1,0 +1,11 @@
+scenario=load_100
+protocol=https
+host=qzze2vy50c.execute-api.ap-southeast-1.amazonaws.com
+endpoint=/api/inventories
+users=100
+ramp_up_seconds=120
+duration_seconds=300
+think_time_seconds=10 - 25
+mode=users
+
+timestamp=20260923-212124

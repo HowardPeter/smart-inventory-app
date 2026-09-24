@@ -1,0 +1,53 @@
+{
+    "Label": "Latency",
+    "Datapoints": [
+        {
+            "Timestamp": "2026-09-24T01:50:00+07:00",
+            "Average": 52.90073761854584,
+            "Maximum": 30000.0,
+            "Unit": "Milliseconds"
+        },
+        {
+            "Timestamp": "2026-09-24T01:46:00+07:00",
+            "Average": 1215.668841761827,
+            "Maximum": 6892.0,
+            "Unit": "Milliseconds"
+        },
+        {
+            "Timestamp": "2026-09-24T01:49:00+07:00",
+            "Average": 146.56577266922093,
+            "Maximum": 30002.0,
+            "Unit": "Milliseconds"
+        },
+        {
+            "Timestamp": "2026-09-24T01:45:00+07:00",
+            "Average": 531.2854662698413,
+            "Maximum": 4769.0,
+            "Unit": "Milliseconds"
+        },
+        {
+            "Timestamp": "2026-09-24T01:52:00+07:00",
+            "Average": 69.70766345123258,
+            "Maximum": 2554.0,
+            "Unit": "Milliseconds"
+        },
+        {
+            "Timestamp": "2026-09-24T01:48:00+07:00",
+            "Average": 277.72222222222223,
+            "Maximum": 30002.0,
+            "Unit": "Milliseconds"
+        },
+        {
+            "Timestamp": "2026-09-24T01:51:00+07:00",
+            "Average": 27.85563973063973,
+            "Maximum": 3192.0,
+            "Unit": "Milliseconds"
+        },
+        {
+            "Timestamp": "2026-09-24T01:47:00+07:00",
+            "Average": 309.7736715504046,
+            "Maximum": 5715.0,
+            "Unit": "Milliseconds"
+        }
+    ]
+}

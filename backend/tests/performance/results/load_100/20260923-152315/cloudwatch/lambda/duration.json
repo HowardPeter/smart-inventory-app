@@ -1,0 +1,41 @@
+{
+    "Label": "Duration",
+    "Datapoints": [
+        {
+            "Timestamp": "2026-09-23T15:27:00+07:00",
+            "Average": 200.96944116764712,
+            "Maximum": 2516.72,
+            "Unit": "Milliseconds"
+        },
+        {
+            "Timestamp": "2026-09-23T15:26:00+07:00",
+            "Average": 191.99449998529414,
+            "Maximum": 1445.12,
+            "Unit": "Milliseconds"
+        },
+        {
+            "Timestamp": "2026-09-23T15:25:00+07:00",
+            "Average": 179.5250455775074,
+            "Maximum": 1067.45,
+            "Unit": "Milliseconds"
+        },
+        {
+            "Timestamp": "2026-09-23T15:23:00+07:00",
+            "Average": 382.4433149171271,
+            "Maximum": 4172.51,
+            "Unit": "Milliseconds"
+        },
+        {
+            "Timestamp": "2026-09-23T15:28:00+07:00",
+            "Average": 241.13673684210528,
+            "Maximum": 1374.19,
+            "Unit": "Milliseconds"
+        },
+        {
+            "Timestamp": "2026-09-23T15:24:00+07:00",
+            "Average": 286.95689348224863,
+            "Maximum": 1897.32,
+            "Unit": "Milliseconds"
+        }
+    ]
+}

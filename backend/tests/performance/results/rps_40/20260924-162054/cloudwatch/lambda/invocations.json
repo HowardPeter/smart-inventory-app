@@ -1,0 +1,35 @@
+{
+    "Label": "Invocations",
+    "Datapoints": [
+        {
+            "Timestamp": "2026-09-24T16:23:00+07:00",
+            "Sum": 2541.0,
+            "Unit": "Count"
+        },
+        {
+            "Timestamp": "2026-09-24T16:22:00+07:00",
+            "Sum": 2553.0,
+            "Unit": "Count"
+        },
+        {
+            "Timestamp": "2026-09-24T16:21:00+07:00",
+            "Sum": 2273.0,
+            "Unit": "Count"
+        },
+        {
+            "Timestamp": "2026-09-24T16:25:00+07:00",
+            "Sum": 2283.0,
+            "Unit": "Count"
+        },
+        {
+            "Timestamp": "2026-09-24T16:20:00+07:00",
+            "Sum": 11.0,
+            "Unit": "Count"
+        },
+        {
+            "Timestamp": "2026-09-24T16:24:00+07:00",
+            "Sum": 2402.0,
+            "Unit": "Count"
+        }
+    ]
+}
