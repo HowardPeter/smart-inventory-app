@@ -146,8 +146,8 @@ module "apigw" {
   project_name = var.project_name
   tags         = var.tags
 
-  throttling_rate_limit = 20
-  throttling_burst_limit = 40
+  throttling_rate_limit = 10000
+  throttling_burst_limit = 5000
 
   api_routes = {
     lambda_invoke_arn = module.lambda_api.function_invoke_arn
