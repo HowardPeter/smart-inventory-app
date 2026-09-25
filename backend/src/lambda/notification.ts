@@ -12,7 +12,7 @@ await loadCronSecretsToEnvironment();
 console.info('Loaded SSM Parameter secrets to env variables');
 
 // Khởi tạo firebase
-await initFirebaseAdmin();
+initFirebaseAdmin();
 
 // Chỉ import các service sau khi database và Firebase đã sẵn sàng
 const { smartAlertService, smartDecisionService } =

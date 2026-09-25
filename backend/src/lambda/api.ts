@@ -11,7 +11,7 @@ await loadApiSecretsToEnvironment();
 console.info('Loaded SSM Parameter secrets to env variables');
 
 // Khởi tạo firebase
-await initFirebaseAdmin();
+initFirebaseAdmin();
 
 // dynamic import để load secret value trước khi khởi tạo server
 const { app } = await import('../app.js');
