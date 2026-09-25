@@ -40,24 +40,53 @@ export class InventoryService {
     auditLogRepositoryTx: new AuditLogRepository(db),
   });
 
+  // private async getSignedUrlForItemImageUrl(
+  //   items: InventoryListItemDto[],
+  // ): Promise<InventoryListItemDto[]> {
+  //   return await Promise.all(
+  //     items.map(async (item) => ({
+  //       ...item,
+  //       productPackage: {
+  //         ...item.productPackage,
+  //         product: {
+  //           ...item.productPackage.product,
+  //           imageUrl: await StorageService.getSignedUrl(
+  //             process.env.STORAGE_BUCKET ?? 'images',
+  //             item.productPackage.product.imageUrl,
+  //           ),
+  //         },
+  //       },
+  //     })),
+  //   );
+  // }
+
   private async getSignedUrlForItemImageUrl(
     items: InventoryListItemDto[],
   ): Promise<InventoryListItemDto[]> {
-    return await Promise.all(
-      items.map(async (item) => ({
+    const paths = items
+      .map((item) => item.productPackage.product.imageUrl)
+      .filter((path): path is string => !!path);
+
+    if (paths.length === 0) {
+      return items;
+    }
+
+    const signedUrlMap = await StorageService.getBatchSignedUrl(paths);
+
+    return items.map((item) => {
+      const path = item.productPackage.product.imageUrl;
+
+      return {
         ...item,
         productPackage: {
           ...item.productPackage,
           product: {
             ...item.productPackage.product,
-            imageUrl: await StorageService.getSignedUrl(
-              process.env.STORAGE_BUCKET ?? 'images',
-              item.productPackage.product.imageUrl,
-            ),
+            imageUrl: path ? (signedUrlMap.get(path) ?? null) : null,
           },
         },
-      })),
-    );
+      };
+    });
   }
 
   // Hàm helper dùng chung để kiểm tra sự tồn tại của kho hàng,

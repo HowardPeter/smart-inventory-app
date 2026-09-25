@@ -1,3 +1,4 @@
+import 'dotenv/config';
 import { StatusCodes } from 'http-status-codes';
 
 import { SupabaseProvider } from '../../db/supabaseClient.js';
@@ -35,6 +36,41 @@ export class StorageService {
       }
 
       return data.signedUrl;
+    } catch (error) {
+      throw new CustomError({
+        message: `Exception occured while creating signed URL Supabase: ${error}`,
+        status: StatusCodes.INTERNAL_SERVER_ERROR,
+        isOperational: false,
+      });
+    }
+  }
+
+  // Batch signed url giảm concurrent request khi lấy nhiều signed url
+  static async getBatchSignedUrl(
+    imagePaths: string[],
+  ): Promise<Map<string, string>> {
+    if (!imagePaths || imagePaths.length === 0) {
+      return new Map();
+    }
+
+    try {
+      // 1. Gọi Singleton Client từ Provider
+      const supabase = SupabaseProvider.getClient();
+
+      // 2. Sử dụng client để tạo Signed URL
+      const { data, error } = await supabase.storage
+        .from(STORAGE_BUCKET)
+        .createSignedUrls(imagePaths, 60 * 60);
+
+      if (error) {
+        throw new CustomError({
+          message: `Error occured while creating signed URL Supabase: ${error}`,
+          status: StatusCodes.INTERNAL_SERVER_ERROR,
+          isOperational: false,
+        });
+      }
+
+      return new Map(data.map((item) => [item.path!, item.signedUrl]));
     } catch (error) {
       throw new CustomError({
         message: `Exception occured while creating signed URL Supabase: ${error}`,
