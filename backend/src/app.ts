@@ -42,7 +42,7 @@ app.use(pinoLogger);
 app.use('/api/health', healthRouter);
 
 // Global rate limiter
-app.use('/api', rateLimiter({ windowMs: 5 * 60 * 1000, max: 300 }));
+// app.use('/api', rateLimiter({ windowMs: 5 * 60 * 1000, max: 300 }));
 
 app.use(
   '/api/stores',
@@ -81,7 +81,7 @@ app.use(
 
 app.use(
   '/api/inventories',
-  rateLimiter({ windowMs: 60 * 1000, max: 120 }),
+  // rateLimiter({ windowMs: 60 * 1000, max: 120 }),
   inventoryRouter,
 );
 
