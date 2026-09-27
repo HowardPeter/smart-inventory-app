@@ -9,7 +9,7 @@ jobs:
   keep-alive:
     runs-on: ubuntu-latest
 
-    environment: ${{ vars.ENVIRONMENT }}
+    environment: production
 
     steps:
       - name: Ping Supabase
