@@ -12,10 +12,10 @@ resource "aws_lambda_function" "main" {
 
   reserved_concurrent_executions = var.reserved_concurrent_executions
 
-  # # Bật X-ray tracing
-  # tracing_config {
-  #   mode = "Active"
-  # }
+  # Bật X-ray tracing
+  tracing_config {
+    mode = var.enable_tracing ? "Active" : "PassThrough"
+  }
 
   image_config {
     command = var.image_command
