@@ -1,5 +1,7 @@
 import { configure } from '@codegenie/serverless-express';
 
+import '../observability/instrumentation.js';
+
 import { loadApiSecretsToEnvironment } from '../common/utils/index.js';
 import { initFirebaseAdmin } from '../config/firebase.config.js';
 
