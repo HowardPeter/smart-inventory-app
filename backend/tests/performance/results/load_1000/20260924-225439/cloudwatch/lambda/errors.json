@@ -1,0 +1,35 @@
+{
+    "Label": "Errors",
+    "Datapoints": [
+        {
+            "Timestamp": "2026-09-24T22:56:00+07:00",
+            "Sum": 0.0,
+            "Unit": "Count"
+        },
+        {
+            "Timestamp": "2026-09-24T23:00:00+07:00",
+            "Sum": 0.0,
+            "Unit": "Count"
+        },
+        {
+            "Timestamp": "2026-09-24T22:55:00+07:00",
+            "Sum": 669.0,
+            "Unit": "Count"
+        },
+        {
+            "Timestamp": "2026-09-24T22:59:00+07:00",
+            "Sum": 0.0,
+            "Unit": "Count"
+        },
+        {
+            "Timestamp": "2026-09-24T22:58:00+07:00",
+            "Sum": 0.0,
+            "Unit": "Count"
+        },
+        {
+            "Timestamp": "2026-09-24T22:57:00+07:00",
+            "Sum": 0.0,
+            "Unit": "Count"
+        }
+    ]
+}
