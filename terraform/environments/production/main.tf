@@ -101,6 +101,11 @@ module "lambda_api" {
     architectures = ["arm64"]
 
     environment = merge(var.lambda_api_env, {
+      STORAGE_BUCKET = "images"
+
+      CHATBOT_COORDINATOR_MODEL    = "openai/gpt-oss-20b"
+      CHATBOT_FRIENDLY_REPLY_MODEL = "openai/gpt-oss-20b"
+
       FIREBASE_SERVICE_ACCOUNT_PARAMETER  = module.ssm_parameters.parameter_names["firebase_service_account"]
       DATABASE_URL_PARAMETER              = module.ssm_parameters.parameter_names["database_url"]
       SUPABASE_SERVICE_ROLE_KEY_PARAMETER = module.ssm_parameters.parameter_names["supabase_service_role_key"]
@@ -127,6 +132,7 @@ module "lambda_cron" {
     memory        = 512
     timeout       = 120
     architectures = ["arm64"]
+
     environment = merge(var.lambda_noti_env, {
       FIREBASE_SERVICE_ACCOUNT_PARAMETER = module.ssm_parameters.parameter_names["firebase_service_account"]
       DATABASE_URL_PARAMETER             = module.ssm_parameters.parameter_names["database_url"]
@@ -159,28 +165,28 @@ module "sqs_dlq" {
   tags         = var.tags
 }
 
-module "cloudwatch" {
-  source = "../../modules/cloudwatch"
+# module "cloudwatch" {
+#   source = "../../modules/cloudwatch"
 
-  project_name = var.project_name
-  tags         = var.tags
-  region       = var.region
+#   project_name = var.project_name
+#   tags         = var.tags
+#   region       = var.region
 
-  sns_email = var.sns_email
+#   sns_email = var.sns_email
 
-  lambda_function_names = {
-    api_function  = module.lambda_api.function_name
-    cron_function = module.lambda_cron.function_name
-  }
+#   lambda_function_names = {
+#     api_function  = module.lambda_api.function_name
+#     cron_function = module.lambda_cron.function_name
+#   }
 
-  apigw = {
-    api_name  = module.apigw.api_name
-    api_id    = module.apigw.api_id
-    api_stage = module.apigw.stage_name
-  }
+#   apigw = {
+#     api_name  = module.apigw.api_name
+#     api_id    = module.apigw.api_id
+#     api_stage = module.apigw.stage_name
+#   }
 
-  notification_dlq_name = module.sqs_dlq.queue_name
-}
+#   notification_dlq_name = module.sqs_dlq.queue_name
+# }
 
 module "notification_schedule_08h" {
   source = "../../modules/event_bridge"
