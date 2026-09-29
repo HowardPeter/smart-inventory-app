@@ -94,6 +94,8 @@ module "lambda_api" {
 
   lambda_role_arn = module.iam.api_lambda_role_arn
 
+  enable_tracing = true
+
   lambda_function_config = {
     image_uri     = "${module.ecr.repository_urls}:${var.image_tag}"
     memory        = 1024
@@ -101,11 +103,22 @@ module "lambda_api" {
     architectures = ["arm64"]
 
     environment = merge(var.lambda_api_env, {
+      STORAGE_BUCKET = "images"
+
+      CHATBOT_COORDINATOR_MODEL    = "openai/gpt-oss-20b"
+      CHATBOT_FRIENDLY_REPLY_MODEL = "openai/gpt-oss-20b"
+
       FIREBASE_SERVICE_ACCOUNT_PARAMETER  = module.ssm_parameters.parameter_names["firebase_service_account"]
       DATABASE_URL_PARAMETER              = module.ssm_parameters.parameter_names["database_url"]
       SUPABASE_SERVICE_ROLE_KEY_PARAMETER = module.ssm_parameters.parameter_names["supabase_service_role_key"]
       REDIS_URL_PARAMETER                 = module.ssm_parameters.parameter_names["redis_url"]
       GROQ_API_KEY_PARAMETER              = module.ssm_parameters.parameter_names["groq_api_key"]
+
+      AWS_LAMBDA_EXEC_WRAPPER              = "/opt/otel-instrument"
+      OTEL_SERVICE_NAME                    = "storix-api"
+      OTEL_AWS_APPLICATION_SIGNALS_ENABLED = "true"
+      OTEL_TRACES_SAMPLER                  = "traceidratio"
+      OTEL_TRACES_SAMPLER_ARG              = "1.0"
     })
   }
 }
@@ -127,12 +140,14 @@ module "lambda_cron" {
     memory        = 512
     timeout       = 120
     architectures = ["arm64"]
+
     environment = merge(var.lambda_noti_env, {
       FIREBASE_SERVICE_ACCOUNT_PARAMETER = module.ssm_parameters.parameter_names["firebase_service_account"]
       DATABASE_URL_PARAMETER             = module.ssm_parameters.parameter_names["database_url"]
     })
   }
 
+  # Chỉ dành cho cron funtion
   async_invoke_config = {
     maximum_event_age_in_seconds = 3000
     maximum_retry_attempts       = 2
@@ -145,6 +160,9 @@ module "apigw" {
 
   project_name = var.project_name
   tags         = var.tags
+
+  throttling_rate_limit  = 10000
+  throttling_burst_limit = 5000
 
   api_routes = {
     lambda_invoke_arn = module.lambda_api.function_invoke_arn

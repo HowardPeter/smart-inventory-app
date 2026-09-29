@@ -40,6 +40,12 @@ variable "lambda_function_config" {
   })
 }
 
+variable "enable_tracing" {
+  description = "Either Lambda function enable X-ray tracing or not"
+  type        = bool
+  default     = false
+}
+
 variable "image_command" {
   description = "Command to override CMD in Dockerfile when creating function"
   type        = list(string)

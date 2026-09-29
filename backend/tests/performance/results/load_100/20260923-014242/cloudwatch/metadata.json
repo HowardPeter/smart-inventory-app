@@ -1,0 +1,17 @@
+{
+  "region": "ap-southeast-1",
+  "lambdaFunction": "storix-staging-lambda-function-api",
+  "apiId": "qzze2vy50c",
+  "apiStage": "$default",
+  "periodSeconds": 60,
+  "bufferSeconds": 60,
+  "requestedWindow": {
+    "start": "2026-09-22T18:42:42Z",
+    "end": "2026-09-22T18:47:46Z"
+  },
+  "queryWindow": {
+    "start": "2026-09-22T18:41:42Z",
+    "end": "2026-09-22T18:48:46Z"
+  },
+  "collectedAt": "2026-09-22T18:50:40Z"
+}

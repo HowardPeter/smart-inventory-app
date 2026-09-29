@@ -49,6 +49,18 @@ resource "aws_iam_role_policy" "lambda_api_get_ssm_parameters" {
   })
 }
 
+# Quyền ghi X-Ray
+resource "aws_iam_role_policy_attachment" "lambda_xray" {
+  role       = aws_iam_role.lambda_api.name
+  policy_arn = "arn:aws:iam::aws:policy/AWSXrayWriteOnlyAccess"
+}
+
+resource "aws_iam_role_policy_attachment" "lambda_application_signals" {
+  role = aws_iam_role.lambda_api.name
+
+  policy_arn = "arn:aws:iam::aws:policy/CloudWatchLambdaApplicationSignalsExecutionRolePolicy"
+}
+
 # Notification Lambda role
 resource "aws_iam_role" "lambda_cron" {
   name               = "${var.project_name}-notification-lambda-role"

@@ -1,0 +1,35 @@
+{
+    "Label": "ConcurrentExecutions",
+    "Datapoints": [
+        {
+            "Timestamp": "2026-09-23T01:46:00+07:00",
+            "Maximum": 10.0,
+            "Unit": "Count"
+        },
+        {
+            "Timestamp": "2026-09-23T01:45:00+07:00",
+            "Maximum": 7.0,
+            "Unit": "Count"
+        },
+        {
+            "Timestamp": "2026-09-23T01:44:00+07:00",
+            "Maximum": 9.0,
+            "Unit": "Count"
+        },
+        {
+            "Timestamp": "2026-09-23T01:43:00+07:00",
+            "Maximum": 7.0,
+            "Unit": "Count"
+        },
+        {
+            "Timestamp": "2026-09-23T01:47:00+07:00",
+            "Maximum": 9.0,
+            "Unit": "Count"
+        },
+        {
+            "Timestamp": "2026-09-23T01:42:00+07:00",
+            "Maximum": 10.0,
+            "Unit": "Count"
+        }
+    ]
+}

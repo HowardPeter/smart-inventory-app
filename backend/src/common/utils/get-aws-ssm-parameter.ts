@@ -3,23 +3,30 @@ import {
   GetParametersCommand,
   SSMClient,
 } from '@aws-sdk/client-ssm';
+import { StatusCodes } from 'http-status-codes';
+
+import { CustomError } from '../errors/custom-error.js';
 
 const ssmClient = new SSMClient({});
 
-// NOTE: Không cần fireBaseServiceAccountKey vì đã load riêng ở firebase.config.ts
 type ApiSecrets = {
   databaseUrl: string;
   supabaseServiceRoleKey: string;
   redisUrl: string;
   groqApiKey: string;
+  firebaseServiceAccountKey: string;
 };
 
 type CronSecrets = {
   databaseUrl: string;
+  firebaseServiceAccountKey: string;
 };
 
 let cachedApiSecrets: Promise<ApiSecrets> | undefined;
 let cachedCronSecrets: Promise<CronSecrets> | undefined;
+
+// Gọi ở ngoài để store cache và tránh `new Map()` ở các lần gọi sau
+const directParameterCache = new Map<string, Promise<string>>();
 
 // Lấy value của một biến env bắt buộc trong lambda function
 // Vd: DATABASE_URL_PARAMETER=/storix/prod/database-url --> return "/storix/prod/database-url"
@@ -27,9 +34,11 @@ const getRequiredEnvironmentVariable = (name: string): string => {
   const value = process.env[name];
 
   if (!value) {
-    throw new Error(
-      `Required environment variable "${name}" is not configured`,
-    );
+    throw new CustomError({
+      status: StatusCodes.INTERNAL_SERVER_ERROR,
+      message: `Required environment variable "${name}" is not configured`,
+      isOperational: false,
+    });
   }
 
   return value;
@@ -38,19 +47,32 @@ const getRequiredEnvironmentVariable = (name: string): string => {
 const getParameterValues = async (
   parameterNames: string[],
 ): Promise<Map<string, string>> => {
-  const result = await ssmClient.send(
-    new GetParametersCommand({
-      Names: parameterNames,
-      WithDecryption: true,
-    }),
-  );
+  let result;
+
+  try {
+    result = await ssmClient.send(
+      new GetParametersCommand({
+        Names: parameterNames,
+        WithDecryption: true,
+      }),
+    );
+  } catch (error: unknown) {
+    throw new CustomError({
+      status: StatusCodes.INTERNAL_SERVER_ERROR,
+      message: 'Failed to load application secrets',
+      isOperational: false,
+      details: {
+        Error: error,
+      },
+    });
+  }
 
   if (result.InvalidParameters?.length) {
-    throw new Error(
-      `Some required SSM parameters could not be loaded: ${result.InvalidParameters.join(
-        ', ',
-      )}`,
-    );
+    throw new CustomError({
+      status: StatusCodes.INTERNAL_SERVER_ERROR,
+      message: 'Some required application secrets could not be loaded',
+      isOperational: false,
+    });
   }
 
   const parameters = new Map<string, string>();
@@ -71,9 +93,11 @@ const getParameterValue = (
   const parameterValue = parameters.get(parameterName);
 
   if (parameterValue === undefined) {
-    throw new Error(
-      `Required SSM parameter "${parameterName}" was not returned`,
-    );
+    throw new CustomError({
+      status: StatusCodes.INTERNAL_SERVER_ERROR,
+      message: 'Required application secret was not returned by SSM',
+      isOperational: false,
+    });
   }
 
   return parameterValue;
@@ -94,12 +118,16 @@ const loadApiSecrets = async (): Promise<ApiSecrets> => {
   const groqApiKeyParameter = getRequiredEnvironmentVariable(
     'GROQ_API_KEY_PARAMETER',
   );
+  const firebaseServiceAccountKeyParameter = getRequiredEnvironmentVariable(
+    'FIREBASE_SERVICE_ACCOUNT_PARAMETER',
+  );
 
   const parameterNames = [
     databaseUrlParameter,
     supabaseServiceRoleKeyParameter,
     redisUrlParameter,
     groqApiKeyParameter,
+    firebaseServiceAccountKeyParameter,
   ];
 
   const parameters = await getParameterValues(parameterNames);
@@ -112,6 +140,10 @@ const loadApiSecrets = async (): Promise<ApiSecrets> => {
     ),
     redisUrl: getParameterValue(parameters, redisUrlParameter),
     groqApiKey: getParameterValue(parameters, groqApiKeyParameter),
+    firebaseServiceAccountKey: getParameterValue(
+      parameters,
+      firebaseServiceAccountKeyParameter,
+    ),
   };
 };
 
@@ -119,13 +151,23 @@ const loadCronSecrets = async (): Promise<CronSecrets> => {
   const databaseUrlParameter = getRequiredEnvironmentVariable(
     'DATABASE_URL_PARAMETER',
   );
+  const firebaseServiceAccountKeyParameter = getRequiredEnvironmentVariable(
+    'FIREBASE_SERVICE_ACCOUNT_PARAMETER',
+  );
 
-  const parameterNames = [databaseUrlParameter];
+  const parameterNames = [
+    databaseUrlParameter,
+    firebaseServiceAccountKeyParameter,
+  ];
 
   const parameters = await getParameterValues(parameterNames);
 
   return {
     databaseUrl: getParameterValue(parameters, databaseUrlParameter),
+    firebaseServiceAccountKey: getParameterValue(
+      parameters,
+      firebaseServiceAccountKeyParameter,
+    ),
   };
 };
 
@@ -173,20 +215,20 @@ export const loadApiSecretsToEnvironment = async (): Promise<void> => {
   process.env.SUPABASE_SERVICE_ROLE_KEY = secrets.supabaseServiceRoleKey;
   process.env.REDIS_URL = secrets.redisUrl;
   process.env.GROQ_API_KEY = secrets.groqApiKey;
+  process.env.FIREBASE_SERVICE_ACCOUNT_KEY = secrets.firebaseServiceAccountKey;
 };
 
 export const loadCronSecretsToEnvironment = async (): Promise<void> => {
   const secrets = await getCronSecrets();
 
   process.env.DATABASE_URL = secrets.databaseUrl;
+  process.env.FIREBASE_SERVICE_ACCOUNT_KEY = secrets.firebaseServiceAccountKey;
 };
 
 // Lấy trực tiếp value 1 Ssm Parameter và cache
 export const getDirectSsmParameter = (
   parameterName: string,
 ): Promise<string> => {
-  const directParameterCache = new Map<string, Promise<string>>();
-
   const cachedParameter = directParameterCache.get(parameterName);
 
   if (cachedParameter) {
@@ -201,8 +243,12 @@ export const getDirectSsmParameter = (
       }),
     )
     .then((response) => {
-      if (!response.Parameter?.Value) {
-        throw new Error(`SSM parameter "${parameterName}" is empty`);
+      if (response.Parameter?.Value === undefined) {
+        throw new CustomError({
+          status: StatusCodes.INTERNAL_SERVER_ERROR,
+          message: 'Required SSM parameter is empty or unavailable',
+          isOperational: false,
+        });
       }
 
       return response.Parameter.Value;

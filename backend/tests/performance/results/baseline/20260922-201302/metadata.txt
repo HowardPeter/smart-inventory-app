@@ -1,0 +1,10 @@
+scenario=baseline
+protocol=https
+host=qzze2vy50c.execute-api.ap-southeast-1.amazonaws.com
+endpoint=/api/inventories
+users=10
+ramp_up_seconds=30
+duration_seconds=120
+mode=users
+
+timestamp=20260922-201302

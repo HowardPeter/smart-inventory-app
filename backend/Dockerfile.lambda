@@ -9,6 +9,20 @@ RUN npm ci
 
 FROM public.ecr.aws/lambda/nodejs@sha256:2c93ad724a87d51dd14b6e8056c148043f5279a13718793ec236ae1e5e724a35 AS builder
 
+RUN dnf install -y unzip wget
+
+# Download ADOT Lambda layer
+# Docs: https://docs.aws.amazon.com/AmazonCloudWatch/latest/monitoring/CloudWatch-Application-Signals-Enable-LambdaMain.html
+RUN wget \
+    https://github.com/aws-observability/aws-otel-js-instrumentation/releases/download/v0.12.0/layer.zip \
+    -O /tmp/otel-layer.zip
+
+# Extract ADOT vào /opt
+RUN mkdir -p /opt && \
+    unzip /tmp/otel-layer.zip -d /opt/ && \
+    chmod -R 755 /opt/ && \
+    rm /tmp/otel-layer.zip
+
 WORKDIR ${LAMBDA_TASK_ROOT}
 
 COPY --from=deps ${LAMBDA_TASK_ROOT}/node_modules ./node_modules
@@ -23,6 +37,8 @@ RUN npm prune --omit=dev && npm cache clean --force
 
 FROM public.ecr.aws/lambda/nodejs@sha256:2c93ad724a87d51dd14b6e8056c148043f5279a13718793ec236ae1e5e724a35 AS runner
 
+COPY --from=builder /opt /opt
+
 WORKDIR ${LAMBDA_TASK_ROOT}
 
 ENV NODE_ENV=production
@@ -31,6 +47,11 @@ COPY --from=builder ${LAMBDA_TASK_ROOT}/node_modules ./node_modules
 COPY --from=builder ${LAMBDA_TASK_ROOT}/package.json .
 COPY --from=builder ${LAMBDA_TASK_ROOT}/package-lock.json .
 COPY --from=builder ${LAMBDA_TASK_ROOT}/dist ./dist
+
+# Import ssl cert cho supabase ssl enforcement
+# COPY certs/prod-ca-2021.crt ./certs/prod-ca-2021.crt
+
+# ENV NODE_EXTRA_CA_CERTS=${LAMBDA_TASK_ROOT}/certs/prod-ca-2021.crt
 
 # Lambda handler
 CMD ["dist/lambda/api.handler"]

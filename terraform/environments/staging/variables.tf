@@ -21,7 +21,7 @@ variable "tags" {
 variable "image_tag" {
   description = "Image tag cho lamba function"
   type        = string
-  default     = "latest"
+  default     = "51656e6a82fbeaacfbad643e5156f2b7f012ea0e"
 }
 
 variable "sns_email" {

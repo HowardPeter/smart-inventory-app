@@ -1,0 +1,13 @@
+scenario=rps_45
+protocol=https
+host=qzze2vy50c.execute-api.ap-southeast-1.amazonaws.com
+endpoint=/api/inventories
+users=500
+ramp_up_seconds=180
+duration_seconds=300
+mode=rps
+throughput_per_minute=2700
+
+timestamp=20260925-195006
+
+Note: Test trước khi sử dụng hàm getBatchSignedUrl để lấy batch image cho inventoires.service tại backend/src/common/utils/get-signed-url.util.ts

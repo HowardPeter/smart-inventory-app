@@ -3,7 +3,7 @@ set -e
 
 AWS_REGION="${AWS_REGION:-ap-southeast-1}"
 AWS_ACCOUNT_ID="${AWS_ACCOUNT_ID:-430118860011}"
-ECR_REPOSITORY="${ECR_REPOSITORY:-storix-backend}"
+ECR_REPOSITORY="${ECR_REPOSITORY:-storix-staging}"
 IMAGE_TAG="${1:-latest}"
 
 aws ecr get-login-password --region "$AWS_REGION" \

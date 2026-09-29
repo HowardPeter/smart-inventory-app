@@ -1,0 +1,41 @@
+{
+    "Label": "IntegrationLatency",
+    "Datapoints": [
+        {
+            "Timestamp": "2026-09-24T15:28:00+07:00",
+            "Average": 89.2135720233139,
+            "Maximum": 2830.0,
+            "Unit": "Milliseconds"
+        },
+        {
+            "Timestamp": "2026-09-24T15:24:00+07:00",
+            "Average": 438.8591065292096,
+            "Maximum": 4812.0,
+            "Unit": "Milliseconds"
+        },
+        {
+            "Timestamp": "2026-09-24T15:27:00+07:00",
+            "Average": 306.8589278516727,
+            "Maximum": 30001.0,
+            "Unit": "Milliseconds"
+        },
+        {
+            "Timestamp": "2026-09-24T15:26:00+07:00",
+            "Average": 217.0925127401019,
+            "Maximum": 1454.0,
+            "Unit": "Milliseconds"
+        },
+        {
+            "Timestamp": "2026-09-24T15:29:00+07:00",
+            "Average": 21.39291217257319,
+            "Maximum": 949.0,
+            "Unit": "Milliseconds"
+        },
+        {
+            "Timestamp": "2026-09-24T15:25:00+07:00",
+            "Average": 233.55699177438308,
+            "Maximum": 1654.0,
+            "Unit": "Milliseconds"
+        }
+    ]
+}

@@ -1,0 +1,11 @@
+scenario=rps_40
+protocol=https
+host=qzze2vy50c.execute-api.ap-southeast-1.amazonaws.com
+endpoint=/api/inventories
+users=500
+ramp_up_seconds=180
+duration_seconds=300
+mode=rps
+throughput_per_minute=2400
+
+timestamp=20260924-162054
