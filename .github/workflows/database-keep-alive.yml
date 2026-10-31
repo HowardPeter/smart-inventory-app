@@ -17,3 +17,8 @@ jobs:
           curl -sS \
             -H "apikey: ${{ secrets.SUPABASE_PUBLISHABLE_KEY }}" \
             "${{ secrets.SUPABASE_URL }}/rest/v1/rpc/keep_alive"
+
+      - name: Ping Upstash Redis
+        run: |
+          curl -sS "${{ secrets.UPSTASH_REDIS_REST_URL }}/set/keepalive/alive" \
+            -H "Authorization: Bearer ${{ secrets.UPSTASH_REDIS_REST_TOKEN }}"
